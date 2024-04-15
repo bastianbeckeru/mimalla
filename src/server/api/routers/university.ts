@@ -63,6 +63,11 @@ export const universityRouter = createTRPCRouter({
             },
           },
         },
+        NOT: {
+          name: {
+            contains: "Psicología",
+          },
+        },
       },
     });
   }),

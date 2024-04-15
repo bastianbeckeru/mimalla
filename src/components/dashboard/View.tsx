@@ -193,7 +193,7 @@ export default function View() {
               </form>
             </Form>
 
-            <p className="px-8 text-center text-sm text-muted-foreground">
+            <p className="px-4 text-center text-sm text-muted-foreground">
               ¿No encuentras tu carrera?{" "}
               <a
                 aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
