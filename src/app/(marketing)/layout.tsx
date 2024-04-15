@@ -1,20 +1,15 @@
 import type { PropsWithChildren } from "react";
 import { getServerAuthSession } from "@/server/auth";
-import { Montserrat } from "next/font/google";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 
-const mont = Montserrat({
-  subsets: ["latin"],
-});
-
 export default async function MarketingLayout({ children }: PropsWithChildren) {
   return (
     // DELETE THIS DIV AT THE FUTURE
-    <div className={`flex h-screen flex-col font-sans ${mont.className}`}>
+    <div className="flex h-screen flex-col">
       <Navbar />
-      <main className={`flex flex-1 items-center justify-center scroll-smooth`}>
+      <main className="flex flex-1 items-center justify-center scroll-smooth">
         {children}
       </main>
       <Footer />
