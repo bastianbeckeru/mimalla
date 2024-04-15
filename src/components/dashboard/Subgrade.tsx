@@ -98,8 +98,8 @@ export default function Subgrade({ enrollmentId, gradeId, subgrade }: Props) {
               <DropdownMenuGroup>
                 <Button
                   aria-label="Remover nota anidada"
-                  variant="ghost-destructive"
-                  size="item"
+                  variant="destructiveGhost"
+                  size="icon"
                   onClick={() =>
                     removeGrade(enrollmentId, {
                       id: subgrade.id,

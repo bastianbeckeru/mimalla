@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Kanban, SquareKanban } from "lucide-react";
+import { Kanban } from "lucide-react";
 
 //import { useSession } from "next-auth/react";
 
 export default function Navbar() {
   //const { data: session } = useSession();
-  /*   const career = useCurriculumStore((state) => state?.curriculum?.career); */
 
   return (
     <header className="container z-40">

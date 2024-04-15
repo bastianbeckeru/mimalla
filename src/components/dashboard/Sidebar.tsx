@@ -24,13 +24,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
 
 export default function Sidebar() {
   const { reset, areas } = useCurriculumStore();
   const { setEditMode } = useSettingsStore();
-  const [isActive, setIsActive] = useState(false);
-
-  const { mutate } = api.user.deleteCurriculum.useMutation();
 
   return (
     <aside className="hidden border-r bg-muted/20 md:block">
@@ -41,8 +40,17 @@ export default function Sidebar() {
             <span className="">Mi Malla</span>
           </Link>
         </div>
+        {/* SIDEBAR CONTENT */}
         <div className="flex-1">
-          <div className="grid items-start px-2 text-sm font-medium lg:px-4">
+          <div className="grid items-start gap-2 p-2 text-sm font-medium lg:px-4">
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="edit-mode">Modo edición</Label>
+              <Switch
+                id="edit-mode"
+                onCheckedChange={(checked: boolean) => setEditMode(checked)}
+              />
+            </div>
+
             {areas.length > 0 && (
               <div className="flex flex-col space-y-2 py-2">
                 <h2 className="font-semibold">Áreas de Formación</h2>
@@ -91,10 +99,6 @@ export default function Sidebar() {
                   onClick={() => {
                     reset();
                     setEditMode(false);
-
-                    if (true) {
-                      mutate();
-                    }
                   }}
                 >
                   Aceptar
@@ -103,6 +107,7 @@ export default function Sidebar() {
             </DialogContent>
           </Dialog>
         </div>
+        {/* SIDEBAR CONTENT ENDS */}
       </div>
     </aside>
   );

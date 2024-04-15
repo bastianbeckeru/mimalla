@@ -13,10 +13,10 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Malla",
+  title: "Mi Malla",
   description: "Personaliza tu malla y visualiza tu progreso.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords: ["Malla Interactiva", "Universidad"],
+  keywords: ["Malla Interactiva", "Universidad", "Herramienta Universitaria"],
   creator: "Jnkyns",
   authors: [{ name: "Jnkyns", url: "" }],
 };

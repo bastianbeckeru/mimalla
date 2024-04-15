@@ -500,18 +500,11 @@ type useSettingsStoreProps = {
   setEditMode: (newState?: boolean) => void;
 };
 
-export const useSettingsStore = create(
-  persist<useSettingsStoreProps>(
-    (set) => ({
-      editMode: true,
-      setEditMode: (newState) =>
-        set((state) => ({ ...state, editMode: newState ?? !state.editMode })),
-    }),
-    {
-      name: "settings",
-    },
-  ),
-);
+export const useSettingsStore = create<useSettingsStoreProps>((set) => ({
+  editMode: false,
+  setEditMode: (newState) =>
+    set((state) => ({ ...state, editMode: newState ?? !state.editMode })),
+}));
 
 /* TYPES */
 type useCurriculumProps = {

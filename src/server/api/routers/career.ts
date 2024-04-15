@@ -89,6 +89,14 @@ export const careerRouter = createTRPCRouter({
       });
 
       const areas = await ctx.db.area.findMany({
+        orderBy: [
+          {
+            name: "asc",
+          },
+          {
+            color: "asc",
+          },
+        ],
         where: {
           faculty: {
             careers: {

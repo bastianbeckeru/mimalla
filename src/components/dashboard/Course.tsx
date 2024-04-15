@@ -8,7 +8,6 @@ import type { EnrollmentProps } from "@/types/user";
 import { Draggable } from "react-beautiful-dnd";
 import CourseModal from "./CourseModal";
 import { Checkbox } from "../ui/checkbox";
-import { X } from "lucide-react";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
 import { cn } from "@/lib/utils";
 import { getContrastRatio } from "@/utils/colorFunctions";
@@ -28,13 +27,18 @@ export default function Course({ variants, index, enrollment }: Props) {
   const available = enrollment.course?.prerequisiteCourses.every((course) =>
     course.code ? approvedCourses.includes(course.code) : true,
   );
+  const lowContrast = getContrastRatio(enrollment.course?.color) < 1.9;
+
+  /*
+   * isDragDisabled={!editMode}
+   */
 
   return (
     <>
       <Draggable
         index={index}
         draggableId={enrollment.id.toString()}
-        isDragDisabled={!editMode}
+        isDragDisabled={false}
       >
         {(provided) => (
           <div
@@ -47,8 +51,8 @@ export default function Course({ variants, index, enrollment }: Props) {
             <MotionLi
               variants={variants}
               className={cn(
-                "relative mb-2 flex h-20 select-none items-center justify-start rounded-2xl bg-red-500 p-2 shadow-md xl:h-[5.5rem]",
-                editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
+                "relative mb-2 flex h-20 select-none items-center justify-start rounded-2xl bg-slate-100 p-2 shadow-md xl:h-[5.5rem]",
+                false ? "hover:cursor-grab" : "hover:cursor-pointer",
                 available
                   ? "brightness-100 hover:brightness-[0.98]"
                   : "brightness-[0.80] hover:brightness-[0.78]",
@@ -59,9 +63,7 @@ export default function Course({ variants, index, enrollment }: Props) {
                 className={cn(
                   "flex h-full items-center justify-center text-pretty text-center text-xs font-normal xl:text-sm",
                   editMode ? "w-10/12" : "w-full",
-                  getContrastRatio(enrollment.course?.color) < 1.5
-                    ? "text-background"
-                    : "text-foreground",
+                  lowContrast ? "text-background" : "text-foreground",
                 )}
               >
                 {enrollment.course?.name ?? `Curso ${index + 1}`}

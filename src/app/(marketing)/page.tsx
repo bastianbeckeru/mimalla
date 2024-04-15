@@ -31,7 +31,8 @@ export default function IndexPage() {
             Personalízala a tu pinta y lleva el registro de tu progreso.
             Simplifica tu vida universitaria.
           </p>
-          <div className="mt-2 flex flex-col items-center justify-center space-y-2 md:mt-0 md:flex-row md:space-x-4">
+
+          <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-0 md:flex-row md:space-x-4">
             <Link
               href="/dashboard"
               className={cn(
@@ -50,7 +51,8 @@ export default function IndexPage() {
           </div>
         </div>
       </section>
-      <section
+
+      {/*       <section
         id="features"
         className="container space-y-16 py-8 md:py-12 lg:py-24"
       >
@@ -134,7 +136,7 @@ export default function IndexPage() {
             Probar Gratis
           </Link>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

@@ -31,15 +31,7 @@ import { ChevronLeftIcon, Kanban, Loader2, Menu } from "lucide-react";
 import { toast } from "../ui/use-toast";
 import Sidebar from "./Sidebar";
 import Link from "next/link";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
-import { Progress } from "../ui/progress";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 const formSchema = z.object({
@@ -83,6 +75,7 @@ export default function View() {
     ) {
       setData(getCareerCurriculum.data);
       setIsCreating(false);
+      form.reset();
 
       toast({
         description: (
@@ -96,7 +89,7 @@ export default function View() {
         ),
       });
     }
-  }, [getCareerCurriculum, curriculum, setData]);
+  }, [getCareerCurriculum, curriculum, setData, form]);
 
   /* Loader or Skeleton */
   if (getCareerCurriculum.isLoading || isLoading) {
@@ -176,6 +169,7 @@ export default function View() {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -205,7 +199,7 @@ export default function View() {
                 aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
                 target="_blank"
                 rel="noreferrer"
-                href="google-form-link-here"
+                href="#google-form-link-here"
                 className="hover:text-brand underline underline-offset-4"
               >
                 Haz clic aquí
@@ -261,8 +255,8 @@ export default function View() {
       )}
     </>
   );
-  /* flex w-full flex-1 flex-col gap-4 overflow-auto */
-  function onSubmit(values: z.infer<typeof formSchema>) {
+
+  function onSubmit() {
     setIsCreating(true);
     void getCareerCurriculum.refetch();
   }
