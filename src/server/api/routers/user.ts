@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
-  getCurriculum: protectedProcedure.query(async ({ ctx }) => {
+  /*   getCurriculum: protectedProcedure.query(async ({ ctx }) => {
     const curriculum = await ctx.db.curriculum.findFirstOrThrow({
       where: { studentId: ctx.session.user.id },
       select: {
@@ -202,5 +202,5 @@ export const userRouter = createTRPCRouter({
     });
 
     return true;
-  }),
+  }), */
 });
