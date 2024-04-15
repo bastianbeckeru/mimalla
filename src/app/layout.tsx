@@ -1,11 +1,12 @@
 import "@/styles/globals.css";
-
 import { Montserrat } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { ThemeProvider } from "../components/ThemeProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const mont = Montserrat({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
           >
             {children}
             <SpeedInsights />
+            <Analytics />
             <Toaster />
           </ThemeProvider>
         </TRPCReactProvider>
