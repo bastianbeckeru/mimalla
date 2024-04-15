@@ -35,11 +35,11 @@ export default function Period({
       <MotionLi
         variants={variants}
         className={`
-    } w-[8.5rem] shrink-0 overflow-hidden pb-4`}
+    } w-[8.5rem] shrink-0 pb-4`}
       >
         <div className="mx-1 flex select-none flex-col">
           <div className="z-10 flex items-center justify-center">
-            <span className="-mb-[0.375rem] flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 font-bold dark:bg-zinc-800">
+            <span className="-mb-[0.375rem] flex size-6 items-center justify-center rounded-full bg-slate-100 font-bold dark:bg-zinc-800">
               {index + 1}
             </span>
           </div>
@@ -57,7 +57,7 @@ export default function Period({
             <ul
               {...provided.droppableProps}
               ref={provided.innerRef}
-              className="flex h-min w-full flex-col px-1 py-2"
+              className="flex h-min w-full flex-col overflow-hidden px-1 py-2"
             >
               {children}
               {provided.placeholder}

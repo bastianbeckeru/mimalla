@@ -39,6 +39,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { Progress } from "../ui/progress";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 const formSchema = z.object({
   siesCode: z.string({
@@ -215,8 +217,8 @@ export default function View() {
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
           <Sidebar />
 
-          <div className="flex flex-col">
-            <header className="flex h-14 items-center gap-4 border-b bg-muted/20 px-4 lg:h-16 lg:justify-center lg:px-6">
+          <div className="flex h-full flex-col overflow-hidden">
+            <header className="flex h-14 items-center gap-4 border-b bg-muted/20 px-4 md:justify-center lg:h-16 lg:px-6">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
@@ -250,15 +252,16 @@ export default function View() {
                 </p>
               </div>
             </header>
-            <main className="flex flex-1 flex-col gap-4 bg-[#FF69B4]/20 p-4 dark:bg-[#FF69B4]/10">
+            <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">
               <Curriculum curriculum={curriculum} />
-            </main>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
         </div>
       )}
     </>
   );
-
+  /* flex w-full flex-1 flex-col gap-4 overflow-auto */
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsCreating(true);
     void getCareerCurriculum.refetch();

@@ -42,17 +42,11 @@ export default function Curriculum({ curriculum }: Props) {
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <button
-        onClick={() => console.log(useCurriculumStore.getState().taskQueue)}
-        className="hidden"
-      >
-        TaskQueue ConsoleLog
-      </button>
       <MotionOl
         variants={variants}
         initial="hidden"
         animate="visible"
-        className="mb-4 flex size-fit p-4"
+        className="flex p-4"
       >
         {curriculum.periods.map((period, pIndex) => {
           return (
