@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# [Mi Malla](https://mimalla.vercel.app)
 
-## Getting Started
+Web application for university students. Derived from a past project, UniCore.
 
-First, run the development server:
+# Tecnologies and Dependencies
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- [T3 Stack](https://create.t3.gg/)
+
+  - [Next.js](https://nextjs.org)
+  - [NextAuth.js](https://next-auth.js.org)
+  - [Prisma](https://prisma.io)
+  - [tRPC](https://trpc.io)
+  - [Tailwind CSS](https://tailwindcss.com)
+
+- [shadcn UI](https://ui.shadcn.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [React Beautiful DnD](https://github.com/atlassian/react-beautiful-dnd)
+
+# Git Commits Messages Style and Versioning
+
+## [Versioning](https://semver.org/)
+
+```
+MAJOR.MINOR.PATCH
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `release:` Publish to production (equivalent to a MAJOR).
+- `feat:` Add a new feature (equivalent to a MINOR).
+- `fix:` Fix a bug (equivalent to a PATCH).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Don't forget to change the version of `package-lock.json` and `package.json`
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## [Git Commits Messages Style](https://gist.github.com/rishavpandey43/84665ffe3cea76400d8e5a1ad7133a79)
 
-## Learn More
+```
+[:<Emoji>: ][<Type>[(<Scope>)]: ]<Subject>
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Common Commits
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+git commit -m ":confetti_ball: release:"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
+git commit -m ":star: feat:"
+```
 
-## Deploy on Vercel
+```
+git commit -m ":bug: fix:"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+git commit -m ":rotating_light: refactor:"
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
+git commit -m ":lipstick: style:"
+```
+
+```
+git commit -m ":chart_with_upwards_trend: perf:"
+```
+
+```
+git commit -m ":wrench: chore:"
+```
+
+```
+git commit -m ":pencil: docs:"
+```
+
+# Proyect Structure
+
+## Prisma
+
+## App
+
+## Components
+
+## Server
+
+## Stores
