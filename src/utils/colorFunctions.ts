@@ -13,7 +13,7 @@ function hexToRgb(hex: string) {
 }
 
 // Function to calculate luminance from RGB values
-function getLuminance(color) {
+function getLuminance(color: number[]) {
   const rgb = color.map((value) => {
     value /= 255; // Convert RGB value to the range 0-1
     return value <= 0.03928
@@ -22,7 +22,9 @@ function getLuminance(color) {
   });
 
   // Calculate luminance using relative luminance formula
-  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+  return (
+    0.2126 * (rgb[0] ?? 0) + 0.7152 * (rgb[1] ?? 0) + 0.0722 * (rgb[2] ?? 0)
+  );
 }
 
 // Function to calculate contrast ratio between two colors
