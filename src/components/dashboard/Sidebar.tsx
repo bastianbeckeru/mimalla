@@ -1,0 +1,109 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
+import { ChevronRight, Kanban, Trash2 } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button, buttonVariants } from "../ui/button";
+import { api } from "@/trpc/react";
+import Link from "next/link";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
+
+export default function Sidebar() {
+  const { reset, areas } = useCurriculumStore();
+  const { setEditMode } = useSettingsStore();
+  const [isActive, setIsActive] = useState(false);
+
+  const { mutate } = api.user.deleteCurriculum.useMutation();
+
+  return (
+    <aside className="hidden border-r bg-muted/20 md:block">
+      <div className="flex h-full max-h-screen flex-col gap-2">
+        <div className="flex h-14 items-center border-b px-4 lg:h-16 lg:px-6">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <Kanban className="size-6" />
+            <span className="">Mi Malla</span>
+          </Link>
+        </div>
+        <div className="flex-1">
+          <div className="grid items-start px-2 text-sm font-medium lg:px-4">
+            {areas.length > 0 && (
+              <div className="flex flex-col space-y-2 py-2">
+                <h2 className="font-semibold">Áreas de Formación</h2>
+                <ul className="space-y-1">
+                  {areas.map((area, aIndex) => {
+                    return (
+                      <li
+                        key={aIndex}
+                        className="flex h-8 w-full flex-row items-center justify-between space-x-2 rounded-lg border border-input px-2 font-normal"
+                      >
+                        <p className="line-clamp-1">{area.name}</p>
+                        <div
+                          className="size-4 shrink-0 rounded-sm border border-black/10"
+                          style={{
+                            backgroundColor: area.color ?? undefined,
+                          }}
+                        ></div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mt-auto p-4">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="destructiveOutline" className="w-full gap-2">
+                <Trash2 className="size-4" />
+                Eliminar Malla
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirmar eliminación</DialogTitle>
+              </DialogHeader>
+              <DialogDescription>
+                ¿Seguro que deseas eliminar tu malla curricular? Esta acción es
+                irreversible y todos los datos se borrarán.
+              </DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant="destructive"
+                  type="submit"
+                  onClick={() => {
+                    reset();
+                    setEditMode(false);
+
+                    if (true) {
+                      mutate();
+                    }
+                  }}
+                >
+                  Aceptar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    </aside>
+  );
+}

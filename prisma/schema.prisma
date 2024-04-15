@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? // @db.Text
+    access_token      String? // @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? // @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+enum Role {
+    USER
+    STUDENT
+    PROFESSOR
+}
+
+enum Status {
+    PASSED
+    PENDING
+    FAILED
+}
+
+model User {
+    id            String      @id @default(cuid())
+    name          String?
+    email         String?     @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    //
+    role          Role        @default(STUDENT)
+    joinedAt      DateTime    @default(now())
+    curriculum    Curriculum?
+}
+
+model University {
+    rut       String    @id
+    name      String
+    acronym   String?
+    faculties Faculty[]
+}
+
+model Faculty {
+    id           Int        @id @default(autoincrement())
+    name         String
+    acronym      String?
+    areas        Area[]
+    careers      Career[]
+    //
+    university   University @relation(fields: [universityId], references: [rut], onDelete: Cascade)
+    universityId String
+
+    @@index([universityId])
+}
+
+model Career {
+    siesCode   String       @id
+    demreCode  Int
+    name       String
+    courses    Course[]
+    curriculum Curriculum[]
+    //
+    faculty    Faculty      @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+    facultyId  Int
+
+    //@@id([siesCode, demreCode])
+    @@index([facultyId])
+}
+
+model Area {
+    id        Int      @id @default(autoincrement())
+    name      String
+    color     String? // #FFFFFF
+    courses   Course[]
+    //
+    faculty   Faculty  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+    facultyId Int
+
+    @@index([facultyId])
+}
+
+model Curriculum {
+    id        Int      @id @default(autoincrement())
+    startedAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+    //modality  String           @default(SEMESTRAL) // Trimestral, Semestral, Anual
+    periods   Period[]
+    //
+    career    Career?  @relation(fields: [careerId], references: [siesCode])
+    careerId  String?
+    student   User?    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    studentId String?  @unique
+
+    @@unique([careerId, studentId])
+    @@index([careerId])
+    @@index([studentId])
+}
+
+model Period {
+    id           Int          @id @default(autoincrement())
+    position     Int
+    date         DateTime?
+    enrollments  Enrollment[]
+    //
+    curriculum   Curriculum   @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+    curriculumId Int
+
+    @@unique([position, curriculumId])
+    @@index([curriculumId])
+}
+
+model Enrollment {
+    id       Int     @id @default(autoincrement())
+    mutable  Boolean @default(false)
+    position Int
+    status   Status  @default(PENDING)
+    grades   Grade[]
+    //
+    period   Period  @relation(fields: [periodId], references: [id], onDelete: Cascade)
+    periodId Int
+    course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    courseId String?
+
+    //@@unique([periodId, courseId])
+    @@unique([position, periodId])
+    @@index([periodId])
+    @@index([courseId])
+}
+
+model Course {
+    id                  String       @id @default(cuid())
+    code                String?
+    name                String
+    credits             Int          @default(0)
+    //description         String?
+    dependentCourses    Course[]     @relation("RequiredCourses")
+    prerequisiteCourses Course[]     @relation("RequiredCourses")
+    //requiredCredits     Int          @default(0)
+    //
+    enrollments         Enrollment[]
+    areas               Area[]
+    career              Career?      @relation(fields: [careerId], references: [siesCode], onDelete: Cascade)
+    careerId            String?
+
+    @@index([careerId])
+}
+
+model Grade {
+    id            Int         @id @default(autoincrement())
+    name          String
+    value         Float?
+    weight        Int?
+    date          DateTime?
+    excluded      Boolean     @default(false)
+    subgrades     Grade[]     @relation("Subgrades")
+    //
+    enrollment    Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+    enrollmentId  Int?
+    parentGrade   Grade?      @relation("Subgrades", fields: [parentGradeId], references: [id], onDelete: Cascade)
+    parentGradeId Int?
+
+    @@index([enrollmentId])
+    @@index([parentGradeId])
+}
