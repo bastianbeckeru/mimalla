@@ -1,6 +1,6 @@
 import type { AreaProps, CurriculumProps, PeriodProps } from "@/types/user";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+//import { persist } from "zustand/middleware";
 import { customAlphabet, nanoid } from "nanoid";
 import { subgradeAverage } from "@/utils/curriculumFunctions";
 
@@ -35,7 +35,7 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                 credits: enrollment.course.credits,
                 dependentCourses: enrollment.course.dependentCourses,
                 prerequisiteCourses: enrollment.course.prerequisiteCourses,
-                requiredCredits: enrollment.course.requiredCredits,
+                //requiredCredits: enrollment.course.requiredCredits,
                 color: undefined,
               },
             };
@@ -56,7 +56,7 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                     name: course.name,
                     code: course.code,
                     credits: course.credits,
-                    requiredCredits: course.requiredCredits,
+                    //requiredCredits: course.requiredCredits,
                     dependentCourses: course.dependentCourses,
                     prerequisiteCourses: course.prerequisiteCourses,
                     color: area.color ?? undefined,
@@ -113,8 +113,9 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                   name: course.name,
                   code: course.code,
                   credits: course.credits,
-                  requiredCredits: course.requiredCredits,
-                  requiredCourses: course.requiredCourses,
+                  //requiredCredits: course.requiredCredits,
+                  dependentCourses: course.dependentCourses,
+                  prerequisiteCourses: course.prerequisiteCourses,
                   color: area.color ?? undefined,
                 },
               };
@@ -150,7 +151,7 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
       const { curriculum, approvedCourses } = state;
       const updatedApprovedCourses = [...approvedCourses];
 
-      let depCourses: { code: string }[] = [];
+      let depCourses: { code: string | null }[] = [];
 
       const updatedPeriods = curriculum.periods.map((period) => {
         if (!period.enrollments) return period;
@@ -160,7 +161,7 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
 
           enrollment.position = updatedEnrollment.position;
           enrollment.status = updatedEnrollment.status;
-          depCourses = updatedEnrollment.dependentCourses || [];
+          depCourses = updatedEnrollment.dependentCourses ?? [];
 
           return enrollment;
         });
@@ -597,7 +598,7 @@ function updateEnrollmentStatusCascade(
 
     updatedPeriods.forEach((period) => {
       const updatedEnrollments = period.enrollments.map((enrollment) => {
-        if (!enrollment.course || !enrollment.course.code) return enrollment;
+        if (!enrollment?.course?.code) return enrollment;
 
         if (
           enrollment.course.code === currentCourseCode &&

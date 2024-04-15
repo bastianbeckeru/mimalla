@@ -42,7 +42,7 @@ export type CourseProps = {
   name: string;
   code: string | null;
   credits: number;
-  requiredCredits: number;
+  //requiredCredits: number;
   dependentCourses: {
     code: string | null;
   }[];
