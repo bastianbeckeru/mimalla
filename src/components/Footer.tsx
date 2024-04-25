@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 /* import ModeToggle from "./ModeToggle"; */
 
-import { GraduationCap, InstagramIcon } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import DiscordIcon from "./icons/DiscordIcon";
 
 export default function Footer({
@@ -26,26 +26,15 @@ export default function Footer({
         </div>
 
         <div className="flex flex-row items-center gap-4">
-          <div className="flex flex-row gap-2">
-            <a
-              aria-label="Discord"
-              target="_blank"
-              rel="noreferrer"
-              href="https://discord.gg/wez3cJDzXk"
-              className="flex items-center justify-center"
-            >
-              <DiscordIcon className="size-5 transition-colors hover:text-muted-foreground" />
-            </a>
-            <a
-              aria-label="Instagram"
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.instagram.com/unicore.app/"
-              className="flex items-center justify-center"
-            >
-              <InstagramIcon className="size-5 transition-colors hover:text-muted-foreground" />
-            </a>
-          </div>
+          <a
+            aria-label="Discord"
+            target="_blank"
+            rel="noreferrer"
+            href="https://discord.gg/wez3cJDzXk"
+            className="flex items-center justify-center"
+          >
+            <DiscordIcon className="size-5 transition-colors hover:text-muted-foreground" />
+          </a>
           {/* <ModeToggle /> */}
         </div>
       </div>

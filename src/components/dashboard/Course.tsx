@@ -73,7 +73,7 @@ export default function Course({ variants, index, enrollment }: Props) {
                 tabIndex={-1}
                 aria-label="Marcar curso como aprobado"
                 className={cn(
-                  "absolute bottom-2 right-2 rounded-full border-black bg-black/5 shadow-inner transition-colors hover:bg-black/10 focus:border",
+                  "absolute bottom-2 right-2 rounded-full border-black/40 bg-black/5 shadow-inner transition-colors hover:bg-black/10 focus:border",
                   editMode ? "flex" : "hidden",
                 )}
                 disabled={!available}
