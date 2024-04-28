@@ -28,18 +28,25 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 
 export default function Sidebar() {
-  const { reset, areas } = useCurriculumStore();
+  const totalCourses =
+    useCurriculumStore().curriculum?.periods.reduce(
+      (total, period) => total + period.enrollments.length,
+      0,
+    ) ?? 0;
+  const { areas, reset, progress } = useCurriculumStore();
   const { setEditMode } = useSettingsStore();
 
   return (
     <aside className="hidden border-r bg-muted/20 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 lg:h-16 lg:px-6">
+        {/* LOGO */}
+        <div className="flex h-14 items-center justify-start border-b px-4 lg:h-16">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <Kanban className="size-6" />
             <span className="">Mi Malla</span>
           </Link>
         </div>
+
         {/* SIDEBAR CONTENT */}
         <div className="flex-1">
           <div className="grid items-start gap-2 p-2 text-sm font-medium lg:px-4">
@@ -50,7 +57,18 @@ export default function Sidebar() {
                 onCheckedChange={(checked: boolean) => setEditMode(checked)}
               />
             </div>
-
+            {/* PROGRESS */}
+            <div>
+              <p>
+                Progreso:{" "}
+                {(
+                  (progress.approvedCourses.length / totalCourses) *
+                  100
+                ).toFixed(2)}
+                %
+              </p>
+              <p>Créditos: {progress.earnedCredits}</p>
+            </div>
             {areas.length > 0 && (
               <div className="flex flex-col space-y-2 py-2">
                 <h2 className="font-semibold">Áreas de Formación</h2>

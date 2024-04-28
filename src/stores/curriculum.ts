@@ -4,13 +4,14 @@ import { create } from "zustand";
 import { customAlphabet, nanoid } from "nanoid";
 import { subgradeAverage } from "@/utils/curriculumFunctions";
 
-/* CURRICULUM STORE */
-
 const initialState: StateProps = {
-  curriculum: undefined,
   areas: [],
+  curriculum: undefined,
+  progress: {
+    approvedCourses: [],
+    earnedCredits: 0,
+  },
   taskQueue: [],
-  approvedCourses: [],
 };
 
 export const useCurriculumStore = create<useCurriculumProps>((set) => ({
@@ -35,7 +36,7 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                 credits: enrollment.course.credits,
                 dependentCourses: enrollment.course.dependentCourses,
                 prerequisiteCourses: enrollment.course.prerequisiteCourses,
-                //requiredCredits: enrollment.course.requiredCredits,
+                prerequisiteCredits: enrollment.course.prerequisiteCredits,
                 color: undefined,
               },
             };
@@ -56,9 +57,9 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                     name: course.name,
                     code: course.code,
                     credits: course.credits,
-                    //requiredCredits: course.requiredCredits,
                     dependentCourses: course.dependentCourses,
                     prerequisiteCourses: course.prerequisiteCourses,
+                    prerequisiteCredits: course.prerequisiteCredits,
                     color: area.color ?? undefined,
                   },
                 };
@@ -113,9 +114,9 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
                   name: course.name,
                   code: course.code,
                   credits: course.credits,
-                  //requiredCredits: course.requiredCredits,
                   dependentCourses: course.dependentCourses,
                   prerequisiteCourses: course.prerequisiteCourses,
+                  prerequisiteCredits: course.prerequisiteCredits,
                   color: area.color ?? undefined,
                 },
               };
@@ -148,12 +149,12 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
     set((state) => {
       if (!state.curriculum?.periods || !updatedEnrollment) return state;
 
-      const { curriculum, approvedCourses } = state;
-      const updatedApprovedCourses = [...approvedCourses];
+      const { curriculum, progress } = state;
+      let updatedApprovedCourses = [...progress.approvedCourses];
+      let updatedEarnedCredits = progress.earnedCredits;
 
-      let depCourses: { code: string | null }[] = [];
-
-      const updatedPeriods = curriculum.periods.map((period) => {
+      // Update enrollment status and position
+      let updatedPeriods = curriculum.periods.map((period) => {
         if (!period.enrollments) return period;
 
         const updatedEnrollments = period.enrollments.map((enrollment) => {
@@ -161,38 +162,36 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
 
           enrollment.position = updatedEnrollment.position;
           enrollment.status = updatedEnrollment.status;
-          depCourses = updatedEnrollment.dependentCourses ?? [];
 
           return enrollment;
         });
         return { ...period, enrollments: updatedEnrollments };
       });
 
-      if (updatedEnrollment.courseCode) {
+      // Update the progress
+      if (updatedEnrollment.course.code) {
         if (
-          updatedEnrollment.courseCode == "PENDING" ||
-          approvedCourses.includes(updatedEnrollment.courseCode)
+          updatedEnrollment.status === "PENDING" &&
+          progress.approvedCourses.includes(updatedEnrollment.course.code)
         ) {
-          console.log("REMOVING");
           updatedApprovedCourses.splice(
-            updatedApprovedCourses.indexOf(updatedEnrollment.courseCode),
+            updatedApprovedCourses.indexOf(updatedEnrollment.course.code),
             1,
           );
-        } else {
-          console.log("ADDING");
+          updatedEarnedCredits -= updatedEnrollment.course.credits;
 
-          updatedApprovedCourses.push(updatedEnrollment.courseCode);
+          ({ updatedPeriods, updatedApprovedCourses, updatedEarnedCredits } =
+            updateEnrollmentStatusCascade(
+              updatedPeriods,
+              updatedApprovedCourses,
+              updatedEarnedCredits,
+              updatedEnrollment.course.dependentCourses ?? [],
+            ));
+        } else {
+          updatedApprovedCourses.push(updatedEnrollment.course.code);
+          updatedEarnedCredits += updatedEnrollment.course.credits;
         }
       }
-
-      if (updatedEnrollment.status === "PENDING") {
-        updateEnrollmentStatusCascade(
-          updatedPeriods,
-          updatedApprovedCourses,
-          depCourses,
-        );
-      }
-      console.log(updatedApprovedCourses);
 
       return {
         ...state,
@@ -200,7 +199,10 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
           ...curriculum,
           periods: updatedPeriods,
         },
-        approvedCourses: updatedApprovedCourses,
+        progress: {
+          approvedCourses: updatedApprovedCourses,
+          earnedCredits: updatedEarnedCredits,
+        },
       };
     }),
 
@@ -522,10 +524,13 @@ type useCurriculumProps = {
     id: number;
     position: number;
     status: string;
-    courseCode?: string | null;
-    dependentCourses?: {
-      code: string | null;
-    }[];
+    course: {
+      code?: string | null;
+      credits: number;
+      dependentCourses?: {
+        code: string | null;
+      }[];
+    };
   }) => void;
 
   /* GRADES */
@@ -559,7 +564,10 @@ type StateProps = {
   curriculum: CurriculumProps | undefined;
   areas: AreaProps[];
   taskQueue: TaskProps[];
-  approvedCourses: string[];
+  progress: {
+    approvedCourses: string[];
+    earnedCredits: number;
+  };
 };
 
 export type TaskProps = {
@@ -591,6 +599,7 @@ export type TaskProps = {
 function updateEnrollmentStatusCascade(
   updatedPeriods: PeriodProps[],
   updatedApprovedCourses: string[],
+  updatedEarnedCredits: number,
   dependentCourses: { code: string | null }[],
 ) {
   function cascade(currentCourseCode: string | null) {
@@ -610,6 +619,7 @@ function updateEnrollmentStatusCascade(
             updatedApprovedCourses.indexOf(currentCourseCode),
             1,
           );
+          updatedEarnedCredits -= enrollment.course.credits;
 
           enrollment.course.dependentCourses.forEach((course) =>
             cascade(course.code),
@@ -622,5 +632,5 @@ function updateEnrollmentStatusCascade(
   }
 
   dependentCourses.forEach((course) => cascade(course.code));
-  return { updatedPeriods, updatedApprovedCourses };
+  return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
 }

@@ -19,14 +19,15 @@ type Props = {
 };
 
 export default function Course({ variants, index, enrollment }: Props) {
-  const { approvedCourses, updateEnrollment } = useCurriculumStore();
+  const { progress, updateEnrollment } = useCurriculumStore();
   const { editMode } = useSettingsStore();
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const available = enrollment.course?.prerequisiteCourses.every((course) =>
-    course.code ? approvedCourses.includes(course.code) : true,
-  );
+  const available =
+    enrollment.course?.prerequisiteCourses.every((course) =>
+      course.code ? progress.approvedCourses.includes(course.code) : true,
+    ) && enrollment.course?.prerequisiteCredits <= 0;
   const lowContrast = getContrastRatio(enrollment.course?.color) < 1.9;
 
   /*
@@ -83,8 +84,11 @@ export default function Course({ variants, index, enrollment }: Props) {
                     id: enrollment.id,
                     position: enrollment.position,
                     status: checked ? "APPROVED" : "PENDING",
-                    courseCode: enrollment.course?.code,
-                    dependentCourses: enrollment.course?.dependentCourses,
+                    course: {
+                      code: enrollment.course?.code,
+                      credits: enrollment.course?.credits ?? 0,
+                      dependentCourses: enrollment.course?.dependentCourses,
+                    },
                   });
                 }}
                 onClick={(e) => e.stopPropagation()}

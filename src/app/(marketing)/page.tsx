@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -18,7 +17,7 @@ export default function IndexPage() {
         dark:bg-[linear-gradient(to_right,#4f4f4f1e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1e_1px,transparent_1px)]"
       />
 
-      <section className="space-y-6 pb-40 pt-36 xl:pt-24">
+      <section className="space-y-6">
         <div className="container flex max-w-[64rem] flex-col items-center space-y-4 text-center">
           <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-[6.5rem]">
             Toma el{" "}
