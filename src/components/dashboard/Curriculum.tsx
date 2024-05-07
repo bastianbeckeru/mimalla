@@ -8,7 +8,6 @@ import Period from "./Period";
 import Course from "./Course";
 import { cn } from "@/lib/utils";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
-import { Plus } from "lucide-react";
 
 type Props = {
   curriculum: CurriculumProps;
@@ -52,7 +51,7 @@ export default function Curriculum({ curriculum }: Props) {
         {curriculum.periods.map((period, pIndex) => {
           return (
             <Period
-              key={pIndex}
+              key={period.id}
               variants={periodVariants}
               period={{
                 id: period.id,
@@ -63,7 +62,7 @@ export default function Curriculum({ curriculum }: Props) {
               {period.enrollments.map((enrollment, eIndex) => {
                 return (
                   <Course
-                    key={eIndex}
+                    key={enrollment.id}
                     variants={courseVariants}
                     index={eIndex}
                     enrollment={enrollment}
@@ -73,25 +72,6 @@ export default function Curriculum({ curriculum }: Props) {
             </Period>
           );
         })}
-
-        {/* Add Semester Button */}
-        <li
-          className={cn(
-            "mx-1 my-[1.125rem] h-7 w-36 shrink-0 items-center justify-center rounded-lg",
-            editMode && curriculum.periods.length < 25 ? "flex" : "hidden",
-            "hidden",
-          )}
-        >
-          <button
-            aria-label="agregar semestre"
-            className="flex size-full items-center justify-center rounded-lg border border-foreground/5 bg-foreground/5 shadow-md transition-colors hover:bg-foreground/10"
-            onClick={() => {
-              console.log("Añadiendo periodo...");
-            }}
-          >
-            <Plus className="size-4 text-white" />
-          </button>
-        </li>
       </MotionOl>
     </DragDropContext>
   );

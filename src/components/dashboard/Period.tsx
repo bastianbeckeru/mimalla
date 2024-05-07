@@ -4,16 +4,6 @@ import { type ReactNode } from "react";
 import { MotionLi, type VariantProps } from "../Motion";
 import { Droppable } from "react-beautiful-dnd";
 import { useSettingsStore } from "@/stores/curriculum";
-import { Plus, X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import CourseForm from "./CourseForm";
-import { cn } from "@/lib/utils";
 
 type Props = {
   variants: VariantProps;
@@ -59,31 +49,6 @@ export default function Period({ variants, period, children }: Props) {
             >
               {children}
               {provided.placeholder}
-
-              <li
-                className={cn(
-                  "h-7",
-                  editMode && period.coursesAmount < 10 ? "flex" : "hidden",
-                  "hidden",
-                )}
-              >
-                <Dialog>
-                  <DialogTrigger
-                    aria-label="agrega un nuevo curso"
-                    className="flex size-full items-center justify-center rounded-2xl border border-foreground/5 bg-foreground/5 shadow-md transition-colors hover:bg-foreground/10"
-                  >
-                    <Plus className="size-4 text-white" />
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Añadir Curso</DialogTitle>
-                    </DialogHeader>
-                    <div>
-                      <CourseForm pId={period.id} pIndex={period.index} />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </li>
             </ul>
           )}
         </Droppable>

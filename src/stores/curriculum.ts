@@ -521,7 +521,6 @@ export const useCurriculumStore = create(
             source.index === destination.index
           )
             return state;
-          console.log("1");
 
           const updatedPeriods = [...state.curriculum.periods];
 
@@ -532,11 +531,7 @@ export const useCurriculumStore = create(
             (e) => e.id.toString() === destination.droppableId,
           );
 
-          console.log(sourcePeriod);
-          console.log(destinationPeriod);
-
           if (!sourcePeriod || !destinationPeriod) return state;
-          console.log("2");
 
           // Case 1: Course stays in the same Semester.
           if (sourcePeriod.id === destinationPeriod.id) {
