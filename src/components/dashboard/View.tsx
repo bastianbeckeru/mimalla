@@ -199,7 +199,7 @@ export default function View() {
                 aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
                 target="_blank"
                 rel="noreferrer"
-                href="#google-form-link-here"
+                href="https://forms.gle/P6JjrCPn1y4fZyUNA"
                 className="hover:text-brand underline underline-offset-4"
               >
                 Haz clic aquí
@@ -209,7 +209,18 @@ export default function View() {
         </div>
       ) : (
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-          <Sidebar />
+          <aside className="hidden border-r bg-muted/20 md:block">
+            <div className="flex h-full max-h-screen flex-col gap-2">
+              {/* LOGO */}
+              <div className="flex h-14 items-center justify-start border-b px-4 lg:h-16">
+                <Link href="/" className="flex items-center gap-2">
+                  <Kanban className="size-6" />
+                  <span className="text-lg font-medium">Mi Malla</span>
+                </Link>
+              </div>
+              <Sidebar />
+            </div>
+          </aside>
 
           <div className="flex h-full flex-col overflow-hidden">
             <header className="flex h-14 items-center gap-4 border-b bg-muted/20 px-4 md:justify-center lg:h-16 lg:px-6">
@@ -224,18 +235,14 @@ export default function View() {
                     <span className="sr-only">Toggle navigation menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="flex w-72 flex-col">
-                  <div className="grid gap-2 text-lg font-medium">
-                    <Link
-                      href="/"
-                      className="flex items-center gap-2 text-lg font-semibold"
-                    >
+                <SheetContent side="left" className="flex w-72 flex-col p-4">
+                  <div className="h-10 border-b pl-2 pr-8">
+                    <Link href="/" className="flex flex-row items-center gap-2">
                       <Kanban className="size-6" />
-                      <span className="sr-only">Mi Malla</span>
+                      <span className="text-lg font-medium">Mi Malla</span>
                     </Link>
-                    {/* CONTENT */}
                   </div>
-                  {/* DELETE CURRICULUM */}
+                  <Sidebar />
                 </SheetContent>
               </Sheet>
 

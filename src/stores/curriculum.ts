@@ -181,12 +181,6 @@ export const useCurriculumStore = create(
               updatedEnrollment.status === "PENDING" &&
               progress.approvedCourses.includes(updatedEnrollment.course.code)
             ) {
-              updatedApprovedCourses.splice(
-                updatedApprovedCourses.indexOf(updatedEnrollment.course.code),
-                1,
-              );
-              updatedEarnedCredits -= updatedEnrollment.course.credits;
-
               ({
                 updatedPeriods,
                 updatedApprovedCourses,
@@ -195,7 +189,7 @@ export const useCurriculumStore = create(
                 updatedPeriods,
                 updatedApprovedCourses,
                 updatedEarnedCredits,
-                updatedEnrollment.course.dependentCourses ?? [],
+                updatedEnrollment.course.code,
               ));
             } else {
               updatedApprovedCourses.push(updatedEnrollment.course.code);
@@ -506,19 +500,16 @@ export const useCurriculumStore = create(
           };
         }),
 
-      /* Drag and Drop Functions */
+      /* DRAG AND DROP */
       onDragEnd: (result) =>
         set((state) => {
           const source = result.source;
           const destination = result.destination;
 
-          console.log(source);
-          console.log(destination);
-
           if (!state.curriculum || !destination) return state;
           if (
-            source.droppableId === destination.droppableId &&
-            source.index === destination.index
+            source.index === destination.index &&
+            source.droppableId === destination.droppableId
           )
             return state;
 
@@ -534,7 +525,7 @@ export const useCurriculumStore = create(
           if (!sourcePeriod || !destinationPeriod) return state;
 
           // Case 1: Course stays in the same Semester.
-          if (sourcePeriod.id === destinationPeriod.id) {
+          if (source.droppableId === destination.droppableId) {
             const movingUp = source.index > destination.index;
 
             sourcePeriod.enrollments.forEach((enrollment, index) => {
@@ -594,8 +585,6 @@ export const useCurriculumStore = create(
               draggableEnrollment,
             );
           }
-
-          console.log(updatedPeriods);
 
           return {
             ...state,
@@ -716,7 +705,7 @@ function updateEnrollmentStatusCascade(
   updatedPeriods: PeriodProps[],
   updatedApprovedCourses: string[],
   updatedEarnedCredits: number,
-  dependentCourses: { code: string | null }[],
+  courseCode: string,
 ) {
   function cascade(currentCourseCode: string | null) {
     if (!currentCourseCode) return;
@@ -747,6 +736,6 @@ function updateEnrollmentStatusCascade(
     });
   }
 
-  dependentCourses.forEach((course) => cascade(course.code));
+  cascade(courseCode);
   return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
 }

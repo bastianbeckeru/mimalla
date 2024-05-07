@@ -2,8 +2,6 @@
 
 import { type ReactNode } from "react";
 import { MotionLi, type VariantProps } from "../Motion";
-import { Droppable } from "react-beautiful-dnd";
-import { useSettingsStore } from "@/stores/curriculum";
 
 type Props = {
   variants: VariantProps;
@@ -16,8 +14,6 @@ type Props = {
 };
 
 export default function Period({ variants, period, children }: Props) {
-  const { editMode } = useSettingsStore();
-
   return (
     <>
       <MotionLi
@@ -40,18 +36,7 @@ export default function Period({ variants, period, children }: Props) {
             </span>
           </div>
         </div>
-        <Droppable droppableId={period.id.toString()}>
-          {(provided) => (
-            <ul
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex h-min w-full flex-col overflow-hidden px-1 py-2"
-            >
-              {children}
-              {provided.placeholder}
-            </ul>
-          )}
-        </Droppable>
+        {children}
       </MotionLi>
     </>
   );
