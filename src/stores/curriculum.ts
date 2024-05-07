@@ -509,54 +509,52 @@ export const useCurriculumStore = create(
       /* Drag and Drop Functions */
       onDragEnd: (result) =>
         set((state) => {
-          console.log(result.source);
-          console.log(result.destination);
+          const source = result.source;
+          const destination = result.destination;
 
-          if (!state.curriculum?.periods) return state;
-          console.log("1");
+          console.log(source);
+          console.log(destination);
 
-          if (!result.destination) return state;
-          console.log("2");
-
+          if (!state.curriculum || !destination) return state;
           if (
-            result.source.index === result.destination.index &&
-            result.source.droppableId === result.destination.droppableId
+            source.droppableId === destination.droppableId &&
+            source.index === destination.index
           )
             return state;
-          console.log("3");
+          console.log("1");
 
-          const curriculum = { ...state.curriculum };
-          const updatedPeriods = [...curriculum.periods];
+          const updatedPeriods = [...state.curriculum.periods];
 
-          const sourceIndex = result.source.index;
-          const destinationIndex = result.destination.index;
           const sourcePeriod = updatedPeriods.find(
-            (e) => e.id.toString() === result.source.droppableId,
+            (e) => e.id.toString() === source.droppableId,
           );
           const destinationPeriod = updatedPeriods.find(
-            (e) => e.id.toString() === result.destination?.droppableId,
+            (e) => e.id.toString() === destination.droppableId,
           );
 
+          console.log(sourcePeriod);
+          console.log(destinationPeriod);
+
           if (!sourcePeriod || !destinationPeriod) return state;
-          console.log("4");
+          console.log("2");
 
           // Case 1: Course stays in the same Semester.
           if (sourcePeriod.id === destinationPeriod.id) {
-            const movingUp = sourceIndex > destinationIndex;
+            const movingUp = source.index > destination.index;
 
             sourcePeriod.enrollments.forEach((enrollment, index) => {
               if (
                 enrollment.id.toString() !== result.draggableId &&
                 (movingUp
-                  ? index <= sourceIndex && index >= destinationIndex
-                  : index >= sourceIndex && index <= destinationIndex)
+                  ? index <= source.index && index >= destination.index
+                  : index >= source.index && index <= destination.index)
               ) {
                 const newPosition = movingUp ? index + 1 : index - 1;
 
                 enrollment.position = newPosition;
               }
               if (enrollment.id.toString() === result.draggableId) {
-                const newPosition = destinationIndex;
+                const newPosition = destination.index;
                 enrollment.position = newPosition;
               }
             });
@@ -566,7 +564,7 @@ export const useCurriculumStore = create(
             sourcePeriod.enrollments.forEach((enrollment, index) => {
               if (
                 enrollment.id.toString() !== result.draggableId &&
-                sourceIndex < index
+                source.index < index
               ) {
                 const newPosition = index - 1;
 
@@ -574,7 +572,7 @@ export const useCurriculumStore = create(
               }
 
               if (enrollment.id.toString() === result.draggableId) {
-                const newPosition = destinationIndex ?? index;
+                const newPosition = destination.index ?? index;
 
                 enrollment.position = newPosition;
               }
@@ -582,7 +580,7 @@ export const useCurriculumStore = create(
             destinationPeriod.enrollments.forEach((enrollment, index) => {
               if (
                 enrollment.id.toString() !== result.draggableId &&
-                destinationIndex <= index
+                destination.index <= index
               ) {
                 const newPosition = index + 1;
                 enrollment.position = newPosition;
@@ -591,12 +589,12 @@ export const useCurriculumStore = create(
           }
 
           // Optimistic UI
-          const draggableEnrollment = sourcePeriod.enrollments[sourceIndex];
+          const draggableEnrollment = sourcePeriod.enrollments[source.index];
 
           if (draggableEnrollment) {
-            sourcePeriod.enrollments.splice(sourceIndex, 1);
+            sourcePeriod.enrollments.splice(source.index, 1);
             destinationPeriod.enrollments.splice(
-              destinationIndex,
+              destination.index,
               0,
               draggableEnrollment,
             );
@@ -607,7 +605,7 @@ export const useCurriculumStore = create(
           return {
             ...state,
             curriculum: {
-              ...curriculum,
+              ...state.curriculum,
               periods: updatedPeriods,
             },
           };
