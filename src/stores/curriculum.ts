@@ -509,13 +509,21 @@ export const useCurriculumStore = create(
       /* Drag and Drop Functions */
       onDragEnd: (result) =>
         set((state) => {
+          console.log(result.source);
+          console.log(result.destination);
+
           if (!state.curriculum?.periods) return state;
+          console.log("1");
+
           if (!result.destination) return state;
+          console.log("2");
+
           if (
             result.source.index === result.destination.index &&
             result.source.droppableId === result.destination.droppableId
           )
             return state;
+          console.log("3");
 
           const curriculum = { ...state.curriculum };
           const updatedPeriods = [...curriculum.periods];
@@ -530,6 +538,7 @@ export const useCurriculumStore = create(
           );
 
           if (!sourcePeriod || !destinationPeriod) return state;
+          console.log("4");
 
           // Case 1: Course stays in the same Semester.
           if (sourcePeriod.id === destinationPeriod.id) {
