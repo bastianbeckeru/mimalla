@@ -30,16 +30,12 @@ export default function Course({ variants, index, enrollment }: Props) {
     ) && enrollment.course?.prerequisiteCredits <= 0;
   const lowContrast = getContrastRatio(enrollment.course?.color) < 1.9;
 
-  /*
-   * isDragDisabled={!editMode}
-   */
-
   return (
     <>
       <Draggable
         index={index}
         draggableId={enrollment.id.toString()}
-        isDragDisabled={false}
+        isDragDisabled={!editMode}
       >
         {(provided) => (
           <div
@@ -53,7 +49,7 @@ export default function Course({ variants, index, enrollment }: Props) {
               variants={variants}
               className={cn(
                 "relative mb-2 flex h-20 select-none items-center justify-start rounded-2xl bg-slate-100 p-2 shadow-md xl:h-[5.5rem]",
-                false ? "hover:cursor-grab" : "hover:cursor-pointer",
+                editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
                 available
                   ? "brightness-100 hover:brightness-[0.98]"
                   : "brightness-[0.80] hover:brightness-[0.78]",

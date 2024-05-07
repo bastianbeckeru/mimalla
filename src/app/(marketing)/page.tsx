@@ -27,25 +27,19 @@ export default function IndexPage() {
             de tu Malla.
           </h1>
           <p className="max-w-[42rem] text-pretty leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            Personalízala a tu pinta y lleva el registro de tu progreso.
-            Simplifica tu vida universitaria.
+            Personalízala a tu pinta y lleva el registro de tu progreso. La
+            flexibilidad está en tus manos.
           </p>
 
           <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-0 md:flex-row md:space-x-4">
             <Link
               href="/dashboard"
               className={cn(
+                "card",
                 buttonVariants({ variant: "default", size: "lg" }),
-                "w-full md:w-fit",
               )}
             >
               Comenzar
-            </Link>
-            <Link
-              href="#features"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
-            >
-              ¿Cómo funciona?
             </Link>
           </div>
         </div>

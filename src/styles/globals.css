@@ -96,7 +96,7 @@
 .card::after {
   content: "";
   position: absolute;
-  inset: -0.25rem;
+  inset: -0.2rem;
   z-index: -1;
   background: conic-gradient(
     from var(--gradient-angle),
@@ -111,7 +111,7 @@
 }
   
 .card::after {
-  filter: blur(3.5rem);
+  filter: blur(4.5rem);
 }
 
 @keyframes rotation {
@@ -122,4 +122,4 @@
     --gradient-angle: 360deg;
   }
 }
-  
+

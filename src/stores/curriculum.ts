@@ -3,6 +3,7 @@ import { create } from "zustand";
 //import { persist } from "zustand/middleware";
 import { customAlphabet, nanoid } from "nanoid";
 import { subgradeAverage } from "@/utils/curriculumFunctions";
+import type { DropResult } from "react-beautiful-dnd";
 
 const initialState: StateProps = {
   areas: [],
@@ -495,6 +496,104 @@ export const useCurriculumStore = create<useCurriculumProps>((set) => ({
         taskQueue: updatedTaskQueue,
       };
     }),
+
+  /* Drag and Drop Functions */
+  onDragEnd: (result) =>
+    set((state) => {
+      if (!state.curriculum?.periods) return state;
+
+      // In case of dropping outside the DnD context or in the same spot, do nothing.
+      if (!result.destination) return state;
+      if (
+        result.source.index === result.destination.index &&
+        result.source.droppableId === result.destination.droppableId
+      )
+        return state;
+
+      const curriculum = { ...state.curriculum };
+      const updatedPeriods = [...curriculum.periods];
+
+      // Find the source and destination semesters
+      const sourcePeriod = updatedPeriods.find(
+        (e) => e.id.toString() === result.source.droppableId,
+      );
+      const destinationPeriod = updatedPeriods.find(
+        (e) => e.id.toString() === result.destination?.droppableId,
+      );
+      const destinationIndex = result.destination.index;
+
+      // In case of return undefined or null
+      if (!sourcePeriod || !destinationPeriod) return state;
+
+      // Case 1: Course stays in the same Semester.
+      if (result.source.droppableId === result.destination.droppableId) {
+        const movingUp = result.source.index > result.destination.index;
+
+        sourcePeriod.enrollments.forEach((enrollment, index) => {
+          if (
+            enrollment.id.toString() !== result.draggableId &&
+            (movingUp
+              ? index <= result.source.index && index >= destinationIndex
+              : index >= result.source.index && index <= destinationIndex)
+          ) {
+            const newPosition = movingUp ? index + 1 : index - 1;
+
+            enrollment.position = newPosition;
+          }
+          if (enrollment.id.toString() === result.draggableId) {
+            const newPosition = result.destination?.index ?? index;
+            enrollment.position = newPosition;
+          }
+        });
+      }
+      // Case 2: Course migrates to another Semester.
+      else {
+        sourcePeriod.enrollments.forEach((enrollment, index) => {
+          if (
+            enrollment.id.toString() !== result.draggableId &&
+            result.source.index < index
+          ) {
+            const newPosition = index - 1;
+
+            enrollment.position = newPosition;
+          }
+
+          if (enrollment.id.toString() === result.draggableId) {
+            const newPosition = result.destination?.index ?? index;
+
+            enrollment.position = newPosition;
+          }
+        });
+        destinationPeriod.enrollments.forEach((enrollment, index) => {
+          if (
+            enrollment.id.toString() !== result.draggableId &&
+            destinationIndex <= index
+          ) {
+            const newPosition = index + 1;
+            enrollment.position = newPosition;
+          }
+        });
+      }
+
+      // Optimistic UI
+      const draggableEnrollment = sourcePeriod.enrollments[result.source.index];
+      if (draggableEnrollment) {
+        sourcePeriod.enrollments.splice(result.source.index, 1);
+        destinationPeriod.enrollments.splice(
+          result.destination?.index,
+          0,
+          draggableEnrollment,
+        );
+      }
+
+      return {
+        ...state,
+        curriculum: {
+          ...curriculum,
+          periods: updatedPeriods,
+        },
+      };
+    }),
 }));
 
 /* SETTINGS STORE */
@@ -558,6 +657,8 @@ type useCurriculumProps = {
     enrollmentId: number,
     removedGrade: { id: number; name: string; parentGradeId?: number },
   ) => void;
+
+  onDragEnd: (result: DropResult) => void;
 } & StateProps;
 
 type StateProps = {
