@@ -15,6 +15,7 @@ type Props = {
 };
 
 export default function Curriculum({ curriculum }: Props) {
+  const { onDragEnd } = useCurriculumStore();
   const { editMode } = useSettingsStore();
 
   /* Animations */
@@ -91,8 +92,4 @@ export default function Curriculum({ curriculum }: Props) {
       </MotionOl>
     </DragDropContext>
   );
-
-  function onDragEnd() {
-    console.log("Drag ended");
-  }
 }
