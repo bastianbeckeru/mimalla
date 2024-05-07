@@ -54,8 +54,11 @@ export default function Curriculum({ curriculum }: Props) {
             <Period
               key={pIndex}
               variants={periodVariants}
-              index={pIndex}
-              coursesAmount={period.enrollments.length}
+              period={{
+                id: period.id,
+                index: pIndex,
+                coursesAmount: period.enrollments.length,
+              }}
             >
               {period.enrollments.map((enrollment, eIndex) => {
                 return (

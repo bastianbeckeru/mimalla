@@ -17,17 +17,15 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   variants: VariantProps;
-  index: number;
-  coursesAmount: number;
+  period: {
+    id: number;
+    index: number;
+    coursesAmount: number;
+  };
   children: ReactNode;
 };
 
-export default function Period({
-  variants,
-  index,
-  coursesAmount,
-  children,
-}: Props) {
+export default function Period({ variants, period, children }: Props) {
   const { editMode } = useSettingsStore();
 
   return (
@@ -40,7 +38,7 @@ export default function Period({
         <div className="mx-1 flex select-none flex-col">
           <div className="z-10 flex items-center justify-center">
             <span className="-mb-[0.375rem] flex size-6 items-center justify-center rounded-full bg-slate-100 font-bold dark:bg-zinc-800">
-              {index + 1}
+              {period.index + 1}
             </span>
           </div>
 
@@ -52,7 +50,7 @@ export default function Period({
             </span>
           </div>
         </div>
-        <Droppable droppableId={index.toString()}>
+        <Droppable droppableId={period.id.toString()}>
           {(provided) => (
             <ul
               {...provided.droppableProps}
@@ -65,7 +63,7 @@ export default function Period({
               <li
                 className={cn(
                   "h-7",
-                  editMode && coursesAmount < 10 ? "flex" : "hidden",
+                  editMode && period.coursesAmount < 10 ? "flex" : "hidden",
                   "hidden",
                 )}
               >
@@ -81,7 +79,7 @@ export default function Period({
                       <DialogTitle>Añadir Curso</DialogTitle>
                     </DialogHeader>
                     <div>
-                      <CourseForm pId={0} pIndex={index} />
+                      <CourseForm pId={period.id} pIndex={period.index} />
                     </div>
                   </DialogContent>
                 </Dialog>
