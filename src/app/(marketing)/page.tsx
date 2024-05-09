@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { useCurriculumStore } from "@/stores/curriculum";
+import { useState } from "react";
 
 export default function IndexPage() {
   /*   const hello = await api.post.hello({ text: "from tRPC" });
@@ -33,7 +35,7 @@ export default function IndexPage() {
 
           <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-0 md:flex-row md:space-x-4">
             <Link
-              href="/dashboard"
+              href="/dashboard/create"
               className={cn(
                 "card",
                 buttonVariants({ variant: "default", size: "lg" }),

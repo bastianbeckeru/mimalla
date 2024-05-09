@@ -14,6 +14,7 @@ import {
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
   const totalCourses =
@@ -23,6 +24,7 @@ export default function Sidebar() {
     ) ?? 0;
   const { areas, reset, progress } = useCurriculumStore();
   const { setEditMode } = useSettingsStore();
+  const router = useRouter();
 
   return (
     <>
@@ -95,6 +97,7 @@ export default function Sidebar() {
                 onClick={() => {
                   reset();
                   setEditMode(false);
+                  router.push("/dashboard/create");
                 }}
               >
                 Aceptar
