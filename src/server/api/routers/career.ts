@@ -134,11 +134,29 @@ export const careerRouter = createTRPCRouter({
               code: true,
               credits: true,
               dependentCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
                 },
               },
               prerequisiteCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
                 },
