@@ -23,7 +23,7 @@ export default function Sidebar() {
       0,
     ) ?? 0;
   const { areas, reset, progress } = useCurriculumStore();
-  const { setEditMode } = useSettingsStore();
+  const { editMode, setEditMode } = useSettingsStore();
   const router = useRouter();
 
   return (
@@ -35,6 +35,7 @@ export default function Sidebar() {
             <Label htmlFor="edit-mode">Modo edición</Label>
             <Switch
               id="edit-mode"
+              checked={editMode}
               onCheckedChange={(checked: boolean) => setEditMode(checked)}
             />
           </div>

@@ -80,8 +80,7 @@ export default function Course({ variants, enrollment }: Props) {
         {enrollment.status === "APPROVED" && (
           <div
             className={cn(
-              "absolute z-10 h-[4px] transform bg-black",
-              editMode && "bottom-[42px] left-[-8px] w-36 rotate-[-33deg]",
+              "absolute bottom-[42px] left-[-8px] z-10 h-[4px] w-36 rotate-[-33deg] transform bg-black",
             )}
           />
         )}
