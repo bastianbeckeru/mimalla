@@ -15,43 +15,6 @@ export type CareerProps = {
   };
 };
 
-export type CurriculumProps = {
-  id: number;
-  startedAt: Date;
-  updatedAt: Date;
-  career: CareerProps | null;
-  periods: PeriodProps[];
-};
-
-export type PeriodProps = {
-  id: number;
-  enrollments: EnrollmentProps[];
-};
-
-export type EnrollmentProps = {
-  id: number; // BORRAR
-  position: number;
-  status: string;
-  courseId: string | null;
-  course?: CourseProps | null;
-  grades: GradeProps[];
-};
-
-export type CourseProps = {
-  id: string;
-  name: string;
-  code: string | null;
-  credits: number;
-  dependentCourses: {
-    code: string | null;
-  }[];
-  prerequisiteCourses: {
-    code: string | null;
-  }[];
-  prerequisiteCredits: number;
-  color?: string;
-};
-
 export type GradeProps = {
   id: number;
   name: string;
@@ -68,10 +31,4 @@ export type SubgradeProps = {
   value: number | null;
   excluded: boolean;
   date?: Date;
-};
-
-export type AreaProps = {
-  name: string;
-  color: string | null; // "#FFFFFF"
-  courses: CourseProps[];
 };

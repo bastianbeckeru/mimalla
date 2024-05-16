@@ -1,10 +1,10 @@
 "use client";
 
 /* import { useSettingsStore } from "@/stores/curriculum"; */
+import type { ModifiedEnrollmentProps } from "@/types/curriculum";
 import { MotionLi, type VariantProps } from "../Motion";
 import { Dialog } from "../ui/dialog";
 import { useState } from "react";
-import type { EnrollmentProps } from "@/types/user";
 import CourseModal from "./CourseModal";
 import { Checkbox } from "../ui/checkbox";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
@@ -13,7 +13,7 @@ import { getContrastRatio } from "@/utils/colorFunctions";
 
 type Props = {
   variants: VariantProps;
-  enrollment: EnrollmentProps;
+  enrollment: ModifiedEnrollmentProps;
 };
 
 export default function Course({ variants, enrollment }: Props) {

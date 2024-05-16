@@ -4,18 +4,18 @@ import { useEffect } from "react";
 import { useCurriculumStore } from "@/stores/curriculum";
 import Curriculum from "./Curriculum";
 
-import { Button, buttonVariants } from "../ui/button";
-import { ChevronLeftIcon, Kanban, Loader2, Menu } from "lucide-react";
-import { toast } from "../ui/use-toast";
+import { Button } from "../ui/button";
+import { Kanban, Loader2, Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
+import CurriculumDashboard from "./CurriculumDashboard";
 
 export default function View() {
   const router = useRouter();
-  const { curriculum, setData } = useCurriculumStore();
+  const { curriculum, areas, setData } = useCurriculumStore();
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -51,7 +51,7 @@ export default function View() {
         </aside>
 
         <div className="flex h-full flex-col overflow-hidden">
-          <header className="flex h-14 items-center gap-4 border-b bg-muted/20 px-4 md:justify-center lg:h-16 lg:px-6">
+          <header className="relative flex h-14 items-center gap-4 border-b bg-muted/20 px-4 md:justify-center lg:h-16 lg:px-6">
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -80,9 +80,17 @@ export default function View() {
                 {curriculum.career?.faculty.university.name}
               </p>
             </div>
+
+            <Button
+              className="absolute right-4 top-auto"
+              onClick={() => setData({ curriculum: curriculum, areas: areas })}
+            >
+              Actualizar
+            </Button>
           </header>
           <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">
             <Curriculum curriculum={curriculum} />
+            {/* <CurriculumDashboard curriculum={curriculum} /> */}
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>

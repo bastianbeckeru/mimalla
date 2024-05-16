@@ -1,6 +1,6 @@
 "use client";
 
-import type { CurriculumProps } from "@/types/user";
+import type { ModifiedCurriculumProps } from "@/types/curriculum";
 
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { MotionOl } from "../Motion";
@@ -9,7 +9,7 @@ import Course from "./Course";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
 
 type Props = {
-  curriculum: CurriculumProps;
+  curriculum: ModifiedCurriculumProps;
 };
 
 export default function Curriculum({ curriculum }: Props) {
@@ -78,10 +78,6 @@ export default function Curriculum({ curriculum }: Props) {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
-                              onClick={
-                                () => console.log("o.o")
-                                //setIsOpen(true)
-                              }
                               className="rounded-2xl"
                             >
                               <Course
