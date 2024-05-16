@@ -76,7 +76,12 @@ export default function View() {
               </SheetContent>
             </Sheet>
 
-            <div className="flex flex-col items-center justify-center space-y-px px-2">
+            <div
+              className={cn(
+                "flex flex-col items-center justify-center space-y-px px-2",
+                version === "1.1.0" ? "" : "hidden md:flex",
+              )}
+            >
               <h1 className="font-semibold">{curriculum.career?.name}</h1>
               <p className="text-xs/3 text-muted-foreground">
                 {curriculum.career?.faculty.university.name}
@@ -85,7 +90,7 @@ export default function View() {
 
             <Button
               className={cn(
-                "absolute right-4 top-auto bg-emerald-600 text-foreground",
+                "absolute right-4 top-auto flex flex-col bg-emerald-600 text-foreground",
                 version === "1.1.0" ? "hidden" : "",
               )}
               onClick={() => {
@@ -93,6 +98,7 @@ export default function View() {
                 updateVersion("1.1.0");
               }}
             >
+              <p className="text-xs">Nueva Versión</p>
               Actualizar ✨
             </Button>
           </header>
