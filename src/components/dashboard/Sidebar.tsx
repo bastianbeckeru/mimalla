@@ -78,7 +78,7 @@ export default function Sidebar() {
         <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
-          className="block w-full py-2 text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
+          className="my-4 block w-full text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
         >
           ¿Te gusta Mi Malla? ¡Opina!
         </a>
