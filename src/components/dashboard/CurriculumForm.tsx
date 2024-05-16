@@ -36,7 +36,7 @@ const formSchema = z.object({
 });
 
 export default function CurriculumForm() {
-  const { curriculum, setData } = useCurriculumStore();
+  const { curriculum, setData, updateVersion } = useCurriculumStore();
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
 
@@ -69,6 +69,7 @@ export default function CurriculumForm() {
     ) {
       router.push("/dashboard");
       setData(getCareerCurriculum.data);
+      updateVersion("1.1.0");
       setIsCreating(false);
       form.reset();
 
@@ -84,7 +85,15 @@ export default function CurriculumForm() {
         ),
       });
     }
-  }, [getCareerCurriculum, curriculum, setData, form, router, isCreating]);
+  }, [
+    getCareerCurriculum,
+    curriculum,
+    setData,
+    form,
+    router,
+    isCreating,
+    updateVersion,
+  ]);
 
   /* Loader or Skeleton */
   if (getCareerCurriculum.isLoading || getCareers.isLoading) {
