@@ -40,6 +40,7 @@ export default function Course({ variants, enrollment }: Props) {
             : "brightness-[0.80] hover:brightness-[0.78]",
         )}
         style={{ backgroundColor: enrollment.course?.color }}
+        onClick={() => setIsOpen(true)}
       >
         <p
           className={cn(
@@ -88,7 +89,7 @@ export default function Course({ variants, enrollment }: Props) {
 
       {/* Course Modal */}
       <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-        {/* <CourseModal enrollment={enrollment} /> */}
+        <CourseModal enrollment={enrollment} />
       </Dialog>
     </>
   );

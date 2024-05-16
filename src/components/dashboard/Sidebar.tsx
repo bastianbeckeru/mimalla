@@ -75,6 +75,13 @@ export default function Sidebar() {
         </div>
       </div>
       <div className="mt-auto p-4">
+        <a
+          href="https://forms.gle/Qm43RjotQ38VGhTq7"
+          target="_blank"
+          className="block w-full py-2 text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
+        >
+          ¿Te gusta Mi Malla? ¡Opina!
+        </a>
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="destructiveOutline" className="w-full gap-2">
