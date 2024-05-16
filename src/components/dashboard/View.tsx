@@ -11,7 +11,7 @@ import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
-import CurriculumDashboard from "./CurriculumDashboard";
+/* import CurriculumDashboard from "./CurriculumDashboard"; */
 
 export default function View() {
   const router = useRouter();
