@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const initialState: StateProps = {
+  version: "1.0.0",
   areas: [],
   curriculum: undefined,
   progress: {
@@ -20,6 +21,9 @@ export const useCurriculumStore = create(
 
       reset: () => {
         set(initialState);
+      },
+      updateVersion: (newVersion) => {
+        set((state) => ({ ...state, version: newVersion }));
       },
       setData: (newData) =>
         set((state) => {
@@ -315,7 +319,6 @@ type useSettingsStoreProps = {
   setEditMode: (newState?: boolean) => void;
 };
 
-/* TYPES */
 export type TaskProps = {
   id: string;
   timestamp: number;
@@ -342,6 +345,7 @@ export type TaskProps = {
   };
 };
 
+/* FUNCTIONS */
 function updateEnrollmentStatusCascade(
   updatedPeriods: ModifiedPeriodProps[],
   updatedApprovedCourses: string[],

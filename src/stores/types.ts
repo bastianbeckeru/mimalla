@@ -7,6 +7,7 @@ import type {
 } from "@/types/curriculum";
 
 export type useCurriculumStoreProps = {
+  updateVersion: (newVersion: string) => void;
   reset: () => void;
   setTaskQueue: (newTaskQueue: TaskProps[]) => void;
   setData: (newData: {
@@ -32,6 +33,7 @@ export type useCurriculumStoreProps = {
 } & StateProps;
 
 export type StateProps = {
+  version: string;
   curriculum: ModifiedCurriculumProps | undefined;
   areas: AreaProps[];
   taskQueue: TaskProps[];

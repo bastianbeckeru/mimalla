@@ -11,11 +11,13 @@ import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 /* import CurriculumDashboard from "./CurriculumDashboard"; */
 
 export default function View() {
   const router = useRouter();
-  const { curriculum, areas, setData } = useCurriculumStore();
+  const { curriculum, areas, setData, version, updateVersion } =
+    useCurriculumStore();
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -82,10 +84,16 @@ export default function View() {
             </div>
 
             <Button
-              className="absolute right-4 top-auto"
-              onClick={() => setData({ curriculum: curriculum, areas: areas })}
+              className={cn(
+                "absolute right-4 top-auto bg-emerald-600 text-foreground",
+                version === "1.1.0" ? "hidden" : "",
+              )}
+              onClick={() => {
+                setData({ curriculum: curriculum, areas: areas });
+                updateVersion("1.1.0");
+              }}
             >
-              Actualizar
+              Actualizar ✨
             </Button>
           </header>
           <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">
