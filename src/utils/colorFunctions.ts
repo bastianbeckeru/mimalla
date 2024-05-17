@@ -1,5 +1,5 @@
 // Function to convert hex color to RGB array
-function hexToRgb(hex: string) {
+export function hexToRgb(hex: string) {
   // Remove # if present
   hex = hex.replace(/^#/, "");
 

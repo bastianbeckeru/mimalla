@@ -2,24 +2,31 @@
 
 import type { ModifiedEnrollmentProps } from "@/types/curriculum";
 import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Check, Minus } from "lucide-react";
+import { useCurriculumStore } from "@/stores/curriculum";
+import { hexToRgb } from "@/utils/colorFunctions";
 
 type Props = {
   enrollment: ModifiedEnrollmentProps;
 };
 
 export default function CourseModal({ enrollment }: Props) {
+  const approvedCourses = useCurriculumStore().progress.approvedCourses;
+
   return (
     <DialogContent tabIndex={-1} className="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle className="text-2xl">
           {enrollment.course?.name ?? `Curso`}
         </DialogTitle>
-        <p className="text-sm text-muted-foreground">
-          {" "}
-          Código: {enrollment.course?.code ?? "XYZ0000"}
-          {" | "}
-          {enrollment.course?.credits ?? "0"} Créditos
-        </p>
+        <div className="mt-1 flex flex-row items-center space-x-2 text-sm text-muted-foreground">
+          {/* Intentar obtener el RGB color del área, si es posible, obtenerlo desde "Course" y luego pasarlo como prop a CourseModal. Luego, aplicar el "/ {transparency}". (OJO: Recordar que el contraste es importante.)
+           */}
+          <p className="rounded-md bg-white/15 px-1 py-px">
+            Código: {enrollment.course?.code ?? "XYZ0000"}
+          </p>
+          <p>{enrollment.course?.credits ?? "0"} Créditos</p>
+        </div>
       </DialogHeader>
 
       <div className="flex size-full min-h-48 flex-col">
@@ -27,6 +34,7 @@ export default function CourseModal({ enrollment }: Props) {
           <RelatedCourses
             relation="Prerrequisitos"
             courses={enrollment.course?.prerequisiteCourses}
+            approvedCourses={approvedCourses}
           />
           <RelatedCourses
             relation="Desbloquea"
@@ -46,9 +54,14 @@ type RelatedCoursesProps = {
         name: string;
       }[]
     | undefined;
+  approvedCourses?: string[];
 };
 
-function RelatedCourses({ relation, courses }: RelatedCoursesProps) {
+function RelatedCourses({
+  relation,
+  courses,
+  approvedCourses,
+}: RelatedCoursesProps) {
   return (
     <div>
       <h2 className="font-bold">{relation}</h2>
@@ -59,7 +72,16 @@ function RelatedCourses({ relation, courses }: RelatedCoursesProps) {
             className="flex flex-row items-center justify-between space-x-1 px-2"
           >
             <p className="text-sm">{course.name}</p>
-            <p className="text-xs text-muted-foreground">({course.code})</p>
+            <div className="flex flex-row space-x-1">
+              <p className="text-xs text-muted-foreground">({course.code})</p>
+              {approvedCourses !== undefined ? (
+                approvedCourses?.includes(course.code) ? (
+                  <Check className="size-4 text-green-500" />
+                ) : (
+                  <Minus className="size-4 text-muted-foreground" />
+                )
+              ) : null}
+            </div>
           </li>
         ))}
       </ul>
