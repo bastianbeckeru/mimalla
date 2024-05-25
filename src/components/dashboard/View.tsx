@@ -23,7 +23,7 @@ export default function View() {
   const isUpToDate = version === currentVersion;
 
   const getCareerAreas = api.career.getAreas.useQuery(
-    { siesCode: curriculum.career.siesCode },
+    { siesCode: curriculum?.career.siesCode },
     {
       enabled: false,
       refetchInterval: false,
