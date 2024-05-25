@@ -19,9 +19,9 @@ export default function Period({ variants, period, children }: Props) {
       <MotionLi
         variants={variants}
         className={`
-    } w-[8.5rem] shrink-0 pb-4`}
+    } w-[8rem] shrink-0 space-y-2 xl:w-[8.5rem]`}
       >
-        <div className="mx-1 flex select-none flex-col">
+        <div className="flex select-none flex-col">
           <div className="z-10 flex items-center justify-center">
             <span className="-mb-[0.375rem] flex size-6 items-center justify-center rounded-full bg-slate-100 font-bold dark:bg-zinc-800">
               {period.index + 1}

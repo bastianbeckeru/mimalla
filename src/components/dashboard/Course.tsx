@@ -93,7 +93,7 @@ export default function Course({ variants, enrollment, color }: Props) {
 
       {/* Course Modal */}
       <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-        <CourseModal enrollment={enrollment} />
+        <CourseModal enrollment={enrollment} color={color} />
       </Dialog>
     </>
   );

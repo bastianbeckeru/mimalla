@@ -9,6 +9,12 @@ export function hexToRgb(hex: string) {
   return { r, g, b };
 }
 
+export function hexToRgba(hexColor: string, alpha = 1.0) {
+  const { r, g, b } = hexToRgb(hexColor);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function getLuminance(rgbColor: { r: number; g: number; b: number }) {
   const rgb = [rgbColor.r, rgbColor.g, rgbColor.b].map((v) => {
     v /= 255; // Convert RGB value to the range 0-1
