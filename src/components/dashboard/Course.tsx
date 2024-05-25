@@ -9,38 +9,48 @@ import CourseModal from "./CourseModal";
 import { Checkbox } from "../ui/checkbox";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
 import { cn } from "@/lib/utils";
-import { getContrastRatio } from "@/utils/colorFunctions";
+import { getHexContrastRatio } from "@/utils/colorFunctions";
 
 type Props = {
   variants: VariantProps;
   enrollment: ModifiedEnrollmentProps;
+  color: string;
 };
 
-export default function Course({ variants, enrollment }: Props) {
+export default function Course({ variants, enrollment, color }: Props) {
   const { progress, updateEnrollment } = useCurriculumStore();
   const { editMode } = useSettingsStore();
-
   const [isOpen, setIsOpen] = useState(false);
 
+  const lowContrast = getHexContrastRatio(color) < 1.9;
   const available =
     enrollment.course?.prerequisiteCourses.every((course) =>
-      course.code ? progress.approvedCourses.includes(course.code) : true,
-    ) && enrollment.course?.prerequisiteCredits <= 0;
-  const lowContrast = getContrastRatio(enrollment.course?.color) < 1.9;
+      course.code
+        ? progress.approvedCourses.some((approvedCourse) =>
+            approvedCourse.startsWith(course.code),
+          )
+        : true,
+    ) && enrollment.course?.prerequisiteCredits <= progress.earnedCredits;
+
+    const style = {
+      backgroundColor: color,
+    };
 
   return (
     <>
       <MotionLi
         variants={variants}
         className={cn(
-          "relative mb-2 flex h-20 select-none items-center justify-start rounded-2xl bg-slate-100 p-2 shadow-md xl:h-[5.5rem]",
+          "relative flex h-[5rem] select-none items-center justify-start  overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
           editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
           available
             ? "brightness-100 hover:brightness-[0.98]"
             : "brightness-[0.80] hover:brightness-[0.78]",
         )}
-        style={{ backgroundColor: enrollment.course?.color }}
-        onClick={() => setIsOpen(true)}
+        style={style}
+        onClick={() => {
+          if (!editMode) setIsOpen(true);
+        }}
       >
         <p
           className={cn(
@@ -73,16 +83,11 @@ export default function Course({ variants, enrollment }: Props) {
               },
             });
           }}
-          onClick={(e) => e.stopPropagation()}
         />
 
         {/* Strikethrough */}
         {enrollment.status === "APPROVED" && (
-          <div
-            className={cn(
-              "absolute bottom-[42px] left-[-8px] z-10 h-[4px] w-36 rotate-[-33deg] transform bg-black",
-            )}
-          />
+          <div className={cn("diagonal-line bg-black")} />
         )}
       </MotionLi>
 

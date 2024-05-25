@@ -164,20 +164,30 @@ export const useCurriculumStore = create(
             const updatedEnrollments = period.enrollments.map((enrollment) => {
               if (enrollment.id !== updatedEnrollment.id) return enrollment;
 
-              enrollment.position = updatedEnrollment.position;
-              enrollment.status = updatedEnrollment.status;
-
-              return enrollment;
+              return {
+                ...enrollment,
+                position: updatedEnrollment.position,
+                status: updatedEnrollment.status,
+              };
             });
             return { ...period, enrollments: updatedEnrollments };
           });
 
           // Update the progress
           if (updatedEnrollment.course.code) {
+            const courseCode =
+              updatedEnrollment.course.code + "-" + updatedEnrollment.id;
+
             if (
               updatedEnrollment.status === "PENDING" &&
-              progress.approvedCourses.includes(updatedEnrollment.course.code)
+              progress.approvedCourses.includes(courseCode)
             ) {
+              updatedApprovedCourses.splice(
+                updatedApprovedCourses.indexOf(courseCode),
+                1,
+              );
+              updatedEarnedCredits -= updatedEnrollment.course.credits;
+
               ({
                 updatedPeriods,
                 updatedApprovedCourses,
@@ -186,10 +196,10 @@ export const useCurriculumStore = create(
                 updatedPeriods,
                 updatedApprovedCourses,
                 updatedEarnedCredits,
-                updatedEnrollment.course.code,
+                updatedEnrollment.course.dependentCourses,
               ));
             } else {
-              updatedApprovedCourses.push(updatedEnrollment.course.code);
+              updatedApprovedCourses.push(courseCode);
               updatedEarnedCredits += updatedEnrollment.course.credits;
             }
           }
@@ -350,8 +360,11 @@ function updateEnrollmentStatusCascade(
   updatedPeriods: ModifiedPeriodProps[],
   updatedApprovedCourses: string[],
   updatedEarnedCredits: number,
-  courseCode: string,
+  dependentCourses: { code: string | null }[] | undefined,
 ) {
+  if (!dependentCourses)
+    return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
+
   function cascade(currentCourseCode: string | null) {
     if (!currentCourseCode) return;
 
@@ -359,14 +372,16 @@ function updateEnrollmentStatusCascade(
       const updatedEnrollments = period.enrollments.map((enrollment) => {
         if (!enrollment?.course?.code) return enrollment;
 
+        const courseCode = enrollment.course.code + "-" + enrollment.id;
+
         if (
           enrollment.course.code === currentCourseCode &&
-          updatedApprovedCourses.includes(currentCourseCode)
+          updatedApprovedCourses.includes(courseCode)
         ) {
           enrollment.status = "PENDING";
 
           updatedApprovedCourses.splice(
-            updatedApprovedCourses.indexOf(currentCourseCode),
+            updatedApprovedCourses.indexOf(courseCode),
             1,
           );
           updatedEarnedCredits -= enrollment.course.credits;
@@ -381,6 +396,6 @@ function updateEnrollmentStatusCascade(
     });
   }
 
-  cascade(courseCode);
+  dependentCourses.forEach((course) => cascade(course.code));
   return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
 }

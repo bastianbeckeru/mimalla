@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useCurriculumStore } from "@/stores/curriculum";
-import Curriculum from "./Curriculum";
+import CurriculumDashboard from "./CurriculumDashboard";
 
 import { Button } from "../ui/button";
 import { Kanban, Loader2, Menu } from "lucide-react";
@@ -12,7 +12,6 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-/* import CurriculumDashboard from "./CurriculumDashboard"; */
 
 export default function View() {
   const router = useRouter();
@@ -103,8 +102,7 @@ export default function View() {
             </Button>
           </header>
           <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">
-            <Curriculum curriculum={curriculum} />
-            {/* <CurriculumDashboard curriculum={curriculum} /> */}
+            <CurriculumDashboard curriculum={curriculum} />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>

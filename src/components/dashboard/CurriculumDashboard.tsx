@@ -12,8 +12,8 @@ type Props = {
   curriculum: ModifiedCurriculumProps;
 };
 
-export default function Curriculum({ curriculum }: Props) {
-  const { onDragEnd } = useCurriculumStore();
+export default function CurriculumDashboard({ curriculum }: Props) {
+  const { areas, onDragEnd } = useCurriculumStore();
   const { editMode } = useSettingsStore();
 
   /* Animations */
@@ -83,6 +83,7 @@ export default function Curriculum({ curriculum }: Props) {
                               <Course
                                 variants={courseVariants}
                                 enrollment={enrollment}
+                                color={getColor(enrollment.course?.id)}
                               />
                             </div>
                           )}
@@ -99,4 +100,16 @@ export default function Curriculum({ curriculum }: Props) {
       </MotionOl>
     </DragDropContext>
   );
+
+  function getColor(id: string | null | undefined) {
+    const hexColor = "#f1f5f9";
+
+    if (!id) return hexColor;
+
+    const area = areas.find((area) =>
+      area.courses.some((course) => course.id === id),
+    );
+
+    return area?.color ?? hexColor;
+  }
 }
