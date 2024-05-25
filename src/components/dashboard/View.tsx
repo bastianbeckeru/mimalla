@@ -12,20 +12,40 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 export default function View() {
   const router = useRouter();
   const { curriculum, areas, setData, version, updateVersion } =
     useCurriculumStore();
 
+  const currentVersion = "1.1.1";
+  const isUpToDate = version === currentVersion;
+
+  const getCareerAreas = api.career.getAreas.useQuery(
+    { siesCode: curriculum.career.siesCode },
+    {
+      enabled: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    },
+  );
+
   useEffect(() => {
+    if (getCareerAreas.isSuccess &&
+      getCareerAreas.data) {
+        setData({ curriculum: curriculum, areas: getCareerAreas.data });
+        updateVersion(currentVersion);
+    }
+
     const delay = setTimeout(() => {
       if (!curriculum) {
         router.push("/dashboard/create");
       }
     }, 3000);
     return () => clearTimeout(delay);
-  }, [curriculum, router]);
+  }, [curriculum, router, getCareerAreas]);
 
   if (!curriculum) {
     return (
@@ -78,7 +98,7 @@ export default function View() {
             <div
               className={cn(
                 "flex flex-col items-center justify-center space-y-px px-2",
-                version === "1.1.0" ? "" : "hidden md:flex",
+                isUpToDate ? "" : "hidden md:flex",
               )}
             >
               <h1 className="font-semibold">{curriculum.career?.name}</h1>
@@ -90,11 +110,12 @@ export default function View() {
             <Button
               className={cn(
                 "absolute right-4 top-auto flex flex-col bg-emerald-600 text-foreground",
-                version === "1.1.0" ? "hidden" : "",
+                isUpToDate ? "hidden" : "",
               )}
               onClick={() => {
-                setData({ curriculum: curriculum, areas: areas });
-                updateVersion("1.1.0");
+                if(!getCareerAreas.isLoading){
+                  getCareerAreas.refetch();
+                }
               }}
             >
               <p className="text-xs">Nueva Versión</p>

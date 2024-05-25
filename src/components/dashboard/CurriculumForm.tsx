@@ -69,7 +69,7 @@ export default function CurriculumForm() {
     ) {
       router.push("/dashboard");
       setData(getCareerCurriculum.data);
-      updateVersion("1.1.0");
+      updateVersion("1.1.1");
       setIsCreating(false);
       form.reset();
 

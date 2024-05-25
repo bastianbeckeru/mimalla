@@ -29,6 +29,10 @@ export const useCurriculumStore = create(
         set((state) => {
           if (!state || !newData.curriculum) return state;
 
+          // Al establecer o actualizar los datos, se debe actualizar el progreso. (ESTO FALTA AQUÍ)
+          let updatedApprovedCourses: string[] = [];
+          let updatedEarnedCredits = 0;
+
           const newPeriods: ModifiedPeriodProps[] =
             newData.curriculum.periods.map((period) => {
               const newEnrollments = period.enrollments.map((enrollment) => {
@@ -135,12 +139,25 @@ export const useCurriculumStore = create(
               };
             });
 
+            newPeriods.forEach((period) => {
+              period.enrollments.forEach((enrollment) => {
+                if(enrollment.course && enrollment.status === "APPROVED") {
+                  updatedApprovedCourses.push(enrollment.course.code + "-" + enrollment.id);
+                  updatedEarnedCredits += enrollment.course.credits;
+                }
+              })
+            })
+
           return {
             curriculum: {
               ...newData.curriculum,
               periods: newPeriods,
             },
             areas: newData.areas,
+            progress: {
+              approvedCourses: updatedApprovedCourses,
+              earnedCredits: updatedEarnedCredits,
+            },
           };
         }),
       setTaskQueue: (newTaskQueue) =>
