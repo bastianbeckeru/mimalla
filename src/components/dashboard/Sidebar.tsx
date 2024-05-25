@@ -39,26 +39,35 @@ export default function Sidebar() {
               onCheckedChange={(checked: boolean) => setEditMode(checked)}
             />
           </div>
+
           {/* PROGRESS */}
           <div>
-            <p>
-              Progreso:{" "}
-              {((progress.approvedCourses.length / totalCourses) * 100).toFixed(
-                2,
-              )}
-              %
-            </p>
-            <p>Créditos: {progress.earnedCredits}</p>
+            <div className="flex space-x-2">
+              <h2 className="font-semibold">Progreso:</h2>
+              <p className="font-normal">
+                {(
+                  (progress.approvedCourses.length / totalCourses) *
+                  100
+                ).toFixed(2)}
+                %
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <h2 className="font-semibold">Créditos:</h2>
+              <p className="font-normal">{progress.earnedCredits}</p>
+            </div>
           </div>
+
+          {/* AREAS */}
           {areas.length > 0 && (
             <div className="flex flex-col space-y-2 py-2">
               <h2 className="font-semibold">Áreas de Formación</h2>
-              <ul className="space-y-1">
+              <ul className="rounded-md border border-input">
                 {areas.map((area, aIndex) => {
                   return (
                     <li
                       key={aIndex}
-                      className="flex h-8 w-full flex-row items-center justify-between space-x-2 rounded-lg border border-input px-2 font-normal"
+                      className="flex h-8 w-full flex-row items-center justify-between space-x-2 px-2 font-normal"
                     >
                       <p className="line-clamp-1">{area.name}</p>
                       <div
@@ -75,13 +84,15 @@ export default function Sidebar() {
           )}
         </div>
       </div>
+
+      {/* SIDEBAR FOOTER */}
       <div className="mt-auto p-4">
-        <a
+      <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
           className="my-4 block w-full text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
         >
-          ¿Te gusta Mi Malla? ¡Opina!
+          ¡Ayudanos a mejorar!
         </a>
         <Dialog>
           <DialogTrigger asChild>
