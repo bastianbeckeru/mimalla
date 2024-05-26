@@ -13,6 +13,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getCareerAreas } from "./serverFunctions";
+import { toast } from "../ui/use-toast";
 
 export default function View() {
   const router = useRouter();
@@ -93,7 +94,7 @@ export default function View() {
             <Button
               className={cn(
                 "absolute right-4 top-auto flex flex-row items-center justify-center bg-emerald-600 text-foreground hover:bg-emerald-500",
-                isUpToDate ? "hidden" : "",
+                isUpToDate ? "" : "",
               )}
               onClick={async () => {
                 if (curriculum.career) {
@@ -103,6 +104,18 @@ export default function View() {
                   console.log("Actualizando...");
                   setData({ curriculum: curriculum, areas: areas });
                   updateVersion(currentVersion);
+
+                  toast({
+                    description: (
+                      <div className="flex flex-row items-start justify-center space-x-2">
+                        <p>✅</p>
+                        <p className="font-bold">
+                          Se ha actualizado a la versión{" "}
+                          <span>{currentVersion}</span> exitosamente.
+                        </p>
+                      </div>
+                    ),
+                  });
                 }
               }}
             >

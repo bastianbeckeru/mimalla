@@ -75,13 +75,16 @@ export default function CurriculumForm() {
 
       toast({
         description: (
-          <p>
-            ✅ Se ha importado la malla de{" "}
-            <span className="italic">
-              {getCareerCurriculum.data.curriculum.career?.name}
-            </span>{" "}
-            exitosamente.
-          </p>
+          <div className="flex flex-row items-start justify-center space-x-2">
+            <p>✅</p>
+            <p className="font-bold">
+              Se ha importado la malla de{" "}
+              <span className="italic">
+                {getCareerCurriculum.data.curriculum.career?.name}
+              </span>{" "}
+              exitosamente.
+            </p>
+          </div>
         ),
       });
     }
