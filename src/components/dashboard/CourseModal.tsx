@@ -79,7 +79,9 @@ function RelatedCourses({
             <div className="flex flex-row space-x-1">
               <p className="text-xs text-muted-foreground">({course.code})</p>
               {approvedCourses !== undefined ? (
-                approvedCourses?.includes(course.code) ? (
+                approvedCourses.some((approvedCourse) =>
+                  approvedCourse.startsWith(course.code),
+                ) ? (
                   <Check className="size-4 text-green-500" />
                 ) : (
                   <Minus className="size-4 text-muted-foreground" />
