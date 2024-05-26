@@ -94,7 +94,7 @@ export default function View() {
             <Button
               className={cn(
                 "absolute right-4 top-auto flex flex-row items-center justify-center bg-emerald-600 text-foreground hover:bg-emerald-500",
-                isUpToDate ? "" : "",
+                isUpToDate ? "hidden" : "",
               )}
               onClick={async () => {
                 if (curriculum.career) {
