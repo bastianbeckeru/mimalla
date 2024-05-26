@@ -48,7 +48,6 @@ export type CourseProps = {
     code: string | null;
   }[];
   prerequisiteCredits: number;
-  color?: string | undefined; // SHOULD NOT BE HERE
 };
 
 //////////////////////////////////////////
@@ -79,7 +78,6 @@ export type ModifiedCourseProps = {
   id: string;
   name: string;
   code: string | null;
-  color: string | undefined;
   credits: number;
   dependentCourses: {
     code: string;

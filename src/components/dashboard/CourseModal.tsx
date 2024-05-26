@@ -13,11 +13,11 @@ type Props = {
 
 export default function CourseModal({ enrollment, color }: Props) {
   const approvedCourses = useCurriculumStore().progress.approvedCourses;
-  const rgbaColor = hexToRgba(color, 0.15);
+  const rgbaColor = hexToRgba(color, 0.2);
 
   const style = {
     backgroundColor: rgbaColor,
-  }
+  };
 
   return (
     <DialogContent tabIndex={-1} className="sm:max-w-2xl">
@@ -26,8 +26,6 @@ export default function CourseModal({ enrollment, color }: Props) {
           {enrollment.course?.name ?? `Curso`}
         </DialogTitle>
         <div className="mt-1 flex flex-row items-center space-x-2 text-sm text-muted-foreground">
-          {/* Intentar obtener el RGB color del área, si es posible, obtenerlo desde "Course" y luego pasarlo como prop a CourseModal. Luego, aplicar el "/ {transparency}". (OJO: Recordar que el contraste es importante.)
-           */}
           <p className="rounded-md px-1 py-px" style={style}>
             Código: {enrollment.course?.code ?? "-------"}
           </p>

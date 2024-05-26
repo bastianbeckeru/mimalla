@@ -1,4 +1,4 @@
-import type { ModifiedPeriodProps } from "@/types/curriculum";
+import type { ModifiedPeriodProps, PeriodProps } from "@/types/curriculum";
 import type { StateProps, useCurriculumStoreProps } from "./types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -23,22 +23,65 @@ export const useCurriculumStore = create(
         set(initialState);
       },
       updateVersion: (newVersion) => {
-        set((state) => ({ ...state, version: newVersion }));
+        set((state) => {
+          console.log(
+            `Se ha actualizado correctamente la versión ${newVersion}.`,
+          );
+          return { ...state, version: newVersion };
+        });
       },
       setData: (newData) =>
         set((state) => {
           if (!state || !newData.curriculum) return state;
 
           // Al establecer o actualizar los datos, se debe actualizar el progreso. (ESTO FALTA AQUÍ)
-          let updatedApprovedCourses: string[] = [];
+          const updatedApprovedCourses: string[] = [];
           let updatedEarnedCredits = 0;
 
-          const newPeriods: ModifiedPeriodProps[] =
-            newData.curriculum.periods.map((period) => {
+          const newPeriods: PeriodProps[] = newData.curriculum.periods.map(
+            (period) => {
               const newEnrollments = period.enrollments.map((enrollment) => {
                 // Desde la BD llegan los enrollment sin curso generalmente, esto debería ser SIEMPRE así. (ARREGLAR)
 
+                const newCourse = newData.areas
+                  .flatMap((a) => a.courses)
+                  .find((c) => c.id === enrollment.courseId);
+
+                if (newCourse)
+                  return {
+                    ...enrollment,
+                    course: newCourse,
+                  };
+                else if (enrollment.course) {
+                  return {
+                    ...enrollment,
+                    course: enrollment.course,
+                  };
+                } else
+                  return {
+                    ...enrollment,
+                    course: null,
+                  };
+              });
+
+              return {
+                ...period,
+                enrollments: newEnrollments,
+              };
+            },
+          );
+
+          const fixedNewPeriods: ModifiedPeriodProps[] = newPeriods.map(
+            (period) => {
+              const newEnrollments = period.enrollments.map((enrollment) => {
                 if (enrollment.course) {
+                  if (enrollment.status === "APPROVED") {
+                    updatedApprovedCourses.push(
+                      enrollment.course.code + "-" + enrollment.id,
+                    );
+                    updatedEarnedCredits += enrollment.course.credits;
+                  }
+
                   function findCourseNames(courses: { code: string | null }[]) {
                     const validCourses = courses.filter(
                       (course) => course.code !== null,
@@ -46,12 +89,15 @@ export const useCurriculumStore = create(
 
                     const relatedCourses = validCourses
                       .map((course) => {
-                        const foundCourse = newData.curriculum?.periods
+                        const foundCourse = newPeriods
                           .flatMap((p) => p.enrollments)
                           .find((e) => e.course?.code === course.code)?.course;
 
                         if (foundCourse) {
-                          return { code: course.code, name: foundCourse.name };
+                          return {
+                            code: foundCourse.code,
+                            name: foundCourse.name,
+                          };
                         }
                         return null;
                       })
@@ -67,7 +113,6 @@ export const useCurriculumStore = create(
                     ...enrollment,
                     course: {
                       ...enrollment.course,
-                      color: enrollment.course.color ?? undefined,
                       dependentCourses: findCourseNames(
                         enrollment.course.dependentCourses,
                       ),
@@ -76,82 +121,20 @@ export const useCurriculumStore = create(
                       ),
                     },
                   };
-                } else {
-                  const area = newData.areas.find((area) =>
-                    area.courses.some(
-                      (course) => course.id === enrollment.courseId,
-                    ),
-                  );
-                  const course = area?.courses.find(
-                    (course) => course.id === enrollment.courseId,
-                  );
-
-                  function findCourseNames(courses: { code: string | null }[]) {
-                    const validCourses = courses.filter(
-                      (course) => course.code !== null,
-                    );
-
-                    const relatedCourses = validCourses
-                      .map((course) => {
-                        const foundCourse = newData.areas
-                          .flatMap((a) => a.courses)
-                          .find((c) => c.code === course.code);
-
-                        if (foundCourse) {
-                          return { code: course.code, name: foundCourse.name };
-                        }
-                        return null;
-                      })
-                      .filter((course) => course !== null) as {
-                      code: string;
-                      name: string;
-                    }[];
-
-                    return relatedCourses;
-                  }
-
-                  if (area && course) {
-                    return {
-                      ...enrollment,
-                      course: {
-                        ...course,
-                        color: area.color ?? undefined,
-                        dependentCourses: findCourseNames(
-                          course.dependentCourses,
-                        ),
-                        prerequisiteCourses: findCourseNames(
-                          course.prerequisiteCourses,
-                        ),
-                      },
-                    };
-                  } else {
-                    return {
-                      ...enrollment,
-                      course: null,
-                    };
-                  }
-                }
+                } else return { ...enrollment, course: null };
               });
 
               return {
                 ...period,
                 enrollments: newEnrollments,
               };
-            });
-
-            newPeriods.forEach((period) => {
-              period.enrollments.forEach((enrollment) => {
-                if(enrollment.course && enrollment.status === "APPROVED") {
-                  updatedApprovedCourses.push(enrollment.course.code + "-" + enrollment.id);
-                  updatedEarnedCredits += enrollment.course.credits;
-                }
-              })
-            })
+            },
+          );
 
           return {
             curriculum: {
               ...newData.curriculum,
-              periods: newPeriods,
+              periods: fixedNewPeriods,
             },
             areas: newData.areas,
             progress: {

@@ -5,47 +5,30 @@ import { useCurriculumStore } from "@/stores/curriculum";
 import CurriculumDashboard from "./CurriculumDashboard";
 
 import { Button } from "../ui/button";
-import { Kanban, Loader2, Menu } from "lucide-react";
+import { ArrowDownToLine, Kanban, Loader2, Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import { getCareerAreas } from "./serverFunctions";
 
 export default function View() {
   const router = useRouter();
-  const { curriculum, areas, setData, version, updateVersion } =
-    useCurriculumStore();
+  const { curriculum, setData, version, updateVersion } = useCurriculumStore();
 
   const currentVersion = "1.1.1";
   const isUpToDate = version === currentVersion;
 
-  const getCareerAreas = api.career.getAreas.useQuery(
-    { siesCode: curriculum?.career.siesCode },
-    {
-      enabled: false,
-      refetchInterval: false,
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false,
-    },
-  );
-
   useEffect(() => {
-    if (getCareerAreas.isSuccess &&
-      getCareerAreas.data) {
-        setData({ curriculum: curriculum, areas: getCareerAreas.data });
-        updateVersion(currentVersion);
-    }
-
     const delay = setTimeout(() => {
       if (!curriculum) {
         router.push("/dashboard/create");
       }
     }, 3000);
     return () => clearTimeout(delay);
-  }, [curriculum, router, getCareerAreas]);
+  }, [curriculum, router]);
 
   if (!curriculum) {
     return (
@@ -109,17 +92,24 @@ export default function View() {
 
             <Button
               className={cn(
-                "absolute right-4 top-auto flex flex-col bg-emerald-600 text-foreground",
+                "absolute right-4 top-auto flex flex-row items-center justify-center bg-emerald-600 text-foreground hover:bg-emerald-500",
                 isUpToDate ? "hidden" : "",
               )}
-              onClick={() => {
-                if(!getCareerAreas.isLoading){
-                  getCareerAreas.refetch();
+              onClick={async () => {
+                if (curriculum.career) {
+                  const areas = await getCareerAreas(
+                    curriculum.career.siesCode,
+                  );
+                  console.log("Actualizando...");
+                  setData({ curriculum: curriculum, areas: areas });
+                  updateVersion(currentVersion);
                 }
               }}
             >
-              <p className="text-xs">Nueva Versión</p>
-              Actualizar ✨
+              <div className="flex flex-col">
+                <p className="text-xs italic">Nueva Versión ✨</p>
+                <p className="text-sm font-bold tracking-widest">Actualizar</p>
+              </div>
             </Button>
           </header>
           <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">

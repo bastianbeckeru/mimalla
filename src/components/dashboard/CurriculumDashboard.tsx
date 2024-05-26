@@ -45,7 +45,7 @@ export default function CurriculumDashboard({ curriculum }: Props) {
         variants={variants}
         initial="hidden"
         animate="visible"
-        className="grid grid-flow-col gap-2 p-4"
+        className="flex flex-row gap-2 p-4"
       >
         {curriculum.periods.map((period, pIndex) => {
           return (
@@ -63,7 +63,7 @@ export default function CurriculumDashboard({ curriculum }: Props) {
                   <ul
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="grid grid-flow-row gap-2"
+                    className="flex flex-col"
                   >
                     {period.enrollments.map((enrollment, eIndex) => {
                       return (

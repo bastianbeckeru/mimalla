@@ -32,16 +32,16 @@ export default function Course({ variants, enrollment, color }: Props) {
         : true,
     ) && enrollment.course?.prerequisiteCredits <= progress.earnedCredits;
 
-    const style = {
-      backgroundColor: color,
-    };
+  const style = {
+    backgroundColor: color,
+  };
 
   return (
     <>
       <MotionLi
         variants={variants}
         className={cn(
-          "relative flex h-[5rem] select-none items-center justify-start  overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
+          "relative mb-2 flex h-[5rem] select-none items-center justify-start  overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
           editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
           available
             ? "brightness-100 hover:brightness-[0.98]"
