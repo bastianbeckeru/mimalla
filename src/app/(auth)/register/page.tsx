@@ -6,7 +6,7 @@ import { UserAuthForm } from "@/components/UserAuthForm";
 import { GraduationCap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Crear cuenta | Malla",
+  title: "Crear cuenta | Mi Malla",
   description: "Crea una cuenta para comenzar.",
 };
 

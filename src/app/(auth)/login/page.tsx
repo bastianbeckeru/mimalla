@@ -8,7 +8,7 @@ import { ChevronLeftIcon, GraduationCap } from "lucide-react";
 import { UserAuthForm } from "@/components/UserAuthForm";
 
 export const metadata: Metadata = {
-  title: "Inicio de sesión | Malla",
+  title: "Inicio de sesión | Mi Malla",
   description: "Inicia sesión en tu cuenta",
 };
 

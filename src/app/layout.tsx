@@ -13,12 +13,53 @@ const mont = Montserrat({
 });
 
 export const metadata = {
-  title: "Mi Malla",
-  description: "Personaliza tu malla y visualiza tu progreso.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords: ["Malla Interactiva", "Universidad", "Herramienta Universitaria"],
   creator: "Jnkyns",
   authors: [{ name: "Jnkyns", url: "" }],
+  title: "Mi Malla",
+  description:
+    "Personalíza tu malla curricular a tu pinta y lleva registro de tu progreso. La flexibilidad está en tus manos.",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  keywords: [
+    "mi malla",
+    "mi malla curricular",
+    "mi malla universitaria",
+    "mi malla universidad",
+    "mi malla udp",
+    "mi malla app",
+    "mi malla app universitaria",
+    "mi malla app universidad",
+    "mi malla app udp",
+    "malla universitaria",
+    "malla curricular",
+    "malla curricular universitaria",
+    "malla curricular interactiva",
+    "app mi malla",
+    "app malla curricular",
+    "app universitaria",
+    "app universitaria malla curricular",
+    "herramienta universitaria",
+    "organizar cursos",
+    "organizar ramos",
+    "gestión de cursos",
+    "gestión de ramos",
+    "planificar estudios",
+    "progreso académico",
+    "carrera universitaria",
+    "seguimiento académico",
+    "planificación de carrera",
+    "planificación académica",
+    "administrar cursos",
+    "administrar ramos",
+    "programa de estudios",
+    "personalizar malla curricular",
+    "personalizar mi malla",
+  ],
+  openGraph: {
+    title: "Mi Malla - Toma el Control de tu Malla.",
+    description:
+      "Personalíza tu malla curricular a tu pinta y lleva registro de tu progreso. La flexibilidad está en tus manos.",
+    url: "https://mimalla.vercel.app",
+  },
 };
 
 export default function RootLayout({
