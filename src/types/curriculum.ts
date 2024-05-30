@@ -43,9 +43,11 @@ export type CourseProps = {
   credits: number;
   dependentCourses: {
     code: string | null;
+    name: string;
   }[];
   prerequisiteCourses: {
     code: string | null;
+    name: string;
   }[];
   prerequisiteCredits: number;
 };

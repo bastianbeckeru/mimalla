@@ -1,19 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getCareerAreas } from "./serverFunctions";
 import { useCurriculumStore } from "@/stores/curriculum";
 import CurriculumDashboard from "./CurriculumDashboard";
-
-import { Button } from "../ui/button";
-import { ArrowDownToLine, Kanban, Loader2, Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
-import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { getCareerAreas } from "./serverFunctions";
 import { toast } from "../ui/use-toast";
+import { Loader2, Menu } from "lucide-react";
 
 export default function View() {
   const router = useRouter();
@@ -27,7 +25,7 @@ export default function View() {
       if (!curriculum) {
         router.push("/dashboard/create");
       }
-    }, 3000);
+    }, 2000);
     return () => clearTimeout(delay);
   }, [curriculum, router]);
 
@@ -42,39 +40,28 @@ export default function View() {
   return (
     <>
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        {/* SIDEBAR on MD devices */}
         <aside className="hidden border-r bg-muted/20 md:block">
           <div className="flex h-full max-h-screen flex-col gap-2">
-            {/* LOGO */}
-            <div className="flex h-14 items-center justify-start border-b px-4 lg:h-16">
-              <Link href="/" className="flex items-center gap-2">
-                <Kanban className="size-6" />
-                <span className="text-lg font-medium">Mi Malla</span>
-              </Link>
-            </div>
             <Sidebar />
           </div>
         </aside>
 
         <div className="flex h-full flex-col overflow-hidden">
-          <header className="relative flex h-14 items-center gap-4 border-b bg-muted/20 px-4 md:justify-center lg:h-16 lg:px-6">
+          <header className="relative flex h-14 items-center justify-center border-b bg-muted/20 pl-12 md:px-6 lg:h-16">
+            {/* SIDEBAR on SM devices */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="shrink-0 md:hidden"
+                  className="absolute left-4 top-auto shrink-0 md:hidden"
                 >
                   <Menu className="size-5" />
                   <span className="sr-only">Toggle navigation menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="flex w-72 flex-col p-4">
-                <div className="h-10 border-b pl-2 pr-8">
-                  <Link href="/" className="flex flex-row items-center gap-2">
-                    <Kanban className="size-6" />
-                    <span className="text-lg font-medium">Mi Malla</span>
-                  </Link>
-                </div>
+              <SheetContent side="left" className="flex w-72 flex-col p-0">
                 <Sidebar />
               </SheetContent>
             </Sheet>
@@ -102,6 +89,7 @@ export default function View() {
                     curriculum.career.siesCode,
                   );
                   console.log("Actualizando...");
+
                   setData({ curriculum: curriculum, areas: areas });
                   updateVersion(currentVersion);
 
@@ -125,6 +113,8 @@ export default function View() {
               </div>
             </Button>
           </header>
+
+          {/* MAIN CONTENT */}
           <ScrollArea className="h-[calc(100vh-3.5rem)] lg:h-[calc(100vh-4rem)]">
             <CurriculumDashboard curriculum={curriculum} />
             <ScrollBar orientation="horizontal" />

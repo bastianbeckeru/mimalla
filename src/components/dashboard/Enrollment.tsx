@@ -1,11 +1,8 @@
 "use client";
 
 /* import { useSettingsStore } from "@/stores/curriculum"; */
-import type { ModifiedEnrollmentProps } from "@/types/curriculum";
+import type { CourseProps, ModifiedEnrollmentProps } from "@/types/curriculum";
 import { MotionLi, type VariantProps } from "../Motion";
-import { Dialog } from "../ui/dialog";
-import { useState } from "react";
-import CourseModal from "./CourseModal";
 import { Checkbox } from "../ui/checkbox";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
 import { cn } from "@/lib/utils";
@@ -14,23 +11,23 @@ import { getHexContrastRatio } from "@/utils/colorFunctions";
 type Props = {
   variants: VariantProps;
   enrollment: ModifiedEnrollmentProps;
+  course: CourseProps | null;
   color: string;
+  openDialog: () => void;
 };
 
-export default function Course({ variants, enrollment, color }: Props) {
+export default function Enrollment({
+  variants,
+  enrollment,
+  course,
+  color,
+  openDialog,
+}: Props) {
   const { progress, updateEnrollment } = useCurriculumStore();
   const { editMode } = useSettingsStore();
-  const [isOpen, setIsOpen] = useState(false);
 
   const lowContrast = getHexContrastRatio(color) < 1.9;
-  const available =
-    enrollment.course?.prerequisiteCourses.every((course) =>
-      course.code
-        ? progress.approvedCourses.some((approvedCourse) =>
-            approvedCourse.startsWith(course.code),
-          )
-        : true,
-    ) && enrollment.course?.prerequisiteCredits <= progress.earnedCredits;
+  const available = getAviability(course, progress);
 
   const style = {
     backgroundColor: color,
@@ -49,7 +46,7 @@ export default function Course({ variants, enrollment, color }: Props) {
         )}
         style={style}
         onClick={() => {
-          if (!editMode) setIsOpen(true);
+          if (!editMode) openDialog();
         }}
       >
         <p
@@ -59,7 +56,7 @@ export default function Course({ variants, enrollment, color }: Props) {
             lowContrast ? "text-background" : "text-foreground",
           )}
         >
-          {enrollment.course?.name ?? `Curso`}
+          {course?.name ?? `Curso`}
         </p>
 
         <Checkbox
@@ -77,9 +74,9 @@ export default function Course({ variants, enrollment, color }: Props) {
               position: enrollment.position,
               status: checked ? "APPROVED" : "PENDING",
               course: {
-                code: enrollment.course?.code,
-                credits: enrollment.course?.credits ?? 0,
-                dependentCourses: enrollment.course?.dependentCourses,
+                code: course?.code,
+                credits: course?.credits ?? 0,
+                dependentCourses: course?.dependentCourses,
               },
             });
           }}
@@ -92,9 +89,29 @@ export default function Course({ variants, enrollment, color }: Props) {
       </MotionLi>
 
       {/* Course Modal */}
-      <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
-        <CourseModal enrollment={enrollment} color={color} />
-      </Dialog>
+      {/*       <Dialog open={isOpen} onOpenChange={(open: boolean) => setIsOpen(open)}>
+        <CourseModal enrollment={enrollment} course={course} color={color} />
+      </Dialog> */}
     </>
   );
+}
+
+type ProgressProps = {
+  earnedCredits: number;
+  approvedCourses: string[];
+};
+
+function getAviability(course: CourseProps | null, progress: ProgressProps) {
+  if (!course || !progress) return false;
+
+  const hasEnoughCredits = course.prerequisiteCredits <= progress.earnedCredits;
+  const hasApprovedPrerequisites = course.prerequisiteCourses.every(
+    ({ code }) =>
+      !code ||
+      progress.approvedCourses.some((approvedCourse) =>
+        approvedCourse.startsWith(code),
+      ),
+  );
+
+  return hasApprovedPrerequisites && hasEnoughCredits;
 }

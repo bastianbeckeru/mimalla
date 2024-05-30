@@ -40,30 +40,6 @@ export const careerRouter = createTRPCRouter({
                   position: true,
                   mutable: true,
                   status: true,
-                  course: {
-                    where: {
-                      areas: {
-                        none: {},
-                      },
-                    },
-                    select: {
-                      id: true,
-                      name: true,
-                      code: true,
-                      credits: true,
-                      dependentCourses: {
-                        select: {
-                          code: true,
-                        },
-                      },
-                      prerequisiteCourses: {
-                        select: {
-                          code: true,
-                        },
-                      },
-                      prerequisiteCredits: true,
-                    },
-                  },
                   courseId: true,
                 },
               },
@@ -72,6 +48,7 @@ export const careerRouter = createTRPCRouter({
         },
       });
 
+      // Career areas
       const areas = await ctx.db.area.findMany({
         orderBy: [
           {
@@ -82,117 +59,26 @@ export const careerRouter = createTRPCRouter({
           },
         ],
         where: {
-          faculty: {
-            careers: {
-              some: {
-                curriculum: {
+          OR: [
+            {
+              faculty: {
+                careers: {
                   some: {
-                    id: curriculum.id,
-                  },
-                },
-              },
-            },
-          },
-          AND: {
-            courses: {
-              some: {
-                enrollments: {
-                  some: {
-                    period: {
-                      curriculumId: curriculum.id,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        select: {
-          name: true,
-          color: true,
-          courses: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-              credits: true,
-              dependentCourses: {
-                where: {
-                  enrollments: {
-                    some: {
-                      period: {
-                        curriculumId: curriculum.id,
+                    curriculum: {
+                      some: {
+                        id: curriculum.id,
                       },
                     },
                   },
                 },
-                select: {
-                  code: true,
-                },
               },
-              prerequisiteCourses: {
-                where: {
-                  enrollments: {
-                    some: {
-                      period: {
-                        curriculumId: curriculum.id,
-                      },
-                    },
-                  },
-                },
-                select: {
-                  code: true,
-                },
-              },
-              prerequisiteCredits: true,
-            },
-          },
-        },
-      });
-
-      const egArea = await ctx.db.area.findFirst({
-        where: {
-          courses: {
-            some: {
-              enrollments: {
-                some: {
-                  period: {
-                    curriculumId: curriculum.id,
-                  },
-                },
-              },
-            },
-          },
-          NOT: {
-            faculty: {
-              careers: {
-                some: {
-                  curriculum: {
-                    some: {
-                      id: curriculum.id,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        select: {
-          name: true,
-          color: true,
-          courses: {
-            where: {
-              NOT: {
-                areas: {
+              AND: {
+                courses: {
                   some: {
-                    faculty: {
-                      careers: {
-                        some: {
-                          curriculum: {
-                            some: {
-                              id: curriculum.id,
-                            },
-                          },
+                    enrollments: {
+                      some: {
+                        period: {
+                          curriculumId: curriculum.id,
                         },
                       },
                     },
@@ -200,19 +86,71 @@ export const careerRouter = createTRPCRouter({
                 },
               },
             },
+            {
+              courses: {
+                some: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
+              },
+              NOT: {
+                faculty: {
+                  careers: {
+                    some: {
+                      curriculum: {
+                        some: {
+                          id: curriculum.id,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        select: {
+          name: true,
+          color: true,
+          courses: {
             select: {
               id: true,
               name: true,
               code: true,
               credits: true,
               dependentCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
+                  name: true,
                 },
               },
               prerequisiteCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
+                  name: true,
                 },
               },
               prerequisiteCredits: true,
@@ -221,14 +159,54 @@ export const careerRouter = createTRPCRouter({
         },
       });
 
-      if (egArea != null) {
-        areas.push(egArea);
+      // Courses without areas
+      const coursesWithoutArea = await ctx.db.course.findMany({
+        where: {
+          areas: {
+            none: {},
+          },
+          enrollments: {
+            some: {
+              period: {
+                curriculumId: curriculum.id,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          credits: true,
+          dependentCourses: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          prerequisiteCourses: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          prerequisiteCredits: true,
+        },
+      });
+
+      if (coursesWithoutArea.length > 0) {
+        const NoArea = {
+          name: "none",
+          color: "#f1f5f9",
+          courses: coursesWithoutArea,
+        };
+        areas.push(NoArea);
       }
 
       return { curriculum, areas };
     }),
 
-    getAreas: publicProcedure
+  getAreas: publicProcedure
     .input(
       z.object({
         siesCode: z.string(),
@@ -243,6 +221,7 @@ export const careerRouter = createTRPCRouter({
         },
       });
 
+      // Career areas
       const areas = await ctx.db.area.findMany({
         orderBy: [
           {
@@ -253,117 +232,26 @@ export const careerRouter = createTRPCRouter({
           },
         ],
         where: {
-          faculty: {
-            careers: {
-              some: {
-                curriculum: {
+          OR: [
+            {
+              faculty: {
+                careers: {
                   some: {
-                    id: curriculum.id,
-                  },
-                },
-              },
-            },
-          },
-          AND: {
-            courses: {
-              some: {
-                enrollments: {
-                  some: {
-                    period: {
-                      curriculumId: curriculum.id,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        select: {
-          name: true,
-          color: true,
-          courses: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-              credits: true,
-              dependentCourses: {
-                where: {
-                  enrollments: {
-                    some: {
-                      period: {
-                        curriculumId: curriculum.id,
+                    curriculum: {
+                      some: {
+                        id: curriculum.id,
                       },
                     },
                   },
                 },
-                select: {
-                  code: true,
-                },
               },
-              prerequisiteCourses: {
-                where: {
-                  enrollments: {
-                    some: {
-                      period: {
-                        curriculumId: curriculum.id,
-                      },
-                    },
-                  },
-                },
-                select: {
-                  code: true,
-                },
-              },
-              prerequisiteCredits: true,
-            },
-          },
-        },
-      });
-
-      const egArea = await ctx.db.area.findFirst({
-        where: {
-          courses: {
-            some: {
-              enrollments: {
-                some: {
-                  period: {
-                    curriculumId: curriculum.id,
-                  },
-                },
-              },
-            },
-          },
-          NOT: {
-            faculty: {
-              careers: {
-                some: {
-                  curriculum: {
-                    some: {
-                      id: curriculum.id,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        select: {
-          name: true,
-          color: true,
-          courses: {
-            where: {
-              NOT: {
-                areas: {
+              AND: {
+                courses: {
                   some: {
-                    faculty: {
-                      careers: {
-                        some: {
-                          curriculum: {
-                            some: {
-                              id: curriculum.id,
-                            },
-                          },
+                    enrollments: {
+                      some: {
+                        period: {
+                          curriculumId: curriculum.id,
                         },
                       },
                     },
@@ -371,19 +259,71 @@ export const careerRouter = createTRPCRouter({
                 },
               },
             },
+            {
+              courses: {
+                some: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
+              },
+              NOT: {
+                faculty: {
+                  careers: {
+                    some: {
+                      curriculum: {
+                        some: {
+                          id: curriculum.id,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        select: {
+          name: true,
+          color: true,
+          courses: {
             select: {
               id: true,
               name: true,
               code: true,
               credits: true,
               dependentCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
+                  name: true,
                 },
               },
               prerequisiteCourses: {
+                where: {
+                  enrollments: {
+                    some: {
+                      period: {
+                        curriculumId: curriculum.id,
+                      },
+                    },
+                  },
+                },
                 select: {
                   code: true,
+                  name: true,
                 },
               },
               prerequisiteCredits: true,
@@ -392,8 +332,48 @@ export const careerRouter = createTRPCRouter({
         },
       });
 
-      if (egArea != null) {
-        areas.push(egArea);
+      // Courses without areas
+      const coursesWithoutArea = await ctx.db.course.findMany({
+        where: {
+          areas: {
+            none: {},
+          },
+          enrollments: {
+            some: {
+              period: {
+                curriculumId: curriculum.id,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          credits: true,
+          dependentCourses: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          prerequisiteCourses: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+          prerequisiteCredits: true,
+        },
+      });
+
+      if (coursesWithoutArea.length > 0) {
+        const NoArea = {
+          name: "none",
+          color: "#f1f5f9",
+          courses: coursesWithoutArea,
+        };
+        areas.push(NoArea);
       }
 
       return areas;

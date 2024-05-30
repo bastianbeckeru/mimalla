@@ -15,22 +15,29 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { useRouter } from "next/navigation";
+import Logo from "../Logo";
 
 export default function Sidebar() {
+  const router = useRouter();
+  const { reset, areas, progress } = useCurriculumStore();
+  const { editMode, setEditMode } = useSettingsStore();
+
   const totalCourses =
     useCurriculumStore().curriculum?.periods.reduce(
       (total, period) => total + period.enrollments.length,
       0,
     ) ?? 0;
-  const { areas, reset, progress } = useCurriculumStore();
-  const { editMode, setEditMode } = useSettingsStore();
-  const router = useRouter();
 
   return (
     <>
+      {/* SM */}
+      <div className="flex h-14 items-center justify-start border-b  px-4 lg:h-16">
+        <Logo alwaysShow />
+      </div>
+
       {/* SIDEBAR CONTENT */}
       <div className="flex-1">
-        <div className="grid items-start gap-2 p-2 text-sm font-medium lg:px-4">
+        <div className="grid items-start gap-2 px-4 py-2 text-sm font-medium">
           <div className="flex items-center justify-between space-x-2">
             <Label htmlFor="edit-mode">Modo edición</Label>
             <Switch
@@ -64,6 +71,7 @@ export default function Sidebar() {
               <h2 className="font-semibold">Áreas de Formación</h2>
               <ul className="rounded-md border border-input">
                 {areas.map((area, aIndex) => {
+                  if (area.name == "none") return null;
                   return (
                     <li
                       key={aIndex}
@@ -87,7 +95,7 @@ export default function Sidebar() {
 
       {/* SIDEBAR FOOTER */}
       <div className="mt-auto p-4">
-      <a
+        <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
           className="my-4 block w-full text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
@@ -125,7 +133,6 @@ export default function Sidebar() {
           </DialogContent>
         </Dialog>
       </div>
-      {/* SIDEBAR CONTENT ENDS */}
     </>
   );
 }
