@@ -39,7 +39,12 @@ export default function Sidebar() {
       <div className="flex-1">
         <div className="grid items-start gap-2 px-4 py-2 text-sm font-medium">
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="edit-mode">Modo edición</Label>
+            <div className="flex flex-row space-x-1">
+              <Label htmlFor="edit-mode">Modo edición</Label>
+              <span className="hidden text-xs text-muted-foreground md:inline-block">
+                ⌘ K
+              </span>
+            </div>
             <Switch
               id="edit-mode"
               checked={editMode}
