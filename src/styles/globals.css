@@ -135,14 +135,23 @@
 
 .rainbow-text {
   background: linear-gradient(180deg, 
+  #ff6666 35%, 
+  #ffb366 35% 43%, 
+  #ffff66 43% 51%, 
+  #66cc66 51% 59%, 
+  #6666ff 59% 67%, 
+  #cc66ff 67%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+font-weight: bold;
+}
+
+/* Colores rainbow para light mode
   #ff0000 35%, 
   #ff8c00 35% 43%, 
   #ffff00 43% 51%, 
   #008000 51% 59%, 
   #0000ff 59% 67%, 
   #8b00ff 67%);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-font-weight: bold;
-}
+*/
