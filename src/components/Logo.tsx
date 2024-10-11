@@ -10,7 +10,7 @@ export default function Logo({ alwaysShow = false }) {
       <Kanban className="size-6" />
       <span
         className={cn(
-          "rainbow-text hidden text-lg font-medium sm:inline-block",
+          "hidden text-lg font-medium sm:inline-block",
           alwaysShow && "inline-block",
         )}
       >
