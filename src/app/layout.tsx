@@ -7,9 +7,11 @@ import { Toaster } from "@/components/ui/toaster";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import { cn } from "@/lib/utils";
 
-const mont = Montserrat({
+const montserrat = Montserrat({
   subsets: ["latin"],
+  variable: "--font-montserrat",
 });
 
 export const metadata = {
@@ -69,19 +71,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`font-sans ${mont.className}`}>
-        <TRPCReactProvider>
+      <body className={cn("font-sans", montserrat.variable)}>
+        
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
+            forcedTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
+<TRPCReactProvider>
             {children}
+</ThemeProvider>
             <SpeedInsights />
             <Analytics />
             <Toaster />
-          </ThemeProvider>
         </TRPCReactProvider>
       </body>
     </html>
