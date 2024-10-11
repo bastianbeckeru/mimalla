@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 /* import ModeToggle from "./ModeToggle"; */
 
+import Link from "next/link";
 import { Kanban } from "lucide-react";
 import DiscordIcon from "./icons/DiscordIcon";
 
@@ -13,7 +14,13 @@ export default function Footer({
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <Kanban className="size-5" />
           <p className="text-center text-sm leading-loose md:text-left">
-            Desarrollado con ❤️, de un estudiante para estudiantes.
+            Desarrollado con ❤️, por{" "}
+            <span
+              className="font-medium underline underline-offset-4"
+            >
+              estudiantes
+            </span>{" "}
+            para estudiantes.
           </p>
         </div>
 
@@ -33,16 +40,3 @@ export default function Footer({
     </footer>
   );
 }
-
-/*
-{" "}
-  <a
-    target="_blank"
-    rel="noreferrer"
-    href="https://www.linkedin.com/in/bastianaviles"
-    className="font-medium underline underline-offset-4"
-  >
-    un estudiante
-  </a>
-{" "}
-*/
