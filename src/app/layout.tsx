@@ -72,21 +72,20 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={cn("font-sans", montserrat.variable)}>
-        
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            forcedTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-<TRPCReactProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          forcedTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TRPCReactProvider>
             {children}
-</ThemeProvider>
-            <SpeedInsights />
-            <Analytics />
-            <Toaster />
-        </TRPCReactProvider>
+          </TRPCReactProvider>
+          <SpeedInsights />
+          <Analytics />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
