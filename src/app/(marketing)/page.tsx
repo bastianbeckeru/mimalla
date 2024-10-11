@@ -18,12 +18,12 @@ export default async function IndexPage() {
             de tu <span className="italic">Malla</span>
           </h1>
           <p className="max-w-[42rem] text-pretty leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            Personalízala a tu pinta y lleva el registro de tu progreso!
+            ¡Personalízala a tu pinta y lleva el registro de tu progreso!
           </p>
 
           <div className="mt-2 flex flex-col items-center justify-center gap-2 md:mt-0 md:flex-row md:space-x-4">
             <Link
-              href="/create"
+              href="/dashboard"
               className={cn(
                 buttonVariants({ variant: 'default', size: 'lg' }),
                 'glow hover:bg-primary',
