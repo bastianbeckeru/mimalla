@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 export default async function IndexPage() {
   return (
@@ -11,10 +11,10 @@ export default async function IndexPage() {
       <section className="space-y-6">
         <div className="container flex max-w-[64rem] flex-col items-center space-y-4 text-center">
           <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-[6.5rem]">
-            Toma el{' '}
+            Toma el{" "}
             <span className="bg-gradient-to-r from-[#FF69B4] to-[#FF947B] bg-clip-text font-extrabold text-transparent">
               Control
-            </span>{' '}
+            </span>{" "}
             de tu <span className="italic">Malla</span>
           </h1>
           <p className="max-w-[42rem] text-pretty leading-normal text-muted-foreground sm:text-xl sm:leading-8">
@@ -25,8 +25,8 @@ export default async function IndexPage() {
             <Link
               href="/dashboard"
               className={cn(
-                buttonVariants({ variant: 'default', size: 'lg' }),
-                'glow hover:bg-primary',
+                buttonVariants({ variant: "default", size: "lg" }),
+                "glow hover:bg-primary",
               )}
             >
               Comenzar

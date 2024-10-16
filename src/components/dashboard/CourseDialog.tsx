@@ -29,7 +29,6 @@ export default function CourseDialog({
   const style = {
     backgroundColor: rgbaColor,
   };
-  console.log("HOLA");
   return (
     <Dialog
       open={isOpen}

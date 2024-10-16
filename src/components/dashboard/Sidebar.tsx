@@ -129,7 +129,7 @@ export default function Sidebar() {
                 onClick={() => {
                   reset();
                   setEditMode(false);
-                  router.push("/dashboard/create");
+                  router.push("/create");
                 }}
               >
                 Aceptar

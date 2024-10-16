@@ -27,8 +27,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { createUrlSlug } from "@/utils/string";
-import type { AreaProps, ModifiedCurriculumProps } from "@/types/curriculum";
+import { createUrlSlug } from "@/utils/strings";
+import type { OldDataProps } from "@/app/(dashboard)/create/page";
 
 const formSchema = z.object({
   programSlug: z.string({
@@ -37,10 +37,7 @@ const formSchema = z.object({
 });
 
 type CurriculumFormProps = {
-  programs: Map<
-    string,
-    { curriculum: ModifiedCurriculumProps; areas: AreaProps[] }
-  >;
+  programs: Map<string, OldDataProps>;
 };
 
 export default function CurriculumForm({ programs }: CurriculumFormProps) {
@@ -89,8 +86,6 @@ export default function CurriculumForm({ programs }: CurriculumFormProps) {
 
     const programFileName = form.getValues().programSlug + ".json";
     const programContent = programs.get(programFileName)!;
-    console.log(programFileName);
-    console.log(programContent);
 
     setData(programContent);
     updateVersion("1.1.1");

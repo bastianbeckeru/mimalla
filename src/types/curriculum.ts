@@ -87,3 +87,56 @@ export type ModifiedCourseProps = {
   }[];
   prerequisiteCredits: number;
 };
+
+// NEW MIMALLA v0.3.0
+export type CurriculumData = {
+  //version: string; // MiMalla version
+  institution: {
+    name: string;
+    acronym: string;
+  };
+  program: {
+    name: string;
+    acronym: string;
+    siesCode: string;
+    demreCode: number;
+    schedule: string;
+  };
+  curriculum: {
+    // year: number;
+    slots: {
+      id: number;
+      year: number;
+      term: number;
+      position: number;
+      //type: 'MANDATORY' | 'ELECTIVE';
+      courseId: number;
+    }[];
+  };
+  areas: {
+    id: number;
+    name: string;
+    color: string;
+    subareaIds: number[];
+    courseIds: number[];
+    electiveIds: number[];
+  }[];
+  courses: {
+    id: number;
+    isElective: boolean;
+    name: string;
+    code: string | null;
+    description: string | null;
+    duration: number;
+    credits: number;
+    //prerequisiteCredits: number;
+    prerequisiteIds: number[];
+  }[];
+  degrees: {
+    id: number;
+    name: string;
+    type: string;
+  }[];
+};
+
+export type PeriodKey = `${number}-${number}`;

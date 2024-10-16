@@ -1,0 +1,258 @@
+{
+  "institution": { "name": "Universidad Diego Portales", "acronym": "UDP" },
+  "department": {
+    "name": "Facultad de Ingeniería y Ciencias",
+    "acronym": "FIC"
+  },
+  "program": {
+    "name": "Ingeniería Civil Plan Común",
+    "siesCode": "I3S1C300J1V1",
+    "demreCode": 38080,
+    "schedule": "DAYTIME"
+  },
+  "curriculum": {
+    "slots": [
+      {
+        "id": 1,
+        "year": 2020,
+        "term": 1,
+        "position": 1,
+        "courseId": 1
+      },
+      {
+        "id": 2,
+        "year": 2020,
+        "term": 1,
+        "position": 2,
+        "courseId": 2
+      },
+      {
+        "id": 3,
+        "year": 2020,
+        "term": 1,
+        "position": 3,
+        "courseId": 3
+      },
+      {
+        "id": 4,
+        "year": 2020,
+        "term": 1,
+        "position": 4,
+        "courseId": 4
+      },
+      {
+        "id": 5,
+        "year": 2020,
+        "term": 1,
+        "position": 5,
+        "courseId": 5
+      },
+      {
+        "id": 6,
+        "year": 2020,
+        "term": 2,
+        "position": 1,
+        "courseId": 6
+      },
+      {
+        "id": 2,
+        "year": 2020,
+        "term": 2,
+        "position": 2,
+        "courseId": 7
+      },
+      {
+        "id": 3,
+        "year": 2020,
+        "term": 2,
+        "position": 3,
+        "courseId": 8
+      },
+      {
+        "id": 4,
+        "year": 2020,
+        "term": 2,
+        "position": 4,
+        "courseId": 20
+      },
+      {
+        "id": 5,
+        "year": 2020,
+        "term": 2,
+        "position": 5,
+        "courseId": 21
+      }
+    ]
+  },
+  "areas": [
+    {
+      "id": 1,
+      "name": "Formación General e Inglés",
+      "color": "#FFFFFF",
+      "subareaIds": [9, 10],
+      "courseIds": [5],
+      "electiveIds": []
+    },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias Básicas",
+      "color": "#34C1CD",
+      "subareaIds": [],
+      "courseIds": [1, 2, 3, 6, 7, 8],
+      "electiveIds": []
+    },
+    {
+      "id": 3,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#BBE5EB",
+      "subareaIds": [4],
+      "courseIds": [4, 9, 309],
+      "electiveIds": []
+    },
+    {
+      "id": 4,
+      "name": "Programación Avanzada o Ingeniería de los Materiales",
+      "color": null,
+      "subareaIds": [],
+      "courseIds": [9, 309, 20],
+      "electiveIds": [1]
+    },
+    {
+      "id": 9,
+      "name": "Formación General",
+      "color": null,
+      "subareaIds": [],
+      "courseIds": [21],
+      "electiveIds": [2]
+    },
+    {
+      "id": 10,
+      "name": "Formación General Deportiva",
+      "color": null,
+      "subareaIds": [],
+      "courseIds": [],
+      "electiveIds": [2]
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "isElective": false,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "description": "",
+      "prerequisiteIds": [],
+      "instructors": [1, 2]
+    },
+    {
+      "id": 2,
+      "isElective": false,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "description": "",
+      "prerequisiteIds": [],
+      "instructors": [3]
+    },
+    {
+      "id": 3,
+      "isElective": false,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "description": "",
+      "prerequisiteIds": [],
+      "instructors": []
+    },
+    {
+      "id": 4,
+      "isElective": false,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "description": "",
+      "prerequisiteIds": [],
+      "instructors": []
+    },
+    {
+      "id": 5,
+      "isElective": false,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "description": "",
+      "prerequisiteIds": [],
+      "instructors": []
+    },
+    {
+      "id": 6,
+      "isElective": false,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "description": "",
+      "prerequisiteIds": [1],
+      "instructors": []
+    },
+    {
+      "id": 7,
+      "isElective": false,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "description": "",
+      "prerequisiteIds": [2],
+      "instructors": []
+    },
+    {
+      "id": 8,
+      "isElective": false,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "description": "",
+      "prerequisiteIds": [2],
+      "instructors": []
+    },
+    {
+      "id": 9,
+      "isElective": false,
+      "name": "Programación Avanzada",
+      "code": "CIT1010",
+      "credits": 6,
+      "description": "",
+      "prerequisiteIds": [4],
+      "instructors": []
+    },
+    {
+      "id": 309,
+      "isElective": false,
+      "name": "Ingeniería de los Materiales",
+      "code": "COC2001",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [3],
+      "instructors": []
+    },
+    {
+      "id": 20,
+      "isElective": true,
+      "name": "Programación Avanzada o Ingeniería de los Materiales",
+      "code": null,
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": []
+    },
+    {
+      "id": 21,
+      "isElective": true,
+      "name": "Curso de Formación General",
+      "code": null,
+      "credits": 5,
+      "description": null,
+      "prerequisiteIds": []
+    }
+  ],
+  "degrees": []
+}

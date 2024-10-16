@@ -23,7 +23,7 @@ export default function View() {
   useEffect(() => {
     const delay = setTimeout(() => {
       if (!curriculum) {
-        router.push("/dashboard/create");
+        router.push("/create");
       }
     }, 2000);
     return () => clearTimeout(delay);
@@ -79,15 +79,15 @@ export default function View() {
 
           <Button
             className={cn(
-              "absolute right-4 top-auto flex flex-row items-center justify-center bg-emerald-600 text-foreground hover:bg-emerald-500",
-              isUpToDate ? "hidden" : "",
+              "absolute right-4 top-auto hidden flex-row items-center justify-center bg-emerald-600 text-foreground hover:bg-emerald-500",
+              !isUpToDate && "flex",
             )}
             onClick={async () => {
               if (curriculum.career) {
-                const areas = await getCareerAreas(curriculum.career.siesCode);
+                //const areas = await getCareerAreas(curriculum.career.siesCode);
                 console.log("Actualizando...");
 
-                setData({ curriculum: curriculum, areas: areas });
+                //setData({ curriculum: curriculum, areas: areas });
                 updateVersion(currentVersion);
 
                 toast({

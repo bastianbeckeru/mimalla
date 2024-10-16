@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import { MotionLi, type VariantProps } from "../Motion";
+import { arabicToRoman } from "@/utils/numbers";
 
 type Props = {
   variants: VariantProps;
@@ -21,20 +22,12 @@ export default function Period({ variants, period, children }: Props) {
         className={`
     } w-[8rem] shrink-0 space-y-2 xl:w-[8.5rem]`}
       >
-        <div className="flex select-none flex-col">
-          <div className="z-10 flex items-center justify-center">
-            <span className="-mb-[0.375rem] flex size-6 items-center justify-center rounded-full bg-slate-100 font-bold dark:bg-zinc-800">
-              {period.index + 1}
-            </span>
-          </div>
-
-          <div className="relative flex h-7 rounded-sm bg-zinc-800 shadow-md dark:bg-zinc-100">
-            <span
-              className={`flex h-full w-full items-center justify-center text-center font-bold text-white dark:text-black`}
-            >
-              Semestre
-            </span>
-          </div>
+        <div className="flex w-full select-none items-center justify-center">
+          <span
+            className={`text-xs font-bold tracking-wider text-muted-foreground`}
+          >
+            SEMESTRE {arabicToRoman(period.index + 1)}
+          </span>
         </div>
         {children}
       </MotionLi>
