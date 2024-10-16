@@ -1,4 +1,4 @@
-/* import { z } from "zod";
+import { z } from "zod";
 
 import {
   createTRPCRouter,
@@ -18,4 +18,3 @@ export const programRouter = createTRPCRouter({
       return program ?? null;
     }),
 });
- */
