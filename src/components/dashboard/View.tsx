@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getCareerAreas } from "./serverFunctions";
 import { useCurriculumStore } from "@/stores/curriculum";
 import CurriculumDashboard from "./CurriculumDashboard";
 import Sidebar from "./Sidebar";
