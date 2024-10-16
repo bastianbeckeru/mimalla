@@ -1,4 +1,4 @@
-import { z } from "zod";
+/* import { z } from "zod";
 
 import {
   createTRPCRouter,
@@ -185,3 +185,4 @@ function extractCourseIds(curriculum: CurriculumProps) {
   );
   return Array.from(uniqueCourseIds);
 }
+ */
