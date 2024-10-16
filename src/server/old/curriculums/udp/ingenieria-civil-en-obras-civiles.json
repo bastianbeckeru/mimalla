@@ -1,0 +1,1237 @@
+{
+  "curriculum": {
+    "career": {
+      "siesCode": "I3S1C49J1V1",
+      "name": "Ingeniería Civil en Obras Civiles",
+      "faculty": {
+        "name": "Facultad de Ingeniería y Ciencias",
+        "university": { "name": "Universidad Diego Portales" }
+      }
+    },
+    "id": 5,
+    "startedAt": "2024-03-31T19:14:23.072Z",
+    "updatedAt": "2024-03-31T19:14:23.072Z",
+    "periods": [
+      {
+        "id": 28,
+        "enrollments": [
+          {
+            "id": 124,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea00086f6mnch5pu7e"
+          },
+          {
+            "id": 125,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea00096f6mcpy2d3r1"
+          },
+          {
+            "id": 126,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000a6f6mwv4relqz"
+          },
+          {
+            "id": 127,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000i6f6mihage37a"
+          },
+          {
+            "id": 128,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea00006f6mbxn4rbjn"
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "enrollments": [
+          {
+            "id": 129,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000b6f6mrpgvsv8j"
+          },
+          {
+            "id": 130,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000c6f6m3j2w84qr"
+          },
+          {
+            "id": 131,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000d6f6mv99wksz3"
+          },
+          {
+            "id": 132,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9hmlb00003hr41jfgod8w"
+          },
+          {
+            "id": 133,
+            "position": 4,
+            "mutable": true,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhs366m0000sbdj6abi47bk"
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "enrollments": [
+          {
+            "id": 134,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000e6f6minuxw075"
+          },
+          {
+            "id": 135,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000f6f6m2ynnfwyc"
+          },
+          {
+            "id": 136,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000g6f6m58yvfolf"
+          },
+          {
+            "id": 137,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9hu0q00013hr4hbouaze8"
+          },
+          {
+            "id": 138,
+            "position": 4,
+            "mutable": true,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhs366m0000sbdj6abi47bk"
+          },
+          {
+            "id": 139,
+            "position": 5,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhsg6yz0001sbdj7l2i9cr7"
+          }
+        ]
+      },
+      {
+        "id": 31,
+        "enrollments": [
+          {
+            "id": 140,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000l6f6mh06t7xcg"
+          },
+          {
+            "id": 141,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9kdu900063hr4ji8f1b9j"
+          },
+          {
+            "id": 142,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000h6f6m5m8jpr30"
+          },
+          {
+            "id": 143,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9i3kj00023hr4vu52lzrk"
+          },
+          {
+            "id": 144,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9mno800073hr46ly6cpfx"
+          },
+          {
+            "id": 145,
+            "position": 5,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhsgm5k0002sbdjrnehys74"
+          }
+        ]
+      },
+      {
+        "id": 32,
+        "enrollments": [
+          {
+            "id": 146,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaeb000q6f6mbscsa8mz"
+          },
+          {
+            "id": 147,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9mwv300083hr4b5hceil2"
+          },
+          {
+            "id": 148,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9n3ff00093hr4mp4h3nxs"
+          },
+          {
+            "id": 149,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9ikxi00033hr403l3ojms"
+          },
+          {
+            "id": 150,
+            "position": 4,
+            "mutable": true,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhs366m0000sbdj6abi47bk"
+          },
+          {
+            "id": 151,
+            "position": 5,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhsgywm0003sbdjxxl0k2oc"
+          }
+        ]
+      },
+      {
+        "id": 33,
+        "enrollments": [
+          {
+            "id": 152,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clufwhaea000n6f6me64ixgol"
+          },
+          {
+            "id": 153,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9n9lo000a3hr4zpjo5hfk"
+          },
+          {
+            "id": 154,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9nia1000b3hr4zzfbzbri"
+          },
+          {
+            "id": 155,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9isby00043hr4p8wpbexp"
+          },
+          {
+            "id": 156,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9j8tx00053hr44q4anj3i"
+          },
+          {
+            "id": 162,
+            "position": 5,
+            "mutable": false,
+            "status": "PENDING",
+            "course": {
+              "id": "clufwhaea00056f6mnv46iv58",
+              "name": "Práctica Profesional I",
+              "code": "COC5011",
+              "credits": 7,
+              "dependentCourses": [{ "code": "COC5022" }],
+              "prerequisiteCourses": [],
+              "prerequisiteCredits": 0
+            },
+            "courseId": "clufwhaea00056f6mnv46iv58"
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "enrollments": [
+          {
+            "id": 157,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9nrvl000c3hr42wlbdiuw"
+          },
+          {
+            "id": 158,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9nzdw000d3hr4o9d9l3b7"
+          },
+          {
+            "id": 159,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9o9wq000e3hr4bc6v1qo1"
+          },
+          {
+            "id": 160,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9oilo000f3hr4q5xcyryh"
+          },
+          {
+            "id": 161,
+            "position": 4,
+            "mutable": true,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluhs366m0000sbdj6abi47bk"
+          }
+        ]
+      },
+      {
+        "id": 35,
+        "enrollments": [
+          {
+            "id": 163,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9osik000g3hr4jag53hd1"
+          },
+          {
+            "id": 164,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9p3gl000h3hr4841i0bcp"
+          },
+          {
+            "id": 165,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9pbmi000i3hr4hid2db2s"
+          },
+          {
+            "id": 166,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9pk1u000j3hr4jzxermdk"
+          },
+          {
+            "id": 167,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9ppv1000k3hr4gcthlisw"
+          },
+          {
+            "id": 173,
+            "position": 5,
+            "mutable": false,
+            "status": "PENDING",
+            "course": {
+              "id": "clufwhaea00066f6m0ppow1a8",
+              "name": "Práctica Profesional II",
+              "code": "COC5022",
+              "credits": 7,
+              "dependentCourses": [],
+              "prerequisiteCourses": [{ "code": "COC5011" }],
+              "prerequisiteCredits": 256
+            },
+            "courseId": "clufwhaea00066f6m0ppow1a8"
+          }
+        ]
+      },
+      {
+        "id": 36,
+        "enrollments": [
+          {
+            "id": 168,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9pv0f000l3hr4za0dpiwe"
+          },
+          {
+            "id": 169,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9q8uk000m3hr41kyg3dv9"
+          },
+          {
+            "id": 170,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          },
+          {
+            "id": 171,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          },
+          {
+            "id": 172,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          }
+        ]
+      },
+      {
+        "id": 37,
+        "enrollments": [
+          {
+            "id": 174,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurjidzp0002qb8eeaxidth8"
+          },
+          {
+            "id": 175,
+            "position": 1,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "cluj9qgmq000n3hr47dcrmefn"
+          },
+          {
+            "id": 176,
+            "position": 2,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          },
+          {
+            "id": 177,
+            "position": 3,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          },
+          {
+            "id": 178,
+            "position": 4,
+            "mutable": false,
+            "status": "PENDING",
+            "course": null,
+            "courseId": "clurnjbu70005qb8emidk8hzz"
+          }
+        ]
+      },
+      {
+        "id": 38,
+        "enrollments": [
+          {
+            "id": 179,
+            "position": 0,
+            "mutable": false,
+            "status": "PENDING",
+            "course": {
+              "id": "clurnjbu60003qb8ecqb7cfrd",
+              "name": "Actividad de Titulación",
+              "code": "COC0000",
+              "credits": 30,
+              "dependentCourses": [],
+              "prerequisiteCourses": [],
+              "prerequisiteCredits": 330
+            },
+            "courseId": "clurnjbu60003qb8ecqb7cfrd"
+          }
+        ]
+      }
+    ]
+  },
+  "areas": [
+    {
+      "name": "Formación en Ciencias Básicas",
+      "color": "#34C1CD",
+      "courses": [
+        {
+          "id": "clufwhaea00086f6mnch5pu7e",
+          "name": "Álgebra y Geometría",
+          "code": "CBM1000",
+          "credits": 7,
+          "dependentCourses": [{ "code": "CBM1002" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea00096f6mcpy2d3r1",
+          "name": "Cálculo I",
+          "code": "CBM1001",
+          "credits": 7,
+          "dependentCourses": [{ "code": "CBM1003" }, { "code": "CBF1000" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000a6f6mwv4relqz",
+          "name": "Química",
+          "code": "CBQ1000",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2203" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000b6f6mrpgvsv8j",
+          "name": "Álgebra Lineal",
+          "code": "CBM1002",
+          "credits": 6,
+          "dependentCourses": [{ "code": "CBM1005" }, { "code": "CII2750" }],
+          "prerequisiteCourses": [{ "code": "CBM1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000c6f6m3j2w84qr",
+          "name": "Cálculo II",
+          "code": "CBM1003",
+          "credits": 6,
+          "dependentCourses": [
+            { "code": "CBM1005" },
+            { "code": "CBM1006" },
+            { "code": "CBF1001" },
+            { "code": "COC2100" },
+            { "code": "CII2100" },
+            { "code": "CBE2000" }
+          ],
+          "prerequisiteCourses": [{ "code": "CBM1001" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000d6f6mv99wksz3",
+          "name": "Mecánica",
+          "code": "CBF1000",
+          "credits": 7,
+          "dependentCourses": [{ "code": "CBF1001" }, { "code": "COC2100" }],
+          "prerequisiteCourses": [{ "code": "CBM1001" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000e6f6minuxw075",
+          "name": "Ecuaciones Diferenciales",
+          "code": "CBM1005",
+          "credits": 6,
+          "dependentCourses": [{ "code": "CBF1002" }],
+          "prerequisiteCourses": [{ "code": "CBM1002" }, { "code": "CBM1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000f6f6m2ynnfwyc",
+          "name": "Cálculo III",
+          "code": "CBM1006",
+          "credits": 6,
+          "dependentCourses": [{ "code": "CBF1002" }, { "code": "CII2750" }],
+          "prerequisiteCourses": [{ "code": "CBM1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000g6f6m58yvfolf",
+          "name": "Calor y Ondas",
+          "code": "CBF1001",
+          "credits": 7,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBM1003" }, { "code": "CBF1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000h6f6m5m8jpr30",
+          "name": "Electricidad y Magnetismo",
+          "code": "CBF1002",
+          "credits": 7,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBM1005" }, { "code": "CBM1006" }],
+          "prerequisiteCredits": 0
+        }
+      ]
+    },
+    {
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#BBE5EB",
+      "courses": [
+        {
+          "id": "clufwhaea000i6f6mihage37a",
+          "name": "Programación",
+          "code": "CIT1000",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000j6f6mavyhbn7z",
+          "name": "Programación Avanzada",
+          "code": "CIT1010",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CIT1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000m6f6mp32t4ujg",
+          "name": "Estática",
+          "code": "CII2250",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBF1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9hmlb00003hr41jfgod8w",
+          "name": "Ingeniería de Materiales",
+          "code": "COC2001",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2002" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9hu0q00013hr4hbouaze8",
+          "name": "Estática",
+          "code": "COC2100",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2200" }, { "code": "COC2101" }],
+          "prerequisiteCourses": [{ "code": "CBM1003" }, { "code": "CBF1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000k6f6m73ro4sxc",
+          "name": "Contabilidad y Costos",
+          "code": "CII1000",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBM1001" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000n6f6me64ixgol",
+          "name": "Introducción a la Economía",
+          "code": "CII2100",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2004" }],
+          "prerequisiteCourses": [{ "code": "CBM1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000o6f6muw8q7qzj",
+          "name": "Inferencia Estadística",
+          "code": "CII2751",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBE2000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000p6f6mpg4vim0v",
+          "name": "Mecánica de Fluidos",
+          "code": "CII2401",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBF1002" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000q6f6mbscsa8mz",
+          "name": "Optimización",
+          "code": "CII2750",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBM1002" }, { "code": "CBM1006" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000r6f6mnu08l1he",
+          "name": "Teoría Organizacional",
+          "code": "CII1001",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "FIC1000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000s6f6mkkwzmaav",
+          "name": "Termodinámica",
+          "code": "CII2402",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBF1001" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000t6f6m8lxhs5fq",
+          "name": "Modelos Estocásticos",
+          "code": "CII2755",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2750" }, { "code": "CBE2000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000u6f6mukvnd8mr",
+          "name": "Microeconomía",
+          "code": "CII2101",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2100" }, { "code": "CII2750" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9ikxi00033hr403l3ojms",
+          "name": "Análisis Estructural",
+          "code": "COC2102",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2104" }],
+          "prerequisiteCourses": [{ "code": "COC2101" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9isby00043hr4p8wpbexp",
+          "name": "Diseño Estructural",
+          "code": "COC2103",
+          "credits": 6,
+          "dependentCourses": [
+            { "code": "COC2105" },
+            { "code": "COC2106" },
+            { "code": "COC2107" }
+          ],
+          "prerequisiteCourses": [{ "code": "COC2101" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9kdu900063hr4ji8f1b9j",
+          "name": "Mecánica de Fluidos",
+          "code": "COC2200",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2201" }, { "code": "COC2104" }],
+          "prerequisiteCourses": [{ "code": "COC2100" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9i3kj00023hr4vu52lzrk",
+          "name": "Mecánica de Sólidos",
+          "code": "COC2101",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2102" }, { "code": "COC2103" }],
+          "prerequisiteCourses": [{ "code": "COC2100" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea000l6f6mh06t7xcg",
+          "name": "Probabilidades y Estadísticas",
+          "code": "CBE2000",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2003" }, { "code": "COC2204" }],
+          "prerequisiteCourses": [{ "code": "CBM1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9t2lu000q3hr42b3i8rrp",
+          "name": "Probabilidades y Estadísticas",
+          "code": "CIT2204",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBM1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9tx4j000r3hr48xh88b77",
+          "name": "Electrónica y Electrotecnia",
+          "code": "CIT2107",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [
+            { "code": "CBF1000" },
+            { "code": "CBM1005" },
+            { "code": "CBM1006" }
+          ],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9wlu300113hr4xwj7hn0m",
+          "name": "Gestión Organizacional",
+          "code": "CIT2206",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9j8tx00053hr44q4anj3i",
+          "name": "Seminario Ciencias de la Ingeniería",
+          "code": "COC2300",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 120
+        }
+      ]
+    },
+    {
+      "name": "Formación en Ingeniería Aplicada",
+      "color": "#818284",
+      "courses": [
+        {
+          "id": "clurjidzp0002qb8eeaxidth8",
+          "name": "Taller de Proyectos",
+          "code": "COC3300",
+          "credits": 7,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "FIC1003" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9pv0f000l3hr4za0dpiwe",
+          "name": "BIM",
+          "code": "FIC1003",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC3300" }],
+          "prerequisiteCourses": [{ "code": "COC2105" }, { "code": "COC2205" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000v6f6mard7e7w3",
+          "name": "Bases de Datos",
+          "code": "CII2501",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000w6f6mxukzrqpn",
+          "name": "Ingeniería Económica",
+          "code": "CII2002",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000x6f6m97ewrwt6",
+          "name": "Econometría",
+          "code": "CII2756",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000y6f6mekx6ov3j",
+          "name": "Proyectos Energéticos",
+          "code": "CII2403",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb000z6f6m73hj027d",
+          "name": "Producción",
+          "code": "CII2253",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2750" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00106f6m4iz4f8uq",
+          "name": "Marketing",
+          "code": "CII2102",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2100" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00116f6mv5dq31b1",
+          "name": "Finanzas",
+          "code": "CII2003",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00126f6my9cva3pi",
+          "name": "Data Science",
+          "code": "CII2504",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2750" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00136f6mlw5vh347",
+          "name": "Simulación",
+          "code": "CII2757",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00146f6mk04bva2o",
+          "name": "Logística",
+          "code": "CII2254",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00156f6mnlemikiw",
+          "name": "Gestión Estratégica",
+          "code": "CII2103",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00166f6mpgk42vh5",
+          "name": "Evaluación de Proyectos",
+          "code": "CII2004",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9mno800073hr46ly6cpfx",
+          "name": "Edificación",
+          "code": "COC2002",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2004" }, { "code": "COC2006" }],
+          "prerequisiteCourses": [{ "code": "COC2001" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9mwv300083hr4b5hceil2",
+          "name": "Hidráulica",
+          "code": "COC2201",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2204" }],
+          "prerequisiteCourses": [{ "code": "COC2200" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9nia1000b3hr4zzfbzbri",
+          "name": "Tecnología del Hormigón",
+          "code": "COC2003",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBE2000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9nrvl000c3hr42wlbdiuw",
+          "name": "Mecánica de Suelos",
+          "code": "COC2104",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2106" }, { "code": "COC3001" }],
+          "prerequisiteCourses": [{ "code": "COC2102" }, { "code": "COC2200" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9nzdw000d3hr4o9d9l3b7",
+          "name": "Hidrología",
+          "code": "COC2204",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2205" }],
+          "prerequisiteCourses": [{ "code": "COC2201" }, { "code": "CBE2000" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9o9wq000e3hr4bc6v1qo1",
+          "name": "Administración de Proyectos Civiles",
+          "code": "COC2004",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC2005" }],
+          "prerequisiteCourses": [{ "code": "CII2100" }, { "code": "COC2002" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9oilo000f3hr4q5xcyryh",
+          "name": "Diseño en Hormigón",
+          "code": "COC2105",
+          "credits": 6,
+          "dependentCourses": [
+            { "code": "FIC1003" },
+            { "code": "COC3100" },
+            { "code": "COC3001" }
+          ],
+          "prerequisiteCourses": [{ "code": "COC2103" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaeb00176f6m8q1jpf7b",
+          "name": "Electivo Profesional",
+          "code": "CIIXXXX",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9osik000g3hr4jag53hd1",
+          "name": "Fundaciones",
+          "code": "COC2106",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2103" }, { "code": "COC2104" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9p3gl000h3hr4841i0bcp",
+          "name": "Hidráulica Urbana",
+          "code": "COC2205",
+          "credits": 6,
+          "dependentCourses": [{ "code": "FIC1003" }],
+          "prerequisiteCourses": [{ "code": "COC2204" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9pbmi000i3hr4hid2db2s",
+          "name": "Planificación de Proyectos",
+          "code": "COC2005",
+          "credits": 6,
+          "dependentCourses": [{ "code": "COC3000" }],
+          "prerequisiteCourses": [{ "code": "COC2004" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9pk1u000j3hr4jzxermdk",
+          "name": "Diseño en Acero",
+          "code": "COC2107",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2103" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9ppv1000k3hr4gcthlisw",
+          "name": "Ingeniería Sísmica",
+          "code": "COC3100",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2105" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9q8uk000m3hr41kyg3dv9",
+          "name": "Ingeniería de Costos",
+          "code": "COC3000",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2005" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9qgmq000n3hr47dcrmefn",
+          "name": "Diseño de Caminos",
+          "code": "COC3001",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2104" }, { "code": "COC2105" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9n3ff00093hr4mp4h3nxs",
+          "name": "Topografía",
+          "code": "COC2006",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "COC2002" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluj9n9lo000a3hr4zpjo5hfk",
+          "name": "Ingeniería Ambiental",
+          "code": "COC2203",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CBQ1000" }],
+          "prerequisiteCredits": 120
+        },
+        {
+          "id": "clurnjbu70005qb8emidk8hzz",
+          "name": "Electivo Profesional",
+          "code": "COCXXXX",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        }
+      ]
+    },
+    {
+      "name": "Formación General e Inglés",
+      "color": "#F3F4F6",
+      "courses": [
+        {
+          "id": "clufwhaea00006f6mbxn4rbjn",
+          "name": "Comunicación para la Ingeniería",
+          "code": "FIC1000",
+          "credits": 5,
+          "dependentCourses": [{ "code": "CII1001" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea00016f6mvwsd7cim",
+          "name": "Liderazgo y Emprendimiento",
+          "code": "CII3101",
+          "credits": 6,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2103" }, { "code": "CII2004" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "clufwhaea00026f6mki9frzgd",
+          "name": "Taller de Ingeniería Industrial",
+          "code": "CII3102",
+          "credits": 7,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CII2004" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluhs366m0000sbdj6abi47bk",
+          "name": "Curso de Formación General",
+          "code": "CFGXXXX",
+          "credits": 5,
+          "dependentCourses": [],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluhsg6yz0001sbdj7l2i9cr7",
+          "name": "Inglés I",
+          "code": "CIG1012",
+          "credits": 5,
+          "dependentCourses": [{ "code": "CIG1013" }],
+          "prerequisiteCourses": [],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluhsgm5k0002sbdjrnehys74",
+          "name": "Inglés II",
+          "code": "CIG1013",
+          "credits": 5,
+          "dependentCourses": [{ "code": "CIG1014" }],
+          "prerequisiteCourses": [{ "code": "CIG1012" }],
+          "prerequisiteCredits": 0
+        },
+        {
+          "id": "cluhsgywm0003sbdjxxl0k2oc",
+          "name": "Inglés III",
+          "code": "CIG1014",
+          "credits": 5,
+          "dependentCourses": [],
+          "prerequisiteCourses": [{ "code": "CIG1013" }],
+          "prerequisiteCredits": 0
+        }
+      ]
+    }
+  ]
+}

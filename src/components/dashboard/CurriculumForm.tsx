@@ -16,11 +16,10 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { api } from "@/trpc/react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCurriculumStore } from "@/stores/curriculum";
 import { toast } from "@/components/ui/use-toast";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
@@ -28,14 +27,33 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { createUrlSlug } from "@/utils/string";
 
 const formSchema = z.object({
-  siesCode: z.string({
+  programSlug: z.string({
     required_error: "Por favor selecciona una carrera.",
   }),
 });
 
-export default function CurriculumForm() {
+type CurriculumFormProps = {
+  programs: Map<
+    string,
+    {
+      curriculum: {
+        id: number;
+        startedAt: string;
+        updatedAt: string;
+        career: {
+          name: string;
+        };
+        periods: any[];
+      };
+      areas: any[];
+    }
+  >;
+};
+
+export default function CurriculumForm({ programs }: CurriculumFormProps) {
   const { curriculum, setData, updateVersion } = useCurriculumStore();
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
@@ -44,62 +62,8 @@ export default function CurriculumForm() {
     resolver: zodResolver(formSchema),
   });
 
-  const getCareers = api.university.getCareers.useQuery(undefined, {
-    enabled: !curriculum,
-    refetchInterval: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
-  const getCareerCurriculum = api.career.getCurriculum.useQuery(
-    { siesCode: form.watch("siesCode") },
-    {
-      enabled: false,
-      refetchInterval: false,
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false,
-    },
-  );
-
-  useEffect(() => {
-    if (
-      !curriculum &&
-      isCreating &&
-      getCareerCurriculum.isSuccess &&
-      getCareerCurriculum.data
-    ) {
-      router.push("/dashboard");
-      setData(getCareerCurriculum.data);
-      updateVersion("1.1.1");
-      setIsCreating(false);
-      form.reset();
-
-      toast({
-        description: (
-          <div className="flex flex-row items-start justify-center space-x-2">
-            <p>✅</p>
-            <p className="font-bold">
-              Se ha importado la malla de{" "}
-              <span className="italic">
-                {getCareerCurriculum.data.curriculum.career?.name}
-              </span>{" "}
-              exitosamente.
-            </p>
-          </div>
-        ),
-      });
-    }
-  }, [
-    getCareerCurriculum,
-    curriculum,
-    setData,
-    form,
-    router,
-    isCreating,
-    updateVersion,
-  ]);
-
   /* Loader or Skeleton */
-  if (getCareerCurriculum.isLoading || getCareers.isLoading) {
+  if (isCreating) {
     return (
       <div className="size-screen flex justify-center overflow-hidden">
         <Loader2 className="mt-64 size-8 animate-spin" />
@@ -109,6 +73,56 @@ export default function CurriculumForm() {
 
   if (curriculum) {
     router.push("/dashboard");
+  }
+
+  const avaiblePrograms = [
+    {
+      name: "Ingeniería Civil Plan Común",
+      siesCode: "12030",
+    },
+    {
+      name: "Ingeniería Civil Industrial",
+      siesCode: "12020",
+    },
+    {
+      name: "Ingeniería Civil en Informática y Telecomunicaciones",
+      siesCode: "12021",
+    },
+    {
+      name: "Ingeniería Civil en Obras Civiles",
+      siesCode: "12022",
+    },
+  ];
+
+  function onSubmit() {
+    setIsCreating(true);
+
+    const programFileName = form.getValues().programSlug + ".json";
+    const programContent = programs.get(programFileName)!;
+    console.log(programFileName);
+    console.log(programContent);
+
+    setData(programContent);
+    updateVersion("1.1.1");
+    router.push("/dashboard");
+
+    setIsCreating(false);
+    form.reset();
+
+    toast({
+      description: (
+        <div className="flex flex-row items-start justify-center space-x-2">
+          <p>✅</p>
+          <p className="font-bold">
+            Se ha importado la malla de{" "}
+            <span className="italic">
+              {programContent.curriculum.career.name}
+            </span>{" "}
+            exitosamente.
+          </p>
+        </div>
+      ),
+    });
   }
 
   return (
@@ -149,7 +163,7 @@ export default function CurriculumForm() {
 
             <FormField
               control={form.control}
-              name="siesCode"
+              name="programSlug"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -163,12 +177,12 @@ export default function CurriculumForm() {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Carreras</SelectLabel>
-                          {getCareers.data?.map((career) => (
+                          {avaiblePrograms.map((program) => (
                             <SelectItem
-                              key={career.siesCode}
-                              value={career.siesCode}
+                              key={program.siesCode}
+                              value={createUrlSlug(program.name)}
                             >
-                              {career.name}
+                              {program.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -214,9 +228,4 @@ export default function CurriculumForm() {
       </div>
     </div>
   );
-
-  function onSubmit() {
-    setIsCreating(true);
-    void getCareerCurriculum.refetch();
-  }
 }
