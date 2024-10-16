@@ -17,8 +17,6 @@ export type CareerProps = {
 
 export type CurriculumProps = {
   id: number;
-  startedAt: Date;
-  updatedAt: Date;
   career: CareerProps | null;
   periods: PeriodProps[];
 };
@@ -57,8 +55,6 @@ export type CourseProps = {
 //////////////////////////////////////////
 export type ModifiedCurriculumProps = {
   id: number;
-  startedAt: Date;
-  updatedAt: Date;
   career: CareerProps | null;
   periods: ModifiedPeriodProps[];
 };

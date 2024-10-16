@@ -1,4 +1,5 @@
 import CurriculumForm from "@/components/dashboard/CurriculumForm";
+import type { ModifiedCurriculumProps } from "@/types/curriculum";
 import fs from "fs";
 import path from "path";
 
@@ -26,7 +27,7 @@ function getAllPrograms() {
     .forEach((fileName) => {
       const filePath = path.join(institutionPath, fileName);
       const fileContent = fs.readFileSync(filePath, "utf-8");
-      const contentObject = JSON.parse(fileContent);
+      const contentObject = JSON.parse(fileContent) as ModifiedCurriculumProps;
 
       programsMap.set(fileName, contentObject);
     });

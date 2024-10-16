@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { createUrlSlug } from "@/utils/string";
+import type { AreaProps, ModifiedCurriculumProps } from "@/types/curriculum";
 
 const formSchema = z.object({
   programSlug: z.string({
@@ -38,18 +39,7 @@ const formSchema = z.object({
 type CurriculumFormProps = {
   programs: Map<
     string,
-    {
-      curriculum: {
-        id: number;
-        startedAt: string;
-        updatedAt: string;
-        career: {
-          name: string;
-        };
-        periods: any[];
-      };
-      areas: any[];
-    }
+    { curriculum: ModifiedCurriculumProps; areas: AreaProps[] }
   >;
 };
 
@@ -116,7 +106,7 @@ export default function CurriculumForm({ programs }: CurriculumFormProps) {
           <p className="font-bold">
             Se ha importado la malla de{" "}
             <span className="italic">
-              {programContent.curriculum.career.name}
+              {programContent.curriculum.career?.name}
             </span>{" "}
             exitosamente.
           </p>
