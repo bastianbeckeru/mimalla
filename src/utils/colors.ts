@@ -9,7 +9,7 @@ export type HexColor = `#${string}`;
 export type RGBAColor = `rgba(${number}, ${number}, ${number}, ${number})`;
 
 export function hexToRgb(hexColor: HexColor) {
-  const hex = hexColor.replace(/^#/, '');
+  const hex = hexColor.replace(/^#/, "");
 
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -25,7 +25,7 @@ export function hexToRgba(hexColor: HexColor, a = 1.0): RGBAColor {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
-function getLuminance(hexColor: HexColor): number {
+export function getLuminance(hexColor: HexColor): number {
   const rgbColor = hexToRgb(hexColor);
 
   // Convert RGB components to linear values
@@ -78,8 +78,8 @@ export function checkContrasts({
 }) {
   const isDarkMode = true;
   const parsedColor = parseHexColor(elementColor);
-  const backgroundColor = isDarkMode ? '#0a0a0a' : '#ffffff';
-  const textColor = isDarkMode ? '#fafafa' : '#0a0a0a';
+  const backgroundColor = isDarkMode ? "#0a0a0a" : "#ffffff";
+  const textColor = isDarkMode ? "#fafafa" : "#0a0a0a";
 
   const backgroundElementContrast = getContrastRatio({
     backgroundColor: backgroundColor,

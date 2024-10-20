@@ -7,7 +7,8 @@ import { createUrlSlug } from "@/utils/strings";
 import CurriculumView from "@/components/curriculum/curriculum-view";
 import { NavigationBreadcrumb } from "@/components/curriculum/nav-breadcrumb";
 import { getPeriods } from "@/utils/curriculum";
-import { CurriculumData } from "@/types/curriculum";
+import type { CurriculumData } from "@/types/curriculum";
+import ProgramInfo from "@/components/curriculum/program-info";
 
 export const dynamicParams = false;
 
@@ -55,39 +56,12 @@ export default async function ProgramPage({ params }: ProgramParams) {
           periods={periods}
           data={data}
         />
-        {/* SEPARAR ESTO EN UN COMPONENTE APARTE QUE RECIBA DEGREE Y PERIODS.LENGHT Y PROGRAM. */}
-        {/* EN CASO DE NO DEGREE, NO MOSTRAR NINGÚN TITULO O GRADO, SOLO INFO */}
-        <div className="w-1/4 space-y-2 rounded-sm bg-neutral-800 p-2 text-foreground">
-          <p className="text-sm font-semibold">
-            Titulo Profesional:{" "}
-            <span className="font-normal">
-              {degrees.find((d) => d.type === "PROFESSIONAL")?.name}
-            </span>
-          </p>
-          <p className="text-sm font-semibold">
-            Grado Académico:{" "}
-            <span className="font-normal">
-              {degrees.find((d) => d.type === "ACADEMIC")?.name}
-            </span>
-          </p>
-          <p className="text-sm font-semibold">
-            Duración:{" "}
-            <span className="font-normal">{periods.length} semestres</span>
-          </p>
-          <p className="text-sm font-semibold">
-            Jornada:{" "}
-            <span className="font-normal">
-              {program.schedule === "DAYTIME" ? "Diurna" : "Verspertina"}
-            </span>
-          </p>
-          <p className="text-sm font-semibold">
-            Código SIES: <span className="font-normal">{program.siesCode}</span>
-          </p>
-          <p className="text-sm font-semibold">
-            Código DEMRE:{" "}
-            <span className="font-normal">{program.demreCode}</span>
-          </p>
-        </div>
+
+        <ProgramInfo
+          program={program}
+          degrees={degrees}
+          duration={periods.length}
+        />
       </div>
     </div>
   );

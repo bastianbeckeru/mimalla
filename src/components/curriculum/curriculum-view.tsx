@@ -7,6 +7,8 @@ import { useState } from "react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Card, CardContent } from "../ui/card";
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
+import { getCourse, getCourseArea } from "@/utils/curriculum";
+import ScrollAreaWrapper from "../ScrollAreaWrapper";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -44,7 +46,7 @@ export default function CurriculumView({
   };
 
   return (
-    <ScrollArea
+    <ScrollAreaWrapper
       className={cn("shadow-[inset_0_0_32px_rgba(0,0,0,0.75)]", className)}
     >
       <div className="p-2">
@@ -67,7 +69,7 @@ export default function CurriculumView({
                 }}
               >
                 <span
-                  className={`text-xs font-bold tracking-wider text-muted-foreground`}
+                  className={`text-center text-xs font-bold tracking-wider text-muted-foreground`}
                 >
                   SEMESTRE {arabicToRoman(pIndex + 1)}
                 </span>
@@ -80,7 +82,7 @@ export default function CurriculumView({
           {curriculum.slots.map((slot, sIndex) => {
             const position = getPosition(periods, slot);
             const course = getCourse({ id: slot.courseId, courses: courses });
-            const area = course && findArea(areas, course);
+            const area = course && getCourseArea(areas, course);
             // const enrollment = enrollments.get(slot.id);
 
             const color = area?.color ?? "#fafafa";
@@ -151,31 +153,11 @@ export default function CurriculumView({
           </svg>
         </div>
       </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+    </ScrollAreaWrapper>
   );
 }
 
 // COURSE FUNCTIONS
-function getCourse({
-  id,
-  courses,
-}: {
-  id: number;
-  courses: Map<number, CurriculumData["courses"][0]>;
-}) {
-  const course = courses.get(id);
-  if (!course) return null;
-
-  const subsequentIds =
-    (course &&
-      Array.from(courses.values())
-        .filter((c) => c.prerequisiteIds.includes(course.id))
-        .map((c) => c.id)) ??
-    [];
-
-  return { ...course, subsequentIds: subsequentIds };
-}
 function getPosition(
   periods: PeriodKey[],
   slot: CurriculumData["curriculum"]["slots"][0],
@@ -206,27 +188,7 @@ function getCoordinates(
     y: 16 * calculatePosition(y, cellHeight),
   };
 }
-function findArea(
-  areas: CurriculumData["areas"],
-  course: CurriculumData["courses"][0],
-) {
-  const { id, isElective } = course;
 
-  if (isElective) {
-    // Qué pasa en el caso de que el electivo pertenezca a un main area indicando que todos los cursos de esa main area son opciones para este electivo?
-    const electiveAreas = areas.filter((area) => area.courseIds.includes(id));
-
-    const mainArea = areas.find((area) =>
-      electiveAreas.every((eArea) => area.subareaIds.includes(eArea.id)),
-    );
-
-    if (!mainArea && electiveAreas.length === 1) return electiveAreas[0];
-
-    return mainArea;
-  }
-
-  return areas.find((area) => area.courseIds.includes(id));
-}
 function getEligibleCourses(
   areas: CurriculumData["areas"],
   courses: Map<number, CurriculumData["courses"][0]>,

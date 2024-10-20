@@ -105,7 +105,7 @@ export type CurriculumData = {
   curriculum: {
     // year: number;
     slots: {
-      id: number;
+      id: number | string;
       year: number;
       term: number;
       position: number;

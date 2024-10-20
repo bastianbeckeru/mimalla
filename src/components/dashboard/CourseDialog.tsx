@@ -4,7 +4,7 @@ import type { CourseProps } from "@/types/curriculum";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Check, Ghost, Minus } from "lucide-react";
 import { useCurriculumStore } from "@/stores/curriculum";
-import { hexToRgba } from "@/utils/colorFunctions";
+import { hexToRgba, parseHexColor } from "@/utils/colors";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -13,7 +13,6 @@ type Props = {
   course: CourseProps | null;
   setSelectedCourse: (course: CourseProps | null) => void;
   color: string;
-  setSelectedColor: (color: string) => void;
 };
 
 export default function CourseDialog({
@@ -24,7 +23,7 @@ export default function CourseDialog({
   color,
 }: Props) {
   const { progress } = useCurriculumStore();
-  const rgbaColor = hexToRgba(color, 0.2);
+  const rgbaColor = hexToRgba(parseHexColor(color), 0.2);
 
   const style = {
     backgroundColor: rgbaColor,
@@ -114,7 +113,7 @@ function RelatedCourses({
           "min-h-32 rounded-lg border p-2",
           !children &&
             relatedCourses?.length == 0 &&
-            " flex items-center justify-center",
+            "flex items-center justify-center",
         )}
       >
         {!children && relatedCourses?.length == 0 ? (

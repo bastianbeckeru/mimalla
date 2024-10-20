@@ -31,7 +31,7 @@ export default function Sidebar() {
   return (
     <>
       {/* SM */}
-      <div className="flex h-14 items-center justify-start border-b  px-4 lg:h-16">
+      <div className="flex h-14 items-center justify-start border-b px-4 lg:h-16">
         <Logo alwaysShow />
       </div>
 
@@ -42,7 +42,7 @@ export default function Sidebar() {
             <div className="flex flex-row space-x-1">
               <Label htmlFor="edit-mode">Modo edición</Label>
               <span className="hidden text-xs text-muted-foreground md:inline-block">
-                ⌘ K
+                ⌘+E
               </span>
             </div>
             <Switch
@@ -109,7 +109,7 @@ export default function Sidebar() {
         </a>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="destructiveOutline" className="w-full gap-2">
+            <Button variant="destructive" className="w-full gap-2">
               <Trash2 className="size-4" />
               Eliminar Malla
             </Button>

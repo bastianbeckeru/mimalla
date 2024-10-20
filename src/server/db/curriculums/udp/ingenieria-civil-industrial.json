@@ -109,7 +109,7 @@
     {
       "id": 5,
       "name": "Economía y Finanzas",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [46],
       "electiveIds": [],
       "subareaIds": []
@@ -117,7 +117,7 @@
     {
       "id": 6,
       "name": "Operaciones y Logística · Gestión y TI",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [46],
       "electiveIds": [],
       "subareaIds": []
@@ -125,7 +125,7 @@
     {
       "id": 7,
       "name": "Análisis Cuantitativo",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [46],
       "electiveIds": [],
       "subareaIds": []
@@ -133,7 +133,7 @@
     {
       "id": 8,
       "name": "Energía y Sustentabilidad",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [46],
       "electiveIds": [],
       "subareaIds": []
@@ -141,7 +141,7 @@
     {
       "id": 9,
       "name": "Formación General",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [],
       "electiveIds": [2],
       "subareaIds": []
@@ -149,7 +149,7 @@
     {
       "id": 10,
       "name": "Formación General Deportiva",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [],
       "electiveIds": [2],
       "subareaIds": []
@@ -157,7 +157,7 @@
     {
       "id": 11,
       "name": "Formación en Inglés General",
-      "color": "#0000FF",
+      "color": null,
       "courseIds": [],
       "electiveIds": [],
       "subareaIds": []

@@ -61,15 +61,7 @@ export default function CurriculumDashboard({ curriculum }: Props) {
         >
           {curriculum.periods.map((period, pIndex) => {
             return (
-              <Period
-                key={period.id}
-                variants={periodVariants}
-                period={{
-                  id: period.id,
-                  index: pIndex,
-                  coursesAmount: period.enrollments.length,
-                }}
-              >
+              <Period key={period.id} variants={periodVariants} index={pIndex}>
                 <Droppable droppableId={period.id.toString()}>
                   {(provided) => (
                     <ul
@@ -131,7 +123,6 @@ export default function CurriculumDashboard({ curriculum }: Props) {
         course={selectedCourse}
         setSelectedCourse={setSelectedCourse}
         color={selectedColor}
-        setSelectedColor={setSelectedColor}
       />
     </>
   );
