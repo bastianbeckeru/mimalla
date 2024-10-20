@@ -28,7 +28,12 @@ import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { createUrlSlug } from "@/utils/strings";
-import type { OldDataProps } from "@/app/(dashboard)/create/page";
+import type { AreaProps, ModifiedCurriculumProps } from "@/types/curriculum";
+
+export type OldDataProps = {
+  curriculum: ModifiedCurriculumProps;
+  areas: AreaProps[];
+};
 
 const formSchema = z.object({
   programSlug: z.string({

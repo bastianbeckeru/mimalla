@@ -6,7 +6,7 @@ import { MotionLi, type VariantProps } from "../Motion";
 import { Checkbox } from "../ui/checkbox";
 import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
 import { cn } from "@/lib/utils";
-import { getHexContrastRatio } from "@/utils/colorFunctions";
+import { checkContrasts } from "@/utils/colors";
 
 type Props = {
   variants: VariantProps;
@@ -26,7 +26,7 @@ export default function Enrollment({
   const { progress, updateEnrollment } = useCurriculumStore();
   const { editMode } = useSettingsStore();
 
-  const lowContrast = getHexContrastRatio(color) < 1.9;
+  const { hasLowElementTextContrast } = checkContrasts({ elementColor: color });
   const available = getAviability(course, progress);
 
   const style = {
@@ -38,7 +38,7 @@ export default function Enrollment({
       <MotionLi
         variants={variants}
         className={cn(
-          "relative mb-2 flex h-[5rem] select-none items-center justify-start  overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
+          "relative mb-2 flex h-[5rem] select-none items-center justify-start overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
           editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
           available
             ? "brightness-100 hover:brightness-[0.98]"
@@ -53,7 +53,7 @@ export default function Enrollment({
           className={cn(
             "flex h-full items-center justify-center text-pretty text-center text-xs font-normal xl:text-sm",
             editMode ? "w-10/12" : "w-full",
-            lowContrast ? "text-background" : "text-foreground",
+            hasLowElementTextContrast ? "text-background" : "text-foreground",
           )}
         >
           {course?.name ?? `Curso`}
