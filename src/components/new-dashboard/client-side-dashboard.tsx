@@ -35,7 +35,7 @@ export default function ClientSideDashboard() {
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
-          router.push("/create");
+          router.push("/test/create"); //CAMBIAR A "/create"
         });
     }
 
