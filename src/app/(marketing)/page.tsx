@@ -12,7 +12,7 @@ export default async function IndexPage() {
         <div className="container flex max-w-[64rem] flex-col items-center space-y-4 text-center">
           <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl 2xl:text-[6.5rem]">
             Toma el{" "}
-            <span className="bg-gradient-to-r from-accent to-accent-foreground bg-clip-text font-extrabold text-transparent">
+            <span className="bg-gradient-to-r from-secondary to-secondary-foreground bg-clip-text font-extrabold text-transparent">
               Control
             </span>{" "}
             de tu <span className="italic">Malla</span>

@@ -15,10 +15,13 @@ export default function PeriodContainer({
 }: PeriodContainerProps) {
   const { setNodeRef } = useDroppable({
     id: id,
+    data: {
+      type: "container",
+    },
   });
 
   return (
-    <div ref={setNodeRef} className="flex flex-col gap-2">
+    <div ref={setNodeRef} className="flex flex-col gap-2 px-1">
       <span
         className={`text-center text-xs font-bold tracking-wider text-muted-foreground`}
       >

@@ -24,7 +24,7 @@ export default function View() {
       if (!curriculum) {
         router.push("/create");
       }
-    }, 2000);
+    }, 1000);
     return () => clearTimeout(delay);
   }, [curriculum, router]);
 

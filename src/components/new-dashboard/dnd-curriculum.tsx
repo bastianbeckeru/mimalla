@@ -1,7 +1,7 @@
 /* This is a Drag and Drop Curriculum, but it is not GRID based */
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 
@@ -9,12 +9,18 @@ import {
   type DragStartEvent,
   type DragOverEvent,
   type DragEndEvent,
+  type CollisionDetection,
   DndContext,
   closestCenter,
   DragOverlay,
   useSensors,
   useSensor,
   MouseSensor,
+  pointerWithin,
+  getFirstCollision,
+  rectIntersection,
+  closestCorners,
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -45,18 +51,75 @@ export default function DndCurriculum({
 }: DndCurriculumProps) {
   const { updateCourseEnrollments } = useNewCurriculumStore();
   const [data, setData] = useState(periods);
+  const [clonedData, setClonedData] = useState(null);
   const [activeEnrollment, setActiveEnrollment] =
     useState<EnrolledCourse | null>(null);
 
   const { areas } = programData;
   const courses = new Map(programData.courses.map((c) => [c.id, c]));
 
-  /*   const [isOpen, setIsOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseProps | null>(
-    null,
-  ); */
+  const lastOverId = useRef<number | string | undefined | null>(null);
+  const recentlyMovedToNewContainer = useRef(false);
 
-  const sensors = useSensors(useSensor(MouseSensor));
+  const customCollisionDetectionAlgorithm: CollisionDetection = useCallback(
+    (args) => {
+      const activeId = activeEnrollment?.id;
+      const isEnrollment = data.some((period) =>
+        period.enrollments.some((e) => e.id === activeId),
+      );
+
+      const pointerIntersections = pointerWithin(args);
+      const intersections =
+        pointerIntersections.length > 0
+          ? pointerIntersections
+          : rectIntersection(args);
+
+      let overId = getFirstCollision(intersections, "id");
+      //console.log("FIRST INTERSECTION", overId);
+
+      /*       console.log("CENTER", closestCenter(args));
+      console.log("CORNERS", closestCorners(args)); */
+
+      if (overId) {
+        const overContainer = data.find((period) => period.id === overId);
+        //console.log("OVER CONTAINER", overContainer?.id);
+
+        if (overContainer && overContainer.enrollments.length > 0) {
+          const overContainerIntersections = closestCenter({
+            ...args,
+            droppableContainers: args.droppableContainers.filter(
+              (container) =>
+                container.id !== overId &&
+                overContainer.enrollments.some((e) => e.id === container.id),
+            ),
+          });
+
+          const firstIntersection = overContainerIntersections[0]!;
+
+          overId = firstIntersection.id;
+        }
+
+        lastOverId.current = overId;
+
+        return [{ id: overId }];
+      }
+
+      if (recentlyMovedToNewContainer.current) {
+        lastOverId.current = activeId;
+      }
+
+      return lastOverId.current ? [{ id: lastOverId.current }] : [];
+    },
+    [data, activeEnrollment?.id],
+  );
+
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      recentlyMovedToNewContainer.current = false;
+    });
+  });
 
   // FIX: No se puede mover tan rápido un curso de un semestre a otro
   // Posible solución: Utilizar virtual lists.
@@ -65,12 +128,13 @@ export default function DndCurriculum({
       <ScrollAreaWrapper>
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={customCollisionDetectionAlgorithm}
           onDragStart={handleOnDragStart}
           onDragOver={handleOnDragOver}
           onDragEnd={handleOnDragEnd}
+          onDragCancel={handleOnDragCancel}
         >
-          <div className="flex flex-row gap-2 p-4">
+          <div className="flex flex-row p-4">
             {data.map((period, pIndex) => (
               <PeriodContainer id={period.id} key={period.id} index={pIndex}>
                 <SortableContext
@@ -120,16 +184,26 @@ export default function DndCurriculum({
         .find((enrollment) => enrollment.id === active.id) ?? null;
 
     setActiveEnrollment(enrollment);
+    //setClonedData(data);
   }
   function handleOnDragOver(event: DragOverEvent) {
     const { active, over } = event;
     if (!active || !over) return;
 
-    const overContainer = findContainer(over.id as string);
+    const isOverSlot = data.some((period) =>
+      period.enrollments.some((e) => e.id === over.id),
+    );
+    //if (isOverSlot) return;
+
+    //const overContainer = findContainer(over.id as string);
+    const overContainer = isOverSlot
+      ? findContainer(over.id as string)
+      : data.find((period) => period.id === over.id);
     const activeContainer = findContainer(active.id as string);
     if (!overContainer || !activeContainer || activeContainer === overContainer)
       return;
 
+    console.log("### HANDLE-OVER", overContainer.id);
     setData((periods) => {
       console.log("IN");
       const [overYear, overTerm] = overContainer.id.split("-").map(Number);
@@ -159,6 +233,8 @@ export default function DndCurriculum({
           return { ...slot, position: index + 1 };
         },
       );
+
+      recentlyMovedToNewContainer.current = true;
 
       const newPeriods = periods.map((period) => {
         if (period.id === activeContainer.id) {
@@ -219,6 +295,15 @@ export default function DndCurriculum({
     }
 
     setActiveEnrollment(null);
+  }
+  function handleOnDragCancel() {
+    console.log("CLONED-DATA", clonedData);
+    if (clonedData) {
+      setData(clonedData);
+    }
+
+    setActiveEnrollment(null);
+    setClonedData(null);
   }
   function findContainer(id: string) {
     return periods.find((period) =>
