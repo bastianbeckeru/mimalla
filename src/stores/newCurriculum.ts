@@ -69,6 +69,35 @@ export const useNewCurriculumStore = create(
 
           return state;
         }),
+
+      /* ENROLLMENT */
+      updateCourseEnrollmentStatus: (enrollmentId, newStatus) =>
+        set((state) => {
+          if (!state || !state.studentEnrollment) return state;
+
+          const currentCourseEnrollments =
+            state.studentEnrollment.enrolledCourses;
+          const updatedEnrollments = currentCourseEnrollments.map(
+            (enrollment) => {
+              if (enrollment.id === enrollmentId) {
+                return {
+                  ...enrollment,
+                  status: newStatus,
+                };
+              }
+              return enrollment;
+            },
+          );
+
+          return {
+            ...state,
+            studentEnrollment: {
+              ...state.studentEnrollment,
+              enrolledCourses: updatedEnrollments,
+            },
+          };
+        }),
+
       /* DRAG AND DROP */
       updateCourseEnrollments: (enrollmentId, enrolledCourses) =>
         set((state) => {
@@ -90,19 +119,6 @@ export const useNewCurriculumStore = create(
     { name: "data" },
   ),
 );
-
-/* SETTINGS STORE */
-export const useSettingsStore = create<useSettingsStoreProps>((set) => ({
-  editMode: false,
-  setEditMode: (newState) =>
-    set((state) => ({ ...state, editMode: newState ?? !state.editMode })),
-}));
-
-/* TYPES */
-type useSettingsStoreProps = {
-  editMode: boolean;
-  setEditMode: (newState?: boolean) => void;
-};
 
 /* FUNCTIONS */
 function updateEnrollmentStatusCascade(

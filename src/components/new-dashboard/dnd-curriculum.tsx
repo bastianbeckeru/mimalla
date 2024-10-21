@@ -19,7 +19,6 @@ import {
   pointerWithin,
   getFirstCollision,
   rectIntersection,
-  closestCorners,
   TouchSensor,
 } from "@dnd-kit/core";
 import {
@@ -34,14 +33,17 @@ import type { EnrolledCourse } from "@/types/store";
 import ScrollAreaWrapper from "../ScrollAreaWrapper";
 import { Slot, DraggableSlot } from "./slot";
 import PeriodContainer from "./period";
+import { useSettingsStore } from "@/stores/settings";
 
 type DndCurriculumProps = {
   programData: CurriculumData;
   studentEnrollmentId: string;
-  periods: {
-    id: PeriodKey;
-    enrollments: EnrolledCourse[];
-  }[];
+  periods: PeriodWithEnrollments[];
+};
+
+type PeriodWithEnrollments = {
+  id: PeriodKey;
+  enrollments: EnrolledCourse[];
 };
 
 export default function DndCurriculum({
@@ -50,10 +52,18 @@ export default function DndCurriculum({
   programData,
 }: DndCurriculumProps) {
   const { updateCourseEnrollments } = useNewCurriculumStore();
-  const [data, setData] = useState(periods);
-  const [clonedData, setClonedData] = useState(null);
-  const [activeEnrollment, setActiveEnrollment] =
-    useState<EnrolledCourse | null>(null);
+  const { editMode } = useSettingsStore();
+  const [data, setData] = useState<PeriodWithEnrollments[]>(periods);
+  const [clonedData, setClonedData] = useState<PeriodWithEnrollments[] | null>(
+    null,
+  );
+  const [activeEnrollment, setActiveEnrollment] = useState<
+    | (EnrolledCourse & {
+        course?: CurriculumData["courses"][0];
+        color?: string;
+      })
+    | null
+  >(null);
 
   const { areas } = programData;
   const courses = new Map(programData.courses.map((c) => [c.id, c]));
@@ -64,9 +74,6 @@ export default function DndCurriculum({
   const customCollisionDetectionAlgorithm: CollisionDetection = useCallback(
     (args) => {
       const activeId = activeEnrollment?.id;
-      const isEnrollment = data.some((period) =>
-        period.enrollments.some((e) => e.id === activeId),
-      );
 
       const pointerIntersections = pointerWithin(args);
       const intersections =
@@ -140,6 +147,7 @@ export default function DndCurriculum({
                 <SortableContext
                   items={period.enrollments}
                   strategy={verticalListSortingStrategy}
+                  disabled={!editMode}
                 >
                   {period.enrollments.map((enrollment) => {
                     const course = getCourse({
@@ -155,6 +163,7 @@ export default function DndCurriculum({
                         slot={enrollment}
                         course={course}
                         color={color}
+                        isDisabled={!editMode}
                       />
                     );
                   })}
@@ -162,7 +171,15 @@ export default function DndCurriculum({
               </PeriodContainer>
             ))}
           </div>
-          <DragOverlay>{activeEnrollment && <Slot dragOverlay />}</DragOverlay>
+          <DragOverlay>
+            {activeEnrollment && (
+              <Slot
+                course={activeEnrollment.course}
+                color={activeEnrollment.color}
+                dragOverlay
+              />
+            )}
+          </DragOverlay>
         </DndContext>
       </ScrollAreaWrapper>
 
@@ -183,8 +200,25 @@ export default function DndCurriculum({
         .flat()
         .find((enrollment) => enrollment.id === active.id) ?? null;
 
-    setActiveEnrollment(enrollment);
-    //setClonedData(data);
+    if (!enrollment) return;
+
+    const course = getCourse({
+      id: enrollment.courseId,
+      courses: courses,
+    });
+    if (course) {
+      const area = course && getCourseArea(areas, course);
+
+      setActiveEnrollment({
+        ...enrollment,
+        course: course,
+        color: area?.color,
+      });
+    } else {
+      setActiveEnrollment(enrollment);
+    }
+
+    setClonedData(data);
   }
   function handleOnDragOver(event: DragOverEvent) {
     const { active, over } = event;
@@ -193,9 +227,7 @@ export default function DndCurriculum({
     const isOverSlot = data.some((period) =>
       period.enrollments.some((e) => e.id === over.id),
     );
-    //if (isOverSlot) return;
 
-    //const overContainer = findContainer(over.id as string);
     const overContainer = isOverSlot
       ? findContainer(over.id as string)
       : data.find((period) => period.id === over.id);
@@ -203,40 +235,36 @@ export default function DndCurriculum({
     if (!overContainer || !activeContainer || activeContainer === overContainer)
       return;
 
-    console.log("### HANDLE-OVER", overContainer.id);
-    setData((periods) => {
-      console.log("IN");
-      const [overYear, overTerm] = overContainer.id.split("-").map(Number);
-      const overIndex = overContainer.enrollments.findIndex(
-        (slot) => slot.id === over.id,
-      );
+    const [overYear, overTerm] = overContainer.id.split("-").map(Number);
+    const overIndex = overContainer.enrollments.findIndex(
+      (slot) => slot.id === over.id,
+    );
 
-      // Remove active slot from active container
-      activeContainer.enrollments = activeContainer.enrollments.filter(
-        (slot) => slot.id !== active.id,
-      );
-      // Add active slot to over container
-      overContainer.enrollments.splice(overIndex, 0, {
-        ...activeEnrollment!,
-        year: overYear!,
-        term: overTerm!,
-      });
+    // Remove active slot from active container
+    activeContainer.enrollments = activeContainer.enrollments.filter(
+      (slot) => slot.id !== active.id,
+    );
+    // Add active slot to over container
+    overContainer.enrollments.splice(overIndex, 0, {
+      ...activeEnrollment!,
+      year: overYear!,
+      term: overTerm!,
+    });
 
-      // Update slot positions
-      activeContainer.enrollments = activeContainer.enrollments.map(
-        (slot, index) => {
-          return { ...slot, position: index + 1 };
-        },
-      );
-      overContainer.enrollments = overContainer.enrollments.map(
-        (slot, index) => {
-          return { ...slot, position: index + 1 };
-        },
-      );
+    // Update slot positions
+    activeContainer.enrollments = activeContainer.enrollments.map(
+      (slot, index) => {
+        return { ...slot, position: index + 1 };
+      },
+    );
+    overContainer.enrollments = overContainer.enrollments.map((slot, index) => {
+      return { ...slot, position: index + 1 };
+    });
 
-      recentlyMovedToNewContainer.current = true;
+    recentlyMovedToNewContainer.current = true;
 
-      const newPeriods = periods.map((period) => {
+    setData((prevData) => {
+      const newData = prevData.map((period) => {
         if (period.id === activeContainer.id) {
           return activeContainer;
         }
@@ -246,7 +274,7 @@ export default function DndCurriculum({
         return period;
       });
 
-      return newPeriods;
+      return newData;
     });
   }
   function handleOnDragEnd(event: DragEndEvent) {
@@ -258,28 +286,28 @@ export default function DndCurriculum({
     if (!overContainer || !activeContainer) return;
 
     if (activeContainer === overContainer) {
-      setData((periods) => {
-        const activeIndex = activeContainer.enrollments.findIndex(
-          (slot) => slot.id === active.id,
-        );
-        const overIndex = overContainer.enrollments.findIndex(
-          (slot) => slot.id === over.id,
-        );
+      const activeIndex = activeContainer.enrollments.findIndex(
+        (slot) => slot.id === active.id,
+      );
+      const overIndex = overContainer.enrollments.findIndex(
+        (slot) => slot.id === over.id,
+      );
 
-        // Move active slot to new position
-        activeContainer.enrollments = arrayMove(
-          activeContainer.enrollments,
-          activeIndex,
-          overIndex,
-        );
-        // Update slot positions
-        activeContainer.enrollments = activeContainer.enrollments.map(
-          (slot, index) => {
-            return { ...slot, position: index + 1 };
-          },
-        );
+      // Move active slot to new position
+      activeContainer.enrollments = arrayMove(
+        activeContainer.enrollments,
+        activeIndex,
+        overIndex,
+      );
+      // Update slot positions
+      activeContainer.enrollments = activeContainer.enrollments.map(
+        (slot, index) => {
+          return { ...slot, position: index + 1 };
+        },
+      );
 
-        const newPeriods = periods.map((period) => {
+      setData((prevData) => {
+        const newData = prevData.map((period) => {
           if (period.id === activeContainer.id) {
             return activeContainer;
           }
@@ -288,9 +316,9 @@ export default function DndCurriculum({
 
         updateCourseEnrollments(
           studentEnrollmentId,
-          newPeriods.map((p) => p.enrollments).flat(),
+          newData.map((p) => p.enrollments).flat(),
         );
-        return newPeriods;
+        return newData;
       });
     }
 

@@ -10,7 +10,7 @@ export type newCurriculumStoreInitialStateProps = {
   } | null;
 };
 
-type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
+export type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
 
 export type EnrolledCourse = {
   id: string;
@@ -30,6 +30,10 @@ export type useNewCurriculumStoreProps = {
     slots: CurriculumData["curriculum"]["slots"];
   }) => void;
   removeProgramEnrollment: (enrollmentId: string) => void;
+  updateCourseEnrollmentStatus: (
+    enrollmentId: string,
+    newStatus: EnrolledCourseStatus,
+  ) => void;
   updateCourseEnrollments: (
     enrollmentId: string,
     newEnrollments: EnrolledCourse[],

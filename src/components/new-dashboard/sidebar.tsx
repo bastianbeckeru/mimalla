@@ -1,7 +1,7 @@
 "use client";
 
-import { useCurriculumStore, useSettingsStore } from "@/stores/curriculum";
-import { Trash2 } from "lucide-react";
+import { useSettingsStore } from "@/stores/settings";
+import { Lock, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ import {
 } from "../ui/sidebar";
 import type { CurriculumData } from "@/types/curriculum";
 import { getLuminance, parseHexColor } from "@/utils/colors";
+import { useEffect } from "react";
 
 type DashboardSidebar = {
   areas: CurriculumData["areas"];
@@ -47,6 +48,18 @@ export default function DashboardSidebar({
       return lumA - lumB;
     });
 
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "e" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setEditMode(!editMode);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, [editMode, setEditMode]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex h-14 justify-center border-b">
@@ -57,7 +70,8 @@ export default function DashboardSidebar({
 
       <SidebarContent className="p-2 text-sm">
         <div className="flex items-center justify-between space-x-2 p-2">
-          <div className="flex flex-row space-x-1">
+          <div className="flex flex-row items-end justify-end space-x-1">
+            <Lock className="size-3" />
             <Label htmlFor="edit-mode">Modo edición</Label>
             <span className="hidden text-xs text-muted-foreground md:inline-block">
               ⌘+E

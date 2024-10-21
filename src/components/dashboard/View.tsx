@@ -14,7 +14,7 @@ import { Loader2, Menu } from "lucide-react";
 
 export default function View() {
   const router = useRouter();
-  const { curriculum, setData, version, updateVersion } = useCurriculumStore();
+  const { curriculum, version, updateVersion } = useCurriculumStore();
 
   const currentVersion = "1.1.1";
   const isUpToDate = version === currentVersion;

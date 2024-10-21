@@ -6,6 +6,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card } from "../ui/card";
 import { checkContrasts } from "@/utils/colors";
 import { forwardRef } from "react";
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
 // Definimos las props para el Slot
 type SlotProps = {
@@ -69,8 +71,10 @@ function DraggableSlot({
   slot,
   course,
   color,
+  isDisabled,
 }: SlotProps & {
-  slot: CurriculumData["curriculum"]["slots"][0];
+  slot: CurriculumData["curriculum"]["slots"][0] | EnrolledCourse;
+  isDisabled: boolean;
 }) {
   const {
     attributes,
@@ -80,6 +84,7 @@ function DraggableSlot({
     transition,
     isDragging,
   } = useSortable({ id: slot.id });
+  const { updateCourseEnrollmentStatus } = useNewCurriculumStore();
 
   // Aplicamos estilos de transformación y transición
   const style = {
@@ -94,10 +99,26 @@ function DraggableSlot({
       {...listeners}
       ref={setNodeRef}
       style={style}
-      className="cursor-grab hover:brightness-95 dark:hover:brightness-105"
+      className={cn(
+        "cursor-grab hover:brightness-95 dark:hover:brightness-105",
+        isDisabled && "cursor-pointer",
+      )}
       course={course}
       color={color}
-    />
+      /*       onPointerDown={(e) => {
+        console.log("Pointer down", slot.id, course?.name);
+        let newStatus: EnrolledCourseStatus = "PENDING";
+        if (slot.status === "PENDING") {
+          newStatus = "APPROVED";
+        } else if (slot.status === "APPROVED") {
+          newStatus = "FAILED";
+        } else if (slot.status === "FAILED") {
+          newStatus = "PENDING";
+        }
+
+        updateCourseEnrollmentStatus(slot.id as string, newStatus);
+      }} */
+    ></Slot>
   );
 }
 
