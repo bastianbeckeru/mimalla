@@ -3,29 +3,32 @@ import { cn } from "@/lib/utils";
 import type { CurriculumData } from "@/types/curriculum";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card } from "../ui/card";
 import { checkContrasts } from "@/utils/colors";
 import { forwardRef } from "react";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import { MotionLi } from "../Motion";
+import type { HTMLMotionProps, Variants } from "framer-motion";
 
-// Definimos las props para el Slot
 type SlotProps = {
   course?: CurriculumData["courses"][0] | null;
   color?: string;
-  dragOverlay?: boolean;
   className?: string;
+  variants?: Variants;
+  dragOverlay?: boolean;
+  children?: React.ReactNode;
 };
 
-type ExtendedSlotProps = SlotProps & React.HTMLAttributes<HTMLDivElement>;
+type ExtendedSlotProps = SlotProps & HTMLMotionProps<"li">;
 
-const Slot = forwardRef<HTMLDivElement, ExtendedSlotProps>(
+const Slot = forwardRef<HTMLLIElement, ExtendedSlotProps>(
   (
     {
       course,
       color = "#fafafa",
       dragOverlay = false,
       className,
+      variants,
       children,
       ...props
     },
@@ -42,12 +45,13 @@ const Slot = forwardRef<HTMLDivElement, ExtendedSlotProps>(
     };
 
     return (
-      <Card
+      <MotionLi
         {...props}
         ref={ref}
         style={style}
+        variants={variants}
         className={cn(
-          "slot flex h-16 w-32 items-center justify-center rounded-md p-2",
+          "slot relative flex h-16 w-32 select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm",
           hasLowBackgroundElementContrast && "border border-foreground/50",
           hasLowElementTextContrast && "text-background",
           dragOverlay &&
@@ -59,11 +63,10 @@ const Slot = forwardRef<HTMLDivElement, ExtendedSlotProps>(
           {course?.name ?? "Vacío"}
         </span>
         {children}
-      </Card>
+      </MotionLi>
     );
   },
 );
-
 Slot.displayName = "Slot";
 
 // Componente DraggableSlot
@@ -72,9 +75,14 @@ function DraggableSlot({
   course,
   color,
   isDisabled,
+  openDialog,
+  updateCourseEnrollmentStatus,
+  ...props
 }: SlotProps & {
-  slot: CurriculumData["curriculum"]["slots"][0] | EnrolledCourse;
+  slot: EnrolledCourse;
   isDisabled: boolean;
+  openDialog: () => void;
+  updateCourseEnrollmentStatus: (newStatus: EnrolledCourseStatus) => void;
 }) {
   const {
     attributes,
@@ -84,41 +92,58 @@ function DraggableSlot({
     transition,
     isDragging,
   } = useSortable({ id: slot.id });
-  const { updateCourseEnrollmentStatus } = useNewCurriculumStore();
 
   // Aplicamos estilos de transformación y transición
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.25 : 1,
   };
+
+  const variants = isDragging
+    ? {
+        hidden: { opacity: 0.15 },
+        visible: { opacity: 0.15 },
+      }
+    : {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 },
+      };
 
   return (
     <Slot
       {...attributes}
       {...listeners}
+      {...props}
       ref={setNodeRef}
       style={style}
+      variants={variants}
       className={cn(
-        "cursor-grab hover:brightness-95 dark:hover:brightness-105",
+        "cursor-pointer hover:brightness-95 dark:hover:brightness-105",
         isDisabled && "cursor-pointer",
       )}
       course={course}
       color={color}
-      /*       onPointerDown={(e) => {
-        console.log("Pointer down", slot.id, course?.name);
-        let newStatus: EnrolledCourseStatus = "PENDING";
-        if (slot.status === "PENDING") {
-          newStatus = "APPROVED";
-        } else if (slot.status === "APPROVED") {
-          newStatus = "FAILED";
-        } else if (slot.status === "FAILED") {
-          newStatus = "PENDING";
+      onPointerUp={() => {
+        if (!isDisabled && !isDragging) {
+          updateCourseEnrollmentStatus(slot.status);
         }
-
-        updateCourseEnrollmentStatus(slot.id as string, newStatus);
-      }} */
-    ></Slot>
+      }}
+      onPointerDown={() => {
+        if (isDisabled && !isDragging) {
+          openDialog();
+        }
+      }}
+    >
+      {/* Strikethrough */}
+      {slot.status !== "PENDING" && (
+        <div
+          className={cn(
+            "diagonal-line",
+            slot.status === "APPROVED" ? "bg-black" : "bg-red-700",
+          )}
+        />
+      )}
+    </Slot>
   );
 }
 

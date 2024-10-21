@@ -1,7 +1,7 @@
 "use client";
 
 import { useSettingsStore } from "@/stores/settings";
-import { Lock, Trash2 } from "lucide-react";
+import { Lock, LockOpen, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -71,7 +71,11 @@ export default function DashboardSidebar({
       <SidebarContent className="p-2 text-sm">
         <div className="flex items-center justify-between space-x-2 p-2">
           <div className="flex flex-row items-end justify-end space-x-1">
-            <Lock className="size-3" />
+            {editMode ? (
+              <LockOpen className="size-3" />
+            ) : (
+              <Lock className="size-3" />
+            )}
             <Label htmlFor="edit-mode">Modo edición</Label>
             <span className="hidden text-xs text-muted-foreground md:inline-block">
               ⌘+E

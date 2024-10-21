@@ -29,11 +29,12 @@ import {
 
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import type { EnrolledCourse } from "@/types/store";
+import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import ScrollAreaWrapper from "../ScrollAreaWrapper";
 import { Slot, DraggableSlot } from "./slot";
 import PeriodContainer from "./period";
 import { useSettingsStore } from "@/stores/settings";
+import CourseDialog from "./course-dialog";
 
 type DndCurriculumProps = {
   programData: CurriculumData;
@@ -51,7 +52,8 @@ export default function DndCurriculum({
   periods,
   programData,
 }: DndCurriculumProps) {
-  const { updateCourseEnrollments } = useNewCurriculumStore();
+  const { updateCourseEnrollments, updateCourseEnrollmentStatus } =
+    useNewCurriculumStore();
   const { editMode } = useSettingsStore();
   const [data, setData] = useState<PeriodWithEnrollments[]>(periods);
   const [clonedData, setClonedData] = useState<PeriodWithEnrollments[] | null>(
@@ -59,11 +61,22 @@ export default function DndCurriculum({
   );
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
-        course?: CurriculumData["courses"][0];
+        course: {
+          id: number;
+          isElective: boolean;
+          name: string;
+          code: string | null;
+          description: string | null;
+          duration: number;
+          credits: number;
+          prerequisiteIds: number[];
+          subsequentIds: number[];
+        } | null;
         color?: string;
       })
     | null
   >(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { areas } = programData;
   const courses = new Map(programData.courses.map((c) => [c.id, c]));
@@ -120,7 +133,19 @@ export default function DndCurriculum({
     [data, activeEnrollment?.id],
   );
 
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+  );
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -164,6 +189,51 @@ export default function DndCurriculum({
                         course={course}
                         color={color}
                         isDisabled={!editMode}
+                        openDialog={() => {
+                          setActiveEnrollment({
+                            ...enrollment,
+                            course: course,
+                            color: color,
+                          });
+
+                          setIsOpen(true);
+                        }}
+                        updateCourseEnrollmentStatus={(
+                          currStatus: EnrolledCourseStatus,
+                        ) => {
+                          let newStatus: EnrolledCourseStatus;
+                          if (currStatus === "PENDING") {
+                            newStatus = "APPROVED";
+                          } else if (currStatus === "APPROVED") {
+                            newStatus = "FAILED";
+                          } else if (currStatus === "FAILED") {
+                            newStatus = "PENDING";
+                          }
+
+                          const newData = data.map((p) => {
+                            if (p.id === period.id) {
+                              return {
+                                ...p,
+                                enrollments: p.enrollments.map((e) => {
+                                  if (e.id === enrollment.id) {
+                                    return {
+                                      ...e,
+                                      status: newStatus,
+                                    };
+                                  }
+                                  return e;
+                                }),
+                              };
+                            }
+                            return p;
+                          });
+
+                          setData(newData);
+                          updateCourseEnrollments(
+                            studentEnrollmentId,
+                            newData.flatMap((p) => p.enrollments),
+                          );
+                        }}
                       />
                     );
                   })}
@@ -172,7 +242,7 @@ export default function DndCurriculum({
             ))}
           </div>
           <DragOverlay>
-            {activeEnrollment && (
+            {editMode && activeEnrollment && (
               <Slot
                 course={activeEnrollment.course}
                 color={activeEnrollment.color}
@@ -183,12 +253,17 @@ export default function DndCurriculum({
         </DndContext>
       </ScrollAreaWrapper>
 
-      {/*       <CourseDialog
+      <CourseDialog
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        course={selectedCourse}
-        setSelectedCourse={setSelectedCourse}
-      /> */}
+        onOpenChange={() => {
+          setIsOpen(!isOpen);
+          setTimeout(() => {
+            setActiveEnrollment(null);
+          }, 250);
+        }}
+        course={activeEnrollment?.course}
+        color={activeEnrollment?.color}
+      />
     </>
   );
 
@@ -196,8 +271,7 @@ export default function DndCurriculum({
     const { active } = event;
     const enrollment =
       periods
-        .map((period) => period.enrollments)
-        .flat()
+        .flatMap((period) => period.enrollments)
         .find((enrollment) => enrollment.id === active.id) ?? null;
 
     if (!enrollment) return;
@@ -206,18 +280,13 @@ export default function DndCurriculum({
       id: enrollment.courseId,
       courses: courses,
     });
-    if (course) {
-      const area = course && getCourseArea(areas, course);
+    const area = course && getCourseArea(areas, course);
 
-      setActiveEnrollment({
-        ...enrollment,
-        course: course,
-        color: area?.color,
-      });
-    } else {
-      setActiveEnrollment(enrollment);
-    }
-
+    setActiveEnrollment({
+      ...enrollment,
+      course: course,
+      color: area?.color,
+    });
     setClonedData(data);
   }
   function handleOnDragOver(event: DragOverEvent) {
@@ -316,7 +385,7 @@ export default function DndCurriculum({
 
         updateCourseEnrollments(
           studentEnrollmentId,
-          newData.map((p) => p.enrollments).flat(),
+          newData.flatMap((p) => p.enrollments),
         );
         return newData;
       });
