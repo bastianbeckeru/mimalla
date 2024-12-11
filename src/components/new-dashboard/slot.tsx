@@ -128,7 +128,7 @@ function DraggableSlot({
           updateCourseEnrollmentStatus(slot.status);
         }
       }}
-      onPointerDown={() => {
+      onClick={() => {
         if (isDisabled && !isDragging) {
           openDialog();
         }
