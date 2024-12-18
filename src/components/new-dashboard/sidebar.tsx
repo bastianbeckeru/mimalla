@@ -116,13 +116,13 @@ export default function DashboardSidebar({
                   key={aIndex}
                   className="flex w-full flex-row items-center justify-between space-x-2 pl-2 font-normal"
                 >
-                  <p className="line-clamp-1">{area.name}</p>
-                  <span
+                  <span className="line-clamp-1">{area.name}</span>
+                  <div
                     className="size-4 shrink-0 rounded-sm shadow-inner"
                     style={{
                       backgroundColor: area.color,
                     }}
-                  ></span>
+                  ></div>
                 </li>
               ))}
             </ul>

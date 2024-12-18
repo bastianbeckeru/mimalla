@@ -38,7 +38,7 @@ export default function Enrollment({
       <MotionLi
         variants={variants}
         className={cn(
-          "relative mb-2 flex h-[5rem] select-none items-center justify-start overflow-hidden rounded-2xl p-2 shadow-md xl:h-[5.5rem]",
+          "relative mb-2 flex h-[5rem] select-none items-center justify-start overflow-hidden rounded-xl p-2 shadow-md xl:h-[5.5rem]",
           editMode ? "hover:cursor-grab" : "hover:cursor-pointer",
           available
             ? "brightness-100 hover:brightness-[0.98]"
@@ -49,15 +49,15 @@ export default function Enrollment({
           if (!editMode) openDialog();
         }}
       >
-        <p
+        <span
           className={cn(
-            "flex h-full items-center justify-center text-pretty text-center text-xs font-normal xl:text-sm",
+            "flex h-full items-center justify-center text-pretty text-center text-xs font-medium xl:text-sm",
             editMode ? "w-10/12" : "w-full",
             hasLowElementTextContrast ? "text-background" : "text-foreground",
           )}
         >
-          {course?.name ?? `Curso`}
-        </p>
+          {course?.name ?? `Vacío`}
+        </span>
 
         <Checkbox
           tabIndex={-1}

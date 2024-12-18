@@ -16,6 +16,7 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { useRouter } from "next/navigation";
 import Logo from "../Logo";
+import { useEffect } from "react";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -27,6 +28,18 @@ export default function Sidebar() {
       (total, period) => total + period.enrollments.length,
       0,
     ) ?? 0;
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "e" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setEditMode(!editMode);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, [editMode, setEditMode]);
 
   return (
     <>
@@ -72,19 +85,19 @@ export default function Sidebar() {
 
           {/* AREAS */}
           {areas.length > 0 && (
-            <div className="flex flex-col space-y-2 py-2">
+            <div className="flex flex-col p-2">
               <h2 className="font-semibold">Áreas de Formación</h2>
-              <ul className="rounded-md border border-input">
+              <ul className="space-y-1 py-2">
                 {areas.map((area, aIndex) => {
                   if (area.name == "none") return null;
                   return (
                     <li
                       key={aIndex}
-                      className="flex h-8 w-full flex-row items-center justify-between space-x-2 px-2 font-normal"
+                      className="flex w-full flex-row items-center justify-between space-x-2 pl-2 font-normal"
                     >
                       <p className="line-clamp-1">{area.name}</p>
                       <div
-                        className="size-4 shrink-0 rounded-sm border border-black/10"
+                        className="size-4 shrink-0 rounded-sm shadow-inner"
                         style={{
                           backgroundColor: area.color ?? undefined,
                         }}

@@ -87,7 +87,7 @@ export default function CurriculumDashboard({ curriculum }: Props) {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 ref={provided.innerRef}
-                                className="rounded-2xl"
+                                className="rounded-xl"
                               >
                                 <Enrollment
                                   variants={courseVariants}
