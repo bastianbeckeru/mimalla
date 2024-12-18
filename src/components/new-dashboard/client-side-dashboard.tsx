@@ -60,7 +60,7 @@ export default function ClientSideDashboard() {
 
       <SidebarInset className="grid min-h-dvh grid-rows-[auto_1fr]">
         <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-sidebar transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <SidebarTrigger className="absolute inset-4 -ml-1 hidden" />
+          <SidebarTrigger className="absolute inset-4 -ml-1" />
           <div className="flex flex-col items-center justify-center space-y-px px-2">
             <h1 className="text-sm font-semibold">{program.name}</h1>
             <p className="text-xs/3 text-muted-foreground">

@@ -85,7 +85,7 @@ export default function Sidebar() {
 
           {/* AREAS */}
           {areas.length > 0 && (
-            <div className="flex flex-col p-2">
+            <div className="flex flex-col">
               <h2 className="font-semibold">Áreas de Formación</h2>
               <ul className="space-y-1 py-2">
                 {areas.map((area, aIndex) => {
