@@ -44,21 +44,22 @@ export default async function ProgramPage({ params }: ProgramParams) {
   });
 
   return (
-    <div className="flex w-dvw flex-col gap-2 border-t pt-2 md:flex-row md:p-4">
-      <CurriculumView
-        className="rounded-sm md:w-3/4 md:border"
-        nCols={nCols}
-        nRows={nRows}
-        periods={periods}
-        data={data}
-      />
+    <div className="w-dvw border-t pt-2 lg:p-4">
+      <div className="flex flex-col rounded-md lg:flex-row lg:border">
+        <CurriculumView
+          nCols={nCols}
+          nRows={nRows}
+          periods={periods}
+          data={data}
+        />
 
-      <ProgramInfo
-        institution={institution}
-        program={program}
-        degrees={degrees}
-        duration={periods.length}
-      />
+        <ProgramInfo
+          institution={institution}
+          program={program}
+          degrees={degrees}
+          duration={periods.length}
+        />
+      </div>
     </div>
   );
 }

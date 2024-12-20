@@ -1,11 +1,5 @@
 import type { CurriculumData } from "@/types/curriculum";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 export default function ProgramInfo({
   institution,
@@ -23,21 +17,29 @@ export default function ProgramInfo({
   const { schedule, siesCode, demreCode } = program;
 
   return (
-    <Card className="rounded-sm border bg-sidebar text-foreground md:w-96">
+    <Card className="min-w-96 rounded-none bg-sidebar text-foreground lg:w-96 lg:rounded-r-md">
       <CardHeader>
-        <CardTitle>{program.name}</CardTitle>
-        <CardDescription>{institution.name}</CardDescription>
+        <CardTitle className="text-2xl font-bold leading-tight">
+          {program.name}
+        </CardTitle>
+        <span className="mt-1 block text-base font-normal text-zinc-400">
+          {institution.name}
+        </span>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-3">
         <InfoItem label="Título Profesional" value={professionalTitle?.name} />
         <InfoItem label="Grado Académico" value={academicTitle?.name} />
+
         <InfoItem label="Duración" value={`${duration} semestres`} />
         <InfoItem
           label="Jornada"
           value={schedule === "DAYTIME" ? "Diurna" : "Vespertina"}
         />
-        <InfoItem label="Código SIES" value={siesCode} />
-        <InfoItem label="Código DEMRE" value={demreCode} />
+
+        <div className="flex flex-col justify-between space-y-2 border-t py-2">
+          <InfoItem label="Código SIES" value={siesCode} />
+          <InfoItem label="Código DEMRE" value={demreCode} />
+        </div>
       </CardContent>
     </Card>
   );
@@ -51,8 +53,11 @@ const InfoItem = ({
   value?: string | number | null;
 }) =>
   value && (
-    <p className="text-sm">
-      <span className="font-semibold">{label}:</span>{" "}
-      <span className="font-normal">{value}</span>
-    </p>
+    <div>
+      <h3 className="text-sm text-muted-foreground">
+        {label}
+        {": "}
+      </h3>
+      <span className="text-foreground">{value}</span>
+    </div>
   );
