@@ -15,9 +15,7 @@ export default function Footer({
           <Kanban className="size-5" />
           <p className="text-center text-sm leading-loose md:text-left">
             Desarrollado con ❤️, por{" "}
-            <span
-              className="font-medium underline underline-offset-4"
-            >
+            <span className="font-medium underline underline-offset-4">
               estudiantes
             </span>{" "}
             para estudiantes.
