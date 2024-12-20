@@ -19,7 +19,7 @@ export default function Logo({ alwaysShow = false, className }: LogoProps) {
       <Kanban className="size-6" />
       <span
         className={cn(
-          "hidden text-lg font-medium sm:inline-block",
+          "hidden text-lg font-semibold sm:inline-block",
           alwaysShow && "inline-block",
         )}
       >

@@ -1,11 +1,19 @@
 import type { CurriculumData } from "@/types/curriculum";
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export default function ProgramInfo({
+  institution,
   program,
   degrees,
   duration,
 }: {
+  institution: CurriculumData["institution"];
   program: CurriculumData["program"];
   degrees: CurriculumData["degrees"];
   duration: number;
@@ -15,7 +23,11 @@ export default function ProgramInfo({
   const { schedule, siesCode, demreCode } = program;
 
   return (
-    <Card className="w-1/4 space-y-2 rounded-sm bg-neutral-800 p-2 text-foreground">
+    <Card className="rounded-sm border bg-sidebar text-foreground md:w-96">
+      <CardHeader>
+        <CardTitle>{program.name}</CardTitle>
+        <CardDescription>{institution.name}</CardDescription>
+      </CardHeader>
       <CardContent className="space-y-2">
         <InfoItem label="Título Profesional" value={professionalTitle?.name} />
         <InfoItem label="Grado Académico" value={academicTitle?.name} />

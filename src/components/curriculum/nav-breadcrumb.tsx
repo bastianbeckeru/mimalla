@@ -25,9 +25,9 @@ export function NavigationBreadcrumb({
   program,
 }: NavigationProps) {
   return (
-    <Breadcrumb className="flex h-20 items-center justify-between py-6">
-      <BreadcrumbList className="text-xl">
-        <BreadcrumbItem>
+    <Breadcrumb>
+      <BreadcrumbList className="text-lg">
+        <BreadcrumbItem className="hover:text-foreground">
           <Logo />
         </BreadcrumbItem>
         <BreadcrumbSeparator className="[&>svg]:size-6">
@@ -46,7 +46,9 @@ export function NavigationBreadcrumb({
           <Slash />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
-          <BreadcrumbPage className=" font-bold">{program.name}</BreadcrumbPage>
+          <BreadcrumbPage className="font-semibold">
+            {program.name}
+          </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

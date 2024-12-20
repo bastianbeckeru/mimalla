@@ -1,22 +1,22 @@
-"use client";
-
-import Link from "next/link";
-import { Kanban } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Logo from "./Logo";
+import { Searchbar } from "./search-bar";
 
 //import { useSession } from "next-auth/react";
 
-export default function Navbar() {
+type NavbarProps = {
+  className?: string;
+};
+
+export default function Navbar({ className }: NavbarProps) {
   //const { data: session } = useSession();
 
   return (
-    <header className="container z-40">
-      <div className="flex h-20 items-center justify-between py-6">
-        <div className="flex gap-6 md:gap-10">
-          <Logo />
-        </div>
-        {/* <nav></nav> */}
-      </div>
+    <header className={cn("container z-40 h-20 py-6", className)}>
+      <nav className="flex items-center justify-between">
+        <Logo />
+        <Searchbar />
+      </nav>
     </header>
   );
 }

@@ -5,7 +5,6 @@ import path from "path";
 import { createUrlSlug } from "@/utils/strings";
 
 import CurriculumView from "@/components/curriculum/curriculum-view";
-import { NavigationBreadcrumb } from "@/components/curriculum/nav-breadcrumb";
 import { getPeriods } from "@/utils/curriculum";
 import type { CurriculumData } from "@/types/curriculum";
 import ProgramInfo from "@/components/curriculum/program-info";
@@ -45,24 +44,21 @@ export default async function ProgramPage({ params }: ProgramParams) {
   });
 
   return (
-    <div className="w-dvw px-8">
-      <NavigationBreadcrumb institution={institution} program={program} />
+    <div className="flex w-dvw flex-col gap-2 border-t pt-2 md:flex-row md:p-4">
+      <CurriculumView
+        className="rounded-sm md:w-3/4 md:border"
+        nCols={nCols}
+        nRows={nRows}
+        periods={periods}
+        data={data}
+      />
 
-      <div className="flex flex-row gap-2">
-        <CurriculumView
-          className="w-3/4 rounded-sm border"
-          nCols={nCols}
-          nRows={nRows}
-          periods={periods}
-          data={data}
-        />
-
-        <ProgramInfo
-          program={program}
-          degrees={degrees}
-          duration={periods.length}
-        />
-      </div>
+      <ProgramInfo
+        institution={institution}
+        program={program}
+        degrees={degrees}
+        duration={periods.length}
+      />
     </div>
   );
 }
