@@ -46,7 +46,7 @@ export default function CurriculumView({
   };
 
   return (
-    <ScrollAreaWrapper className={cn("shadow-inner", className)}>
+    <ScrollAreaWrapper className={cn("flex-grow shadow-inner", className)}>
       <div className="p-2">
         <div
           className="flex flex-row gap-2"

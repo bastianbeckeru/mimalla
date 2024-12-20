@@ -17,7 +17,7 @@ export default function ProgramInfo({
   const { schedule, siesCode, demreCode } = program;
 
   return (
-    <Card className="min-w-96 rounded-none bg-sidebar text-foreground lg:w-96 lg:rounded-r-md">
+    <Card className="rounded-none bg-sidebar text-foreground lg:w-[26rem] lg:rounded-r-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold leading-tight">
           {program.name}
