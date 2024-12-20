@@ -1,5 +1,5 @@
 import Navbar from "@/components/navbar";
-import Footer from "@/components/Footer";
+import Footer from "@/components/footer";
 
 export default async function MarketingLayout({
   children,

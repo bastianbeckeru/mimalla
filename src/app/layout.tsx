@@ -6,7 +6,7 @@ import { Montserrat } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
