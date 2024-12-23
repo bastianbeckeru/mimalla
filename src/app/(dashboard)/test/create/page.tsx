@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import EnrollmentForm from "@/components/new-dashboard/enrollment-form";
 
-export default function CreateCurriculumPage() {
+export default function TestCreateCurriculumPage() {
   const programs = getAllPrograms();
 
   return <EnrollmentForm programs={programs} />;

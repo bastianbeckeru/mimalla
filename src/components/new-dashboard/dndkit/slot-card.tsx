@@ -1,14 +1,16 @@
 import "@/styles/curriculum.css";
 import { cn } from "@/lib/utils";
 import type { CurriculumData } from "@/types/curriculum";
+
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
 import { checkContrasts } from "@/utils/colors";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
-import { MotionLi } from "../Motion";
 import type { HTMLMotionProps, Variants } from "framer-motion";
+import { MotionLi } from "@/components/Motion";
 
 type SlotProps = {
   course?: CurriculumData["courses"][0] | null;
@@ -21,56 +23,58 @@ type SlotProps = {
 
 type ExtendedSlotProps = SlotProps & HTMLMotionProps<"li">;
 
-const Slot = forwardRef<HTMLLIElement, ExtendedSlotProps>(
-  (
-    {
-      course,
-      color = "#fafafa",
-      dragOverlay = false,
-      className,
-      variants,
-      children,
-      ...props
+const SlotCard = memo(
+  forwardRef<HTMLLIElement, ExtendedSlotProps>(
+    (
+      {
+        course,
+        color = "#fafafa",
+        dragOverlay = false,
+        className,
+        variants,
+        children,
+        ...props
+      },
+      ref,
+    ) => {
+      const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
+        checkContrasts({
+          elementColor: color,
+        });
+
+      const style = {
+        backgroundColor: color,
+        ...props.style, // Combina los estilos pasados manualmente
+      };
+
+      return (
+        <MotionLi
+          {...props}
+          ref={ref}
+          style={style}
+          variants={variants}
+          className={cn(
+            "relative flex h-16 w-32 select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm",
+            hasLowBackgroundElementContrast && "border border-foreground/50",
+            hasLowElementTextContrast && "text-background",
+            dragOverlay &&
+              "shadow-xl brightness-95 transition-shadow dark:brightness-105",
+            className,
+          )}
+        >
+          <span className="text-center text-xs font-medium">
+            {course?.name ?? "Vacío"}
+          </span>
+          {children}
+        </MotionLi>
+      );
     },
-    ref,
-  ) => {
-    const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
-      checkContrasts({
-        elementColor: color,
-      });
-
-    const style = {
-      backgroundColor: color,
-      ...props.style, // Combina los estilos pasados manualmente
-    };
-
-    return (
-      <MotionLi
-        {...props}
-        ref={ref}
-        style={style}
-        variants={variants}
-        className={cn(
-          "slot relative flex h-16 w-32 select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm",
-          hasLowBackgroundElementContrast && "border border-foreground/50",
-          hasLowElementTextContrast && "text-background",
-          dragOverlay &&
-            "dragOverlaySlot shadow-xl brightness-95 transition-shadow dark:brightness-105",
-          className,
-        )}
-      >
-        <span className="text-center text-xs font-medium">
-          {course?.name ?? "Vacío"}
-        </span>
-        {children}
-      </MotionLi>
-    );
-  },
+  ),
 );
-Slot.displayName = "Slot";
+SlotCard.displayName = "SlotCard";
 
 // Componente DraggableSlot
-function DraggableSlot({
+function DraggableSlotCard({
   slot,
   course,
   color,
@@ -110,7 +114,7 @@ function DraggableSlot({
       };
 
   return (
-    <Slot
+    <SlotCard
       {...attributes}
       {...listeners}
       {...props}
@@ -143,8 +147,8 @@ function DraggableSlot({
           )}
         />
       )}
-    </Slot>
+    </SlotCard>
   );
 }
 
-export { Slot, DraggableSlot };
+export { SlotCard, DraggableSlotCard };

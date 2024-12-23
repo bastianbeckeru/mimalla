@@ -52,7 +52,18 @@ export default function CourseDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex size-full min-h-48 flex-col"></div>
+        <div className="flex size-full min-h-48 flex-col">
+          {course?.prerequisiteIds.map((id, pIndex) => (
+            <p key={pIndex} className="text-sm text-muted-foreground">
+              {id}
+            </p>
+          ))}
+          {course?.subsequentIds.map((id, pIndex) => (
+            <p key={pIndex} className="text-sm text-muted-foreground">
+              {id}
+            </p>
+          ))}
+        </div>
       </DialogContent>
     </Dialog>
   );

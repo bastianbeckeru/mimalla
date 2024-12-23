@@ -630,14 +630,58 @@
       "id": 1,
       "name": "Licenciatura en Ciencias de la Ingeniería",
       "type": "ACADEMIC",
-      "requiredCourses": [1, 2]
+      "requiredCourseIds": [1, 2]
     },
     {
       "id": 2,
       "name": "Ingeniería Civil Industrial",
       "type": "PROFESSIONAL",
-      "requiredCourses": [1, 2],
+      "requiredCourseIds": [1, 2],
       "requiredElectives": [1]
+    }
+  ],
+  "plans": [
+    {
+      "id": 1,
+      "name": "Ingeniería Civil Industrial",
+      "type": "NONE",
+      "areCoursesMandatory": true,
+      "courseIds": [1, 2],
+      "subplanIds": [2, 3]
+    },
+    {
+      "id": 2,
+      "name": "Licenciatura en Ciencias de la Ingeniería",
+      "type": "ACADEMIC",
+      "areCoursesMandatory": true,
+      "courseIds": [3, 4],
+      "subplanIds": [3]
+    },
+    {
+      "id": 3,
+      "name": "Ingeniería Civil Industrial",
+      "type": "PROFESSIONAL",
+      "areCoursesMandatory": true,
+      "courseIds": [8],
+      "subplanIds": [4]
+    },
+    {
+      "id": 4,
+      "name": "Cursos de Formación General",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 20,
+      "courseIds": [5, 6, 7],
+      "subplanIds": []
+    },
+    {
+      "id": 5,
+      "name": "Electivos Profesionales",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 36,
+      "courseIds": [8, 10, 11],
+      "subplanIds": []
     }
   ]
 }

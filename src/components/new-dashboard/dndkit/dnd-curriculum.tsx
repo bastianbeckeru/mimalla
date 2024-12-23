@@ -30,11 +30,11 @@ import {
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
-import ScrollAreaWrapper from "../ScrollAreaWrapper";
-import { Slot, DraggableSlot } from "./slot";
-import PeriodContainer from "./period";
+import ScrollAreaWrapper from "../../ScrollAreaWrapper";
+import { SlotCard, DraggableSlotCard } from "./slot-card";
+import PeriodContainer from "./period-container";
 import { useSettingsStore } from "@/stores/settings";
-import CourseDialog from "./course-dialog";
+import CourseDialog from "../course-dialog";
 
 type DndCurriculumProps = {
   programData: CurriculumData;
@@ -183,7 +183,7 @@ export default function DndCurriculum({
                     const color = area?.color;
 
                     return (
-                      <DraggableSlot
+                      <DraggableSlotCard
                         key={enrollment.id}
                         slot={enrollment}
                         course={course}
@@ -243,7 +243,7 @@ export default function DndCurriculum({
           </div>
           <DragOverlay>
             {editMode && activeEnrollment && (
-              <Slot
+              <SlotCard
                 course={activeEnrollment.course}
                 color={activeEnrollment.color}
                 dragOverlay

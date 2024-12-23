@@ -25,7 +25,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { createUrlSlug } from "@/utils/strings";
 import { Button, buttonVariants } from "@/components/ui/button";

@@ -46,7 +46,7 @@ export default function PeriodContainer({
       variants={variants}
       custom={index}
       ref={setNodeRef}
-      className="flex select-none flex-col gap-2 px-1"
+      className="z-0 flex select-none flex-col gap-2 px-1"
       {...props}
     >
       <span
@@ -55,7 +55,8 @@ export default function PeriodContainer({
         SEMESTRE {arabicToRoman(index + 1)}
       </span>
 
-      <div className="flex flex-col gap-2">{children}</div>
+      {/* <div className="flex flex-col gap-2">{children}</div> */}
+      {children}
     </MotionOl>
   );
 }
