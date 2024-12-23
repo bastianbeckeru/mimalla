@@ -1,7 +1,7 @@
+import { MotionOl } from "@/components/Motion";
 import type { PeriodKey } from "@/types/curriculum";
 import { arabicToRoman } from "@/utils/numbers";
 import { useDroppable } from "@dnd-kit/core";
-import { MotionOl } from "../Motion";
 
 type PeriodContainerProps = {
   id: PeriodKey;
