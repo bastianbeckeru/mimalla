@@ -102,7 +102,7 @@ export default function RBDndCurriculum({
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
-                              slot={enrollment}
+                              enrollment={enrollment}
                               course={course}
                               color={color}
                               isDragging={snapshot.isDragging}

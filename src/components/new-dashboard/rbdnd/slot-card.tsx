@@ -5,17 +5,16 @@ import type { CurriculumData } from "@/types/curriculum";
 import { checkContrasts } from "@/utils/colors";
 import { type ComponentPropsWithoutRef, forwardRef } from "react";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import type { EnrolledCourse } from "@/types/store";
 
 type SlotProps = {
   color?: string;
   isDisabled?: boolean;
   isDragging?: boolean;
-  slot: EnrolledCourse;
+  enrollment: EnrolledCourse;
   course?: CurriculumData["courses"][0] | null;
   className?: string;
   children?: React.ReactNode;
-  updateCourseEnrollmentStatus: (newStatus: EnrolledCourseStatus) => void;
 };
 
 type ExtendedSlotProps = SlotProps & ComponentPropsWithoutRef<"li">;
@@ -25,7 +24,7 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
     {
       color = "#fafafa",
       isDragging = false,
-      slot,
+      enrollment,
       course,
       className,
       children,
@@ -63,11 +62,11 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
         {children}
 
         {/* Strikethrough */}
-        {slot.status !== "PENDING" && (
+        {enrollment.status !== "PENDING" && (
           <div
             className={cn(
               "diagonal-line",
-              slot.status === "APPROVED" ? "bg-black" : "bg-red-700",
+              enrollment.status === "APPROVED" ? "bg-black" : "bg-red-700",
             )}
           />
         )}
