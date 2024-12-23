@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { toast } from "../ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Loader2, Menu } from "lucide-react";
 
 export default function View() {
