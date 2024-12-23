@@ -9,8 +9,8 @@ import type { EnrolledCourse } from "@/types/store";
 
 type SlotProps = {
   color?: string;
-  isDisabled?: boolean;
   isDragging?: boolean;
+  isAvailable?: boolean;
   enrollment: EnrolledCourse;
   course?: CurriculumData["courses"][0] | null;
   className?: string;
@@ -24,6 +24,7 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
     {
       color = "#fafafa",
       isDragging = false,
+      isAvailable = true,
       enrollment,
       course,
       className,
@@ -51,6 +52,9 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
           "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm",
           hasLowBackgroundElementContrast && "border border-foreground/50",
           hasLowElementTextContrast && "text-background",
+          isAvailable
+            ? "hover:brightness-[1.05]"
+            : "brightness-[0.5] hover:brightness-[0.55]",
           isDragging && "shadow-2xl",
           className,
         )}

@@ -57,6 +57,13 @@ export default function ClientSideDashboard() {
   const { institution, program, areas, courses } = programData;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
+  const approvedEnrollments = studentEnrollment.enrolledCourses.filter(
+    (e) => e.status === "APPROVED",
+  );
+  const approvedCourses = approvedEnrollments
+    .map((e) => coursesMap.get(e.courseId))
+    .filter((c) => c !== null && c !== undefined);
+
   return (
     <SidebarProvider>
       <Sidebar
@@ -81,6 +88,7 @@ export default function ClientSideDashboard() {
           periods={periods}
           areas={areas}
           courses={coursesMap}
+          approvedCourses={approvedCourses.map((c) => c.id)}
         />
       </SidebarInset>
     </SidebarProvider>

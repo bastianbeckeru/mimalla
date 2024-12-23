@@ -25,9 +25,10 @@ import CourseDialog from "../course-dialog";
 
 type RBDndCurriculum = {
   areas: CurriculumData["areas"];
-  courses: Map<number, CurriculumData["courses"][0]>;
   studentEnrollmentId: string;
   periods: PeriodWithEnrollments[];
+  courses: Map<number, CurriculumData["courses"][0]>;
+  approvedCourses: number[];
 };
 
 type PeriodWithEnrollments = {
@@ -40,6 +41,7 @@ export default function RBDndCurriculum({
   periods,
   areas,
   courses,
+  approvedCourses,
 }: RBDndCurriculum) {
   const { updateCourseEnrollments, updateCourseEnrollmentStatus } =
     useNewCurriculumStore();
@@ -90,6 +92,12 @@ export default function RBDndCurriculum({
                       const area = course && getCourseArea(areas, course);
                       const color = area?.color;
 
+                      // Estoy disponible solamente si he aprobado todos los cursos de prerequisito
+                      // approvedCourses.includes(prerequisiteIds)
+                      const isAvailable = course?.prerequisiteIds.every((id) =>
+                        approvedCourses.includes(id),
+                      );
+
                       return (
                         <Draggable
                           key={enrollment.id}
@@ -105,6 +113,7 @@ export default function RBDndCurriculum({
                               enrollment={enrollment}
                               course={course}
                               color={color}
+                              isAvailable={isAvailable}
                               isDragging={snapshot.isDragging}
                               onClick={() => {
                                 if (snapshot.isDragging) return;
@@ -118,6 +127,8 @@ export default function RBDndCurriculum({
 
                                   setIsOpen(true);
                                 } else {
+                                  if (!isAvailable) return;
+
                                   const currStatus = enrollment.status;
                                   let newStatus: EnrolledCourseStatus;
 
@@ -129,22 +140,43 @@ export default function RBDndCurriculum({
                                     newStatus = "PENDING";
                                   }
 
-                                  const newData = data.map((p) => {
-                                    if (p.id === period.id) {
-                                      return {
-                                        ...p,
-                                        enrollments: p.enrollments.map((e) => {
-                                          if (e.id === enrollment.id) {
-                                            return {
-                                              ...e,
-                                              status: newStatus,
-                                            };
-                                          }
-                                          return e;
-                                        }),
-                                      };
+                                  // Obtener todos los cursos subsequent que están aprobados y que pasarán a pendientes
+                                  // Obtener todos los enrollment que alguno de los ids obtenidos en el paso anterior
+                                  // Cambiar el status de esos enrollments a pendiente
+
+                                  /* const coursesToPending = [enrollment.courseId] */
+                                  const coursesToPending: number[] = [];
+                                  course?.subsequentIds.forEach((id) => {
+                                    if (approvedCourses.includes(id)) {
+                                      coursesToPending.push(id);
+                                      // FALTA EL LOOP
                                     }
-                                    return p;
+                                  });
+
+                                  console.log(coursesToPending);
+
+                                  const newData = data.map((p) => {
+                                    return {
+                                      ...p,
+                                      enrollments: p.enrollments.map((e) => {
+                                        if (e.id === enrollment.id) {
+                                          return {
+                                            ...e,
+                                            status: newStatus,
+                                          };
+                                        } else if (
+                                          newStatus !== "APPROVED" &&
+                                          coursesToPending.includes(e.courseId)
+                                        ) {
+                                          return {
+                                            ...e,
+                                            status:
+                                              "PENDING" as EnrolledCourseStatus,
+                                          };
+                                        }
+                                        return e;
+                                      }),
+                                    };
                                   });
 
                                   setData(newData);

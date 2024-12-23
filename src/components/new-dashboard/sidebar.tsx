@@ -94,7 +94,7 @@ export default function DashboardSidebar({
               asChild
               className="group-data-[collapsible=icon]:!p-1 [&>svg]:size-6"
             >
-              <Logo />
+              <Logo alwaysShow />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
