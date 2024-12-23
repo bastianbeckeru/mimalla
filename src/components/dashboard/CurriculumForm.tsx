@@ -21,7 +21,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useCurriculumStore } from "@/stores/curriculum";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
