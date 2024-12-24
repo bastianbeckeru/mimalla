@@ -5,10 +5,12 @@ import { useCurriculumStore } from "@/stores/curriculum";
 import { hexToRgba, parseHexColor } from "@/utils/colors";
 import { cn } from "@/lib/utils";
 import { Check, Ghost, Minus } from "lucide-react";
+import { type CurriculumData } from "@/types/curriculum";
 
 type CourseDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
+  courses: Map<number, CurriculumData["courses"][0]>;
   course?: {
     id: number;
     isElective: boolean;
@@ -19,125 +21,141 @@ type CourseDialogProps = {
     credits: number;
     prerequisiteIds: number[];
     subsequentIds: number[];
+    prerequisiteCredits: number;
   } | null;
   color?: string;
+  approvedCourses: number[];
+  approvedCredits: number;
 };
 
 export default function CourseDialog({
   isOpen,
   onOpenChange,
+  courses,
   course,
   color = "#fafafa",
+  approvedCourses,
+  approvedCredits,
 }: CourseDialogProps) {
-  const { progress } = useCurriculumStore();
   const rgbaColor = hexToRgba(parseHexColor(color), 0.2);
 
   const style = {
     backgroundColor: rgbaColor,
   };
+
+  if (!course) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent tabIndex={-1} className="min-h-64 sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">
-            {course?.name ?? `Curso`}
-          </DialogTitle>
+          <DialogTitle className="text-left text-xl">{course.name}</DialogTitle>
           <div className="mt-1 flex flex-row items-center space-x-2 text-sm text-muted-foreground">
-            <p className="min-w-32 rounded-md px-1 py-px" style={style}>
-              Código: <span className="">{course?.code}</span>
-            </p>
-            <p className="min-w-32 rounded-md px-1 py-px">
-              {course?.credits} Créditos
+            {course.code && (
+              <p className="min-w-fit rounded-md px-2 py-px" style={style}>
+                {course.code}
+              </p>
+            )}
+            <p className="min-w-fit rounded-md py-px">
+              {course.credits} créditos
             </p>
           </div>
         </DialogHeader>
 
-        <div className="flex size-full min-h-48 flex-col">
-          {course?.prerequisiteIds.map((id, pIndex) => (
-            <p key={pIndex} className="text-sm text-muted-foreground">
-              {id}
-            </p>
-          ))}
-          {course?.subsequentIds.map((id, pIndex) => (
-            <p key={pIndex} className="text-sm text-muted-foreground">
-              {id}
-            </p>
-          ))}
+        <div className="flex size-full min-h-48 flex-col gap-2 md:flex-row">
+          <div className="rounded-md border md:w-1/2">
+            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
+              Prerequisitos
+            </h2>
+            <ul className="flex min-h-32 flex-col space-y-1 p-2">
+              {course.prerequisiteIds.length > 0 ||
+              course.prerequisiteCredits > 0 ? (
+                <>
+                  {course.prerequisiteCredits > 0 && (
+                    <RelatedElement
+                      name={`${course.prerequisiteCredits}` + " créditos"}
+                      code={null}
+                      isChecked={course.prerequisiteCredits <= approvedCredits}
+                    />
+                  )}
+                  {course.prerequisiteIds.map((id) => {
+                    const isApproved = approvedCourses.includes(id);
+                    const c = courses.get(id);
+
+                    if (!c) return null;
+
+                    return (
+                      <RelatedElement
+                        key={id}
+                        name={c.name}
+                        code={c.code}
+                        isChecked={isApproved}
+                      />
+                    );
+                  })}
+                </>
+              ) : (
+                <div className="flex h-28 items-center justify-center">
+                  <Ghost className="size-8 text-muted" />
+                </div>
+              )}
+            </ul>
+          </div>
+          <div className="rounded-md border md:w-1/2">
+            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
+              Desbloquea
+            </h2>
+            <ul className="flex min-h-32 flex-col space-y-1 p-2">
+              {course.subsequentIds.length > 0 ? (
+                <>
+                  {course.subsequentIds.map((id) => {
+                    const isApproved = approvedCourses.includes(id);
+                    const c = courses.get(id);
+
+                    if (!c) return null;
+
+                    return (
+                      <RelatedElement
+                        key={id}
+                        name={c.name}
+                        code={c.code}
+                        isChecked={isApproved}
+                      />
+                    );
+                  })}
+                </>
+              ) : (
+                <div className="flex h-28 items-center justify-center">
+                  <Ghost className="size-8 text-muted" />
+                </div>
+              )}
+            </ul>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-type RelatedCoursesProps = {
-  relation: string;
-  relatedCourses:
-    | {
-        code: string | null;
-        name: string;
-      }[]
-    | undefined;
-  progress?: {
-    approvedCourses?: string[];
-    earnedCredits?: number;
-  };
-  children?: React.ReactNode;
-};
+const RelatedElement = ({
+  name,
+  code,
+  isChecked,
+}: {
+  name: string;
+  code: string | null;
+  isChecked: boolean;
+}) => (
+  <li className="flex flex-row items-center space-x-1 text-sm">
+    <p className="flex-grow">{name}</p>
+    {code && <p className="text-muted-foreground">({code})</p>}
 
-function RelatedCourses({
-  relation,
-  relatedCourses,
-  progress,
-  children,
-}: RelatedCoursesProps) {
-  return (
-    <div>
-      <h2 className="font-bold">{relation}</h2>
-      <ul
-        className={cn(
-          "min-h-32 rounded-lg border p-2",
-          !children &&
-            relatedCourses?.length == 0 &&
-            "flex items-center justify-center",
-        )}
-      >
-        {!children && relatedCourses?.length == 0 ? (
-          <Ghost className="size-5 text-muted" />
-        ) : (
-          <>
-            {children}
-
-            {relatedCourses?.map((course, cIndex) => {
-              const isApproved = course.code
-                ? progress?.approvedCourses?.some((approvedCourse) =>
-                    approvedCourse.startsWith(course.code!),
-                  )
-                : false;
-
-              return (
-                <li
-                  key={cIndex}
-                  className="flex flex-row items-center justify-between space-x-1 px-2"
-                >
-                  <p className="text-sm">{course.name}</p>
-                  <div className="flex flex-row space-x-1">
-                    <p className="text-xs text-muted-foreground">
-                      ({course.code ?? "-------"})
-                    </p>
-                    {progress?.approvedCourses !== undefined ? (
-                      isApproved ? (
-                        <Check className="size-4 text-green-500" />
-                      ) : (
-                        <Minus className="size-4 text-muted-foreground" />
-                      )
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </>
-        )}
-      </ul>
+    <div className="flex size-5 items-center justify-center">
+      {isChecked ? (
+        <Check className="size-4 text-green-500" />
+      ) : (
+        <Minus className="size-4 text-muted-foreground" />
+      )}
     </div>
-  );
-}
+  </li>
+);

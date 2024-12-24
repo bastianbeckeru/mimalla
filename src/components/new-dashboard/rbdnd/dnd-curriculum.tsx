@@ -218,6 +218,9 @@ export default function RBDndCurriculum({
         }}
         course={activeEnrollment?.course}
         color={activeEnrollment?.color}
+        courses={courses}
+        approvedCourses={approvedCourses}
+        approvedCredits={approvedCredits}
       />
     </>
   );
