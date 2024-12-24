@@ -29,6 +29,7 @@ type RBDndCurriculum = {
   periods: PeriodWithEnrollments[];
   courses: Map<number, CurriculumData["courses"][0]>;
   approvedCourses: number[];
+  approvedCredits: number;
 };
 
 type PeriodWithEnrollments = {
@@ -42,9 +43,9 @@ export default function RBDndCurriculum({
   areas,
   courses,
   approvedCourses,
+  approvedCredits,
 }: RBDndCurriculum) {
-  const { updateCourseEnrollments, updateCourseEnrollmentStatus } =
-    useNewCurriculumStore();
+  const { updateCourseEnrollments } = useNewCurriculumStore();
   const { editMode } = useSettingsStore();
   const [data, setData] = useState<PeriodWithEnrollments[]>(periods);
 
@@ -60,12 +61,14 @@ export default function RBDndCurriculum({
           credits: number;
           prerequisiteIds: number[];
           subsequentIds: number[];
+          prerequisiteCredits: number;
         } | null;
         color?: string;
       })
     | null
   >(null);
   const [isOpen, setIsOpen] = useState(false);
+  console.log(approvedCredits);
 
   return (
     <>
@@ -92,11 +95,10 @@ export default function RBDndCurriculum({
                       const area = course && getCourseArea(areas, course);
                       const color = area?.color;
 
-                      // Estoy disponible solamente si he aprobado todos los cursos de prerequisito
-                      // approvedCourses.includes(prerequisiteIds)
-                      const isAvailable = course?.prerequisiteIds.every((id) =>
-                        approvedCourses.includes(id),
-                      );
+                      const isAvailable =
+                        course?.prerequisiteIds.every((id) =>
+                          approvedCourses.includes(id),
+                        ) && course.prerequisiteCredits <= approvedCredits;
 
                       return (
                         <Draggable
@@ -140,20 +142,26 @@ export default function RBDndCurriculum({
                                     newStatus = "PENDING";
                                   }
 
-                                  // Obtener todos los cursos subsequent que están aprobados y que pasarán a pendientes
-                                  // Obtener todos los enrollment que alguno de los ids obtenidos en el paso anterior
-                                  // Cambiar el status de esos enrollments a pendiente
-
-                                  /* const coursesToPending = [enrollment.courseId] */
                                   const coursesToPending: number[] = [];
-                                  course?.subsequentIds.forEach((id) => {
-                                    if (approvedCourses.includes(id)) {
-                                      coursesToPending.push(id);
-                                      // FALTA EL LOOP
-                                    }
-                                  });
 
-                                  console.log(coursesToPending);
+                                  function getSubsequentCoursesLoop(
+                                    courseId: number,
+                                  ) {
+                                    const course = getCourse({
+                                      id: courseId,
+                                      courses,
+                                    });
+                                    if (!course) return;
+
+                                    course.subsequentIds.forEach((id) => {
+                                      if (approvedCourses.includes(id)) {
+                                        coursesToPending.push(id);
+                                        getSubsequentCoursesLoop(id);
+                                      }
+                                    });
+                                  }
+
+                                  getSubsequentCoursesLoop(enrollment.courseId);
 
                                   const newData = data.map((p) => {
                                     return {
