@@ -129,7 +129,7 @@ export type CurriculumData = {
     description: string | null;
     duration: number;
     credits: number;
-    //prerequisiteCredits: number;
+    prerequisiteCredits: number;
     prerequisiteIds: number[];
   }[];
   degrees: {

@@ -171,6 +171,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -181,6 +182,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -191,6 +193,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -201,6 +204,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -211,6 +215,7 @@
       "credits": 5,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -221,6 +226,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [1],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -231,6 +237,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -241,6 +248,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -251,6 +259,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [4],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -262,6 +271,7 @@
       "credits": 5,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "duration": 1
     },
     {
@@ -271,6 +281,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [6, 7],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -281,6 +292,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -291,6 +303,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [7, 8],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -301,6 +314,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -311,6 +325,7 @@
       "credits": 5,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -321,6 +336,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -331,6 +347,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [8],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -341,6 +358,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [11, 12],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -351,6 +369,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -361,6 +380,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [16],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -371,6 +391,7 @@
       "credits": 7,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 131,
       "isElective": false,
       "duration": 2
     },
@@ -381,6 +402,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [17],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -391,6 +413,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [18, 19],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -401,6 +424,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [6, 12],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -411,6 +435,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [5],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -421,6 +446,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [22],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -431,6 +457,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [9],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -441,6 +468,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [13, 25],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -451,6 +479,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [17, 26],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -461,6 +490,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [20, 26],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -471,6 +501,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [14],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -481,6 +512,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [24, 33],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -491,6 +523,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [31],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -501,6 +534,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [26],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -511,6 +545,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [20, 27],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -521,6 +556,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [34],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -531,6 +567,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [24, 26],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -541,6 +578,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [32],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -551,6 +589,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [37],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -561,6 +600,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [38],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -571,6 +611,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [39],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -581,6 +622,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [23],
+      "prerequisiteCredits": 256,
       "isElective": false,
       "duration": 2
     },
@@ -592,6 +634,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
       "duration": 1
     },
     {
@@ -601,6 +644,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [43, 44],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -611,6 +655,7 @@
       "credits": 6,
       "description": null,
       "prerequisiteIds": [44],
+      "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
@@ -620,7 +665,8 @@
       "code": "",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [23, 45],
+      "prerequisiteCredits": 330,
       "isElective": true,
       "duration": 1
     }
