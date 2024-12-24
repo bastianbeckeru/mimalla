@@ -57,19 +57,24 @@ export default function ClientSideDashboard() {
   const { institution, program, areas, courses } = programData;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
+  const totalEnrollments = studentEnrollment.enrolledCourses.length;
   const approvedEnrollments = studentEnrollment.enrolledCourses.filter(
     (e) => e.status === "APPROVED",
   );
   const approvedCourses = approvedEnrollments
     .map((e) => coursesMap.get(e.courseId))
     .filter((c) => c !== null && c !== undefined);
+  const approvedCredits = approvedCourses.reduce(
+    (acc, course) => acc + (course?.credits ?? 0),
+    0,
+  );
 
   return (
     <SidebarProvider>
       <Sidebar
         areas={areas}
-        courses={coursesMap}
-        enrollments={studentEnrollment.enrolledCourses}
+        progress={(approvedEnrollments.length / totalEnrollments) * 100}
+        approvedCredits={approvedCredits}
       />
 
       <SidebarInset className="grid min-h-dvh grid-rows-[auto_1fr]">
@@ -89,6 +94,7 @@ export default function ClientSideDashboard() {
           areas={areas}
           courses={coursesMap}
           approvedCourses={approvedCourses.map((c) => c.id)}
+          approvedCredits={approvedCredits}
         />
       </SidebarInset>
     </SidebarProvider>

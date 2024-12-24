@@ -33,19 +33,18 @@ import {
 import type { CurriculumData } from "@/types/curriculum";
 import { getLuminance, parseHexColor } from "@/utils/colors";
 import { useEffect } from "react";
-import type { EnrolledCourse } from "@/types/store";
 import { Progress } from "../ui/progress";
 
 type DashboardSidebar = {
   areas: CurriculumData["areas"];
-  courses: Map<number, CurriculumData["courses"][0]>;
-  enrollments: EnrolledCourse[];
+  progress: number;
+  approvedCredits: number;
 };
 
 export default function DashboardSidebar({
   areas,
-  courses,
-  enrollments,
+  progress,
+  approvedCredits,
   ...props
 }: DashboardSidebar) {
   const router = useRouter();
@@ -59,19 +58,6 @@ export default function DashboardSidebar({
       const lumB = getLuminance(parseHexColor(b.color));
       return lumA - lumB;
     });
-
-  const totalEnrollments = enrollments.length;
-  const approvedEnrollments = enrollments.filter(
-    (e) => e.status === "APPROVED",
-  );
-  const approvedCourses = approvedEnrollments.map((e) =>
-    courses.get(e.courseId),
-  );
-  const approvedCredits = approvedCourses.reduce(
-    (acc, course) => acc + (course?.credits ?? 0),
-    0,
-  );
-  const currentProgress = (approvedEnrollments.length / totalEnrollments) * 100;
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -132,9 +118,9 @@ export default function DashboardSidebar({
         <SidebarGroup>
           <SidebarGroupLabel>Progreso</SidebarGroupLabel>
           <SidebarGroupContent className="space-y-2">
-            <Progress value={currentProgress} />
+            <Progress value={progress} />
             <div className="flex flex-row justify-between space-x-2">
-              <p>{currentProgress.toFixed(2)}%</p>
+              <p>{progress.toFixed(2)}%</p>
               <p>
                 {approvedCredits}
                 {" créditos"}
