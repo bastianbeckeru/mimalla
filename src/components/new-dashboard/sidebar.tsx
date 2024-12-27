@@ -1,7 +1,14 @@
 "use client";
 
+import type { CurriculumData } from "@/types/curriculum";
+import { useEffect } from "react";
+
 import { useSettingsStore } from "@/stores/settings";
-import { Lock, LockOpen, Trash2 } from "lucide-react";
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
+
+import { getLuminance, parseHexColor } from "@/utils/colors";
+import Logo from "../Logo";
+
 import {
   Dialog,
   DialogClose,
@@ -12,11 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
-import { useRouter } from "next/navigation";
-import Logo from "../Logo";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import {
   Sidebar,
   SidebarContent,
@@ -30,10 +32,10 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "../ui/sidebar";
-import type { CurriculumData } from "@/types/curriculum";
-import { getLuminance, parseHexColor } from "@/utils/colors";
-import { useEffect } from "react";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
 import { Progress } from "../ui/progress";
+import { Lock, LockOpen, Trash2 } from "lucide-react";
 
 type DashboardSidebar = {
   areas: CurriculumData["areas"];
@@ -47,7 +49,6 @@ export default function DashboardSidebar({
   approvedCredits,
   ...props
 }: DashboardSidebar) {
-  const router = useRouter();
   const { resetStore } = useNewCurriculumStore();
   const { editMode, setEditMode } = useSettingsStore();
 
@@ -188,7 +189,6 @@ export default function DashboardSidebar({
                 onClick={() => {
                   resetStore();
                   setEditMode(false);
-                  router.push("/create");
                 }}
               >
                 Aceptar

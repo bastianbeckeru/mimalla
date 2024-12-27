@@ -1,4 +1,3 @@
-import type { ModifiedPeriodProps } from "@/types/curriculum";
 import type {
   EnrolledCourse,
   newCurriculumStoreInitialStateProps,
@@ -7,6 +6,7 @@ import type {
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
+import { createUrlSlug } from "@/utils/strings";
 
 const initialState: newCurriculumStoreInitialStateProps = {
   //version: "0.1.4",
@@ -36,6 +36,7 @@ export const useNewCurriculumStore = create(
 
           const fixednNewCurriculum = {
             id: nanoid(),
+            programSlug: createUrlSlug(program.name), // Necessary because we don't use programId
             year: year,
             term: term,
             enrolledCourses: slots.map((slot) => ({

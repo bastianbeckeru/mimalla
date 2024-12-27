@@ -7,16 +7,16 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProgramData } from "../../utils/curriculum-data";
-import { createUrlSlug } from "@/utils/strings";
 import Sidebar from "./sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
 /* import DndKitCurriculum from "./dndkit/dnd-curriculum"; */
 import RBDndCurriculum from "./rbdnd/dnd-curriculum";
+import CurriculumForm from "./curriculum-form";
 
 export default function ClientSideDashboard() {
   const router = useRouter();
-  const { studentEnrollment, curriculums, present } = useNewCurriculumStore();
+  const { curriculums, present } = useNewCurriculumStore();
   const [programData, setProgramData] = useState<CurriculumData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,20 +31,21 @@ export default function ClientSideDashboard() {
     if (present) {
       getProgramData({
         institutionAcronym: "udp",
-        programSlug: createUrlSlug(present.programName),
+        programSlug: present.programSlug,
       })
         .then((data) => {
           setProgramData(data);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
-          router.push("/test/create"); //CAMBIAR A "/create"
+          setIsLoading(false);
         });
-      setIsLoading(false);
     }
 
     return () => clearTimeout(delay);
-  }, [studentEnrollment, present, isLoading, router, curriculums]);
+  }, [present, isLoading, router, curriculums]);
+
+  if (!isLoading && (!present || !programData)) return <CurriculumForm />;
 
   if (!present || !programData)
     return (

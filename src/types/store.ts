@@ -1,13 +1,8 @@
 import type { CurriculumData } from "./curriculum";
 
-type HistoryState<T> = {
-  past: T[];
-  present: T | null;
-  future: T[];
-};
-
 type StudentEnrollment = {
   id: string;
+  programSlug: string;
   year: number;
   term: number;
   enrolledCourses: EnrolledCourse[];
