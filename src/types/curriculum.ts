@@ -88,7 +88,7 @@ export type ModifiedCourseProps = {
   prerequisiteCredits: number;
 };
 
-// NEW MIMALLA v0.3.0
+// NEW MIMALLA v0.2.0
 export type CurriculumData = {
   //version: string; // MiMalla version
   institution: {
@@ -138,5 +138,18 @@ export type CurriculumData = {
     type: string;
   }[];
 };
+
+export type ModifiedCourse = {
+  id: number;
+  isElective: boolean;
+  name: string;
+  code: string | null;
+  description: string | null;
+  duration: number;
+  credits: number;
+  prerequisiteCredits: number;
+  prerequisiteIds: number[];
+  subsequentIds: number[];
+} | null;
 
 export type PeriodKey = `${number}-${number}`;

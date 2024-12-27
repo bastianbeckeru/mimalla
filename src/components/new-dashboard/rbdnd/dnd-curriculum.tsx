@@ -3,7 +3,11 @@
 
 import { useState } from "react";
 
-import type { CurriculumData, PeriodKey } from "@/types/curriculum";
+import type {
+  CurriculumData,
+  ModifiedCourse,
+  PeriodKey,
+} from "@/types/curriculum";
 
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
@@ -22,6 +26,7 @@ import {
 
 import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
+import { toast } from "@/hooks/use-toast";
 
 type RBDndCurriculum = {
   areas: CurriculumData["areas"];
@@ -68,7 +73,6 @@ export default function RBDndCurriculum({
     | null
   >(null);
   const [isOpen, setIsOpen] = useState(false);
-  console.log(approvedCredits);
 
   return (
     <>
@@ -228,22 +232,118 @@ export default function RBDndCurriculum({
   function handleOnDragEnd(event: DropResult) {
     const { source, destination } = event;
 
-    // 0. Check if the drag is valid
+    /*  Check if: 
+        - destionation exist ✅
+        - source and destination are not the same ✅
+        - source and destination are not null ✅
+        - destination does not have a prerequisite or subsequent course ✅
+        - destination is not previous to a container with a prerequisite course ✅
+        - destination is not next to a container with a subsequent course ✅
+     */
+
+    if (!destination) return;
     if (
-      !destination ||
-      (source.index === destination.index &&
-        source.droppableId === destination.droppableId)
+      source.index === destination.index &&
+      source.droppableId === destination.droppableId
     )
       return;
 
-    // 1. Find the source and destination containers
-    const sourceContainer = periods.find((p) => p.id === source.droppableId);
-    const destinationContainer = periods.find(
+    const sourceContainerIndex = periods.findIndex(
+      (p) => p.id === source.droppableId,
+    );
+    const destinationContainerIndex = periods.findIndex(
       (p) => p.id === destination.droppableId,
     );
-    if (!sourceContainer || !destinationContainer) return null;
+    const sourceContainer = periods[sourceContainerIndex];
+    const destinationContainer = periods[destinationContainerIndex];
 
-    // 2. Move the element
+    if (!sourceContainer || !destinationContainer) return;
+
+    const sourceEnrollment = sourceContainer.enrollments[source.index]!;
+    const sourceCourse = getCourse({
+      id: sourceEnrollment.courseId,
+      courses,
+    });
+
+    function isValidMove(
+      sourceIndex: number,
+      destinationIndex: number,
+      container: PeriodWithEnrollments,
+      course: ModifiedCourse,
+    ) {
+      if (!course) return true;
+
+      const hasContainerRelatedCourses = container.enrollments.some(
+        (e) =>
+          course.prerequisiteIds.includes(e.courseId) ||
+          course.subsequentIds.includes(e.courseId),
+      );
+
+      if (hasContainerRelatedCourses) {
+        toast({
+          title: "❌ Error",
+          description:
+            "No puedes mover un curso a un destino que contenga un curso prerequisito o sucesor.",
+        });
+        return false;
+      }
+
+      const hasBlockingCourses = (
+        startIndex: number,
+        endIndex: number,
+        relatedIds: number[],
+      ): boolean => {
+        const range = periods.slice(startIndex + 1, endIndex);
+        return range.some((p) =>
+          p.enrollments.some((e) => relatedIds.includes(e.courseId)),
+        );
+      };
+
+      if (sourceIndex < destinationIndex) {
+        const hasBlockingSubsequents = hasBlockingCourses(
+          sourceIndex,
+          destinationIndex,
+          course.subsequentIds,
+        );
+
+        if (hasBlockingSubsequents) {
+          toast({
+            title: "❌ Error",
+            description:
+              "No puedes mover un curso adelante de un curso sucesor.",
+          });
+        }
+
+        return !hasBlockingSubsequents;
+      } else {
+        const hasBlockingPrerequisites = hasBlockingCourses(
+          destinationIndex,
+          sourceIndex,
+          course.prerequisiteIds,
+        );
+
+        if (hasBlockingPrerequisites) {
+          toast({
+            title: "❌ Error",
+            description:
+              "No puedes mover un curso atrás de un curso prerequisito.",
+          });
+        }
+        return !hasBlockingPrerequisites;
+      }
+    }
+
+    if (
+      !isValidMove(
+        sourceContainerIndex,
+        destinationContainerIndex,
+        destinationContainer,
+        sourceCourse,
+      )
+    )
+      return;
+
+    // 1. Move the element
     function updatePositions(container: PeriodWithEnrollments) {
       const [newYear, newTerm] = container.id.split("-").map(Number);
 

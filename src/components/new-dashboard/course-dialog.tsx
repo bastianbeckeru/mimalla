@@ -1,28 +1,15 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { useCurriculumStore } from "@/stores/curriculum";
+import type { ModifiedCourse, CurriculumData } from "@/types/curriculum";
 import { hexToRgba, parseHexColor } from "@/utils/colors";
-import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Check, Ghost, Minus } from "lucide-react";
-import { type CurriculumData } from "@/types/curriculum";
 
 type CourseDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
   courses: Map<number, CurriculumData["courses"][0]>;
-  course?: {
-    id: number;
-    isElective: boolean;
-    name: string;
-    code: string | null;
-    description: string | null;
-    duration: number;
-    credits: number;
-    prerequisiteIds: number[];
-    subsequentIds: number[];
-    prerequisiteCredits: number;
-  } | null;
+  course?: ModifiedCourse;
   color?: string;
   approvedCourses: number[];
   approvedCredits: number;
