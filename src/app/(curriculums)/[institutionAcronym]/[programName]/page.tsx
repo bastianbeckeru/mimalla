@@ -6,8 +6,8 @@ import { createUrlSlug } from "@/utils/strings";
 
 import CurriculumView from "@/components/curriculum/curriculum-view";
 import { getPeriods } from "@/utils/curriculum";
-import type { CurriculumData } from "@/types/curriculum";
 import ProgramInfo from "@/components/curriculum/program-info";
+import { getProgramData } from "@/utils/curriculum-data";
 
 export const dynamicParams = false;
 
@@ -34,7 +34,10 @@ export async function generateStaticParams({ params }: InstitutionParams) {
 type ProgramParams = InstitutionParams & { params: { programName: string } };
 
 export default async function ProgramPage({ params }: ProgramParams) {
-  const data = getProgramData(params.institutionAcronym, params.programName);
+  const data = await getProgramData({
+    institutionAcronym: params.institutionAcronym,
+    programSlug: params.programName,
+  });
 
   if (!data) return <div>Error al cargar el programa</div>;
 
@@ -62,19 +65,4 @@ export default async function ProgramPage({ params }: ProgramParams) {
       </div>
     </div>
   );
-}
-
-function getProgramData(institutionAcronym: string, programSlug: string) {
-  const curriculumPath = path.join(
-    process.cwd(),
-    "src",
-    "server",
-    "db",
-    "curriculums",
-    institutionAcronym,
-    `${programSlug}.json`,
-  );
-
-  const fileContent = fs.readFileSync(curriculumPath, "utf-8");
-  return JSON.parse(fileContent) as CurriculumData;
 }

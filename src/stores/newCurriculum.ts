@@ -10,12 +10,13 @@ import { nanoid } from "nanoid";
 
 const initialState: newCurriculumStoreInitialStateProps = {
   //version: "0.1.4",
-  /*   progress: {
-    approvedCourses: [],
-    earnedCredits: 0,
-  }, */
-  studentEnrollment: null,
+  curriculums: [],
+  past: [],
+  present: null,
+  future: [],
 };
+
+const MAX_HISTORY = 10;
 
 export const useNewCurriculumStore = create(
   persist<useNewCurriculumStoreProps>(
@@ -25,142 +26,117 @@ export const useNewCurriculumStore = create(
       resetStore: () => {
         set(initialState);
       },
-      addProgramEnrollment: (newEnrollment) =>
+
+      /* CURRICULUM */
+      addCurriculum: (newCurriculum) =>
         set((state) => {
-          if (!state || !newEnrollment) return state;
+          if (!state || !newCurriculum) return state;
 
-          const { year, term, program, slots } = newEnrollment;
+          const { year, term, program, slots } = newCurriculum;
 
-          const newProgramEnrollment = {
+          const fixednNewCurriculum = {
             id: nanoid(),
-            programName: program.name,
             year: year,
             term: term,
-            enrolledCourses: [],
+            enrolledCourses: slots.map((slot) => ({
+              ...slot,
+              id: nanoid(),
+              status: "PENDING",
+            })) as EnrolledCourse[],
           };
-
-          const newCourseEnrollments: EnrolledCourse[] = slots.map((slot) => ({
-            id: nanoid(),
-            year: slot.year, // Slot Year - Curriculum Year + Student Year
-            term: slot.term,
-            position: slot.position,
-            status: "PENDING",
-            courseId: slot.courseId,
-          }));
 
           return {
             ...state,
-            studentEnrollment: {
-              ...newProgramEnrollment,
-              enrolledCourses: newCourseEnrollments,
-            },
+            curriculums: [...state.curriculums, fixednNewCurriculum],
+            past: [],
+            present: fixednNewCurriculum,
+            future: [],
           };
         }),
-      removeProgramEnrollment: (enrollmentId) =>
+      removeCurriculum: (curriculumId) =>
         set((state) => {
-          if (!state || !state.studentEnrollment) return state;
+          if (!state) return state;
 
-          if (state.studentEnrollment.id === enrollmentId) {
+          const newCurriculums = state.curriculums.filter(
+            (c) => c.id !== curriculumId,
+          );
+
+          if (newCurriculums.length === 0) return initialState;
+
+          if (state.present?.id === curriculumId) {
             return {
               ...state,
-              studentEnrollment: null,
+              curriculums: newCurriculums,
+              past: [],
+              present: newCurriculums[0],
+              future: [],
             };
           }
 
-          return state;
+          return {
+            ...state,
+            curriculums: newCurriculums,
+          };
         }),
-
-      /* ENROLLMENT */
-      updateCourseEnrollmentStatus: (enrollmentId, newStatus) =>
+      selectCurriculum: (id) =>
         set((state) => {
-          if (!state || !state.studentEnrollment) return state;
-
-          const currentCourseEnrollments =
-            state.studentEnrollment.enrolledCourses;
-          const updatedEnrollments = currentCourseEnrollments.map(
-            (enrollment) => {
-              if (enrollment.id === enrollmentId) {
-                return {
-                  ...enrollment,
-                  status: newStatus,
-                };
-              }
-              return enrollment;
-            },
-          );
+          const curriculum = state.curriculums.find((c) => c.id === id);
+          if (!curriculum) return state;
 
           return {
             ...state,
-            studentEnrollment: {
-              ...state.studentEnrollment,
-              enrolledCourses: updatedEnrollments,
-            },
+            past: [],
+            present: curriculum,
+            future: [],
           };
         }),
-
-      /* DRAG AND DROP */
-      updateCourseEnrollments: (enrollmentId, enrolledCourses) =>
+      updateCurriculumEnrollments: (curriculumId, newEnrollments) =>
         set((state) => {
-          if (!state || !state.studentEnrollment) return state;
+          if (!state || !state.present) return state;
 
-          if (state.studentEnrollment.id === enrollmentId) {
+          if (state.present.id === curriculumId) {
             return {
               ...state,
-              studentEnrollment: {
-                ...state.studentEnrollment,
-                enrolledCourses: enrolledCourses,
+              present: {
+                ...state.present,
+                enrolledCourses: newEnrollments,
               },
             };
           }
 
           return state;
         }),
+
+      /* HISTORY */
+      undo: () =>
+        set((state) => {
+          if (state.past.length === 0 || state.present === null) return state;
+
+          const previous = state.past[state.past.length - 1];
+          const newPast = state.past.slice(0, -1);
+
+          return {
+            ...state,
+            past: newPast,
+            present: previous,
+            future: [state.present, ...state.future].slice(0, MAX_HISTORY),
+          };
+        }),
+      redo: () =>
+        set((state) => {
+          if (state.future.length === 0 || state.present === null) return state;
+
+          const next = state.future[0];
+          const newFuture = state.future.slice(1);
+
+          return {
+            ...state,
+            past: [...state.past, state.present].slice(-MAX_HISTORY),
+            present: next,
+            future: newFuture,
+          };
+        }),
     }),
     { name: "data" },
   ),
 );
-
-/* FUNCTIONS */
-function updateEnrollmentStatusCascade(
-  updatedPeriods: ModifiedPeriodProps[],
-  updatedApprovedCourses: string[],
-  updatedEarnedCredits: number,
-  dependentCourses: { code: string | null }[] | undefined,
-) {
-  if (!dependentCourses)
-    return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
-
-  function cascade(currentCourseCode: string | null) {
-    if (!currentCourseCode) return;
-
-    updatedPeriods.forEach((period) => {
-      const updatedEnrollments = period.enrollments.map((enrollment) => {
-        if (!enrollment?.course?.code) return enrollment;
-
-        const courseCode = enrollment.course.code + "-" + enrollment.id;
-
-        if (
-          enrollment.course.code === currentCourseCode &&
-          updatedApprovedCourses.includes(courseCode)
-        ) {
-          enrollment.status = "PENDING";
-
-          updatedApprovedCourses.splice(
-            updatedApprovedCourses.indexOf(courseCode),
-            1,
-          );
-          updatedEarnedCredits -= enrollment.course.credits;
-
-          enrollment.course.dependentCourses.forEach((course) =>
-            cascade(course.code),
-          );
-        }
-      });
-
-      return updatedEnrollments;
-    });
-  }
-
-  dependentCourses.forEach((course) => cascade(course.code));
-  return { updatedPeriods, updatedApprovedCourses, updatedEarnedCredits };
-}

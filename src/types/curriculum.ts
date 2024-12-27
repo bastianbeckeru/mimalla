@@ -103,7 +103,7 @@ export type CurriculumData = {
     schedule: string;
   };
   curriculum: {
-    // year: number;
+    year: number;
     slots: {
       id: number | string;
       year: number;

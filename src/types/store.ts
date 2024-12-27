@@ -1,13 +1,23 @@
 import type { CurriculumData } from "./curriculum";
 
+type HistoryState<T> = {
+  past: T[];
+  present: T | null;
+  future: T[];
+};
+
+type StudentEnrollment = {
+  id: string;
+  year: number;
+  term: number;
+  enrolledCourses: EnrolledCourse[];
+};
+
 export type newCurriculumStoreInitialStateProps = {
-  studentEnrollment: {
-    id: string;
-    programName: string;
-    year: number;
-    term: number;
-    enrolledCourses: EnrolledCourse[];
-  } | null;
+  curriculums: StudentEnrollment[];
+  past: StudentEnrollment[];
+  present: StudentEnrollment | null;
+  future: StudentEnrollment[];
 };
 
 export type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
@@ -23,19 +33,19 @@ export type EnrolledCourse = {
 
 export type useNewCurriculumStoreProps = {
   resetStore: () => void;
-  addProgramEnrollment: (newEnrollment: {
+  /* CURRICULUM */
+  addCurriculum: (newCurriculum: {
     year: number;
     term: number;
     program: CurriculumData["program"];
     slots: CurriculumData["curriculum"]["slots"];
   }) => void;
-  removeProgramEnrollment: (enrollmentId: string) => void;
-  updateCourseEnrollmentStatus: (
-    enrollmentId: string,
-    newStatus: EnrolledCourseStatus,
-  ) => void;
-  updateCourseEnrollments: (
-    enrollmentId: string,
+  removeCurriculum: (curriculumId: string) => void;
+  updateCurriculumEnrollments: (
+    curriculumId: string,
     newEnrollments: EnrolledCourse[],
   ) => void;
+  selectCurriculum: (id: string) => void;
+  undo: () => void;
+  redo: () => void;
 } & newCurriculumStoreInitialStateProps;

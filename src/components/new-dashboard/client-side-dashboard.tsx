@@ -6,31 +6,32 @@ import type { CurriculumData } from "@/types/curriculum";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getProgramData } from "./test";
+import { getProgramData } from "../../utils/curriculum-data";
 import { createUrlSlug } from "@/utils/strings";
 import Sidebar from "./sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
-import DndKitCurriculum from "./dndkit/dnd-curriculum";
+/* import DndKitCurriculum from "./dndkit/dnd-curriculum"; */
 import RBDndCurriculum from "./rbdnd/dnd-curriculum";
 
 export default function ClientSideDashboard() {
   const router = useRouter();
-  const { studentEnrollment } = useNewCurriculumStore();
+  const { studentEnrollment, curriculums, present } = useNewCurriculumStore();
   const [programData, setProgramData] = useState<CurriculumData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Wait for the store to be hydrated
   useEffect(() => {
     const delay = setTimeout(() => {
-      if (!studentEnrollment) {
-        router.push("/create");
+      if (curriculums.length === 0) {
+        setIsLoading(false);
       }
     }, 500);
 
-    if (studentEnrollment) {
+    if (present) {
       getProgramData({
         institutionAcronym: "udp",
-        programSlug: createUrlSlug(studentEnrollment.programName),
+        programSlug: createUrlSlug(present.programName),
       })
         .then((data) => {
           setProgramData(data);
@@ -39,26 +40,28 @@ export default function ClientSideDashboard() {
           console.error("Error fetching data:", error);
           router.push("/test/create"); //CAMBIAR A "/create"
         });
+      setIsLoading(false);
     }
 
     return () => clearTimeout(delay);
-  }, [studentEnrollment, router]);
+  }, [studentEnrollment, present, isLoading, router, curriculums]);
 
-  if (!studentEnrollment || !programData)
+  if (!present || !programData)
     return (
-      <div className="size-screen flex justify-center overflow-hidden">
-        <Loader2 className="mt-64 size-8 animate-spin" />
+      <div className="relative h-dvh w-dvw">
+        <Loader2 className="absolute left-[50%] top-[40%] size-8 animate-spin" />
       </div>
     );
 
   const { periods } = getPeriodsWithEnrollments({
-    enrollments: studentEnrollment.enrolledCourses,
+    enrollments: present.enrolledCourses,
   });
   const { institution, program, areas, courses } = programData;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
-  const totalEnrollments = studentEnrollment.enrolledCourses.length;
-  const approvedEnrollments = studentEnrollment.enrolledCourses.filter(
+  /* PROGRESS */
+  const totalEnrollments = present.enrolledCourses.length;
+  const approvedEnrollments = present.enrolledCourses.filter(
     (e) => e.status === "APPROVED",
   );
   const approvedCourses = approvedEnrollments
@@ -89,10 +92,10 @@ export default function ClientSideDashboard() {
         </header>
 
         <RBDndCurriculum
-          studentEnrollmentId={studentEnrollment.id}
-          periods={periods}
+          curriculumId={present.id}
           areas={areas}
           courses={coursesMap}
+          periods={periods}
           approvedCourses={approvedCourses.map((c) => c.id)}
           approvedCredits={approvedCredits}
         />

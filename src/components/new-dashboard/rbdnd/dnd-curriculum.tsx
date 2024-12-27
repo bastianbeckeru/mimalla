@@ -25,7 +25,7 @@ import CourseDialog from "../course-dialog";
 
 type RBDndCurriculum = {
   areas: CurriculumData["areas"];
-  studentEnrollmentId: string;
+  curriculumId: string;
   periods: PeriodWithEnrollments[];
   courses: Map<number, CurriculumData["courses"][0]>;
   approvedCourses: number[];
@@ -38,14 +38,14 @@ type PeriodWithEnrollments = {
 };
 
 export default function RBDndCurriculum({
-  studentEnrollmentId,
+  curriculumId,
   periods,
   areas,
   courses,
   approvedCourses,
   approvedCredits,
 }: RBDndCurriculum) {
-  const { updateCourseEnrollments } = useNewCurriculumStore();
+  const { updateCurriculumEnrollments } = useNewCurriculumStore();
   const { editMode } = useSettingsStore();
   const [data, setData] = useState<PeriodWithEnrollments[]>(periods);
 
@@ -188,8 +188,8 @@ export default function RBDndCurriculum({
                                   });
 
                                   setData(newData);
-                                  updateCourseEnrollments(
-                                    studentEnrollmentId,
+                                  updateCurriculumEnrollments(
+                                    curriculumId,
                                     newData.flatMap((p) => p.enrollments),
                                   );
                                 }
@@ -290,8 +290,8 @@ export default function RBDndCurriculum({
         return period;
       });
 
-      updateCourseEnrollments(
-        studentEnrollmentId,
+      updateCurriculumEnrollments(
+        curriculumId,
         newData.flatMap((p) => p.enrollments),
       );
       return newData;
