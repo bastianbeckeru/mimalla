@@ -88,7 +88,7 @@ export default function CurriculumForm() {
 
     setIsCreating(true);
 
-    const institutionAcronym = selectedInstitution.acronym;
+    const institutionAcronym = selectedInstitution.acronym.toLowerCase();
     const programSlug = createUrlSlug(selectedProgram.name);
 
     try {
