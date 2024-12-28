@@ -116,7 +116,7 @@ export default function CurriculumForm() {
   }
 
   return (
-    <div className="container flex h-screen w-screen flex-col justify-center">
+    <div className="container flex h-full items-center justify-center">
       <Link
         href="/"
         className={cn(
@@ -128,7 +128,7 @@ export default function CurriculumForm() {
         Volver
       </Link>
 
-      <div className="mx-auto mb-24 flex w-full flex-col justify-center space-y-4 px-2 sm:w-[350px]">
+      <div className="flex w-full flex-col justify-center space-y-4 px-2 sm:w-[350px]">
         <div className="mb-2 flex flex-col space-y-2 text-center">
           <h1 className="flex items-center gap-2">
             <span className="text-2xl font-semibold tracking-tight">
@@ -136,7 +136,7 @@ export default function CurriculumForm() {
             </span>
           </h1>
           <p className="text-left text-sm text-muted-foreground">
-            Comienza seleccionando la malla curricular de tu carrera
+            Comienza seleccionando tu carrera y datos de ingreso
           </p>
         </div>
 
@@ -150,6 +150,7 @@ export default function CurriculumForm() {
                 setSelectedInstitution(selected);
               }}
               value={selectedInstitution?.acronym}
+              disabled={institutions.length === 1}
             >
               <SelectTrigger id="institution">
                 <SelectValue placeholder="Selecciona una universidad" />
@@ -245,7 +246,7 @@ export default function CurriculumForm() {
             {isCreating ? (
               <Loader2 className="animate-spin" />
             ) : (
-              "Crear malla ✨"
+              "Importar malla ✨"
             )}
           </Button>
 

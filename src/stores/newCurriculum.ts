@@ -96,8 +96,14 @@ export const useNewCurriculumStore = create(
           if (!state || !state.present) return state;
 
           if (state.present.id === curriculumId) {
+            const newPast = [...state.past, state.present];
+            if (newPast.length > MAX_HISTORY) {
+              newPast.shift(); // Remove the oldest entry if past exceeds MAX_HISTORY
+            }
+
             return {
               ...state,
+              past: newPast,
               present: {
                 ...state.present,
                 enrolledCourses: newEnrollments,

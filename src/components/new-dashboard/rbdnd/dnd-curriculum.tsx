@@ -27,6 +27,7 @@ import {
 import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "@/hooks/use-toast";
+import { Undo2 } from "lucide-react";
 
 type RBDndCurriculum = {
   areas: CurriculumData["areas"];
@@ -42,6 +43,14 @@ type PeriodWithEnrollments = {
   enrollments: EnrolledCourse[];
 };
 
+type History<T> = {
+  past: T[];
+  present: T;
+  future: T[];
+};
+
+const MAX_HISTORY = 10;
+
 export default function RBDndCurriculum({
   curriculumId,
   periods,
@@ -52,7 +61,11 @@ export default function RBDndCurriculum({
 }: RBDndCurriculum) {
   const { updateCurriculumEnrollments } = useNewCurriculumStore();
   const { editMode } = useSettingsStore();
-  const [data, setData] = useState<PeriodWithEnrollments[]>(periods);
+  const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
+    past: [],
+    present: periods,
+    future: [],
+  });
 
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
@@ -83,7 +96,7 @@ export default function RBDndCurriculum({
             animate={{ opacity: 1 }}
             className="flex flex-row p-4"
           >
-            {data.map((period, pIndex) => (
+            {history.present.map((period, pIndex) => (
               <Droppable droppableId={period.id} key={period.id}>
                 {(provided) => (
                   <PeriodContainer
@@ -167,7 +180,7 @@ export default function RBDndCurriculum({
 
                                   getSubsequentCoursesLoop(enrollment.courseId);
 
-                                  const newData = data.map((p) => {
+                                  const newData = history.present.map((p) => {
                                     return {
                                       ...p,
                                       enrollments: p.enrollments.map((e) => {
@@ -191,7 +204,9 @@ export default function RBDndCurriculum({
                                     };
                                   });
 
-                                  setData(newData);
+                                  setHistory((prev) => {
+                                    return { ...prev, present: newData };
+                                  });
                                   updateCurriculumEnrollments(
                                     curriculumId,
                                     newData.flatMap((p) => p.enrollments),
@@ -210,6 +225,25 @@ export default function RBDndCurriculum({
             ))}
           </MotionDiv>
         </DragDropContext>
+
+        {editMode && (
+          <div className="absolute bottom-0 left-0 m-4 flex h-8 w-16 flex-row justify-center rounded-md border bg-muted">
+            <button
+              className="flex size-8 items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
+              onClick={() => undo()}
+              disabled={history.past.length === 0}
+            >
+              <Undo2 className="size-4" />
+            </button>
+            <button
+              className="flex size-8 items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
+              onClick={redo}
+              disabled={history.future.length === 0}
+            >
+              <Undo2 className="size-4 -scale-x-100" />
+            </button>
+          </div>
+        )}
       </ScrollAreaWrapper>
 
       <CourseDialog
@@ -229,17 +263,38 @@ export default function RBDndCurriculum({
     </>
   );
 
+  function undo() {
+    const { past, present, future } = history;
+
+    if (past.length === 0 || !present) return;
+
+    const previous = past[past.length - 1]!;
+    const newPast = past.slice(0, -1);
+
+    setHistory({
+      past: newPast,
+      present: previous,
+      future: [present, ...future].slice(0, MAX_HISTORY),
+    });
+  }
+
+  function redo() {
+    const { past, present, future } = history;
+
+    if (future.length === 0 || !present) return;
+
+    const next = future[0]!;
+    const newFuture = future.slice(1);
+
+    setHistory({
+      past: [...past, present].slice(-MAX_HISTORY),
+      present: next,
+      future: newFuture,
+    });
+  }
+
   function handleOnDragEnd(event: DropResult) {
     const { source, destination } = event;
-
-    /*  Check if: 
-        - destionation exist ✅
-        - source and destination are not the same ✅
-        - source and destination are not null ✅
-        - destination does not have a prerequisite or subsequent course ✅
-        - destination is not previous to a container with a prerequisite course ✅
-        - destination is not next to a container with a subsequent course ✅
-     */
 
     if (!destination) return;
     if (
@@ -248,155 +303,199 @@ export default function RBDndCurriculum({
     )
       return;
 
-    const sourceContainerIndex = periods.findIndex(
+    const currentPeriods: PeriodWithEnrollments[] = [...history.present];
+    const sourceContainerIndex = currentPeriods.findIndex(
       (p) => p.id === source.droppableId,
     );
-    const destinationContainerIndex = periods.findIndex(
+    const destinationContainerIndex = currentPeriods.findIndex(
       (p) => p.id === destination.droppableId,
     );
-    const sourceContainer = periods[sourceContainerIndex];
-    const destinationContainer = periods[destinationContainerIndex];
+    const sourceContainer = currentPeriods[sourceContainerIndex];
+    const destinationContainer = currentPeriods[destinationContainerIndex];
 
     if (!sourceContainer || !destinationContainer) return;
 
+    //
     const sourceEnrollment = sourceContainer.enrollments[source.index]!;
     const sourceCourse = getCourse({
       id: sourceEnrollment.courseId,
       courses,
     });
 
-    function isValidMove(
-      sourceIndex: number,
-      destinationIndex: number,
-      container: PeriodWithEnrollments,
-      course: ModifiedCourse,
-    ) {
-      if (!course) return true;
-
-      const hasContainerRelatedCourses = container.enrollments.some(
-        (e) =>
-          course.prerequisiteIds.includes(e.courseId) ||
-          course.subsequentIds.includes(e.courseId),
-      );
-
-      if (hasContainerRelatedCourses) {
-        toast({
-          title: "❌ Error",
-          description:
-            "No puedes mover un curso a un destino que contenga un curso prerequisito o sucesor.",
-        });
-        return false;
-      }
-
-      const hasBlockingCourses = (
-        startIndex: number,
-        endIndex: number,
-        relatedIds: number[],
-      ): boolean => {
-        const range = periods.slice(startIndex + 1, endIndex);
-        return range.some((p) =>
-          p.enrollments.some((e) => relatedIds.includes(e.courseId)),
-        );
-      };
-
-      if (sourceIndex < destinationIndex) {
-        const hasBlockingSubsequents = hasBlockingCourses(
-          sourceIndex,
-          destinationIndex,
-          course.subsequentIds,
-        );
-
-        if (hasBlockingSubsequents) {
-          toast({
-            title: "❌ Error",
-            description:
-              "No puedes mover un curso adelante de un curso sucesor.",
-          });
-        }
-
-        return !hasBlockingSubsequents;
-      } else {
-        const hasBlockingPrerequisites = hasBlockingCourses(
-          destinationIndex,
-          sourceIndex,
-          course.prerequisiteIds,
-        );
-
-        if (hasBlockingPrerequisites) {
-          toast({
-            title: "❌ Error",
-            description:
-              "No puedes mover un curso atrás de un curso prerequisito.",
-          });
-        }
-        return !hasBlockingPrerequisites;
-      }
-    }
-
+    // 1. Check if the move is valid
     if (
       !isValidMove(
+        currentPeriods,
         sourceContainerIndex,
         destinationContainerIndex,
-        destinationContainer,
         sourceCourse,
       )
     )
       return;
 
-    // 1. Move the element
-    function updatePositions(container: PeriodWithEnrollments) {
-      const [newYear, newTerm] = container.id.split("-").map(Number);
-
-      return {
-        ...container,
-        enrollments: container.enrollments.map((slot, index) => {
-          return {
-            ...slot,
-            position: index + 1,
-            year: newYear!,
-            term: newTerm!,
-          };
-        }),
-      };
-    }
-
-    const isSameContainer = sourceContainer.id === destinationContainer.id;
-    const sourceElement = sourceContainer.enrollments.splice(
+    // 2. Reorder the data
+    const { newSourceContainer, newDestinationContainer } = reorder(
+      sourceContainer,
+      destinationContainer,
       source.index,
-      1,
-    )[0]!;
-
-    if (isSameContainer) {
-      sourceContainer.enrollments.splice(destination.index, 0, sourceElement);
-    } else {
-      destinationContainer.enrollments.splice(
-        destination.index,
-        0,
-        sourceElement,
-      );
-    }
-
-    const newSourceContainer = updatePositions(sourceContainer);
-    const newDestinationContainer = isSameContainer
-      ? newSourceContainer
-      : updatePositions(destinationContainer);
+      destination.index,
+    );
 
     // 3. Save the data into current state and update the store
-    setData((prevData) => {
-      const newData = prevData.map((period) => {
-        if (period.id === sourceContainer.id) return newSourceContainer;
-        if (period.id === destinationContainer.id)
-          return newDestinationContainer;
-        return period;
+    setHistory((prev) => {
+      const newPast = [...prev.past, prev.present];
+
+      if (newPast.length > MAX_HISTORY) {
+        newPast.shift(); // Remove the oldest entry if past exceeds MAX_HISTORY
+      }
+
+      const newPresent = prev.present.map((p) => {
+        if (p.id === sourceContainer.id) return newSourceContainer;
+        if (p.id === destinationContainer.id) return newDestinationContainer;
+        return p;
       });
 
-      updateCurriculumEnrollments(
+      /*       updateCurriculumEnrollments(
         curriculumId,
-        newData.flatMap((p) => p.enrollments),
-      );
-      return newData;
+        newPresent.flatMap((p) => p.enrollments),
+      ); */
+
+      return {
+        ...prev,
+        past: newPast,
+        present: newPresent,
+      };
     });
 
     setActiveEnrollment(null);
+  }
+}
+
+function updatePositions(container: PeriodWithEnrollments) {
+  const [newYear, newTerm] = container.id.split("-").map(Number);
+
+  return {
+    ...container,
+    enrollments: container.enrollments.map((slot, index) => {
+      return {
+        ...slot,
+        position: index + 1,
+        year: newYear!,
+        term: newTerm!,
+      };
+    }),
+  };
+}
+
+function reorder(
+  sourceContainer: PeriodWithEnrollments,
+  destinationContainer: PeriodWithEnrollments,
+  sourceIndex: number,
+  destinationIndex: number,
+) {
+  const isSameContainer = sourceContainer.id === destinationContainer.id;
+
+  const newSourceContainer = {
+    ...sourceContainer,
+    enrollments: [...sourceContainer.enrollments],
+  };
+  const newDestinationContainer = {
+    ...destinationContainer,
+    enrollments: [...destinationContainer.enrollments],
+  };
+
+  const movedEnrollment = newSourceContainer.enrollments.splice(
+    sourceIndex,
+    1,
+  )[0]!;
+
+  if (isSameContainer) {
+    newSourceContainer.enrollments.splice(destinationIndex, 0, movedEnrollment);
+  } else {
+    newDestinationContainer.enrollments.splice(
+      destinationIndex,
+      0,
+      movedEnrollment,
+    );
+  }
+
+  const updatedSourceContainer = updatePositions(newSourceContainer);
+  const updatedDestinationContainer = isSameContainer
+    ? updatedSourceContainer
+    : updatePositions(newDestinationContainer);
+
+  return {
+    newSourceContainer: updatedSourceContainer,
+    newDestinationContainer: updatedDestinationContainer,
+  };
+}
+
+function isValidMove(
+  currentPeriods: PeriodWithEnrollments[],
+  sourceContainerIndex: number,
+  destinationContainerIndex: number,
+  course: ModifiedCourse | null,
+) {
+  if (!course) return true;
+
+  const destinationContainer = currentPeriods[destinationContainerIndex]!;
+
+  // 1. Check if the destination container has a course that is a prerequisite or subsequent of the course being moved
+  const hasContainerRelatedCourses = destinationContainer.enrollments.some(
+    (e) =>
+      course.prerequisiteIds.includes(e.courseId) ||
+      course.subsequentIds.includes(e.courseId),
+  );
+
+  if (hasContainerRelatedCourses) {
+    toast({
+      title: "❌ Error",
+      description:
+        "No puedes mover un curso a un destino que contenga un curso prerequisito o sucesor.",
+    });
+    return false;
+  }
+
+  const hasBlockingCourses = (
+    startIndex: number,
+    endIndex: number,
+    relatedIds: number[],
+  ): boolean => {
+    const range = currentPeriods.slice(startIndex + 1, endIndex);
+    return range.some((p) =>
+      p.enrollments.some((e) => relatedIds.includes(e.courseId)),
+    );
+  };
+
+  // 2. Check if the move will block any subsequent or prerequisite courses
+  if (sourceContainerIndex < destinationContainerIndex) {
+    const hasBlockingSubsequents = hasBlockingCourses(
+      sourceContainerIndex,
+      destinationContainerIndex,
+      course.subsequentIds,
+    );
+
+    if (hasBlockingSubsequents) {
+      toast({
+        title: "❌ Error",
+        description: "No puedes mover un curso adelante de un curso sucesor.",
+      });
+    }
+
+    return !hasBlockingSubsequents;
+  } else {
+    const hasBlockingPrerequisites = hasBlockingCourses(
+      destinationContainerIndex,
+      sourceContainerIndex,
+      course.prerequisiteIds,
+    );
+
+    if (hasBlockingPrerequisites) {
+      toast({
+        title: "❌ Error",
+        description: "No puedes mover un curso atrás de un curso prerequisito.",
+      });
+    }
+    return !hasBlockingPrerequisites;
   }
 }
