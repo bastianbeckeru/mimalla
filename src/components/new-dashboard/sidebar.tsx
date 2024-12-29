@@ -1,7 +1,6 @@
 "use client";
 
 import type { CurriculumData } from "@/types/curriculum";
-import { useEffect } from "react";
 
 import { useSettingsStore } from "@/stores/settings";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
@@ -36,6 +35,7 @@ import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { Progress } from "../ui/progress";
 import { Lock, LockOpen, Trash2 } from "lucide-react";
+import useShortcuts from "@/hooks/use-shortcut";
 
 type DashboardSidebar = {
   areas: CurriculumData["areas"];
@@ -60,17 +60,12 @@ export default function DashboardSidebar({
       return lumA - lumB;
     });
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "e" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setEditMode(!editMode);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, [editMode, setEditMode]);
+  useShortcuts([
+    {
+      keys: ["Control", "e"],
+      handler: () => setEditMode(!editMode),
+    },
+  ]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

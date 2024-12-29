@@ -10,9 +10,7 @@ type StudentEnrollment = {
 
 export type newCurriculumStoreInitialStateProps = {
   curriculums: StudentEnrollment[];
-  past: StudentEnrollment[];
-  present: StudentEnrollment | null;
-  future: StudentEnrollment[];
+  activeCurriculumId: string | null;
 };
 
 export type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
@@ -36,11 +34,6 @@ export type useNewCurriculumStoreProps = {
     slots: CurriculumData["curriculum"]["slots"];
   }) => void;
   removeCurriculum: (curriculumId: string) => void;
-  updateCurriculumEnrollments: (
-    curriculumId: string,
-    newEnrollments: EnrolledCourse[],
-  ) => void;
+  updateCurriculumEnrollments: (newEnrollments: EnrolledCourse[]) => void;
   selectCurriculum: (id: string) => void;
-  undo: () => void;
-  redo: () => void;
 } & newCurriculumStoreInitialStateProps;

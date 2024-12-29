@@ -11,12 +11,8 @@ import { createUrlSlug } from "@/utils/strings";
 const initialState: newCurriculumStoreInitialStateProps = {
   //version: "0.1.4",
   curriculums: [],
-  past: [],
-  present: null,
-  future: [],
+  activeCurriculumId: null,
 };
-
-const MAX_HISTORY = 10;
 
 export const useNewCurriculumStore = create(
   persist<useNewCurriculumStoreProps>(
@@ -34,7 +30,7 @@ export const useNewCurriculumStore = create(
 
           const { year, term, program, slots } = newCurriculum;
 
-          const fixednNewCurriculum = {
+          const fixedNewCurriculum = {
             id: nanoid(),
             programSlug: createUrlSlug(program.name), // Necessary because we don't use programId
             year: year,
@@ -48,29 +44,23 @@ export const useNewCurriculumStore = create(
 
           return {
             ...state,
-            curriculums: [...state.curriculums, fixednNewCurriculum],
-            past: [],
-            present: fixednNewCurriculum,
-            future: [],
+            curriculums: [...state.curriculums, fixedNewCurriculum],
+            activeCurriculumId: fixedNewCurriculum.id,
           };
         }),
-      removeCurriculum: (curriculumId) =>
+      removeCurriculum: (id) =>
         set((state) => {
           if (!state) return state;
 
-          const newCurriculums = state.curriculums.filter(
-            (c) => c.id !== curriculumId,
-          );
+          const newCurriculums = state.curriculums.filter((c) => c.id !== id);
 
           if (newCurriculums.length === 0) return initialState;
 
-          if (state.present?.id === curriculumId) {
+          if (state.activeCurriculumId === id && newCurriculums.length > 0) {
             return {
               ...state,
               curriculums: newCurriculums,
-              past: [],
-              present: newCurriculums[0],
-              future: [],
+              activeCurriculumId: newCurriculums[0]!.id,
             };
           }
 
@@ -79,68 +69,25 @@ export const useNewCurriculumStore = create(
             curriculums: newCurriculums,
           };
         }),
-      selectCurriculum: (id) =>
+      selectCurriculum: (id) => set({ activeCurriculumId: id }),
+      updateCurriculumEnrollments: (newEnrollments) =>
         set((state) => {
-          const curriculum = state.curriculums.find((c) => c.id === id);
-          if (!curriculum) return state;
+          if (!state || !state.activeCurriculumId) return state;
 
-          return {
-            ...state,
-            past: [],
-            present: curriculum,
-            future: [],
-          };
-        }),
-      updateCurriculumEnrollments: (curriculumId, newEnrollments) =>
-        set((state) => {
-          if (!state || !state.present) return state;
-
-          if (state.present.id === curriculumId) {
-            const newPast = [...state.past, state.present];
-            if (newPast.length > MAX_HISTORY) {
-              newPast.shift(); // Remove the oldest entry if past exceeds MAX_HISTORY
+          const newCurriculums = state.curriculums.map((c) => {
+            if (c.id === state.activeCurriculumId) {
+              return {
+                ...c,
+                enrolledCourses: newEnrollments,
+              };
             }
 
-            return {
-              ...state,
-              past: newPast,
-              present: {
-                ...state.present,
-                enrolledCourses: newEnrollments,
-              },
-            };
-          }
-
-          return state;
-        }),
-
-      /* HISTORY */
-      undo: () =>
-        set((state) => {
-          if (state.past.length === 0 || state.present === null) return state;
-
-          const previous = state.past[state.past.length - 1];
-          const newPast = state.past.slice(0, -1);
+            return c;
+          });
 
           return {
             ...state,
-            past: newPast,
-            present: previous,
-            future: [state.present, ...state.future].slice(0, MAX_HISTORY),
-          };
-        }),
-      redo: () =>
-        set((state) => {
-          if (state.future.length === 0 || state.present === null) return state;
-
-          const next = state.future[0];
-          const newFuture = state.future.slice(1);
-
-          return {
-            ...state,
-            past: [...state.past, state.present].slice(-MAX_HISTORY),
-            present: next,
-            future: newFuture,
+            curriculums: newCurriculums,
           };
         }),
     }),

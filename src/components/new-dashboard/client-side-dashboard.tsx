@@ -1,9 +1,12 @@
 "use client";
 
+import type {
+  CurriculumData,
+  History,
+  PeriodWithEnrollments,
+} from "@/types/curriculum";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import { getPeriodsWithEnrollments } from "@/utils/curriculum";
-import type { CurriculumData } from "@/types/curriculum";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProgramData } from "../../utils/curriculum-data";
@@ -15,10 +18,16 @@ import RBDndCurriculum from "./rbdnd/dnd-curriculum";
 import CurriculumForm from "./curriculum-form";
 
 export default function ClientSideDashboard() {
-  const router = useRouter();
-  const { curriculums, present } = useNewCurriculumStore();
-  const [programData, setProgramData] = useState<CurriculumData | null>(null);
+  const { curriculums, activeCurriculumId, selectCurriculum } =
+    useNewCurriculumStore();
+
   const [isLoading, setIsLoading] = useState(true);
+  const [programData, setProgramData] = useState<CurriculumData | null>(null);
+  const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
+    past: [],
+    present: [],
+    future: [],
+  });
 
   // Wait for the store to be hydrated
   useEffect(() => {
@@ -28,13 +37,31 @@ export default function ClientSideDashboard() {
       }
     }, 500);
 
-    if (present) {
+    if (isLoading && curriculums.length > 0) {
+      if (!activeCurriculumId) {
+        selectCurriculum(curriculums[0]!.id);
+        return;
+      }
+
+      const present = curriculums.find((c) => c.id === activeCurriculumId);
+
+      if (!present) {
+        setIsLoading(false);
+        return;
+      }
+
       getProgramData({
         institutionAcronym: "udp",
         programSlug: present.programSlug,
       })
         .then((data) => {
+          const { periods } = getPeriodsWithEnrollments({
+            enrollments: present.enrolledCourses,
+          });
+
           setProgramData(data);
+          setHistory({ ...history, present: periods });
+          setIsLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
@@ -43,26 +70,22 @@ export default function ClientSideDashboard() {
     }
 
     return () => clearTimeout(delay);
-  }, [present, isLoading, router, curriculums]);
+  }, [isLoading, curriculums, activeCurriculumId, selectCurriculum, history]);
 
-  if (!isLoading && (!present || !programData)) return <CurriculumForm />;
+  if (!isLoading && curriculums.length === 0) return <CurriculumForm />;
 
-  if (!present || !programData)
+  if (!programData)
     return (
-      <div className="relative h-dvh w-dvw">
-        <Loader2 className="absolute left-[50%] top-[40%] size-8 animate-spin" />
-      </div>
+      <Loader2 className="absolute left-[50%] top-[40%] size-8 animate-spin" />
     );
 
-  const { periods } = getPeriodsWithEnrollments({
-    enrollments: present.enrolledCourses,
-  });
   const { institution, program, areas, courses } = programData;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
   /* PROGRESS */
-  const totalEnrollments = present.enrolledCourses.length;
-  const approvedEnrollments = present.enrolledCourses.filter(
+  const enrollments = history.present.flatMap((p) => p.enrollments);
+  const totalEnrollments = enrollments.length;
+  const approvedEnrollments = enrollments.filter(
     (e) => e.status === "APPROVED",
   );
   const approvedCourses = approvedEnrollments
@@ -93,10 +116,10 @@ export default function ClientSideDashboard() {
         </header>
 
         <RBDndCurriculum
-          curriculumId={present.id}
+          history={history}
+          setHistory={setHistory}
           areas={areas}
           courses={coursesMap}
-          periods={periods}
           approvedCourses={approvedCourses.map((c) => c.id)}
           approvedCredits={approvedCredits}
         />

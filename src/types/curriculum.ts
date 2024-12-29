@@ -1,3 +1,5 @@
+import type { EnrolledCourse } from "./store";
+
 export type AreaProps = {
   name: string;
   color: string | null; // "#FFFFFF"
@@ -152,4 +154,15 @@ export type ModifiedCourse = {
   subsequentIds: number[];
 } | null;
 
+export type PeriodWithEnrollments = {
+  id: PeriodKey;
+  enrollments: EnrolledCourse[];
+};
+
 export type PeriodKey = `${number}-${number}`;
+
+export type History<T> = {
+  past: T[];
+  present: T;
+  future: T[];
+};

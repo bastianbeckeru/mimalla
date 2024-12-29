@@ -83,7 +83,7 @@ export default function CurriculumForm() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
   async function onSubmit() {
-    console.log("Creating curriculum...");
+    console.log("Importing curriculum...");
     if (!selectedInstitution || !selectedProgram || !year || !period) return;
 
     setIsCreating(true);

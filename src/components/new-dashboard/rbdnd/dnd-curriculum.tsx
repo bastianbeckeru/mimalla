@@ -1,21 +1,20 @@
-/* This is a Drag and Drop Curriculum, but it is not GRID based */
 "use client";
 
-import { useState } from "react";
-
+import { type Dispatch, type SetStateAction, useState } from "react";
 import type {
   CurriculumData,
+  History,
   ModifiedCourse,
-  PeriodKey,
+  PeriodWithEnrollments,
 } from "@/types/curriculum";
-
-import { getCourse, getCourseArea } from "@/utils/curriculum";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import { useSettingsStore } from "@/stores/settings";
+import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../../ScrollAreaWrapper";
 import SlotCard from "./slot-card";
 import PeriodContainer from "./period-container";
-import { useSettingsStore } from "@/stores/settings";
 
 import {
   DragDropContext,
@@ -28,32 +27,24 @@ import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "@/hooks/use-toast";
 import { Undo2 } from "lucide-react";
+import useShortcuts from "@/hooks/use-shortcut";
 
 type RBDndCurriculum = {
+  history: History<PeriodWithEnrollments[]>;
+  setHistory: Dispatch<SetStateAction<History<PeriodWithEnrollments[]>>>;
+  //
   areas: CurriculumData["areas"];
-  curriculumId: string;
-  periods: PeriodWithEnrollments[];
   courses: Map<number, CurriculumData["courses"][0]>;
+  //
   approvedCourses: number[];
   approvedCredits: number;
 };
 
-type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: EnrolledCourse[];
-};
-
-type History<T> = {
-  past: T[];
-  present: T;
-  future: T[];
-};
-
-const MAX_HISTORY = 10;
+const MAX_HISTORY = 15;
 
 export default function RBDndCurriculum({
-  curriculumId,
-  periods,
+  history,
+  setHistory,
   areas,
   courses,
   approvedCourses,
@@ -61,31 +52,30 @@ export default function RBDndCurriculum({
 }: RBDndCurriculum) {
   const { updateCurriculumEnrollments } = useNewCurriculumStore();
   const { editMode } = useSettingsStore();
-  const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
-    past: [],
-    present: periods,
-    future: [],
-  });
 
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
-        course: {
-          id: number;
-          isElective: boolean;
-          name: string;
-          code: string | null;
-          description: string | null;
-          duration: number;
-          credits: number;
-          prerequisiteIds: number[];
-          subsequentIds: number[];
-          prerequisiteCredits: number;
-        } | null;
+        course: ModifiedCourse;
         color?: string;
       })
     | null
   >(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  useShortcuts([
+    {
+      keys: ["Control", "z"],
+      handler: () => {
+        if (editMode) undo();
+      },
+    },
+    {
+      keys: ["Control", "Shift", "Z"],
+      handler: () => {
+        if (editMode) redo();
+      },
+    },
+  ]);
 
   return (
     <>
@@ -180,36 +170,52 @@ export default function RBDndCurriculum({
 
                                   getSubsequentCoursesLoop(enrollment.courseId);
 
-                                  const newData = history.present.map((p) => {
-                                    return {
-                                      ...p,
-                                      enrollments: p.enrollments.map((e) => {
-                                        if (e.id === enrollment.id) {
-                                          return {
-                                            ...e,
-                                            status: newStatus,
-                                          };
-                                        } else if (
-                                          newStatus !== "APPROVED" &&
-                                          coursesToPending.includes(e.courseId)
-                                        ) {
-                                          return {
-                                            ...e,
-                                            status:
-                                              "PENDING" as EnrolledCourseStatus,
-                                          };
-                                        }
-                                        return e;
-                                      }),
-                                    };
-                                  });
+                                  const newPresent = history.present.map(
+                                    (p) => {
+                                      return {
+                                        ...p,
+                                        enrollments: p.enrollments.map((e) => {
+                                          if (e.id === enrollment.id) {
+                                            return {
+                                              ...e,
+                                              status: newStatus,
+                                            };
+                                          } else if (
+                                            newStatus !== "APPROVED" &&
+                                            coursesToPending.includes(
+                                              e.courseId,
+                                            )
+                                          ) {
+                                            return {
+                                              ...e,
+                                              status:
+                                                "PENDING" as EnrolledCourseStatus,
+                                            };
+                                          }
+                                          return e;
+                                        }),
+                                      };
+                                    },
+                                  );
 
                                   setHistory((prev) => {
-                                    return { ...prev, present: newData };
+                                    const newPast = [
+                                      ...prev.past,
+                                      prev.present,
+                                    ];
+
+                                    if (newPast.length > MAX_HISTORY) {
+                                      newPast.shift();
+                                    }
+
+                                    return {
+                                      ...prev,
+                                      past: newPast,
+                                      present: newPresent,
+                                    };
                                   });
                                   updateCurriculumEnrollments(
-                                    curriculumId,
-                                    newData.flatMap((p) => p.enrollments),
+                                    newPresent.flatMap((p) => p.enrollments),
                                   );
                                 }
                               }}
@@ -355,10 +361,7 @@ export default function RBDndCurriculum({
         return p;
       });
 
-      /*       updateCurriculumEnrollments(
-        curriculumId,
-        newPresent.flatMap((p) => p.enrollments),
-      ); */
+      updateCurriculumEnrollments(newPresent.flatMap((p) => p.enrollments));
 
       return {
         ...prev,
