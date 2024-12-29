@@ -2,9 +2,7 @@
 
 import type { CurriculumData } from "@/types/curriculum";
 
-import { useSettingsStore } from "@/stores/settings";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
-
 import { getLuminance, parseHexColor } from "@/utils/colors";
 import Logo from "../Logo";
 
@@ -32,25 +30,26 @@ import {
   SidebarSeparator,
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
 import { Progress } from "../ui/progress";
-import { Lock, LockOpen, Trash2 } from "lucide-react";
-import useShortcuts from "@/hooks/use-shortcut";
+import { Pencil, PencilOff, Trash2 } from "lucide-react";
 
 type DashboardSidebar = {
+  editMode: boolean;
+  setEditMode: (editMode: boolean) => void;
   areas: CurriculumData["areas"];
   progress: number;
   approvedCredits: number;
 };
 
 export default function DashboardSidebar({
+  editMode,
+  setEditMode,
   areas,
   progress,
   approvedCredits,
   ...props
 }: DashboardSidebar) {
   const { resetStore } = useNewCurriculumStore();
-  const { editMode, setEditMode } = useSettingsStore();
 
   const fixedAreas = areas
     .filter((area) => area.color !== null)
@@ -59,13 +58,6 @@ export default function DashboardSidebar({
       const lumB = getLuminance(parseHexColor(b.color));
       return lumA - lumB;
     });
-
-  useShortcuts([
-    {
-      keys: ["Control", "e"],
-      handler: () => setEditMode(!editMode),
-    },
-  ]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -84,26 +76,20 @@ export default function DashboardSidebar({
 
       <SidebarContent className="p-2 text-sm">
         <SidebarGroup>
-          <SidebarMenu className="flex cursor-pointer items-center justify-between space-x-2">
-            <SidebarMenuItem>
+          <SidebarMenu className="flex items-center justify-between">
+            <SidebarMenuItem className="w-full">
               <SidebarMenuButton
                 tooltip="Modo edición"
                 onClick={() => setEditMode(!editMode)}
+                className="justify-start text-muted-foreground hover:text-foreground group-data-[collapsible=icon]:!p-1 [&>svg]:size-4 [&>svg]:text-foreground"
               >
-                {editMode ? (
-                  <LockOpen className="size-4" />
-                ) : (
-                  <Lock className="size-4" />
-                )}
-                <span className="font-semibold">Modo edición</span>
-                <span className="hidden text-xs text-muted-foreground md:inline-block">
-                  ⌘+E
+                {editMode ? <PencilOff /> : <Pencil />}
+                <span className="flex-grow truncate text-foreground">
+                  {editMode ? "Deshabilitar" : "Habilitar"} edición
                 </span>
-                <Switch
-                  id="edit-mode"
-                  checked={editMode}
-                  onCheckedChange={(checked: boolean) => setEditMode(checked)}
-                />
+                <kbd className="hidden h-5 items-center justify-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-sm font-medium md:inline-flex">
+                  <span className="text-[0.625rem]">⌘</span>E
+                </kbd>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

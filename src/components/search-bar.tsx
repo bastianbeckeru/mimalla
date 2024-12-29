@@ -36,7 +36,7 @@ export function Searchbar() {
       >
         <p className="flex flex-grow text-sm">Buscar malla...</p>
         <p className="">
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-[10px] text-sm font-medium">
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-sm font-medium">
             <span className="text-xs">⌘</span>K
           </kbd>
         </p>

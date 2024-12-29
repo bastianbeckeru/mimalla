@@ -9,8 +9,6 @@ import type {
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { useSettingsStore } from "@/stores/settings";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../../ScrollAreaWrapper";
 import SlotCard from "./slot-card";
@@ -30,6 +28,7 @@ import { Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 
 type RBDndCurriculum = {
+  editMode: boolean;
   history: History<PeriodWithEnrollments[]>;
   setHistory: Dispatch<SetStateAction<History<PeriodWithEnrollments[]>>>;
   //
@@ -43,6 +42,7 @@ type RBDndCurriculum = {
 const MAX_HISTORY = 15;
 
 export default function RBDndCurriculum({
+  editMode,
   history,
   setHistory,
   areas,
@@ -50,9 +50,7 @@ export default function RBDndCurriculum({
   approvedCourses,
   approvedCredits,
 }: RBDndCurriculum) {
-  const { updateCurriculumEnrollments } = useNewCurriculumStore();
-  const { editMode } = useSettingsStore();
-
+  console.log("RBDndCurriculum has been rendered.");
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
         course: ModifiedCourse;
@@ -138,14 +136,13 @@ export default function RBDndCurriculum({
                                 } else {
                                   if (!isAvailable) return;
 
-                                  const currStatus = enrollment.status;
                                   let newStatus: EnrolledCourseStatus;
 
-                                  if (currStatus === "PENDING") {
+                                  if (enrollment.status === "PENDING") {
                                     newStatus = "APPROVED";
-                                  } else if (currStatus === "APPROVED") {
+                                  } else if (enrollment.status === "APPROVED") {
                                     newStatus = "FAILED";
-                                  } else if (currStatus === "FAILED") {
+                                  } else if (enrollment.status === "FAILED") {
                                     newStatus = "PENDING";
                                   }
 
@@ -170,8 +167,14 @@ export default function RBDndCurriculum({
 
                                   getSubsequentCoursesLoop(enrollment.courseId);
 
-                                  const newPresent = history.present.map(
-                                    (p) => {
+                                  setHistory((prev) => {
+                                    const newPresent = prev.present.map((p) => {
+                                      if (
+                                        newStatus === "APPROVED" &&
+                                        p.id !== period.id
+                                      )
+                                        return p;
+
                                       return {
                                         ...p,
                                         enrollments: p.enrollments.map((e) => {
@@ -180,43 +183,32 @@ export default function RBDndCurriculum({
                                               ...e,
                                               status: newStatus,
                                             };
-                                          } else if (
+                                          }
+
+                                          const isToPending =
                                             newStatus !== "APPROVED" &&
                                             coursesToPending.includes(
                                               e.courseId,
-                                            )
-                                          ) {
-                                            return {
-                                              ...e,
-                                              status:
-                                                "PENDING" as EnrolledCourseStatus,
-                                            };
-                                          }
-                                          return e;
+                                            );
+
+                                          return {
+                                            ...e,
+                                            status: isToPending
+                                              ? "PENDING"
+                                              : e.status,
+                                          };
                                         }),
                                       };
-                                    },
-                                  );
-
-                                  setHistory((prev) => {
-                                    const newPast = [
-                                      ...prev.past,
-                                      prev.present,
-                                    ];
-
-                                    if (newPast.length > MAX_HISTORY) {
-                                      newPast.shift();
-                                    }
+                                    });
 
                                     return {
-                                      ...prev,
-                                      past: newPast,
+                                      past: [...prev.past, prev.present].slice(
+                                        -MAX_HISTORY,
+                                      ),
                                       present: newPresent,
+                                      future: [],
                                     };
                                   });
-                                  updateCurriculumEnrollments(
-                                    newPresent.flatMap((p) => p.enrollments),
-                                  );
                                 }
                               }}
                             />
@@ -233,7 +225,7 @@ export default function RBDndCurriculum({
         </DragDropContext>
 
         {editMode && (
-          <div className="absolute bottom-0 left-0 m-4 flex h-8 w-16 flex-row justify-center rounded-md border bg-muted">
+          <div className="absolute bottom-4 right-4 flex h-8 w-16 flex-row justify-center rounded-md border bg-muted md:left-4">
             <button
               className="flex size-8 items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
               onClick={() => undo()}
@@ -349,28 +341,18 @@ export default function RBDndCurriculum({
 
     // 3. Save the data into current state and update the store
     setHistory((prev) => {
-      const newPast = [...prev.past, prev.present];
-
-      if (newPast.length > MAX_HISTORY) {
-        newPast.shift(); // Remove the oldest entry if past exceeds MAX_HISTORY
-      }
-
       const newPresent = prev.present.map((p) => {
         if (p.id === sourceContainer.id) return newSourceContainer;
         if (p.id === destinationContainer.id) return newDestinationContainer;
         return p;
       });
 
-      updateCurriculumEnrollments(newPresent.flatMap((p) => p.enrollments));
-
       return {
-        ...prev,
-        past: newPast,
+        past: [...prev.past, prev.present].slice(-MAX_HISTORY),
         present: newPresent,
+        future: [],
       };
     });
-
-    setActiveEnrollment(null);
   }
 }
 
@@ -439,7 +421,8 @@ function isValidMove(
   destinationContainerIndex: number,
   course: ModifiedCourse | null,
 ) {
-  if (!course) return true;
+  if (!course || sourceContainerIndex === destinationContainerIndex)
+    return true;
 
   const destinationContainer = currentPeriods[destinationContainerIndex]!;
 
