@@ -19,6 +19,7 @@ import CurriculumForm from "./curriculum-form";
 import useShortcuts from "@/hooks/use-shortcut";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { Progress } from "../ui/progress";
 
 export default function ClientSideDashboard() {
   const {
@@ -114,6 +115,7 @@ export default function ClientSideDashboard() {
     (acc, course) => acc + (course?.credits ?? 0),
     0,
   );
+  const progress = (approvedEnrollments.length / totalEnrollments) * 100;
 
   return (
     <SidebarProvider>
@@ -121,7 +123,7 @@ export default function ClientSideDashboard() {
         editMode={editMode}
         setEditMode={setEditMode}
         areas={areas}
-        progress={(approvedEnrollments.length / totalEnrollments) * 100}
+        progress={progress}
         approvedCredits={approvedCredits}
       />
 
@@ -152,6 +154,7 @@ export default function ClientSideDashboard() {
             )}
           </div>
         </header>
+        <Progress value={progress} className="h-1 rounded-none md:hidden" />
 
         <RBDndCurriculum
           editMode={editMode}
