@@ -119,8 +119,12 @@ export function getPeriodsWithEnrollments({
       return { id, enrollments };
     });
 
+  if (sortedPeriods.at(-1)?.enrollments.length === 0) {
+    sortedPeriods.splice(-1, 1);
+  }
+
   return {
-    nCols: periodMap.size,
+    nCols: sortedPeriods.length,
     nRows: maxRows,
     periods: sortedPeriods,
   };

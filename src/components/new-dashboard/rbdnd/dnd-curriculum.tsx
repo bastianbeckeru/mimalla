@@ -5,6 +5,7 @@ import type {
   CurriculumData,
   History,
   ModifiedCourse,
+  PeriodKey,
   PeriodWithEnrollments,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
@@ -26,8 +27,8 @@ import CourseDialog from "../course-dialog";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { nanoid } from "nanoid";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -42,6 +43,11 @@ type RBDndCurriculum = {
 };
 
 const MAX_HISTORY = 15;
+const statusTransitions: Record<EnrolledCourseStatus, EnrolledCourseStatus> = {
+  PENDING: "APPROVED",
+  APPROVED: "FAILED",
+  FAILED: "PENDING",
+};
 
 export default function RBDndCurriculum({
   editMode,
@@ -52,7 +58,6 @@ export default function RBDndCurriculum({
   approvedCourses,
   approvedCredits,
 }: RBDndCurriculum) {
-  console.log("RBDndCurriculum has been rendered.");
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
         course: ModifiedCourse;
@@ -80,13 +85,7 @@ export default function RBDndCurriculum({
   return (
     <>
       <ScrollAreaWrapper>
-        <DragDropContext
-          onDragStart={() => {
-            navigator.vibrate?.([50, 200]);
-            navigator.vibrate?.(200);
-          }}
-          onDragEnd={handleOnDragEnd}
-        >
+        <DragDropContext onDragEnd={handleOnDragEnd}>
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -108,10 +107,11 @@ export default function RBDndCurriculum({
                       const area = course && getCourseArea(areas, course);
                       const color = area?.color;
 
-                      const isAvailable =
-                        course?.prerequisiteIds.every((id) =>
-                          approvedCourses.includes(id),
-                        ) && course.prerequisiteCredits <= approvedCredits;
+                      const isAvailable = !course
+                        ? true
+                        : course.prerequisiteIds.every((id) =>
+                            approvedCourses.includes(id),
+                          ) && course.prerequisiteCredits <= approvedCredits;
 
                       return (
                         <Draggable
@@ -144,76 +144,146 @@ export default function RBDndCurriculum({
                                 } else {
                                   if (!isAvailable) return;
 
-                                  let newStatus: EnrolledCourseStatus;
-
-                                  if (enrollment.status === "PENDING") {
-                                    newStatus = "APPROVED";
-                                  } else if (enrollment.status === "APPROVED") {
-                                    newStatus = "FAILED";
-                                  } else if (enrollment.status === "FAILED") {
-                                    newStatus = "PENDING";
-                                  }
-
-                                  const coursesToPending: number[] = [];
-
-                                  function getSubsequentCoursesLoop(
-                                    courseId: number,
-                                  ) {
-                                    const course = getCourse({
-                                      id: courseId,
-                                      courses,
-                                    });
-                                    if (!course) return;
-
-                                    course.subsequentIds.forEach((id) => {
-                                      if (approvedCourses.includes(id)) {
-                                        coursesToPending.push(id);
-                                        getSubsequentCoursesLoop(id);
-                                      }
-                                    });
-                                  }
-
-                                  getSubsequentCoursesLoop(enrollment.courseId);
+                                  const newStatus =
+                                    statusTransitions[enrollment.status];
+                                  const coursesToRevert =
+                                    collectSubsequentCourses(
+                                      enrollment.courseId,
+                                    );
 
                                   setHistory((prev) => {
-                                    const newPresent = prev.present.map((p) => {
-                                      if (
-                                        newStatus === "APPROVED" &&
-                                        p.id !== period.id
-                                      )
-                                        return p;
+                                    const currentPresent = [...prev.present];
 
-                                      return {
-                                        ...p,
-                                        enrollments: p.enrollments.map((e) => {
-                                          if (e.id === enrollment.id) {
+                                    // Update the status of the enrollment and related enrollments
+                                    const updatedPresent = currentPresent.map(
+                                      (p) => {
+                                        const updatedEnrollments =
+                                          p.enrollments.map((e) => {
+                                            if (e.id === enrollment.id) {
+                                              return {
+                                                ...e,
+                                                status: newStatus,
+                                              };
+                                            }
+
+                                            const shouldRevert =
+                                              newStatus !== "APPROVED" &&
+                                              coursesToRevert.includes(
+                                                e.courseId,
+                                              );
                                             return {
                                               ...e,
-                                              status: newStatus,
+                                              status: shouldRevert
+                                                ? "PENDING"
+                                                : e.status,
                                             };
-                                          }
+                                          });
 
-                                          const isToPending =
-                                            newStatus !== "APPROVED" &&
-                                            coursesToPending.includes(
-                                              e.courseId,
-                                            );
+                                        return {
+                                          ...p,
+                                          enrollments: updatedEnrollments,
+                                        };
+                                      },
+                                    );
+
+                                    // Add a new enrollment with the same course to the next period if status changes to FAILED
+                                    if (
+                                      newStatus === "FAILED" &&
+                                      !course?.isElective
+                                    ) {
+                                      const nextPeriod = updatedPresent.at(
+                                        pIndex + 1,
+                                      );
+
+                                      if (!nextPeriod) {
+                                        const [year, term] = period.id
+                                          .split("-")
+                                          .map(Number);
+                                        const newYear =
+                                          term === 2 ? year! + 1 : year!;
+                                        const newTerm = term === 2 ? 1 : 2;
+
+                                        updatedPresent.push({
+                                          id: `${newYear}-${newTerm}`,
+                                          enrollments: [
+                                            {
+                                              id: nanoid(),
+                                              courseId: enrollment.courseId,
+                                              status: "PENDING",
+                                              position: 1,
+                                              year: newYear,
+                                              term: newTerm,
+                                            },
+                                          ],
+                                        });
+                                      } else {
+                                        const [year, term] = nextPeriod.id
+                                          .split("-")
+                                          .map(Number);
+
+                                        nextPeriod.enrollments.push({
+                                          id: nanoid(),
+                                          courseId: enrollment.courseId,
+                                          status:
+                                            "PENDING" as EnrolledCourseStatus,
+                                          position:
+                                            nextPeriod.enrollments.length + 1,
+                                          year: year!,
+                                          term: term!,
+                                        });
+                                      }
+                                    }
+
+                                    // Cloned courses should be removed from future periods if status changes to PENDING or APPROVED
+                                    // If the cloned courses are not in PENDING status, ask the user if they really want to remove them
+                                    if (
+                                      newStatus !== "FAILED" &&
+                                      !course?.isElective
+                                    ) {
+                                      const nextPeriods = updatedPresent.slice(
+                                        pIndex + 1,
+                                      );
+
+                                      let hasToAsk = false;
+                                      const enrollmentsToRemove = [];
+
+                                      const newNextPeriods = nextPeriods.map(
+                                        (p) => {
+                                          const newEnrollments =
+                                            p.enrollments.filter((e) => {
+                                              if (
+                                                e.courseId ===
+                                                enrollment.courseId
+                                              ) {
+                                                hasToAsk =
+                                                  e.status !== "PENDING";
+                                                enrollmentsToRemove.push(e);
+                                                return false;
+                                              }
+                                              return true;
+                                            });
 
                                           return {
-                                            ...e,
-                                            status: isToPending
-                                              ? "PENDING"
-                                              : e.status,
+                                            ...p,
+                                            enrollments: newEnrollments,
                                           };
-                                        }),
-                                      };
-                                    });
+                                        },
+                                      );
+
+                                      if (enrollmentsToRemove.length > 0) {
+                                        updatedPresent.splice(
+                                          pIndex + 1,
+                                          nextPeriods.length,
+                                          ...newNextPeriods,
+                                        );
+                                      }
+                                    }
 
                                     return {
                                       past: [...prev.past, prev.present].slice(
                                         -MAX_HISTORY,
                                       ),
-                                      present: newPresent,
+                                      present: updatedPresent,
                                       future: [],
                                     };
                                   });
@@ -232,14 +302,12 @@ export default function RBDndCurriculum({
 
             <button
               className={cn(
-                "invisible flex w-32 flex-col items-center justify-center rounded-md border p-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                editMode &&
-                  "visible hover:bg-accent hover:text-accent-foreground",
+                "hidden w-32 flex-col items-center justify-center rounded-md border p-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                editMode && "flex hover:bg-accent hover:text-accent-foreground",
               )}
               onClick={handleAddPeriod}
             >
               <Plus />
-              Periodo
             </button>
           </MotionDiv>
         </DragDropContext>
@@ -397,18 +465,33 @@ export default function RBDndCurriculum({
 
       const newPresent = [...currentData, newPeriod];
 
-      const container = document.getElementById(newPeriodId);
-      if (container) {
-        console.log("Hola");
-        container.scrollLeft = 8;
-      }
-
       return {
         past: [...prev.past, prev.present].slice(-MAX_HISTORY),
         present: newPresent,
         future: [],
       };
     });
+  }
+
+  function collectSubsequentCourses(courseId: number) {
+    const coursesToRevert: number[] = [];
+
+    function loop(courseId: number) {
+      const c = getCourse({
+        id: courseId,
+        courses,
+      });
+      if (!c) return;
+
+      c.subsequentIds.forEach((id) => {
+        if (approvedCourses.includes(id)) {
+          coursesToRevert.push(id);
+          loop(id);
+        }
+      });
+    }
+    loop(courseId);
+    return coursesToRevert;
   }
 }
 
@@ -477,10 +560,27 @@ function isValidMove(
   destinationContainerIndex: number,
   course: ModifiedCourse | null,
 ) {
-  if (!course || sourceContainerIndex === destinationContainerIndex)
-    return true;
+  if (!course) return true;
 
   const destinationContainer = currentPeriods[destinationContainerIndex]!;
+
+  const hasContainerCourse = destinationContainer.enrollments.some(
+    (c) => c.courseId === course.id,
+  );
+
+  if (
+    sourceContainerIndex !== destinationContainerIndex &&
+    hasContainerCourse &&
+    !course.isElective
+  ) {
+    toast({
+      title: "❌ Error",
+      description:
+        "No puedes mover un curso a un destino que contenga el mismo curso.",
+    });
+    return false;
+  }
+  if (sourceContainerIndex === destinationContainerIndex) return true;
 
   // 1. Check if the destination container has a course that is a prerequisite or subsequent of the course being moved
   const hasContainerRelatedCourses = destinationContainer.enrollments.some(
@@ -503,7 +603,7 @@ function isValidMove(
     endIndex: number,
     relatedIds: number[],
   ): boolean => {
-    const range = currentPeriods.slice(startIndex + 1, endIndex);
+    const range = currentPeriods.slice(startIndex, endIndex);
     return range.some((p) =>
       p.enrollments.some((e) => relatedIds.includes(e.courseId)),
     );

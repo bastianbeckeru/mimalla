@@ -219,22 +219,16 @@ export default function ClientSideDashboard() {
   function handleSaveChanges() {
     setEditMode(!editMode);
     setHistory((prev) => {
-      const currentData = [...prev.present];
+      const newPresent = [...prev.present];
 
-      // Encontrar el índice del último período con inscripciones
-      const lastWithEnrollmentsIndex = currentData
-        .map((period) => period.enrollments.length > 0)
+      const lastWithEnrollmentsIndex = newPresent
+        .map((p) => p.enrollments.length > 0)
         .lastIndexOf(true);
 
-      // Filtrar períodos vacíos después del último con inscripciones
-      const newPresent = currentData.filter(
-        (_, index) =>
-          index <= lastWithEnrollmentsIndex || _.enrollments.length > 0,
-      );
-
-      updateCurriculumEnrollments(newPresent.flatMap((p) => p.enrollments));
+      newPresent.splice(lastWithEnrollmentsIndex + 1);
 
       return { ...history, past: [], present: newPresent, future: [] };
     });
+    updateCurriculumEnrollments(history.present.flatMap((p) => p.enrollments));
   }
 }
