@@ -154,10 +154,10 @@ export default function DashboardSidebar({
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>¿Deseas eliminar esta malla curricular?</DialogTitle>
+              <DialogDescription>
+                Esta acción es irreversible, todos los datos se perderán.
+              </DialogDescription>
             </DialogHeader>
-            <DialogDescription>
-              Esta acción es irreversible, todos los datos se perderán.
-            </DialogDescription>
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="ghost">

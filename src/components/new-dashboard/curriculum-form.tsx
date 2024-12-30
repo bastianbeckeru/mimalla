@@ -100,10 +100,9 @@ export default function CurriculumForm() {
       addCurriculum({
         year: year,
         term: period,
-        path: `{${institutionAcronym}}/{${programSlug}}`,
+        path: `${institutionAcronym}/${programSlug}`,
         slots: data.curriculum.slots,
       });
-      router.push("/test");
 
       toast({
         title: "✅ Malla importada",
