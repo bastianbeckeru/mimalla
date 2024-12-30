@@ -43,7 +43,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
 
   const { institution, program, degrees } = data;
   const { periods, nCols, nRows } = getPeriods({
-    slots: data.curriculum.slots,
+    enrollments: data.curriculum.slots,
   });
 
   return (
