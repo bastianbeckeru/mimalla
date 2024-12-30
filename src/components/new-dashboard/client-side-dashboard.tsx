@@ -13,13 +13,13 @@ import { getProgramData } from "../../utils/curriculum-data";
 import Sidebar from "./sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
-/* import DndKitCurriculum from "./dndkit/dnd-curriculum"; */
 import RBDndCurriculum from "./rbdnd/dnd-curriculum";
 import CurriculumForm from "./curriculum-form";
 import useShortcuts from "@/hooks/use-shortcut";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
+import { toast } from "@/hooks/use-toast";
 
 export default function ClientSideDashboard() {
   const {
@@ -31,7 +31,7 @@ export default function ClientSideDashboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [programData, setProgramData] = useState<CurriculumData | null>(null);
+  const [data, setData] = useState<CurriculumData | null>(null);
   const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
     past: [],
     present: [],
@@ -41,7 +41,7 @@ export default function ClientSideDashboard() {
   useShortcuts([
     {
       keys: ["Control", "e"],
-      handler: () => setEditMode(!editMode),
+      handler: handleEditMode,
     },
     {
       keys: ["Control", "s"],
@@ -57,12 +57,12 @@ export default function ClientSideDashboard() {
       }
     }, 500);
 
-    if (isLoading && curriculums.length > 0) {
-      if (!activeCurriculumId) {
-        selectCurriculum(curriculums[0]!.id);
-        return;
-      }
+    if (curriculums.length > 0 && !activeCurriculumId) {
+      selectCurriculum(curriculums[0]!.id);
+      return;
+    }
 
+    if (isLoading && curriculums.length > 0) {
       const present = curriculums.find((c) => c.id === activeCurriculumId);
 
       if (!present) {
@@ -86,8 +86,8 @@ export default function ClientSideDashboard() {
             enrollments: present.enrolledCourses,
           });
 
-          setProgramData(data);
           setHistory({ ...history, present: periods });
+          setData(data);
           setIsLoading(false);
         })
         .catch((error) => {
@@ -96,17 +96,42 @@ export default function ClientSideDashboard() {
         });
     }
 
+    if (
+      !isLoading &&
+      history.present.length === 0 &&
+      curriculums.length > 0 &&
+      data
+    ) {
+      const present = curriculums.find((c) => c.id === activeCurriculumId);
+
+      if (!present) return;
+
+      const { periods } = getPeriodsWithEnrollments({
+        enrollments: present.enrolledCourses,
+      });
+
+      setHistory({ ...history, present: periods });
+    }
+
     return () => clearTimeout(delay);
-  }, [isLoading, curriculums, activeCurriculumId, selectCurriculum, history]);
+  }, [
+    isLoading,
+    data,
+    curriculums,
+    activeCurriculumId,
+    selectCurriculum,
+    history,
+  ]);
 
-  if (!isLoading && curriculums.length === 0) return <CurriculumForm />;
+  if (!isLoading && curriculums.length === 0)
+    return <CurriculumForm setData={setData} />;
 
-  if (!programData)
+  if (isLoading || !data)
     return (
       <Loader2 className="absolute left-[50%] top-[40%] size-8 animate-spin" />
     );
 
-  const { institution, program, areas, courses } = programData;
+  const { institution, program, areas, courses } = data;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
   /* PROGRESS */
@@ -124,17 +149,31 @@ export default function ClientSideDashboard() {
   );
   const progress = (approvedEnrollments.length / totalEnrollments) * 100;
 
+  function handleEditMode() {
+    if (history.past.length > 0) {
+      toast({
+        title: "⚠️ Cambios sin guardar",
+        description:
+          "Guarda los cambios realizados antes de finalizar la edición.",
+      });
+      return;
+    }
+    if (history.future.length > 0)
+      setHistory({ ...history, past: [], future: [] });
+    setEditMode(!editMode);
+  }
+
   return (
     <SidebarProvider>
       <Sidebar
         editMode={editMode}
-        setEditMode={setEditMode}
+        setEditMode={handleEditMode}
         areas={areas}
         progress={progress}
         approvedCredits={approvedCredits}
       />
 
-      <SidebarInset className="grid min-h-dvh grid-rows-[auto_1fr]">
+      <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr]">
         <div>
           <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-sidebar px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <SidebarTrigger className="absolute left-2 md:hidden" />
@@ -143,24 +182,23 @@ export default function ClientSideDashboard() {
               <h1 className="font-bold">{program.name}</h1>
             </div>
 
-            <div className="absolute inset-y-0 right-0 flex items-center justify-center gap-2 px-2">
-              {editMode && (
-                <Button
-                  aria-label="Save Changes"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    history.past.length !== 0 &&
-                      "bg-secondary hover:bg-secondary/80",
-                  )}
-                  disabled={history.past.length === 0}
-                  onClick={handleSaveChanges}
-                >
-                  <Save />
-                  <span className="hidden md:inline">Guardar</span>
-                </Button>
-              )}
-            </div>
+            {editMode && (
+              <Button
+                aria-label="Save Changes"
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "absolute right-4",
+                  history.past.length !== 0 &&
+                    "bg-secondary hover:bg-secondary/80",
+                )}
+                disabled={history.past.length === 0}
+                onClick={handleSaveChanges}
+              >
+                <Save />
+                <span className="hidden md:inline">Guardar</span>
+              </Button>
+            )}
           </header>
           <Progress value={progress} className="h-1 rounded-none md:hidden" />
         </div>
@@ -180,7 +218,23 @@ export default function ClientSideDashboard() {
 
   function handleSaveChanges() {
     setEditMode(!editMode);
-    updateCurriculumEnrollments(history.present.flatMap((p) => p.enrollments));
-    setHistory({ ...history, past: [], future: [] });
+    setHistory((prev) => {
+      const currentData = [...prev.present];
+
+      // Encontrar el índice del último período con inscripciones
+      const lastWithEnrollmentsIndex = currentData
+        .map((period) => period.enrollments.length > 0)
+        .lastIndexOf(true);
+
+      // Filtrar períodos vacíos después del último con inscripciones
+      const newPresent = currentData.filter(
+        (_, index) =>
+          index <= lastWithEnrollmentsIndex || _.enrollments.length > 0,
+      );
+
+      updateCurriculumEnrollments(newPresent.flatMap((p) => p.enrollments));
+
+      return { ...history, past: [], present: newPresent, future: [] };
+    });
   }
 }

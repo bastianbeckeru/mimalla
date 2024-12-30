@@ -29,6 +29,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { getProgramData } from "@/utils/curriculum-data";
+import { CurriculumData } from "@/types/curriculum";
 
 type Institution = {
   acronym: string;
@@ -70,15 +71,21 @@ const periods = [
   { value: 2, label: "Segundo semestre" },
 ];
 
-export default function CurriculumForm() {
+export default function CurriculumForm({
+  setData,
+}: {
+  setData: (data: CurriculumData) => void;
+}) {
   const router = useRouter();
   const { addCurriculum } = useNewCurriculumStore();
+
   const [selectedInstitution, setSelectedInstitution] = useState<
     Institution | undefined
   >(institutions.length === 1 ? institutions[0] : undefined);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [year, setYear] = useState<number>();
   const [period, setPeriod] = useState<number>();
+
   const [open, setOpen] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
@@ -103,6 +110,8 @@ export default function CurriculumForm() {
         path: `${institutionAcronym}/${programSlug}`,
         slots: data.curriculum.slots,
       });
+
+      setData(data);
 
       toast({
         title: "✅ Malla importada",

@@ -27,6 +27,7 @@ import { toast } from "@/hooks/use-toast";
 import { Plus, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -81,14 +82,15 @@ export default function RBDndCurriculum({
       <ScrollAreaWrapper>
         <DragDropContext
           onDragStart={() => {
-            navigator.vibrate?.(50);
+            navigator.vibrate?.([50, 200]);
+            navigator.vibrate?.(200);
           }}
           onDragEnd={handleOnDragEnd}
         >
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-row space-x-2 p-4"
+            className="flex h-max min-h-fit flex-row space-x-2 p-4"
           >
             {history.present.map((period, pIndex) => (
               <Droppable droppableId={period.id} key={period.id}>
@@ -227,12 +229,18 @@ export default function RBDndCurriculum({
                 )}
               </Droppable>
             ))}
-            {editMode && (
-              <button className="flex w-32 flex-col items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
-                <Plus />
-                Periodo
-              </button>
-            )}
+
+            <button
+              className={cn(
+                "invisible flex w-32 flex-col items-center justify-center rounded-md border p-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                editMode &&
+                  "visible hover:bg-accent hover:text-accent-foreground",
+              )}
+              onClick={handleAddPeriod}
+            >
+              <Plus />
+              Periodo
+            </button>
           </MotionDiv>
         </DragDropContext>
 
@@ -324,7 +332,14 @@ export default function RBDndCurriculum({
     const destinationContainer = currentPeriods[destinationContainerIndex];
 
     if (!sourceContainer || !destinationContainer) return;
-
+    if (destinationContainer.enrollments.length >= 10) {
+      toast({
+        title: "❌ Error",
+        description:
+          "No puedes mover un curso a un destino que contenga 10 cursos o más.",
+      });
+      return;
+    }
     //
     const sourceEnrollment = sourceContainer.enrollments[source.index]!;
     const sourceCourse = getCourse({
@@ -358,6 +373,35 @@ export default function RBDndCurriculum({
         if (p.id === destinationContainer.id) return newDestinationContainer;
         return p;
       });
+
+      return {
+        past: [...prev.past, prev.present].slice(-MAX_HISTORY),
+        present: newPresent,
+        future: [],
+      };
+    });
+  }
+
+  function handleAddPeriod() {
+    setHistory((prev) => {
+      const currentData = [...prev.present];
+
+      if (currentData.length >= 25) return { ...prev };
+
+      const [maxYear, term] =
+        currentData[currentData.length - 1]!.id.split("-").map(Number);
+
+      const newPeriodId: `${number}-${number}` =
+        term === 2 ? `${maxYear! + 1}-${1}` : `${maxYear!}-${2}`;
+      const newPeriod = { id: newPeriodId, enrollments: [] };
+
+      const newPresent = [...currentData, newPeriod];
+
+      const container = document.getElementById(newPeriodId);
+      if (container) {
+        console.log("Hola");
+        container.scrollLeft = 8;
+      }
 
       return {
         past: [...prev.past, prev.present].slice(-MAX_HISTORY),

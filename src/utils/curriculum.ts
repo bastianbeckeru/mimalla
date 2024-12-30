@@ -1,71 +1,5 @@
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
-import { EnrolledCourse } from "@/types/store";
-
-export function getPeriods({
-  slots,
-}: {
-  slots: CurriculumData["curriculum"]["slots"];
-}): {
-  nCols: number;
-  nRows: number;
-  periods: PeriodKey[];
-} {
-  const periodSet = new Set<PeriodKey>();
-  let maxRows = 1;
-
-  slots.forEach((slot) => {
-    periodSet.add(`${slot.year}-${slot.term}`);
-    maxRows = Math.max(maxRows, slot.position);
-  });
-
-  const sortedPeriods = Array.from(periodSet).sort((a, b) => {
-    const [yearA, termA] = a.split("-").map(Number);
-    const [yearB, termB] = b.split("-").map(Number);
-    return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
-  });
-
-  return { nCols: periodSet.size, nRows: maxRows, periods: sortedPeriods };
-}
-
-export function getPeriodsWithSlots({
-  slots,
-}: {
-  slots: CurriculumData["curriculum"]["slots"];
-}): {
-  nCols: number;
-  nRows: number;
-  periods: {
-    id: PeriodKey;
-    slots: CurriculumData["curriculum"]["slots"];
-  }[];
-} {
-  const periodMap = new Map<PeriodKey, CurriculumData["curriculum"]["slots"]>();
-  let maxRows = 1;
-
-  slots.forEach((slot) => {
-    const periodKey: PeriodKey = `${slot.year}-${slot.term}`;
-    if (!periodMap.has(periodKey)) {
-      periodMap.set(periodKey, []);
-    }
-
-    periodMap.get(periodKey)!.push(slot);
-    maxRows = Math.max(maxRows, slot.position);
-  });
-
-  const sortedPeriods = Array.from(periodMap.entries())
-    .sort(([a], [b]) => {
-      const [yearA, termA] = a.split("-").map(Number);
-      const [yearB, termB] = b.split("-").map(Number);
-      return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
-    })
-    .map(([id, slots]) => ({ id, slots }));
-
-  return {
-    nCols: periodMap.size,
-    nRows: maxRows,
-    periods: sortedPeriods,
-  };
-}
+import type { EnrolledCourse } from "@/types/store";
 
 export function getCourse({
   id,
@@ -109,6 +43,32 @@ export function getCourseArea(
   return areas.find((area) => area.courseIds.includes(id));
 }
 
+export function getPeriods({
+  enrollments,
+}: {
+  enrollments: CurriculumData["curriculum"]["slots"];
+}): {
+  nCols: number;
+  nRows: number;
+  periods: PeriodKey[];
+} {
+  const periodSet = new Set<PeriodKey>();
+  let maxRows = 1;
+
+  enrollments.forEach((e) => {
+    periodSet.add(`${e.year}-${e.term}`);
+    maxRows = Math.max(maxRows, e.position);
+  });
+
+  const sortedPeriods = Array.from(periodSet).sort((a, b) => {
+    const [yearA, termA] = a.split("-").map(Number);
+    const [yearB, termB] = b.split("-").map(Number);
+    return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
+  });
+
+  return { nCols: periodSet.size, nRows: maxRows, periods: sortedPeriods };
+}
+
 export function getPeriodsWithEnrollments({
   enrollments,
 }: {
@@ -123,16 +83,31 @@ export function getPeriodsWithEnrollments({
 } {
   const periodMap = new Map<PeriodKey, EnrolledCourse[]>();
   let maxRows = 1;
+  let minYear = Infinity,
+    maxYear = -Infinity;
 
-  enrollments.forEach((enrollment) => {
-    const periodKey: PeriodKey = `${enrollment.year}-${enrollment.term}`;
+  enrollments.forEach((e) => {
+    const periodKey: PeriodKey = `${e.year}-${e.term}`;
     if (!periodMap.has(periodKey)) {
       periodMap.set(periodKey, []);
     }
 
-    periodMap.get(periodKey)!.push(enrollment);
-    maxRows = Math.max(maxRows, enrollment.position);
+    periodMap.get(periodKey)!.push(e);
+
+    maxRows = Math.max(maxRows, e.position);
+    minYear = Math.min(minYear, e.year);
+    maxYear = Math.max(maxYear, e.year);
   });
+
+  for (let year = minYear; year <= maxYear; year++) {
+    for (let term = 1; term <= 2; term++) {
+      const periodKey: PeriodKey = `${year}-${term}`;
+
+      if (!periodMap.has(periodKey)) {
+        periodMap.set(periodKey, []);
+      }
+    }
+  }
 
   const sortedPeriods = Array.from(periodMap.entries())
     .sort(([a], [b]) => {
@@ -140,7 +115,9 @@ export function getPeriodsWithEnrollments({
       const [yearB, termB] = b.split("-").map(Number);
       return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
     })
-    .map(([id, enrollments]) => ({ id, enrollments }));
+    .map(([id, enrollments]) => {
+      return { id, enrollments };
+    });
 
   return {
     nCols: periodMap.size,

@@ -9,7 +9,7 @@ type PeriodContainerProps = {
 const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
   ({ index, children, ...props }, ref) => {
     return (
-      <ol className="flex select-none flex-col gap-2">
+      <ol className="flex min-w-32 select-none flex-col gap-2">
         <h3
           className={`text-center text-xs font-bold tracking-wider text-muted-foreground`}
         >
