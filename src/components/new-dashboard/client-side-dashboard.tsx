@@ -70,9 +70,16 @@ export default function ClientSideDashboard() {
         return;
       }
 
+      const [institutionAcronym, programSlug] = present.path.split("/");
+
+      if (!institutionAcronym || !programSlug) {
+        setIsLoading(false);
+        return;
+      }
+
       getProgramData({
-        institutionAcronym: "udp",
-        programSlug: present.programSlug,
+        institutionAcronym: institutionAcronym,
+        programSlug: programSlug,
       })
         .then((data) => {
           const { periods } = getPeriodsWithEnrollments({
@@ -128,33 +135,35 @@ export default function ClientSideDashboard() {
       />
 
       <SidebarInset className="grid min-h-dvh grid-rows-[auto_1fr]">
-        <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-sidebar transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <SidebarTrigger className="absolute left-2" />
+        <div>
+          <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-sidebar px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <SidebarTrigger className="absolute left-2 md:hidden" />
 
-          <div className="flex items-center justify-center px-2">
-            <h1 className="font-bold">{program.name}</h1>
-          </div>
+            <div className="flex items-center justify-center px-2">
+              <h1 className="font-bold">{program.name}</h1>
+            </div>
 
-          <div className="absolute inset-y-0 right-0 flex items-center justify-center gap-2 px-2">
-            {editMode && (
-              <Button
-                aria-label="Save Changes"
-                variant="outline"
-                size="sm"
-                className={cn(
-                  history.past.length !== 0 &&
-                    "bg-secondary hover:bg-secondary/80",
-                )}
-                disabled={history.past.length === 0}
-                onClick={handleSaveChanges}
-              >
-                <Save />
-                <span className="hidden md:inline">Guardar</span>
-              </Button>
-            )}
-          </div>
-        </header>
-        <Progress value={progress} className="h-1 rounded-none md:hidden" />
+            <div className="absolute inset-y-0 right-0 flex items-center justify-center gap-2 px-2">
+              {editMode && (
+                <Button
+                  aria-label="Save Changes"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    history.past.length !== 0 &&
+                      "bg-secondary hover:bg-secondary/80",
+                  )}
+                  disabled={history.past.length === 0}
+                  onClick={handleSaveChanges}
+                >
+                  <Save />
+                  <span className="hidden md:inline">Guardar</span>
+                </Button>
+              )}
+            </div>
+          </header>
+          <Progress value={progress} className="h-1 rounded-none md:hidden" />
+        </div>
 
         <RBDndCurriculum
           editMode={editMode}

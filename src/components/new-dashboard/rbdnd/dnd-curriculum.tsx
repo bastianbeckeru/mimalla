@@ -24,8 +24,9 @@ import {
 import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Undo2 } from "lucide-react";
+import { Plus, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
+import { Button } from "@/components/ui/button";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -78,11 +79,16 @@ export default function RBDndCurriculum({
   return (
     <>
       <ScrollAreaWrapper>
-        <DragDropContext onDragEnd={handleOnDragEnd}>
+        <DragDropContext
+          onDragStart={() => {
+            navigator.vibrate?.(50);
+          }}
+          onDragEnd={handleOnDragEnd}
+        >
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-row p-4"
+            className="flex flex-row space-x-2 p-4"
           >
             {history.present.map((period, pIndex) => (
               <Droppable droppableId={period.id} key={period.id}>
@@ -221,6 +227,12 @@ export default function RBDndCurriculum({
                 )}
               </Droppable>
             ))}
+            {editMode && (
+              <button className="flex w-32 flex-col items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
+                <Plus />
+                Periodo
+              </button>
+            )}
           </MotionDiv>
         </DragDropContext>
 

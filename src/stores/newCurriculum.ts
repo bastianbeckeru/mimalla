@@ -6,7 +6,6 @@ import type {
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
-import { createUrlSlug } from "@/utils/strings";
 
 const initialState: newCurriculumStoreInitialStateProps = {
   //version: "0.1.4",
@@ -28,11 +27,11 @@ export const useNewCurriculumStore = create(
         set((state) => {
           if (!state || !newCurriculum) return state;
 
-          const { year, term, program, slots } = newCurriculum;
+          const { year, term, path, slots } = newCurriculum;
 
           const fixedNewCurriculum = {
             id: nanoid(),
-            programSlug: createUrlSlug(program.name), // Necessary because we don't use programId
+            path: path, // Necessary, because we don't use programId yet
             year: year,
             term: term,
             enrolledCourses: slots.map((slot) => ({

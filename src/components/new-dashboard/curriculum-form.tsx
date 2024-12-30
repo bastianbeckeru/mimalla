@@ -100,7 +100,7 @@ export default function CurriculumForm() {
       addCurriculum({
         year: year,
         term: period,
-        program: data.program,
+        path: `{${institutionAcronym}}/{${programSlug}}`,
         slots: data.curriculum.slots,
       });
       router.push("/test");
@@ -128,7 +128,7 @@ export default function CurriculumForm() {
         Volver
       </Link>
 
-      <div className="flex w-full flex-col justify-center space-y-4 px-2 sm:w-[350px]">
+      <div className="flex w-full flex-col justify-center space-y-2 px-2 sm:w-[350px]">
         <div className="mb-2 flex flex-col space-y-2 text-center">
           <h1 className="flex items-center gap-2">
             <span className="text-2xl font-semibold tracking-tight">
@@ -167,28 +167,38 @@ export default function CurriculumForm() {
               </SelectContent>
             </Select>
 
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  disabled={!selectedInstitution}
+            <div className="flex h-14 w-full flex-col items-end justify-start">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    disabled={!selectedInstitution}
+                  >
+                    {selectedProgram ? (
+                      <>{selectedProgram.name}</>
+                    ) : (
+                      <>Selecciona una carrera</>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96 p-0" align="start">
+                  <ProgramList
+                    departments={selectedInstitution?.departments ?? []}
+                    setOpen={setOpen}
+                    setSelectedProgram={setSelectedProgram}
+                  />
+                </PopoverContent>
+              </Popover>
+              {selectedProgram && (
+                <Link
+                  href={`${selectedInstitution?.acronym.toLowerCase()}/${createUrlSlug(selectedProgram.name)}`}
+                  className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
                 >
-                  {selectedProgram ? (
-                    <>{selectedProgram.name}</>
-                  ) : (
-                    <>Selecciona una carrera</>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96 p-0" align="start">
-                <ProgramList
-                  departments={selectedInstitution?.departments ?? []}
-                  setOpen={setOpen}
-                  setSelectedProgram={setSelectedProgram}
-                />
-              </PopoverContent>
-            </Popover>
+                  Ver malla
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -257,7 +267,7 @@ export default function CurriculumForm() {
               target="_blank"
               rel="noreferrer"
               href="https://forms.gle/P6JjrCPn1y4fZyUNA"
-              className="hover:text-brand underline underline-offset-4"
+              className="underline underline-offset-4 hover:text-foreground"
             >
               Haz clic aquí
             </a>

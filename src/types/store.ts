@@ -2,7 +2,7 @@ import type { CurriculumData } from "./curriculum";
 
 type StudentEnrollment = {
   id: string;
-  programSlug: string;
+  path: string;
   year: number;
   term: number;
   enrolledCourses: EnrolledCourse[];
@@ -30,7 +30,7 @@ export type useNewCurriculumStoreProps = {
   addCurriculum: (newCurriculum: {
     year: number;
     term: number;
-    program: CurriculumData["program"];
+    path: string;
     slots: CurriculumData["curriculum"]["slots"];
   }) => void;
   removeCurriculum: (curriculumId: string) => void;
