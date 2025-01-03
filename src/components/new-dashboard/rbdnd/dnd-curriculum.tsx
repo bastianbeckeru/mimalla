@@ -5,7 +5,6 @@ import type {
   CurriculumData,
   History,
   ModifiedCourse,
-  PeriodKey,
   PeriodWithEnrollments,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
@@ -42,7 +41,7 @@ type RBDndCurriculum = {
   approvedCredits: number;
 };
 
-const MAX_HISTORY = 15;
+const MAX_HISTORY = 25;
 const statusTransitions: Record<EnrolledCourseStatus, EnrolledCourseStatus> = {
   PENDING: "APPROVED",
   APPROVED: "FAILED",
