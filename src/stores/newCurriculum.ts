@@ -90,6 +90,6 @@ export const useNewCurriculumStore = create(
           };
         }),
     }),
-    { name: "data" },
+    { name: "curriculum-storage", version: 1 },
   ),
 );

@@ -146,17 +146,19 @@ export default function RBDndCurriculum({
 
                                   const newStatus =
                                     statusTransitions[enrollment.status];
-                                  const coursesToRevert =
-                                    collectSubsequentCourses(
-                                      enrollment.courseId,
-                                    );
+                                  const currentPeriods = [...history.present];
+                                  let updatedPeriods = currentPeriods;
 
-                                  setHistory((prev) => {
-                                    const currentPresent = [...prev.present];
-
-                                    // Update the status of the enrollment and related enrollments
-                                    const updatedPresent = currentPresent.map(
-                                      (p) => {
+                                  // 1. APPROVED: Change the status of the enrollment
+                                  // 2. PENDING: Revert the status of the enrollment and related enrollments
+                                  // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
+                                  if (
+                                    !course ||
+                                    course.isElective ||
+                                    newStatus === "APPROVED"
+                                  ) {
+                                    updatedPeriods = updatedPeriods.map((p) => {
+                                      if (p.id === period.id) {
                                         const updatedEnrollments =
                                           p.enrollments.map((e) => {
                                             if (e.id === enrollment.id) {
@@ -166,16 +168,8 @@ export default function RBDndCurriculum({
                                               };
                                             }
 
-                                            const shouldRevert =
-                                              newStatus !== "APPROVED" &&
-                                              coursesToRevert.includes(
-                                                e.courseId,
-                                              );
                                             return {
                                               ...e,
-                                              status: shouldRevert
-                                                ? "PENDING"
-                                                : e.status,
                                             };
                                           });
 
@@ -183,33 +177,46 @@ export default function RBDndCurriculum({
                                           ...p,
                                           enrollments: updatedEnrollments,
                                         };
-                                      },
+                                      }
+                                      return { ...p };
+                                    });
+                                  } else {
+                                    const coursesToRevert =
+                                      collectSubsequentCourses(
+                                        enrollment.courseId,
+                                      );
+                                    updatedPeriods = revert(
+                                      currentPeriods,
+                                      coursesToRevert,
                                     );
 
-                                    // Add a new enrollment with the same course to the next period if status changes to FAILED
-                                    if (
-                                      newStatus === "FAILED" &&
-                                      !course?.isElective
-                                    ) {
-                                      const nextPeriod = updatedPresent.at(
+                                    // EXTRA LOGIC
+                                    if (newStatus === "FAILED") {
+                                      // Add a new enrollment with the same course to the next period
+                                      const nextPeriod = updatedPeriods.at(
                                         pIndex + 1,
                                       );
+                                      const newEnrollment = {
+                                        id: nanoid(),
+                                        courseId: enrollment.courseId,
+                                        status:
+                                          "PENDING" as EnrolledCourseStatus,
+                                      };
 
                                       if (!nextPeriod) {
                                         const [year, term] = period.id
                                           .split("-")
                                           .map(Number);
-                                        const newYear =
-                                          term === 2 ? year! + 1 : year!;
-                                        const newTerm = term === 2 ? 1 : 2;
+                                        const [newYear, newTerm] =
+                                          term === 2
+                                            ? [year! + 1, 1]
+                                            : [year!, 2];
 
-                                        updatedPresent.push({
+                                        updatedPeriods.push({
                                           id: `${newYear}-${newTerm}`,
                                           enrollments: [
                                             {
-                                              id: nanoid(),
-                                              courseId: enrollment.courseId,
-                                              status: "PENDING",
+                                              ...newEnrollment,
                                               position: 1,
                                               year: newYear,
                                               term: newTerm,
@@ -217,73 +224,76 @@ export default function RBDndCurriculum({
                                           ],
                                         });
                                       } else {
-                                        const [year, term] = nextPeriod.id
-                                          .split("-")
-                                          .map(Number);
+                                        if (
+                                          !nextPeriod.enrollments.some(
+                                            (e) =>
+                                              e.courseId ===
+                                              enrollment.courseId,
+                                          )
+                                        ) {
+                                          const [newYear, newTerm] =
+                                            nextPeriod.id
+                                              .split("-")
+                                              .map(Number);
 
-                                        nextPeriod.enrollments.push({
-                                          id: nanoid(),
-                                          courseId: enrollment.courseId,
-                                          status:
-                                            "PENDING" as EnrolledCourseStatus,
-                                          position:
-                                            nextPeriod.enrollments.length + 1,
-                                          year: year!,
-                                          term: term!,
-                                        });
+                                          nextPeriod.enrollments.push({
+                                            ...newEnrollment,
+                                            position:
+                                              nextPeriod.enrollments.length + 1,
+                                            year: newYear!,
+                                            term: newTerm!,
+                                          });
+
+                                          // Move every subsequent course to the next period
+                                          updatedPeriods =
+                                            moveSubsequentCourses(
+                                              updatedPeriods,
+                                              enrollment.courseId,
+                                            );
+                                        }
                                       }
                                     }
+                                  }
 
-                                    // Cloned courses should be removed from future periods if status changes to PENDING or APPROVED
-                                    // If the cloned courses are not in PENDING status, ask the user if they really want to remove them
-                                    if (
-                                      newStatus !== "FAILED" &&
-                                      !course?.isElective
-                                    ) {
-                                      const nextPeriods = updatedPresent.slice(
-                                        pIndex + 1,
-                                      );
+                                  function revert(
+                                    periods: PeriodWithEnrollments[],
+                                    coursesToRevert: number[] = [],
+                                  ) {
+                                    return periods.map((p) => {
+                                      const updatedEnrollments =
+                                        p.enrollments.map((e) => {
+                                          if (e.id === enrollment.id) {
+                                            return {
+                                              ...e,
+                                              status: newStatus,
+                                            };
+                                          }
 
-                                      let hasToAsk = false;
-                                      const enrollmentsToRemove = [];
-
-                                      const newNextPeriods = nextPeriods.map(
-                                        (p) => {
-                                          const newEnrollments =
-                                            p.enrollments.filter((e) => {
-                                              if (
-                                                e.courseId ===
-                                                enrollment.courseId
-                                              ) {
-                                                hasToAsk =
-                                                  e.status !== "PENDING";
-                                                enrollmentsToRemove.push(e);
-                                                return false;
-                                              }
-                                              return true;
-                                            });
-
+                                          const shouldRevert =
+                                            coursesToRevert.includes(
+                                              e.courseId,
+                                            );
                                           return {
-                                            ...p,
-                                            enrollments: newEnrollments,
+                                            ...e,
+                                            status: shouldRevert
+                                              ? "PENDING"
+                                              : e.status,
                                           };
-                                        },
-                                      );
+                                        });
 
-                                      if (enrollmentsToRemove.length > 0) {
-                                        updatedPresent.splice(
-                                          pIndex + 1,
-                                          nextPeriods.length,
-                                          ...newNextPeriods,
-                                        );
-                                      }
-                                    }
+                                      return {
+                                        ...p,
+                                        enrollments: updatedEnrollments,
+                                      };
+                                    });
+                                  }
 
+                                  setHistory((prev) => {
                                     return {
                                       past: [...prev.past, prev.present].slice(
                                         -MAX_HISTORY,
                                       ),
-                                      present: updatedPresent,
+                                      present: updatedPeriods,
                                       future: [],
                                     };
                                   });
@@ -313,16 +323,16 @@ export default function RBDndCurriculum({
         </DragDropContext>
 
         {editMode && (
-          <div className="absolute bottom-4 right-4 flex h-8 w-16 flex-row justify-center rounded-md border bg-muted md:left-4">
+          <div className="absolute bottom-4 right-4 flex h-10 w-20 flex-row justify-center rounded-md border bg-muted md:left-4 md:h-8 md:w-16">
             <button
-              className="flex size-8 items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
+              className="flex size-full items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
               onClick={() => undo()}
               disabled={history.past.length === 0}
             >
               <Undo2 className="size-4" />
             </button>
             <button
-              className="flex size-8 items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
+              className="flex size-full items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
               onClick={redo}
               disabled={history.future.length === 0}
             >
@@ -402,7 +412,7 @@ export default function RBDndCurriculum({
     if (!sourceContainer || !destinationContainer) return;
     if (destinationContainer.enrollments.length >= 10) {
       toast({
-        title: "❌ Error",
+        title: "❌ Error: Límite de cursos",
         description:
           "No puedes mover un curso a un destino que contenga 10 cursos o más.",
       });
@@ -416,15 +426,20 @@ export default function RBDndCurriculum({
     });
 
     // 1. Check if the move is valid
-    if (
-      !isValidMove(
-        currentPeriods,
-        sourceContainerIndex,
-        destinationContainerIndex,
-        sourceCourse,
-      )
-    )
+    const { isValid, error } = isValidMove(
+      currentPeriods,
+      sourceContainerIndex,
+      destinationContainerIndex,
+      sourceCourse,
+    );
+
+    if (!isValid) {
+      toast({
+        title: "❌ Movimiento inválido",
+        description: error,
+      });
       return;
+    }
 
     // 2. Reorder the data
     const { newSourceContainer, newDestinationContainer } = reorder(
@@ -493,6 +508,54 @@ export default function RBDndCurriculum({
     loop(courseId);
     return coursesToRevert;
   }
+  function moveSubsequentCourses(
+    periods: PeriodWithEnrollments[],
+    courseId: number,
+  ) {
+    const newPeriods = [...periods];
+
+    function loop(courseId: number) {
+      const c = getCourse({
+        id: courseId,
+        courses,
+      });
+      if (!c) return;
+
+      // For each subsequent course, move it to the next period
+      c.subsequentIds.forEach((id) => {
+        const periodIndex = newPeriods.findIndex((p) =>
+          p.enrollments.some((e) => e.courseId === id),
+        );
+
+        if (periodIndex === -1) return;
+
+        const sourcePeriod = newPeriods[periodIndex];
+        const destinationPeriod = newPeriods[periodIndex + 1];
+
+        if (!sourcePeriod || !destinationPeriod) return;
+
+        const sourceIndex = sourcePeriod.enrollments.findIndex(
+          (e) => e.courseId === id,
+        );
+        const destinationIndex = destinationPeriod.enrollments.length;
+
+        const { newSourceContainer, newDestinationContainer } = reorder(
+          sourcePeriod,
+          destinationPeriod,
+          sourceIndex,
+          destinationIndex,
+        );
+
+        newPeriods[periodIndex] = newSourceContainer;
+        newPeriods[periodIndex + 1] = newDestinationContainer;
+
+        loop(id);
+      });
+    }
+
+    loop(courseId);
+    return newPeriods;
+  }
 }
 
 function updatePositions(container: PeriodWithEnrollments) {
@@ -559,85 +622,65 @@ function isValidMove(
   sourceContainerIndex: number,
   destinationContainerIndex: number,
   course: ModifiedCourse | null,
-) {
-  if (!course) return true;
+): { isValid: boolean; error?: string } {
+  // 💡 Maybe add credits limit. 30 credits per term, for example, 0 by default. User can change it.
+
+  // Enrollments without courses (if exist) can move anywhere.
+  // Enrollments with elective courses can move anywhere.
+  // Enrollments can move freely within the same container.
+  if (
+    !course ||
+    course.isElective ||
+    sourceContainerIndex === destinationContainerIndex
+  )
+    return { isValid: true };
 
   const destinationContainer = currentPeriods[destinationContainerIndex]!;
 
-  const hasContainerCourse = destinationContainer.enrollments.some(
+  const hasContainerSameCourse = destinationContainer.enrollments.some(
     (c) => c.courseId === course.id,
   );
 
-  if (
-    sourceContainerIndex !== destinationContainerIndex &&
-    hasContainerCourse &&
-    !course.isElective
-  ) {
-    toast({
-      title: "❌ Error",
-      description:
-        "No puedes mover un curso a un destino que contenga el mismo curso.",
-    });
-    return false;
-  }
-  if (sourceContainerIndex === destinationContainerIndex) return true;
+  if (hasContainerSameCourse)
+    return {
+      isValid: false,
+      error: "Este periodo ya tiene este curso.",
+    };
 
-  // 1. Check if the destination container has a course that is a prerequisite or subsequent of the course being moved
+  const isMovingForward = sourceContainerIndex < destinationContainerIndex;
+  const relatedIds = isMovingForward
+    ? course.subsequentIds
+    : course.prerequisiteIds;
+
   const hasContainerRelatedCourses = destinationContainer.enrollments.some(
-    (e) =>
-      course.prerequisiteIds.includes(e.courseId) ||
-      course.subsequentIds.includes(e.courseId),
+    (e) => relatedIds.includes(e.courseId),
   );
 
-  if (hasContainerRelatedCourses) {
-    toast({
-      title: "❌ Error",
-      description:
-        "No puedes mover un curso a un destino que contenga un curso prerequisito o sucesor.",
-    });
-    return false;
+  if (hasContainerRelatedCourses)
+    return {
+      isValid: false,
+      error: isMovingForward
+        ? "Este periodo tiene un curso sucesor."
+        : "Este periodo tiene un curso prerequisito.",
+    };
+
+  // Can not move after a subsequents or before a prerequisites courses
+  const [startIndex, endIndex] = isMovingForward
+    ? [sourceContainerIndex, destinationContainerIndex]
+    : [destinationContainerIndex, sourceContainerIndex];
+
+  const isBlockingRelatedCourses = currentPeriods
+    .slice(startIndex, endIndex)
+    .some((p) => p.enrollments.some((e) => relatedIds.includes(e.courseId)));
+
+  if (isBlockingRelatedCourses) {
+    return {
+      isValid: false,
+      error: isMovingForward
+        ? "Hay un curso sucesor en el camino."
+        : "Hay un curso prerequisito en el camino.",
+    };
   }
 
-  const hasBlockingCourses = (
-    startIndex: number,
-    endIndex: number,
-    relatedIds: number[],
-  ): boolean => {
-    const range = currentPeriods.slice(startIndex, endIndex);
-    return range.some((p) =>
-      p.enrollments.some((e) => relatedIds.includes(e.courseId)),
-    );
-  };
-
-  // 2. Check if the move will block any subsequent or prerequisite courses
-  if (sourceContainerIndex < destinationContainerIndex) {
-    const hasBlockingSubsequents = hasBlockingCourses(
-      sourceContainerIndex,
-      destinationContainerIndex,
-      course.subsequentIds,
-    );
-
-    if (hasBlockingSubsequents) {
-      toast({
-        title: "❌ Error",
-        description: "No puedes mover un curso adelante de un curso sucesor.",
-      });
-    }
-
-    return !hasBlockingSubsequents;
-  } else {
-    const hasBlockingPrerequisites = hasBlockingCourses(
-      destinationContainerIndex,
-      sourceContainerIndex,
-      course.prerequisiteIds,
-    );
-
-    if (hasBlockingPrerequisites) {
-      toast({
-        title: "❌ Error",
-        description: "No puedes mover un curso atrás de un curso prerequisito.",
-      });
-    }
-    return !hasBlockingPrerequisites;
-  }
+  return { isValid: true };
 }
