@@ -103,12 +103,14 @@ export default function ClientSideDashboard() {
       curriculums.length > 0 &&
       data
     ) {
-      const present = curriculums.find((c) => c.id === activeCurriculumId);
+      const activeCurriculum = curriculums.find(
+        (c) => c.id === activeCurriculumId,
+      );
 
-      if (!present) return;
+      if (!activeCurriculum) return;
 
       const { periods } = getPeriodsWithEnrollments({
-        enrollments: present.enrolledCourses,
+        enrollments: activeCurriculum.enrolledCourses,
       });
 
       setHistory({ ...history, present: periods });
@@ -140,34 +142,6 @@ export default function ClientSideDashboard() {
       history.present.flatMap((p) => p.enrollments),
       coursesMap,
     );
-
-  function getProgress(
-    enrollments: EnrolledCourse[],
-    coursesMap: Map<number, CurriculumData["courses"][0]>,
-  ) {
-    const totalEnrollments = enrollments.length;
-
-    const approvedEnrollments = enrollments.filter(
-      (e) => e.status === "APPROVED",
-    );
-    const failedEnrollments = enrollments.filter((e) => e.status === "FAILED");
-
-    const approvedCourses = approvedEnrollments
-      .map((e) => e.courseId)
-      .filter((id) => id !== null && id !== undefined);
-    const failedCourses = failedEnrollments
-      .map((e) => e.courseId)
-      .filter((id) => id !== null && id !== undefined);
-
-    const earnedCredits = approvedCourses.reduce(
-      (acc, courseId) => acc + (coursesMap.get(courseId)?.credits ?? 0),
-      0,
-    );
-
-    const progress = (approvedEnrollments.length / totalEnrollments) * 100;
-
-    return { progress, earnedCredits, approvedCourses, failedCourses };
-  }
 
   function handleEditMode() {
     if (history.past.length > 0) {
@@ -248,8 +222,45 @@ export default function ClientSideDashboard() {
 
       newPresent.splice(lastWithEnrollmentsIndex + 1);
 
-      return { ...history, past: [], present: newPresent, future: [] };
+      const updatedPeriods = newPresent.filter((p) => {
+        const term = Number(p.id.split("-")[1]!);
+
+        const hasEnrollments = p.enrollments.length > 0;
+        const isSemester = term === 1 || term === 3;
+
+        return hasEnrollments || isSemester;
+      });
+
+      return { ...history, past: [], present: updatedPeriods, future: [] };
     });
     updateCurriculumEnrollments(history.present.flatMap((p) => p.enrollments));
   }
+}
+
+function getProgress(
+  enrollments: EnrolledCourse[],
+  coursesMap: Map<number, CurriculumData["courses"][0]>,
+) {
+  const totalEnrollments = enrollments.length;
+
+  const approvedEnrollments = enrollments.filter(
+    (e) => e.status === "APPROVED",
+  );
+  const failedEnrollments = enrollments.filter((e) => e.status === "FAILED");
+
+  const approvedCourses = approvedEnrollments
+    .map((e) => e.courseId)
+    .filter((id) => id !== null && id !== undefined);
+  const failedCourses = failedEnrollments
+    .map((e) => e.courseId)
+    .filter((id) => id !== null && id !== undefined);
+
+  const earnedCredits = approvedCourses.reduce(
+    (acc, courseId) => acc + (coursesMap.get(courseId)?.credits ?? 0),
+    0,
+  );
+
+  const progress = (approvedEnrollments.length / totalEnrollments) * 100;
+
+  return { progress, earnedCredits, approvedCourses, failedCourses };
 }

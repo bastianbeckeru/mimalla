@@ -100,13 +100,11 @@ export function getPeriodsWithEnrollments({
   });
 
   for (let year = minYear; year <= maxYear; year++) {
-    for (let term = 1; term <= 2; term++) {
-      const periodKey: PeriodKey = `${year}-${term}`;
+    const firstSemesterKey: PeriodKey = `${year}-1`;
+    const secondSemesterKey: PeriodKey = `${year}-3`;
 
-      if (!periodMap.has(periodKey)) {
-        periodMap.set(periodKey, []);
-      }
-    }
+    if (!periodMap.has(firstSemesterKey)) periodMap.set(firstSemesterKey, []);
+    if (!periodMap.has(secondSemesterKey)) periodMap.set(secondSemesterKey, []);
   }
 
   const sortedPeriods = Array.from(periodMap.entries())
