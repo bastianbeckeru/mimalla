@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
 import { toast } from "@/hooks/use-toast";
+import type { EnrolledCourse } from "@/types/store";
 
 export default function ClientSideDashboard() {
   const {
@@ -134,20 +135,39 @@ export default function ClientSideDashboard() {
   const { institution, program, areas, courses } = data;
   const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
-  /* PROGRESS */
-  const enrollments = history.present.flatMap((p) => p.enrollments);
-  const totalEnrollments = enrollments.length;
-  const approvedEnrollments = enrollments.filter(
-    (e) => e.status === "APPROVED",
-  );
-  const approvedCourses = approvedEnrollments
-    .map((e) => coursesMap.get(e.courseId))
-    .filter((c) => c !== null && c !== undefined);
-  const approvedCredits = approvedCourses.reduce(
-    (acc, course) => acc + (course?.credits ?? 0),
-    0,
-  );
-  const progress = (approvedEnrollments.length / totalEnrollments) * 100;
+  const { progress, earnedCredits, approvedCourses, failedCourses } =
+    getProgress(
+      history.present.flatMap((p) => p.enrollments),
+      coursesMap,
+    );
+
+  function getProgress(
+    enrollments: EnrolledCourse[],
+    coursesMap: Map<number, CurriculumData["courses"][0]>,
+  ) {
+    const totalEnrollments = enrollments.length;
+
+    const approvedEnrollments = enrollments.filter(
+      (e) => e.status === "APPROVED",
+    );
+    const failedEnrollments = enrollments.filter((e) => e.status === "FAILED");
+
+    const approvedCourses = approvedEnrollments
+      .map((e) => e.courseId)
+      .filter((id) => id !== null && id !== undefined);
+    const failedCourses = failedEnrollments
+      .map((e) => e.courseId)
+      .filter((id) => id !== null && id !== undefined);
+
+    const earnedCredits = approvedCourses.reduce(
+      (acc, courseId) => acc + (coursesMap.get(courseId)?.credits ?? 0),
+      0,
+    );
+
+    const progress = (approvedEnrollments.length / totalEnrollments) * 100;
+
+    return { progress, earnedCredits, approvedCourses, failedCourses };
+  }
 
   function handleEditMode() {
     if (history.past.length > 0) {
@@ -170,7 +190,7 @@ export default function ClientSideDashboard() {
         setEditMode={handleEditMode}
         areas={areas}
         progress={progress}
-        approvedCredits={approvedCredits}
+        approvedCredits={earnedCredits}
       />
 
       <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr]">
@@ -209,8 +229,9 @@ export default function ClientSideDashboard() {
           setHistory={setHistory}
           areas={areas}
           courses={coursesMap}
-          approvedCourses={approvedCourses.map((c) => c.id)}
-          approvedCredits={approvedCredits}
+          approvedCourses={approvedCourses}
+          failedCourses={failedCourses}
+          approvedCredits={earnedCredits}
         />
       </SidebarInset>
     </SidebarProvider>

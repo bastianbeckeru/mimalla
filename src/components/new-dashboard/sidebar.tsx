@@ -164,16 +164,18 @@ export default function DashboardSidebar({
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button
-                variant="destructive"
-                type="submit"
-                onClick={() => {
-                  resetStore();
-                  setEditMode(false);
-                }}
-              >
-                Aceptar
-              </Button>
+              <DialogClose asChild>
+                <Button
+                  variant="destructive"
+                  type="submit"
+                  onClick={() => {
+                    resetStore();
+                    setEditMode(false);
+                  }}
+                >
+                  Aceptar
+                </Button>
+              </DialogClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>

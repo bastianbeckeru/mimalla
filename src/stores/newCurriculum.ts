@@ -74,14 +74,12 @@ export const useNewCurriculumStore = create(
           if (!state || !state.activeCurriculumId) return state;
 
           const newCurriculums = state.curriculums.map((c) => {
-            if (c.id === state.activeCurriculumId) {
-              return {
-                ...c,
-                enrolledCourses: newEnrollments,
-              };
-            }
+            if (c.id !== state.activeCurriculumId) return c;
 
-            return c;
+            return {
+              ...c,
+              enrolledCourses: newEnrollments,
+            };
           });
 
           return {
