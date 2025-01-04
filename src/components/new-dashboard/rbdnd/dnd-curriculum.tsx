@@ -126,7 +126,7 @@ export default function RBDndCurriculum({
     <>
       <ScrollAreaWrapper>
         <DragDropContext onDragEnd={handleOnDragEnd}>
-          <div className="flex select-none flex-row space-x-2 px-4 py-2">
+          <div className="flex select-none flex-row space-x-2 px-4 pb-2 pt-4">
             {years.map(({ year, count }) => (
               <div
                 key={year}
@@ -148,11 +148,10 @@ export default function RBDndCurriculum({
               </div>
             ))}
           </div>
-
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex h-max min-h-fit flex-row space-x-2 px-4"
+            className="flex h-max min-h-fit flex-row space-x-2 px-4 pb-4"
           >
             {history.present.map((period, pIndex) => (
               <Droppable droppableId={period.id} key={period.id}>
@@ -298,6 +297,12 @@ export default function RBDndCurriculum({
                                             nextPeriod.id
                                               .split("-")
                                               .map(Number);
+                                          const hasNextPeriodSubsequentCourses =
+                                            nextPeriod.enrollments.some((e) =>
+                                              course.subsequentIds.includes(
+                                                e.courseId,
+                                              ),
+                                            );
 
                                           nextPeriod.enrollments.push({
                                             ...newEnrollment,
@@ -307,12 +312,14 @@ export default function RBDndCurriculum({
                                             term: newTerm!,
                                           });
 
-                                          // Move every subsequent course to the next period
-                                          updatedPeriods =
-                                            moveSubsequentCourses(
-                                              updatedPeriods,
-                                              enrollment.courseId,
-                                            );
+                                          if (hasNextPeriodSubsequentCourses) {
+                                            // Move every subsequent course to the next period
+                                            updatedPeriods =
+                                              moveSubsequentCourses(
+                                                updatedPeriods,
+                                                enrollment.courseId,
+                                              );
+                                          }
                                         }
                                       }
                                     }
@@ -371,7 +378,7 @@ export default function RBDndCurriculum({
 
                     <button
                       className={cn(
-                        "hidden h-16 w-32 items-center justify-center rounded-md border text-muted-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                        "hidden h-16 w-32 items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                         editMode &&
                           "flex hover:bg-accent hover:text-accent-foreground",
                       )}
@@ -389,7 +396,7 @@ export default function RBDndCurriculum({
 
             <button
               className={cn(
-                "hidden w-32 flex-col items-center justify-center rounded-md border p-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                "-mt-6 hidden w-32 flex-col items-center justify-center rounded-md border p-2 text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                 editMode && "flex hover:bg-accent hover:text-accent-foreground",
               )}
               onClick={() => setOpenDialogId("add-period")}
@@ -729,6 +736,7 @@ export default function RBDndCurriculum({
       if (!c) return;
 
       // For each subsequent course, move it to the next period
+      // only if the previous course moved was a prerequisite and is in the same period
       c.subsequentIds.forEach((id) => {
         const periodIndex = newPeriods.findIndex((p) =>
           p.enrollments.some((e) => e.courseId === id),
@@ -740,6 +748,12 @@ export default function RBDndCurriculum({
         const destinationPeriod = newPeriods[periodIndex + 1];
 
         if (!sourcePeriod || !destinationPeriod) return;
+
+        const hasSourceContainerRelatedCourses = sourcePeriod.enrollments.some(
+          (e) => c.subsequentIds.includes(e.courseId),
+        );
+
+        if (!hasSourceContainerRelatedCourses) return;
 
         const sourceIndex = sourcePeriod.enrollments.findIndex(
           (e) => e.courseId === id,

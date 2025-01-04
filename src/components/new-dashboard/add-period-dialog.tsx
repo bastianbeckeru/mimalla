@@ -52,7 +52,14 @@ export default function AddPeriodDialog({
   ].map(Number);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        onOpenChange();
+        setSelectedYear(null);
+        setSelectedTerm(null);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Añadir Periodo</DialogTitle>
