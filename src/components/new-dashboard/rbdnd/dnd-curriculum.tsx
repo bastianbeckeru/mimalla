@@ -25,7 +25,7 @@ import {
 import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Undo2 } from "lucide-react";
+import { Plus, Trash, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { cn } from "@/lib/utils";
 import { nanoid } from "nanoid";
@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/select";
 import AddPeriodDialog from "../add-period-dialog";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import { useSettingsStore } from "@/stores/settings";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -85,6 +86,7 @@ export default function RBDndCurriculum({
   failedCourses,
   approvedCredits,
 }: RBDndCurriculum) {
+  const { showTimeline, autoRescheduleFailed } = useSettingsStore();
   const { curriculums, activeCurriculumId } = useNewCurriculumStore();
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
@@ -98,6 +100,7 @@ export default function RBDndCurriculum({
   const [selectedPeriodId, setSelectedPeriodId] = useState<PeriodKey | null>(
     null,
   );
+  const [isDragging, setIsDragging] = useState(false);
 
   useShortcuts([
     {
@@ -125,33 +128,42 @@ export default function RBDndCurriculum({
   return (
     <>
       <ScrollAreaWrapper>
-        <DragDropContext onDragEnd={handleOnDragEnd}>
-          <div className="flex select-none flex-row space-x-2 px-4 pb-2 pt-4">
-            {years.map(({ year, count }) => (
-              <div
-                key={year}
-                className={cn(
-                  "flex min-w-32 flex-row items-center justify-center",
-                  count === 2 && "w-[16.5rem]",
-                  count === 3 && "w-[25.0rem]",
-                  count === 4 && "w-[33.5rem]",
-                )}
-              >
-                <div className="h-px flex-grow bg-muted-foreground/50"></div>
-                <span
+        <DragDropContext
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={handleOnDragEnd}
+        >
+          {showTimeline && (
+            <div className="flex select-none flex-row space-x-2 px-4 pb-2 pt-4">
+              {years.map(({ year, count }) => (
+                <div
                   key={year}
-                  className="px-2 text-center text-xs font-bold tracking-wider text-muted-foreground/50"
+                  className={cn(
+                    "flex min-w-32 flex-row items-center justify-center",
+                    count === 2 && "w-[16.5rem]",
+                    count === 3 && "w-[25.0rem]",
+                    count === 4 && "w-[33.5rem]",
+                  )}
                 >
-                  {Number(year) + enrolledYear - 1}
-                </span>
-                <div className="h-px flex-grow bg-muted-foreground/50"></div>
-              </div>
-            ))}
-          </div>
+                  <div className="h-px flex-grow bg-muted-foreground/50"></div>
+                  <span
+                    key={year}
+                    className="px-2 text-center text-xs font-bold tracking-wider text-muted-foreground/50"
+                  >
+                    {Number(year) + enrolledYear - 1}
+                  </span>
+                  <div className="h-px flex-grow bg-muted-foreground/50"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex h-max min-h-fit flex-row space-x-2 px-4 pb-4"
+            className={cn(
+              "flex h-max min-h-fit flex-row space-x-2 px-4 pb-4",
+              !showTimeline && "pt-4",
+            )}
           >
             {history.present.map((period, pIndex) => (
               <Droppable droppableId={period.id} key={period.id}>
@@ -230,9 +242,7 @@ export default function RBDndCurriculum({
                                               };
                                             }
 
-                                            return {
-                                              ...e,
-                                            };
+                                            return e;
                                           });
 
                                         return {
@@ -240,7 +250,7 @@ export default function RBDndCurriculum({
                                           enrollments: updatedEnrollments,
                                         };
                                       }
-                                      return { ...p };
+                                      return p;
                                     });
                                   } else {
                                     const coursesToRevert =
@@ -253,7 +263,10 @@ export default function RBDndCurriculum({
                                     );
 
                                     // EXTRA LOGIC
-                                    if (newStatus === "FAILED") {
+                                    if (
+                                      newStatus === "FAILED" &&
+                                      autoRescheduleFailed
+                                    ) {
                                       // Add a new enrollment with the same course to the next period
                                       const nextPeriod = updatedPeriods.at(
                                         pIndex + 1,
@@ -393,6 +406,26 @@ export default function RBDndCurriculum({
                 )}
               </Droppable>
             ))}
+
+            {editMode && (
+              <Droppable droppableId="trash">
+                {(provided, snapshot) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    id="trash"
+                    className={cn(
+                      "absolute inset-x-2/4 bottom-4 flex h-20 w-36 -translate-x-1/2 items-center justify-center rounded-md border bg-muted p-2 transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                      snapshot.isDraggingOver &&
+                        "border-2 border-foreground bg-accent",
+                    )}
+                  >
+                    <Trash />
+                    <div className="absolute">{provided.placeholder}</div>
+                  </div>
+                )}
+              </Droppable>
+            )}
 
             <button
               className={cn(
@@ -646,10 +679,32 @@ export default function RBDndCurriculum({
     const sourceContainer = currentPeriods[sourceContainerIndex];
     const destinationContainer = currentPeriods[destinationContainerIndex];
 
+    if (sourceContainer && destination.droppableId === "trash") {
+      setHistory((prev) => {
+        const newPresent = prev.present.map((p) => {
+          if (p.id === sourceContainer.id)
+            return {
+              ...p,
+              enrollments: p.enrollments.filter(
+                (_, index) => index !== source.index,
+              ),
+            };
+          return p;
+        });
+
+        return {
+          past: [...prev.past, prev.present].slice(-MAX_HISTORY),
+          present: newPresent,
+          future: [],
+        };
+      });
+      setIsDragging(false);
+    }
     if (!sourceContainer || !destinationContainer) return;
+
     if (destinationContainer.enrollments.length >= 10) {
       toast({
-        title: "❌ Error: Límite de cursos",
+        title: "❌ Límite de cursos",
         description:
           "No puedes mover un curso a un destino que contenga 10 cursos o más.",
       });
@@ -700,6 +755,7 @@ export default function RBDndCurriculum({
         future: [],
       };
     });
+    setIsDragging(false);
   }
 
   function collectSubsequentCourses(courseId: number) {

@@ -1,13 +1,24 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 /* SETTINGS STORE */
-export const useSettingsStore = create<useSettingsStoreProps>((set) => ({
-  editMode: false,
-  setEditMode: (newState) => set((state) => ({ ...state, editMode: newState })),
-}));
+export const useSettingsStore = create(
+  persist<useSettingsStoreProps>(
+    (set) => ({
+      showTimeline: false,
+      setShowTimeline: (newState: boolean) => set({ showTimeline: newState }),
+      autoRescheduleFailed: false,
+      setRescheduleFailed: (newState: boolean) =>
+        set({ autoRescheduleFailed: newState }),
+    }),
+    { name: "settings", version: 1 },
+  ),
+);
 
 /* TYPES */
 type useSettingsStoreProps = {
-  editMode: boolean;
-  setEditMode: (newState: boolean) => void;
+  showTimeline: boolean;
+  autoRescheduleFailed: boolean;
+  setShowTimeline: (newState: boolean) => void;
+  setRescheduleFailed: (newState: boolean) => void;
 };
