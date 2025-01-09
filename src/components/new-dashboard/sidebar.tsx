@@ -120,15 +120,15 @@ export default function DashboardSidebar({
               {fixedAreas.map((area, aIndex) => (
                 <li
                   key={aIndex}
-                  className="flex w-full flex-row items-center justify-between space-x-2"
+                  className="flex w-full flex-row items-center space-x-2"
                 >
-                  <span className="line-clamp-1">{area.name}</span>
                   <div
                     className="size-4 shrink-0 rounded-sm shadow-inner"
                     style={{
                       backgroundColor: area.color,
                     }}
                   ></div>
+                  <span className="line-clamp-1">{area.name}</span>
                 </li>
               ))}
             </SidebarGroupContent>

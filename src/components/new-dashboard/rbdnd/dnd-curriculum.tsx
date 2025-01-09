@@ -127,11 +127,11 @@ export default function RBDndCurriculum({
 
   return (
     <>
-      <ScrollAreaWrapper>
-        <DragDropContext
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={handleOnDragEnd}
-        >
+      <DragDropContext
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={handleOnDragEnd}
+      >
+        <ScrollAreaWrapper>
           {showTimeline && (
             <div className="flex select-none flex-row space-x-2 px-4 pb-2 pt-4">
               {years.map(({ year, count }) => (
@@ -391,7 +391,7 @@ export default function RBDndCurriculum({
 
                     <button
                       className={cn(
-                        "hidden h-16 w-32 items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                        "hidden h-8 w-32 items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                         editMode &&
                           "flex hover:bg-accent hover:text-accent-foreground",
                       )}
@@ -407,29 +407,9 @@ export default function RBDndCurriculum({
               </Droppable>
             ))}
 
-            {editMode && (
-              <Droppable droppableId="trash">
-                {(provided, snapshot) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    id="trash"
-                    className={cn(
-                      "absolute inset-x-2/4 bottom-4 flex h-20 w-36 -translate-x-1/2 items-center justify-center rounded-md border bg-muted p-2 transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                      snapshot.isDraggingOver &&
-                        "border-2 border-foreground bg-accent",
-                    )}
-                  >
-                    <Trash />
-                    <div className="absolute">{provided.placeholder}</div>
-                  </div>
-                )}
-              </Droppable>
-            )}
-
             <button
               className={cn(
-                "-mt-6 hidden w-32 flex-col items-center justify-center rounded-md border p-2 text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                "hidden w-32 flex-col items-center justify-center rounded-md border p-2 text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                 editMode && "flex hover:bg-accent hover:text-accent-foreground",
               )}
               onClick={() => setOpenDialogId("add-period")}
@@ -437,27 +417,53 @@ export default function RBDndCurriculum({
               <Plus />
             </button>
           </MotionDiv>
-        </DragDropContext>
+        </ScrollAreaWrapper>
 
         {editMode && (
-          <div className="absolute bottom-4 right-4 flex h-10 w-20 flex-row justify-center rounded-md border bg-muted md:left-4 md:h-8 md:w-16">
-            <button
-              className="flex size-full items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
-              onClick={() => undo()}
-              disabled={history.past.length === 0}
-            >
-              <Undo2 className="size-4" />
-            </button>
-            <button
-              className="flex size-full items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted"
-              onClick={redo}
-              disabled={history.future.length === 0}
-            >
-              <Undo2 className="size-4 -scale-x-100" />
-            </button>
+          <div className="m-2 grid grid-cols-3 items-center rounded-md bg-muted p-2 transition-transform md:bg-transparent">
+            <div></div>
+
+            <div className="mx-auto">
+              <Droppable droppableId="trash">
+                {(provided, snapshot) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    id="trash"
+                    className={cn(
+                      "flex h-10 w-24 items-center justify-center rounded-md bg-black/25 p-2 shadow-inner transition-all md:h-14 md:w-32 md:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                      snapshot.isDraggingOver &&
+                        "h-20 w-36 border-2 border-foreground bg-destructive md:h-20 md:w-36 md:bg-destructive",
+                    )}
+                  >
+                    <Trash className="absolute" />
+                    <div>{provided.placeholder}</div>
+                  </div>
+                )}
+              </Droppable>
+            </div>
+
+            <div className="flex size-full items-end justify-end">
+              <div className="flex h-10 w-28 flex-row items-center justify-end rounded-md bg-muted md:h-8 md:w-16">
+                <button
+                  className="flex size-full items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                  onClick={() => undo()}
+                  disabled={history.past.length === 0}
+                >
+                  <Undo2 />
+                </button>
+                <button
+                  className="flex size-full items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                  onClick={redo}
+                  disabled={history.future.length === 0}
+                >
+                  <Undo2 className="-scale-x-100" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
-      </ScrollAreaWrapper>
+      </DragDropContext>
 
       <CourseDialog
         isOpen={openDialogId === "course-info"}
