@@ -7,6 +7,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -77,6 +78,12 @@ export function Searchbar() {
                 onClick={() => setOpen(false)}
               >
                 Ingeniería Civil Plan Común
+              </Link>
+            </CommandItem>
+            <CommandSeparator />
+            <CommandItem asChild>
+              <Link href="/udp/psicologia" onClick={() => setOpen(false)}>
+                Psicología
               </Link>
             </CommandItem>
           </CommandGroup>

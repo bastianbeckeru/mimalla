@@ -68,6 +68,10 @@ const institutions = [
           { name: "Ingeniería Civil Plan Común", siesCode: "I3S1C300J1V1" },
         ],
       },
+      {
+        name: "Facultad de Psicología",
+        programs: [{ name: "Psicología", siesCode: "I3S1C12J1V1" }],
+      },
     ],
   },
 ];
