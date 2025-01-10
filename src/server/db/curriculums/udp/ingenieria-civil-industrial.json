@@ -444,7 +444,7 @@
       "code": "CIG1014",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [21],
+      "prerequisiteIds": [20],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -477,7 +477,7 @@
       "code": "CII2755",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [17, 24],
+      "prerequisiteIds": [16, 24],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -488,7 +488,7 @@
       "code": "CII2101",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [20, 24],
+      "prerequisiteIds": [19, 24],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -653,7 +653,7 @@
       "code": "CII3102",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [40],
+      "prerequisiteIds": [41],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
