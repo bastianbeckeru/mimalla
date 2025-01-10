@@ -651,7 +651,7 @@
     },
     {
       "id": 2,
-      "name": "Ingeniería Civil Industrial",
+      "name": "Ingeniería Civil en Obras Civiles",
       "type": "PROFESSIONAL",
       "requiredCourseIds": [1, 2],
       "requiredElectives": [1]
@@ -660,7 +660,7 @@
   "plans": [
     {
       "id": 1,
-      "name": "Ingeniería Civil Industrial",
+      "name": "Ingeniería Civil en Obras Civiles",
       "type": "NONE",
       "areCoursesMandatory": true,
       "courseIds": [1, 2],
@@ -676,7 +676,7 @@
     },
     {
       "id": 3,
-      "name": "Ingeniería Civil Industrial",
+      "name": "Ingeniería Civil en Obras Civiles",
       "type": "PROFESSIONAL",
       "areCoursesMandatory": true,
       "courseIds": [8],
