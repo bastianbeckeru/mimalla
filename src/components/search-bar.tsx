@@ -57,6 +57,22 @@ export function Searchbar() {
             </CommandItem>
             <CommandItem asChild>
               <Link
+                href="/udp/ingenieria-civil-en-informatica-y-telecomunicaciones"
+                onClick={() => setOpen(false)}
+              >
+                Ingeniería Civil en Informática y Telecomunicaciones
+              </Link>
+            </CommandItem>
+            <CommandItem asChild>
+              <Link
+                href="/udp/ingenieria-civil-en-obras-civiles"
+                onClick={() => setOpen(false)}
+              >
+                Ingeniería Civil en Obras Civiles
+              </Link>
+            </CommandItem>
+            <CommandItem asChild>
+              <Link
                 href="/udp/ingenieria-civil-plan-comun"
                 onClick={() => setOpen(false)}
               >

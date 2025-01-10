@@ -8,6 +8,7 @@ import CurriculumView from "@/components/curriculum/curriculum-view";
 import { getPeriods } from "@/utils/curriculum";
 import ProgramInfo from "@/components/curriculum/program-info";
 import { getProgramData } from "@/utils/curriculum-data";
+import ImportCurriculumButton from "@/components/curriculum/import-button";
 
 export const dynamicParams = false;
 
@@ -61,7 +62,13 @@ export default async function ProgramPage({ params }: ProgramParams) {
           program={program}
           degrees={degrees}
           duration={periods.length}
-        />
+        >
+          <ImportCurriculumButton
+            institution={institution}
+            program={program}
+            curriculum={data.curriculum}
+          />
+        </ProgramInfo>
       </div>
     </div>
   );
