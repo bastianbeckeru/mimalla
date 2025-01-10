@@ -1,6 +1,10 @@
 "use client";
 
-import type { CurriculumData } from "@/types/curriculum";
+import type {
+  CurriculumData,
+  History,
+  PeriodWithEnrollments,
+} from "@/types/curriculum";
 
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import { getLuminance, parseHexColor } from "@/utils/colors";
@@ -39,6 +43,7 @@ type DashboardSidebar = {
   areas: CurriculumData["areas"];
   progress: number;
   approvedCredits: number;
+  setHistory: (history: History<PeriodWithEnrollments[]>) => void;
 };
 
 export default function DashboardSidebar({
@@ -47,6 +52,7 @@ export default function DashboardSidebar({
   areas,
   progress,
   approvedCredits,
+  setHistory,
   ...props
 }: DashboardSidebar) {
   const { resetStore } = useNewCurriculumStore();
@@ -170,6 +176,7 @@ export default function DashboardSidebar({
                   type="submit"
                   onClick={() => {
                     resetStore();
+                    setHistory({ past: [], present: [], future: [] });
                     setEditMode(false);
                   }}
                 >

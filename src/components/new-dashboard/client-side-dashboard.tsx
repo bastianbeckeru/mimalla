@@ -135,12 +135,11 @@ export default function ClientSideDashboard() {
     );
 
   const { institution, program, areas, courses } = data;
-  const coursesMap = new Map(courses.map((c) => [c.id, c]));
 
   const { progress, earnedCredits, approvedCourses, failedCourses } =
     getProgress(
       history.present.flatMap((p) => p.enrollments),
-      coursesMap,
+      new Map(courses.map((c) => [c.id, c])),
     );
 
   function handleEditMode() {
@@ -165,6 +164,7 @@ export default function ClientSideDashboard() {
         areas={areas}
         progress={progress}
         approvedCredits={earnedCredits}
+        setHistory={setHistory}
       />
 
       <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr]">
@@ -202,7 +202,7 @@ export default function ClientSideDashboard() {
           history={history}
           setHistory={setHistory}
           areas={areas}
-          courses={coursesMap}
+          courses={new Map(courses.map((c) => [c.id, c]))}
           approvedCourses={approvedCourses}
           failedCourses={failedCourses}
           approvedCredits={earnedCredits}

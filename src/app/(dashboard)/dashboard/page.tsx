@@ -1,5 +1,5 @@
-import View from "@/components/dashboard/View";
+import ClientSideDashboard from "@/components/new-dashboard/client-side-dashboard";
 
-export default async function DashboardPage() {
-  return <View />;
+export default function DashboardPage() {
+  return <ClientSideDashboard />;
 }

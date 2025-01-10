@@ -117,9 +117,10 @@ export default function RBDndCurriculum({
     },
   ]);
 
-  const coursesAllowedToAdd = Array.from(courses.values()).filter(
+  /*   const coursesAllowedToAdd = Array.from(courses.values()).filter(
     (c) => failedCourses.includes(c.id) || c.isElective,
-  );
+  ); */
+  const coursesAllowedToAdd = Array.from(courses.values());
 
   const years = countYearOccurrences(history.present);
   const enrolledYear =
@@ -436,8 +437,8 @@ export default function RBDndCurriculum({
                         "h-20 w-36 border-2 border-foreground bg-destructive md:h-20 md:w-36 md:bg-destructive",
                     )}
                   >
-                    <Trash className="absolute" />
-                    <div>{provided.placeholder}</div>
+                    <Trash />
+                    <div className="absolute">{provided.placeholder}</div>
                   </div>
                 )}
               </Droppable>

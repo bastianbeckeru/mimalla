@@ -6,11 +6,13 @@ export default function ProgramInfo({
   program,
   degrees,
   duration,
+  children,
 }: {
   institution: CurriculumData["institution"];
   program: CurriculumData["program"];
   degrees: CurriculumData["degrees"];
   duration: number;
+  children?: React.ReactNode;
 }) {
   const professionalTitle = degrees.find((d) => d.type === "PROFESSIONAL");
   const academicTitle = degrees.find((d) => d.type === "ACADEMIC");
@@ -40,6 +42,8 @@ export default function ProgramInfo({
           <InfoItem label="Código SIES" value={siesCode} />
           <InfoItem label="Código DEMRE" value={demreCode} />
         </div>
+
+        {children}
       </CardContent>
     </Card>
   );

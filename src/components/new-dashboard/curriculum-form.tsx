@@ -29,7 +29,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { getProgramData } from "@/utils/curriculum-data";
-import { CurriculumData } from "@/types/curriculum";
+import type { CurriculumData } from "@/types/curriculum";
 
 type Institution = {
   acronym: string;
@@ -57,6 +57,14 @@ const institutions = [
         name: "Facultad de Ingeniería y Ciencias",
         programs: [
           { name: "Ingeniería Civil Industrial", siesCode: "I3S1C10J1V1" },
+          {
+            name: "Ingeniería Civil en Informática y Telecomunicaciones",
+            siesCode: "I3S1C11J1V1",
+          },
+          {
+            name: "Ingeniería Civil en Obras Civiles",
+            siesCode: "I3S1C49J1V1",
+          },
           { name: "Ingeniería Civil Plan Común", siesCode: "I3S1C300J1V1" },
         ],
       },

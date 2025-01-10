@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { checkContrasts } from "@/utils/colors";
 
 import { useState } from "react";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Card, CardContent } from "../ui/card";
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
@@ -46,7 +45,7 @@ export default function CurriculumView({
   };
 
   return (
-    <ScrollAreaWrapper className={cn("flex-grow shadow-inner", className)}>
+    <ScrollAreaWrapper className={cn("flex-grow", className)}>
       <div className="p-2">
         <div
           className="flex flex-row gap-2"
@@ -67,7 +66,7 @@ export default function CurriculumView({
                 }}
               >
                 <span
-                  className={`text-center text-xs font-bold tracking-wider text-muted-foreground`}
+                  className={`w-full text-center text-xs font-bold tracking-wider text-muted-foreground`}
                 >
                   SEMESTRE {arabicToRoman(pIndex + 1)}
                 </span>
@@ -99,7 +98,7 @@ export default function CurriculumView({
               <Card
                 key={`${slot.year}-${slot.term}-${slot.position}`}
                 className={cn(
-                  "cursor-pointer hover:brightness-95 dark:hover:brightness-105",
+                  "cursor-pointer select-none hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
                   hasLowBackgroundElementContrast &&
                     "border border-foreground/50",
                   hasLowElementTextContrast && "text-background",

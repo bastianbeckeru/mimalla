@@ -1,0 +1,739 @@
+{
+  "institution": { "name": "Universidad Diego Portales", "acronym": "UDP" },
+  "department": {
+    "name": "Facultad de Ingeniería y Ciencias",
+    "acronym": "FIC"
+  },
+  "program": {
+    "name": "Ingeniería Civil en Informática y Telecomunicaciones",
+    "siesCode": "I3S1C11J1V1",
+    "demreCode": 38175,
+    "schedule": "DAYTIME"
+  },
+  "curriculum": {
+    "version": "v4",
+    "year": 2020,
+    "slots": [
+      { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 1 },
+      { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 2 },
+      { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 3 },
+      { "id": 4, "year": 1, "term": 1, "position": 4, "courseId": 4 },
+      { "id": 5, "year": 1, "term": 1, "position": 5, "courseId": 5 },
+      { "id": 6, "year": 1, "term": 3, "position": 1, "courseId": 6 },
+      { "id": 7, "year": 1, "term": 3, "position": 2, "courseId": 7 },
+      { "id": 8, "year": 1, "term": 3, "position": 3, "courseId": 8 },
+      { "id": 9, "year": 1, "term": 3, "position": 4, "courseId": 9 },
+      { "id": 10, "year": 1, "term": 3, "position": 5, "courseId": 10 },
+      { "id": 11, "year": 2, "term": 1, "position": 1, "courseId": 11 },
+      { "id": 12, "year": 2, "term": 1, "position": 2, "courseId": 12 },
+      { "id": 13, "year": 2, "term": 1, "position": 3, "courseId": 13 },
+      { "id": 14, "year": 2, "term": 1, "position": 4, "courseId": 47 },
+      { "id": 15, "year": 2, "term": 1, "position": 5, "courseId": 48 },
+      { "id": 16, "year": 2, "term": 3, "position": 1, "courseId": 16 },
+      { "id": 17, "year": 2, "term": 3, "position": 2, "courseId": 49 },
+      { "id": 18, "year": 2, "term": 3, "position": 3, "courseId": 18 },
+      { "id": 19, "year": 2, "term": 3, "position": 4, "courseId": 50 },
+      { "id": 20, "year": 2, "term": 3, "position": 5, "courseId": 51 },
+      { "id": 21, "year": 2, "term": 3, "position": 6, "courseId": 15 },
+      { "id": 22, "year": 2, "term": 3, "position": 7, "courseId": 52 },
+      { "id": 23, "year": 3, "term": 1, "position": 1, "courseId": 24 },
+      { "id": 24, "year": 3, "term": 1, "position": 2, "courseId": 53 },
+      { "id": 25, "year": 3, "term": 1, "position": 3, "courseId": 54 },
+      { "id": 26, "year": 3, "term": 1, "position": 4, "courseId": 55 },
+      { "id": 27, "year": 3, "term": 1, "position": 5, "courseId": 10 },
+      { "id": 28, "year": 3, "term": 1, "position": 6, "courseId": 20 },
+      { "id": 29, "year": 3, "term": 3, "position": 1, "courseId": 14 },
+      { "id": 30, "year": 3, "term": 3, "position": 2, "courseId": 56 },
+      { "id": 31, "year": 3, "term": 3, "position": 3, "courseId": 57 },
+      { "id": 32, "year": 3, "term": 3, "position": 4, "courseId": 58 },
+      { "id": 33, "year": 3, "term": 3, "position": 5, "courseId": 10 },
+      { "id": 34, "year": 3, "term": 3, "position": 6, "courseId": 26 },
+      { "id": 35, "year": 4, "term": 1, "position": 1, "courseId": 59 },
+      { "id": 36, "year": 4, "term": 1, "position": 2, "courseId": 60 },
+      { "id": 37, "year": 4, "term": 1, "position": 3, "courseId": 61 },
+      { "id": 38, "year": 4, "term": 1, "position": 4, "courseId": 62 },
+      { "id": 39, "year": 4, "term": 1, "position": 5, "courseId": 10 },
+      { "id": 40, "year": 4, "term": 3, "position": 1, "courseId": 19 },
+      { "id": 41, "year": 4, "term": 3, "position": 2, "courseId": 63 },
+      { "id": 42, "year": 4, "term": 3, "position": 3, "courseId": 64 },
+      { "id": 43, "year": 4, "term": 3, "position": 4, "courseId": 65 },
+      { "id": 44, "year": 4, "term": 3, "position": 5, "courseId": 66 },
+      { "id": 45, "year": 4, "term": 3, "position": 6, "courseId": 67 },
+      { "id": 46, "year": 5, "term": 1, "position": 1, "courseId": 68 },
+      { "id": 47, "year": 5, "term": 1, "position": 2, "courseId": 69 },
+      { "id": 48, "year": 5, "term": 1, "position": 3, "courseId": 70 },
+      { "id": 49, "year": 5, "term": 1, "position": 4, "courseId": 71 },
+      { "id": 50, "year": 5, "term": 1, "position": 5, "courseId": 72 },
+      { "id": 51, "year": 5, "term": 3, "position": 1, "courseId": 68 },
+      { "id": 52, "year": 5, "term": 3, "position": 2, "courseId": 70 },
+      { "id": 53, "year": 5, "term": 3, "position": 3, "courseId": 70 },
+      { "id": 54, "year": 5, "term": 3, "position": 4, "courseId": 68 },
+      { "id": 55, "year": 5, "term": 3, "position": 5, "courseId": 73 },
+      { "id": 56, "year": 6, "term": 1, "position": 1, "courseId": 74 }
+    ]
+  },
+  "areas": [
+    {
+      "id": 1,
+      "name": "Formación General e Inglés",
+      "color": "#FFFFFF",
+      "courseIds": [5, 10, 20, 21, 26, 41, 44, 45, 46, 87, 97, 103],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias Básicas",
+      "color": "#34C1CD",
+      "courseIds": [1, 2, 3, 6, 7, 8, 11, 12, 13, 18],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 3,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#BBE5EB",
+      "courseIds": [
+        4, 9, 14, 16, 17, 19, 22, 23, 24, 25, 28, 29, 30, 49, 59, 75, 76, 77,
+        78, 82, 85, 86
+      ],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 4,
+      "name": "Formación en Ingeniería Aplicada",
+      "color": "#818284",
+      "courseIds": [
+        27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 43, 79, 80, 81, 83, 84,
+        88, 89, 90, 91, 92, 93, 94, 95, 96, 98, 99, 100, 101, 102
+      ],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 5,
+      "name": "Formación en Ingeniería Aplicada: Informática",
+      "color": "#AFCEC3",
+      "courseIds": [47, 50, 51, 55, 58, 60, 62, 68, 71],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 6,
+      "name": "Formación en Ingeniería Aplicada: Telecomunicaciones",
+      "color": "#719FC0",
+      "courseIds": [48, 53, 56, 57, 61, 63, 64, 69, 70],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 7,
+      "name": "Formación en Ingeniería Aplicada: Proyectos e Integración",
+      "color": "#AFC7DA",
+      "courseIds": [54, 66, 72, 73],
+      "electiveIds": [],
+      "subareaIds": []
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 2,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 3,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 4,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 5,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 6,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [1],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 7,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 8,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 9,
+      "name": "Programación Avanzada",
+      "code": "CIT1010",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [4],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 10,
+      "isElective": true,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "duration": 1
+    },
+    {
+      "id": 11,
+      "name": "Ecuaciones Diferenciales",
+      "code": "CBM1005",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [6, 7],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 12,
+      "name": "Cálculo III",
+      "code": "CBM1006",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 13,
+      "name": "Calor y Ondas",
+      "code": "CBF1001",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [7, 8],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 14,
+      "name": "Contabilidad y Costos",
+      "code": "CII1000",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [2],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 15,
+      "name": "Inglés I",
+      "code": "CIG1012",
+      "credits": 5,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 16,
+      "name": "Probabilidades y Estadística",
+      "code": "CBE2000",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 18,
+      "name": "Electricidad y Magnetismo",
+      "code": "CBF1002",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [11, 12],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 19,
+      "name": "Introducción a la Economía",
+      "code": "CII2100",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [7],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 20,
+      "name": "Inglés II",
+      "code": "CIG1013",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [15],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 24,
+      "name": "Optimización",
+      "code": "CII2750",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [6, 12],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 26,
+      "name": "Inglés III",
+      "code": "CIG1014",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [21],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 47,
+      "name": "Estructura de Datos y Algoritmos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [9],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 48,
+      "name": "Redes de Datos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [9],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 49,
+      "name": "Electrónica y Electrotecnia",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [8, 11, 12],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 50,
+      "name": "Bases de Datos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [47],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 51,
+      "name": "Desarrollo Web y Móvil",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [9],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 52,
+      "name": "Práctica Profesional I",
+      "code": "",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 134,
+      "isElective": false,
+      "duration": 2
+    },
+    {
+      "id": 53,
+      "name": "Taller de Redes y Servicios",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [48, 16],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 54,
+      "name": "Proyectos en TICs I",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [48, 51],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 55,
+      "name": "Bases de Datos Avanzadas",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [50],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 56,
+      "name": "Arquitectura y Organización de Computadores",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [48, 49],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 57,
+      "name": "Señales y Sistemas",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [13, 49],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 58,
+      "name": "Sistemas Operativos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [47, 53],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 59,
+      "name": "Gestión Organizacional",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [52],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 60,
+      "name": "Sistemas Distribuidos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [48, 58],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 61,
+      "name": "Comunicaciones Digitales",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [18, 57],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 62,
+      "name": "Ingeniería de Software",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [50, 54],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 63,
+      "name": "Tecnologías Inalámbricas",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [61],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 64,
+      "name": "Criptografía y Seguridad en Redes",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [53],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 65,
+      "name": "Inteligencia Artificial",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [16, 50, 24],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 66,
+      "name": "Evaluación de Proyectos TIC",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [14, 59, 62],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 67,
+      "name": "Práctica Profesional II",
+      "code": "",
+      "credits": 7,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 268,
+      "isElective": false,
+      "duration": 2
+    },
+    {
+      "id": 68,
+      "name": "Electivo Profesional",
+      "code": "CITXXXX",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": true,
+      "duration": 1
+    },
+    {
+      "id": 69,
+      "name": "Arquitecturas Emergentes",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [60],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 70,
+      "name": "Electivo Profesional",
+      "code": "CITYYYY",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": true,
+      "duration": 1
+    },
+    {
+      "id": 71,
+      "name": "Arquitectura de Software",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [62],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 72,
+      "name": "Data Science",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [55, 65],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 73,
+      "name": "Proyectos en TICs II",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [66],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 74,
+      "name": "Actividad de Titulación",
+      "code": "",
+      "credits": 30,
+      "description": null,
+      "prerequisiteIds": [52, 67],
+      "prerequisiteCredits": 336,
+      "isElective": true,
+      "duration": 1
+    }
+  ],
+  "degrees": [
+    {
+      "id": 1,
+      "name": "Licenciatura en Ciencias de la Ingeniería",
+      "type": "ACADEMIC",
+      "requiredCourseIds": [1, 2]
+    },
+    {
+      "id": 2,
+      "name": "Ingeniería Civil Industrial",
+      "type": "PROFESSIONAL",
+      "requiredCourseIds": [1, 2],
+      "requiredElectives": [1]
+    }
+  ],
+  "plans": [
+    {
+      "id": 1,
+      "name": "Ingeniería Civil Industrial",
+      "type": "NONE",
+      "areCoursesMandatory": true,
+      "courseIds": [1, 2],
+      "subplanIds": [2, 3]
+    },
+    {
+      "id": 2,
+      "name": "Licenciatura en Ciencias de la Ingeniería",
+      "type": "ACADEMIC",
+      "areCoursesMandatory": true,
+      "courseIds": [3, 4],
+      "subplanIds": [3]
+    },
+    {
+      "id": 3,
+      "name": "Ingeniería Civil Industrial",
+      "type": "PROFESSIONAL",
+      "areCoursesMandatory": true,
+      "courseIds": [8],
+      "subplanIds": [4]
+    },
+    {
+      "id": 4,
+      "name": "Cursos de Formación General",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 20,
+      "courseIds": [5, 6, 7],
+      "subplanIds": []
+    },
+    {
+      "id": 5,
+      "name": "Electivos Profesionales",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 36,
+      "courseIds": [8, 10, 11],
+      "subplanIds": []
+    }
+  ]
+}
