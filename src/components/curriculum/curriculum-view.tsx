@@ -22,7 +22,7 @@ const GRID_CELL_WIDTH = 8;
 const GRID_CELL_HEIGHT = 4;
 const GRID_GAP = 0.5;
 const PADDING = 0.5;
-const FONTSIZE = 14;
+const FONTSIZE = 16;
 
 export default function CurriculumView({
   data,
