@@ -57,7 +57,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
           data={data}
         />
 
-        <ProgramInfo
+        {/*         <ProgramInfo
           institution={institution}
           program={program}
           degrees={degrees}
@@ -68,7 +68,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
             program={program}
             curriculum={data.curriculum}
           />
-        </ProgramInfo>
+        </ProgramInfo> */}
       </div>
     </div>
   );

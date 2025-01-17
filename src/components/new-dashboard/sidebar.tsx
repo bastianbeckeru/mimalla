@@ -35,7 +35,7 @@ import {
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
-import { Pencil, PencilOff, Trash2 } from "lucide-react";
+import { Pencil, PencilOff, Trash } from "lucide-react";
 
 type DashboardSidebar = {
   editMode: boolean;
@@ -153,7 +153,7 @@ export default function DashboardSidebar({
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outlineDestructive" className="w-full gap-2">
-              <Trash2 className="size-4" />
+              <Trash className="size-4" />
               Eliminar Malla
             </Button>
           </DialogTrigger>
