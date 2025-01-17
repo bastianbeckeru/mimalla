@@ -142,7 +142,7 @@ export default function CurriculumView({
               </Card>
             );
           })}
-          <svg className="absolute inset-0 -z-50 size-full">
+          <svg className="absolute inset-0 -top-2 -z-50 size-full md:top-0">
             {isHovering &&
               relatedPaths.map((related) => {
                 return related.paths.map((path, pIndex) => (
