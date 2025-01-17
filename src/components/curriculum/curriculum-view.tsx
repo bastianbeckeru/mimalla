@@ -142,7 +142,7 @@ export default function CurriculumView({
               </Card>
             );
           })}
-          <svg className="absolute -z-50 size-full">
+          <svg className="absolute z-50 size-full">
             {isHovering &&
               relatedPaths.map((related) => {
                 return related.paths.map((path, pIndex) => (
@@ -166,24 +166,15 @@ function getPosition(
 
   return { x: x + 1, y: y };
 }
-function getCoordinates(
-  position: Coordinate,
-  gridConfig: {
-    cellWidth: number;
-    cellHeight: number;
-    gap: number;
-    padding: number;
-  },
-) {
-  const { cellWidth, cellHeight, gap, padding } = gridConfig;
+function getCoordinates(position: Coordinate) {
   const { x, y } = position;
 
   const calculatePosition = (pos: number, size: number) =>
-    (pos - 1) * (size + gap) + size / 2 + padding;
+    (pos - 1) * (size + GRID_GAP) + size / 2 + PADDING;
 
   return {
-    x: FONTSIZE * calculatePosition(x, cellWidth),
-    y: FONTSIZE * calculatePosition(y, cellHeight),
+    x: FONTSIZE * calculatePosition(x, GRID_CELL_WIDTH),
+    y: FONTSIZE * calculatePosition(y, GRID_CELL_HEIGHT),
   };
 }
 
@@ -263,17 +254,7 @@ function getRelatedPaths({
   const { prerequisiteIds, subsequentIds } = course;
   const { year, term } = originSlot;
 
-  const gridConfig = {
-    cellWidth: GRID_CELL_WIDTH,
-    cellHeight: GRID_CELL_HEIGHT,
-    gap: GRID_GAP,
-    padding: PADDING,
-  };
-
-  const originCoordinates = getCoordinates(
-    getPosition(periods, originSlot),
-    gridConfig,
-  );
+  const originCoordinates = getCoordinates(getPosition(periods, originSlot));
 
   // Considerando que se obtienen todos los paths de un tipo, estos se podrían optimizar
   // evitando repetir los mismos paths. Por ahora, se deja así para simplificar.
@@ -288,7 +269,7 @@ function getRelatedPaths({
       if (!relatedSlot) return null;
 
       const relatedPosition = getPosition(periods, relatedSlot);
-      const relatedCoordinates = getCoordinates(relatedPosition, gridConfig);
+      const relatedCoordinates = getCoordinates(relatedPosition);
 
       // 2. Generar los puntos de la ruta
       const points = getStepPathPoints({
@@ -313,7 +294,7 @@ function getRelatedPaths({
       if (!relatedSlot) return null;
 
       const relatedPosition = getPosition(periods, relatedSlot);
-      const relatedCoordinates = getCoordinates(relatedPosition, gridConfig);
+      const relatedCoordinates = getCoordinates(relatedPosition);
 
       // 2. Generar los puntos de la ruta
       const points = getStepPathPoints({
