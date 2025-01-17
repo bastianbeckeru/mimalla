@@ -22,9 +22,7 @@ const GRID_CELL_WIDTH = 8;
 const GRID_CELL_HEIGHT = 4;
 const GRID_GAP = 0.5;
 const PADDING = 0.5;
-const FONTSIZE = parseFloat(
-  getComputedStyle(document.documentElement).fontSize,
-);
+const FONTSIZE = 14;
 
 export default function CurriculumView({
   data,
