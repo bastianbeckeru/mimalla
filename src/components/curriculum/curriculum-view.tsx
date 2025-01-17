@@ -48,7 +48,7 @@ export default function CurriculumView({
 
   return (
     <ScrollAreaWrapper className={cn("flex-grow", className)}>
-      <div className="p-2">
+      <div className="p-2 pb-4">
         <div
           className="flex flex-row gap-2"
           style={{
@@ -142,7 +142,7 @@ export default function CurriculumView({
               </Card>
             );
           })}
-          <svg className="absolute -z-50 size-full">
+          <svg className="absolute inset-0 -z-50 size-full">
             {isHovering &&
               relatedPaths.map((related) => {
                 return related.paths.map((path, pIndex) => (
