@@ -46,9 +46,17 @@ export default function CurriculumView({
     padding: `${PADDING}rem`,
   };
 
+  const [isTesting, setIsTesting] = useState(false);
+
   return (
     <ScrollAreaWrapper className={cn("flex-grow", className)}>
       <div className="p-2 pb-4">
+        <button
+          className="border bg-foreground p-2"
+          onClick={() => setIsTesting(!isTesting)}
+        >
+          TEST
+        </button>
         <div
           className="flex flex-row gap-2"
           style={{
@@ -142,7 +150,12 @@ export default function CurriculumView({
               </Card>
             );
           })}
-          <svg className="absolute inset-0 -top-2 -z-50 size-full md:top-0">
+          <svg
+            className={cn(
+              "absolute left-0 top-0 -z-50 size-full",
+              isTesting && "inset-0",
+            )}
+          >
             {isHovering &&
               relatedPaths.map((related) => {
                 return related.paths.map((path, pIndex) => (
