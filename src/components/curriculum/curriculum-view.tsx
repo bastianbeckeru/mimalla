@@ -8,6 +8,7 @@ import { Card, CardContent } from "../ui/card";
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../ScrollAreaWrapper";
+import { arabicToRoman } from "@/utils/numbers";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -21,6 +22,9 @@ const GRID_CELL_WIDTH = 8;
 const GRID_CELL_HEIGHT = 4;
 const GRID_GAP = 0.5;
 const PADDING = 0.5;
+const FONTSIZE = parseFloat(
+  getComputedStyle(document.documentElement).fontSize,
+);
 
 export default function CurriculumView({
   data,
@@ -179,10 +183,9 @@ function getCoordinates(
   const calculatePosition = (pos: number, size: number) =>
     (pos - 1) * (size + gap) + size / 2 + padding;
 
-  // 1 rem = 16px
   return {
-    x: 16 * calculatePosition(x, cellWidth),
-    y: 16 * calculatePosition(y, cellHeight),
+    x: FONTSIZE * calculatePosition(x, cellWidth),
+    y: FONTSIZE * calculatePosition(y, cellHeight),
   };
 }
 
@@ -212,8 +215,8 @@ function getStepPathPoints({
   target: Coordinate;
 }): Coordinate[] {
   const directionY = Math.pow(-1, source.y >= target.y ? 1 : 2);
-  const midX = ((GRID_CELL_WIDTH + GRID_GAP) * 16) / 2;
-  const midY = (((GRID_CELL_HEIGHT + GRID_GAP) * 16) / 2) * directionY;
+  const midX = ((GRID_CELL_WIDTH + GRID_GAP) * FONTSIZE) / 2;
+  const midY = (((GRID_CELL_HEIGHT + GRID_GAP) * FONTSIZE) / 2) * directionY;
 
   // Case 1: Next column and same row
   const points = [
@@ -343,33 +346,4 @@ function Path({ path, color }: { path: string; color: string }) {
       className="animate-dash"
     />
   );
-}
-
-function arabicToRoman(num: number): string {
-  if (num < 1 || num > 100) {
-    throw new Error("El número debe estar entre 1 y 100.");
-  }
-
-  const romanNumerals: { value: number; numeral: string }[] = [
-    { value: 100, numeral: "C" },
-    { value: 90, numeral: "XC" },
-    { value: 50, numeral: "L" },
-    { value: 40, numeral: "XL" },
-    { value: 10, numeral: "X" },
-    { value: 9, numeral: "IX" },
-    { value: 5, numeral: "V" },
-    { value: 4, numeral: "IV" },
-    { value: 1, numeral: "I" },
-  ];
-
-  let result = "";
-
-  for (const { value, numeral } of romanNumerals) {
-    while (num >= value) {
-      result += numeral;
-      num -= value;
-    }
-  }
-
-  return result;
 }
