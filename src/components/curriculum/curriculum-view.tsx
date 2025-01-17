@@ -100,7 +100,7 @@ export default function CurriculumView({
               <Card
                 key={`${slot.year}-${slot.term}-${slot.position}`}
                 className={cn(
-                  "cursor-pointer select-none hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
+                  "cursor-pointer select-none opacity-20 hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
                   hasLowBackgroundElementContrast &&
                     "border border-foreground/50",
                   hasLowElementTextContrast && "text-background",
@@ -142,7 +142,7 @@ export default function CurriculumView({
               </Card>
             );
           })}
-          <svg className="absolute z-50 size-full">
+          <svg className="absolute -z-50 size-full">
             {isHovering &&
               relatedPaths.map((related) => {
                 return related.paths.map((path, pIndex) => (
