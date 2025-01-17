@@ -4,7 +4,6 @@ import type { CurriculumData } from "@/types/curriculum";
 
 import { checkContrasts } from "@/utils/colors";
 import { type ComponentPropsWithoutRef, forwardRef } from "react";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { EnrolledCourse } from "@/types/store";
 
 type SlotProps = {
@@ -49,12 +48,10 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
         ref={ref}
         style={style}
         className={cn(
-          "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm",
+          "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-opacity hover:brightness-[1.05]",
           hasLowBackgroundElementContrast && "border border-foreground/50",
           hasLowElementTextContrast && "text-background",
-          isAvailable
-            ? "hover:brightness-[1.05]"
-            : "brightness-[0.5] hover:brightness-[0.55]",
+          !isAvailable && "opacity-25",
           isDragging && "shadow-2xl",
           className,
         )}

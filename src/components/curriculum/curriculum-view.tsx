@@ -49,6 +49,34 @@ export default function CurriculumView({
   return (
     <ScrollAreaWrapper className={cn("flex-grow", className)}>
       <div className="p-2">
+        <div
+          className="flex flex-row gap-2"
+          style={{
+            paddingLeft: `${PADDING}rem`,
+            paddingRight: `${PADDING}rem`,
+          }}
+        >
+          {periods.map((pKey, pIndex) => {
+            //const [year, term] = pKey.split("-").map(Number);
+
+            return (
+              <div
+                key={pKey}
+                className="relative flex h-7 justify-center rounded-md p-2"
+                style={{
+                  width: `${GRID_CELL_WIDTH}rem`,
+                }}
+              >
+                <span
+                  className={`w-full text-center text-xs font-bold tracking-wider text-muted-foreground`}
+                >
+                  SEMESTRE {arabicToRoman(pIndex + 1)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
         <div style={curriculumStyle} className="relative">
           {curriculum.slots.map((slot, sIndex) => {
             const position = getPosition(periods, slot);
@@ -72,7 +100,7 @@ export default function CurriculumView({
               <Card
                 key={`${slot.year}-${slot.term}-${slot.position}`}
                 className={cn(
-                  "cursor-pointer select-none opacity-20 hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
+                  "cursor-pointer select-none hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
                   hasLowBackgroundElementContrast &&
                     "border border-foreground/50",
                   hasLowElementTextContrast && "text-background",

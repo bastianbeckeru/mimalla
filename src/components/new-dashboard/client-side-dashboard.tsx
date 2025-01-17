@@ -194,7 +194,10 @@ export default function ClientSideDashboard() {
               </Button>
             )}
           </header>
-          <Progress value={progress} className="h-px rounded-none md:hidden" />
+          <Progress
+            value={progress}
+            className="h-[.125rem] rounded-none md:hidden"
+          />
         </div>
 
         <RBDndCurriculum
