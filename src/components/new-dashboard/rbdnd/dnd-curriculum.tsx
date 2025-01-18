@@ -117,10 +117,12 @@ export default function RBDndCurriculum({
     },
   ]);
 
-  /*   const coursesAllowedToAdd = Array.from(courses.values()).filter(
-    (c) => failedCourses.includes(c.id) || c.isElective,
-  ); */
-  const coursesAllowedToAdd = Array.from(courses.values());
+  const coursesAllowedToAdd = Array.from(courses.values()).filter(
+    (c) =>
+      (failedCourses.includes(c.id) && !approvedCourses.includes(c.id)) ||
+      c.isElective,
+  );
+  //const coursesAllowedToAdd = Array.from(courses.values());
 
   const years = countYearOccurrences(history.present);
   const enrolledYear =
@@ -619,6 +621,25 @@ export default function RBDndCurriculum({
 
     return updatedPeriods.map((p) => {
       if (p.id !== periodId) return p;
+
+      if (p.enrollments.length >= 10) {
+        toast({
+          title: "❌ Límite de cursos",
+          description: "No puedes añadir más de 10 cursos por periodo.",
+        });
+        return p;
+      }
+      const course = courses.get(courseId)!;
+      if (
+        p.enrollments.some((e) => e.courseId === courseId) &&
+        !course.isElective
+      ) {
+        toast({
+          title: "❌ Curso duplicado",
+          description: "No puedes añadir un curso que ya está en el periodo.",
+        });
+        return p;
+      }
 
       const newEnrollment = {
         id: nanoid(),
