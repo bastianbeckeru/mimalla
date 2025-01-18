@@ -5,7 +5,11 @@ import { checkContrasts } from "@/utils/colors";
 
 import { useState } from "react";
 import { Card, CardContent } from "../ui/card";
-import type { CurriculumData, PeriodKey } from "@/types/curriculum";
+import type {
+  CurriculumData,
+  ModifiedCourse,
+  PeriodKey,
+} from "@/types/curriculum";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../ScrollAreaWrapper";
 import { arabicToRoman } from "@/utils/numbers";
@@ -36,9 +40,9 @@ export default function CurriculumView({
   const courses = new Map(data.courses.map((item) => [item.id, item]));
   const [isHovering, setIsHovering] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<
-    CurriculumData["courses"][0] | null
-  >(null);
+  const [selectedCourse, setSelectedCourse] = useState<ModifiedCourse | null>(
+    null,
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [relatedPaths, setRelatedPaths] = useState<
     { paths: string[]; color: string }[]

@@ -3,27 +3,14 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "../ui/sheet";
 
 type CourseSheetProps = {
   isOpen: boolean;
   onOpenChange: () => void;
-  course: {
-    id: number;
-    isElective: boolean;
-    name: string;
-    code: string | null;
-    description: string | null;
-    duration: number;
-    credits: number;
-    prerequisiteCredits: number;
-    prerequisiteIds: number[];
-    subsequentIds: number[];
-  };
+  course: ModifiedCourse;
   courses: Map<number, CurriculumData["courses"][0]>;
   areas: CurriculumData["areas"];
 };
