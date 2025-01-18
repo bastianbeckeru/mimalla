@@ -57,8 +57,9 @@ export default function DashboardSidebar({
 }: DashboardSidebar) {
   const { resetStore } = useNewCurriculumStore();
 
+  const subareaIds = areas.flatMap((area) => area.subareaIds);
   const fixedAreas = areas
-    .filter((area) => area.color !== null)
+    .filter((area) => area.color !== null && !subareaIds.includes(area.id))
     .sort((a, b) => {
       const lumA = getLuminance(parseHexColor(a.color));
       const lumB = getLuminance(parseHexColor(b.color));

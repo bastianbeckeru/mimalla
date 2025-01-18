@@ -629,6 +629,7 @@ export default function RBDndCurriculum({
         });
         return p;
       }
+
       const course = courses.get(courseId)!;
       if (
         p.enrollments.some((e) => e.courseId === courseId) &&
