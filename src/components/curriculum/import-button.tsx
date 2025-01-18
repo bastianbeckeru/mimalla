@@ -52,7 +52,7 @@ export default function ImportCurriculumButton({
     <Dialog>
       <DialogTrigger asChild>
         <Button className="w-full">
-          Importar malla <Import />
+          <Import /> Importar malla
         </Button>
       </DialogTrigger>
       <DialogContent className="min-h-48">

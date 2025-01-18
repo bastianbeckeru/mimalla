@@ -105,7 +105,7 @@
       "id": 3,
       "name": "Formación en Ciencias de la Ingeniería",
       "color": "#BBE5EB",
-      "subareaIds": [4],
+      "subareaIds": [8],
       "courseIds": [4, 9, 75],
       "electiveIds": []
     },
@@ -115,7 +115,7 @@
       "color": "#BBE5EB",
       "subareaIds": [],
       "courseIds": [9, 75, 104],
-      "electiveIds": [1]
+      "electiveIds": []
     }
   ],
   "courses": [

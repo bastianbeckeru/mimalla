@@ -48,7 +48,7 @@ const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
         ref={ref}
         style={style}
         className={cn(
-          "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-opacity hover:brightness-[1.05]",
+          "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-opacity hover:brightness-105",
           hasLowBackgroundElementContrast && "border border-foreground/50",
           hasLowElementTextContrast && "text-background",
           !isAvailable && "opacity-25",

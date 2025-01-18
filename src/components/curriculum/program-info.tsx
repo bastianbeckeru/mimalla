@@ -19,12 +19,12 @@ export default function ProgramInfo({
   const { schedule, siesCode, demreCode } = program;
 
   return (
-    <Card className="rounded-none bg-sidebar text-foreground lg:w-[26rem] lg:rounded-r-md">
+    <Card className="w-auto rounded-none bg-sidebar text-foreground lg:w-1/4">
       <CardHeader>
         <CardTitle className="text-2xl font-bold leading-tight">
           {program.name}
         </CardTitle>
-        <span className="mt-1 block text-base font-normal text-zinc-400">
+        <span className="mt-1 block text-base font-normal text-muted-foreground">
           {institution.name}
         </span>
       </CardHeader>

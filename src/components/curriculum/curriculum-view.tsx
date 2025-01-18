@@ -9,6 +9,7 @@ import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../ScrollAreaWrapper";
 import { arabicToRoman } from "@/utils/numbers";
+import CourseSheet from "./course-sheet";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -22,7 +23,7 @@ const GRID_CELL_WIDTH = 8;
 const GRID_CELL_HEIGHT = 4;
 const GRID_GAP = 0.5;
 const PADDING = 0.5;
-const FONTSIZE = 16;
+const FONTSIZE = 16; // px
 
 export default function CurriculumView({
   data,
@@ -34,6 +35,11 @@ export default function CurriculumView({
   const { curriculum, areas } = data;
   const courses = new Map(data.courses.map((item) => [item.id, item]));
   const [isHovering, setIsHovering] = useState(false);
+  const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<
+    CurriculumData["courses"][0] | null
+  >(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [relatedPaths, setRelatedPaths] = useState<
     { paths: string[]; color: string }[]
   >([]);
@@ -47,112 +53,128 @@ export default function CurriculumView({
   };
 
   return (
-    <ScrollAreaWrapper className={cn("flex-grow", className)}>
-      <div className="p-2 pb-4">
-        <div
-          className="flex flex-row gap-2"
-          style={{
-            paddingLeft: `${PADDING}rem`,
-            paddingRight: `${PADDING}rem`,
-          }}
-        >
-          {periods.map((pKey, pIndex) => {
-            //const [year, term] = pKey.split("-").map(Number);
+    <>
+      <ScrollAreaWrapper className={cn(className)}>
+        <div className="p-2 pb-4">
+          <div
+            className="flex flex-row gap-2"
+            style={{
+              paddingLeft: `${PADDING}rem`,
+              paddingRight: `${PADDING}rem`,
+            }}
+          >
+            {periods.map((pKey, pIndex) => {
+              //const [year, term] = pKey.split("-").map(Number);
 
-            return (
-              <div
-                key={pKey}
-                className="relative flex h-7 justify-center rounded-md p-2"
-                style={{
-                  width: `${GRID_CELL_WIDTH}rem`,
-                }}
-              >
-                <span
-                  className={`w-full text-center text-xs font-bold tracking-wider text-muted-foreground`}
+              return (
+                <div
+                  key={pKey}
+                  className="relative flex h-7 justify-center rounded-md p-2"
+                  style={{
+                    width: `${GRID_CELL_WIDTH}rem`,
+                  }}
                 >
-                  SEMESTRE {arabicToRoman(pIndex + 1)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        <div style={curriculumStyle} className="relative">
-          {curriculum.slots.map((slot, sIndex) => {
-            const position = getPosition(periods, slot);
-            const course = getCourse({ id: slot.courseId, courses: courses });
-            const area = course && getCourseArea(areas, course);
-            // const enrollment = enrollments.get(slot.id);
-
-            const color = area?.color ?? "#fafafa";
-            const {
-              hasLowBackgroundElementContrast,
-              hasLowElementTextContrast,
-            } = checkContrasts({ elementColor: color });
-
-            const slotStyle = {
-              backgroundColor: color,
-              gridColumn: `${position.x} / span ${course?.duration ?? 1}`,
-              gridRow: `${position.y} / span ${1}`,
-            };
-
-            return (
-              <Card
-                key={`${slot.year}-${slot.term}-${slot.position}`}
-                className={cn(
-                  "cursor-pointer select-none hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
-                  hasLowBackgroundElementContrast &&
-                    "border border-foreground/50",
-                  hasLowElementTextContrast && "text-background",
-                )}
-                style={slotStyle}
-                onMouseEnter={() => {
-                  if (!course) return;
-
-                  const relatedPaths = getRelatedPaths({
-                    originSlot: slot,
-                    slots: curriculum.slots,
-                    periods: periods,
-                    course: course,
-                  });
-
-                  setRelatedPaths(relatedPaths);
-                  setIsHovering(true);
-                }}
-                onMouseLeave={() => {
-                  if (!course) return;
-
-                  setIsHovering(false);
-                }}
-                onClick={() => {
-                  // Si no es electivo, no se hace nada
-                  if (!course?.isElective) return null;
-
-                  const eligibleCourses =
-                    course && getEligibleCourses(areas, courses, course.id);
-
-                  console.log("ELECTIVE COURSES", eligibleCourses);
-                }}
-              >
-                <CardContent className="flex h-full items-center justify-center p-2">
-                  <span className="text-center text-xs font-medium">
-                    {course?.name ?? `Slot ${sIndex + 1}`}
+                  <span
+                    className={`w-full text-center text-xs font-bold tracking-wider text-muted-foreground`}
+                  >
+                    SEMESTRE {arabicToRoman(pIndex + 1)}
                   </span>
-                </CardContent>
-              </Card>
-            );
-          })}
-          <svg className="absolute left-0 top-0 -z-50 size-full">
-            {isHovering &&
-              relatedPaths.map((related) => {
-                return related.paths.map((path, pIndex) => (
-                  <Path key={pIndex} path={path} color={related.color} />
-                ));
-              })}
-          </svg>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={curriculumStyle} className="relative">
+            {curriculum.slots.map((slot, sIndex) => {
+              const position = getPosition(periods, slot);
+              const course = getCourse({ id: slot.courseId, courses: courses });
+              const area = course && getCourseArea(areas, course);
+              // const enrollment = enrollments.get(slot.id);
+
+              const color = area?.color ?? "#fafafa";
+              const {
+                hasLowBackgroundElementContrast,
+                hasLowElementTextContrast,
+              } = checkContrasts({ elementColor: color });
+
+              const slotStyle = {
+                backgroundColor: color,
+                gridColumn: `${position.x} / span ${course?.duration ?? 1}`,
+                gridRow: `${position.y} / span ${1}`,
+              };
+
+              const isRelated = course && selectedCourses.includes(course.id);
+
+              return (
+                <Card
+                  key={`${slot.year}-${slot.term}-${slot.position}`}
+                  className={cn(
+                    "cursor-pointer select-none transition-opacity hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
+                    hasLowBackgroundElementContrast &&
+                      "border border-foreground/50",
+                    hasLowElementTextContrast && "text-background",
+                    isHovering && !isRelated && "opacity-25",
+                  )}
+                  style={slotStyle}
+                  onMouseEnter={() => {
+                    if (!course) return;
+
+                    const relatedPaths = getRelatedPaths({
+                      originSlot: slot,
+                      slots: curriculum.slots,
+                      periods: periods,
+                      course: course,
+                    });
+
+                    setSelectedCourses([
+                      ...course.prerequisiteIds,
+                      ...course.subsequentIds,
+                      ...[course.id],
+                    ]);
+                    setRelatedPaths(relatedPaths);
+                    setIsHovering(true);
+                  }}
+                  onMouseLeave={() => {
+                    if (!course) return;
+
+                    setSelectedCourses([]);
+                    setIsHovering(false);
+                  }}
+                  onClick={() => {
+                    if (!course?.isElective) return;
+
+                    setSelectedCourse(course);
+                    setIsOpen(true);
+                  }}
+                >
+                  <CardContent className="flex h-full items-center justify-center p-2">
+                    <span className="text-center text-xs font-medium">
+                      {course?.name ?? `Slot ${sIndex + 1}`}
+                    </span>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            <svg className="absolute left-0 top-0 -z-50 size-full">
+              {isHovering &&
+                relatedPaths.map((related) => {
+                  return related.paths.map((path, pIndex) => (
+                    <Path key={pIndex} path={path} color={related.color} />
+                  ));
+                })}
+            </svg>
+          </div>
         </div>
-      </div>
-    </ScrollAreaWrapper>
+      </ScrollAreaWrapper>
+
+      <CourseSheet
+        isOpen={isOpen}
+        onOpenChange={() => setIsOpen(!isOpen)}
+        course={selectedCourse}
+        courses={courses}
+        areas={areas}
+      />
+    </>
   );
 }
 
@@ -176,21 +198,6 @@ function getCoordinates(position: Coordinate) {
     x: FONTSIZE * calculatePosition(x, GRID_CELL_WIDTH),
     y: FONTSIZE * calculatePosition(y, GRID_CELL_HEIGHT),
   };
-}
-
-function getEligibleCourses(
-  areas: CurriculumData["areas"],
-  courses: Map<number, CurriculumData["courses"][0]>,
-  electiveId: number,
-) {
-  const electiveAreas = areas.filter((area) =>
-    area.courseIds.includes(electiveId),
-  );
-
-  // Debería excluirse el mismo?
-  return electiveAreas
-    .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
-    .filter((course) => course !== undefined && !course.isElective);
 }
 
 /* SVG */

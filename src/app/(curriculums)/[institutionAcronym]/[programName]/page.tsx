@@ -48,15 +48,15 @@ export default async function ProgramPage({ params }: ProgramParams) {
   });
 
   return (
-    <div className="w-dvw border-t pt-2 lg:p-4">
-      <div className="flex flex-col rounded-md lg:flex-row lg:border">
+    <div className="w-dvw border-t lg:border-none lg:p-4">
+      <div className="flex max-w-full flex-col lg:flex-row lg:rounded-md lg:border">
         <CurriculumView
           nCols={nCols}
           nRows={nRows}
           periods={periods}
           data={data}
+          className="h-[31rem] w-auto lg:h-auto lg:w-3/4"
         />
-
         <ProgramInfo
           institution={institution}
           program={program}
