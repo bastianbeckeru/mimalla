@@ -43,7 +43,7 @@ export default function ProgramInfo({
           <InfoItem label="Código DEMRE" value={demreCode} />
         </div>
 
-        {children}
+        <div>{children}</div>
       </CardContent>
     </Card>
   );

@@ -22,9 +22,15 @@ export default function CourseSheet({
   courses,
   areas,
 }: CourseSheetProps) {
-  const alternatives = course?.isElective
-    ? getEligibleCourses(areas, courses, course.id)
-    : [];
+  if (!course) return null;
+
+  const { parentArea, subareas } = getAreasWithCourses(
+    areas,
+    courses,
+    course.id,
+  );
+
+  // if isElective return React.Node
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -33,49 +39,67 @@ export default function CourseSheet({
           <SheetTitle>{course?.name}</SheetTitle>
           <SheetDescription>{course?.description}</SheetDescription>
         </SheetHeader>
-        {alternatives.map((alternative) => (
-          <p key={alternative.id}>
-            <span>{alternative.name}</span>
-          </p>
-        ))}
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+          {parentArea && parentArea.courses.length > 0 && (
+            <div className="col-span-1 rounded-md border p-2">
+              <ul>
+                {parentArea.courses.map((alternative) => (
+                  <li key={alternative.id} className="text-muted-foreground">
+                    {alternative.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {subareas.map((subarea) => (
+            <div key={subarea.id} className="col-span-1 rounded-md border p-2">
+              <h3 className="font-semibold">{subarea.name}</h3>
+              <ul>
+                {subarea.courses.map((alternative) => (
+                  <li key={alternative.id} className="text-muted-foreground">
+                    {alternative.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </SheetContent>
     </Sheet>
   );
 }
 
-function getEligibleCourses(
+function getAreasWithCourses(
   areas: CurriculumData["areas"],
   courses: Map<number, CurriculumData["courses"][0]>,
   electiveId: number,
 ) {
-  const electiveAreas = areas.filter((area) =>
+  const parentArea = areas.filter((area) =>
     area.courseIds.includes(electiveId),
+  )[0];
+
+  if (!parentArea) return { parentArea: undefined, subareas: [] };
+
+  const subareas = areas.filter((area) =>
+    parentArea.subareaIds.includes(area.id),
   );
 
-  if (electiveAreas.length === 1) {
-    const parentArea = electiveAreas[0]!;
-    const subareas = areas.filter((area) =>
-      parentArea.subareaIds.includes(area.id),
-    );
+  const fixedSubareas = subareas.map((area) => {
+    return {
+      ...area,
+      courses: area.courseIds
+        .map((id) => courses.get(id))
+        .filter((c) => c !== undefined),
+    };
+  });
 
-    const electiveCourses = subareas
-      .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
-      .filter((course) => course !== undefined);
+  const fixedParentArea = {
+    ...parentArea,
+    courses: parentArea.courseIds
+      .filter((id) => id !== electiveId)
+      .map((id) => courses.get(id))
+      .filter((c) => c !== undefined),
+  };
 
-    const electiveCourses2 = electiveAreas
-      .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
-      .filter((course) => course !== undefined);
-
-    return [
-      ...electiveCourses,
-      ...electiveCourses2.filter((course) => course.id !== electiveId),
-    ];
-  }
-
-  const electiveCourses = electiveAreas
-    .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
-    .filter((course) => course !== undefined);
-
-  // Debería excluirse el mismo?
-  return electiveCourses.filter((course) => course.id !== electiveId);
+  return { parentArea: fixedParentArea, subareas: fixedSubareas };
 }
