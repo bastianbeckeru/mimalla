@@ -6,6 +6,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ScrollArea } from "../ui/scroll-area";
 
 type CourseSheetProps = {
   isOpen: boolean;
@@ -22,6 +24,8 @@ export default function CourseSheet({
   courses,
   areas,
 }: CourseSheetProps) {
+  const isMobile = useIsMobile();
+
   if (!course) return null;
 
   const { parentArea, subareas } = getAreasWithCourses(
@@ -34,14 +38,15 @@ export default function CourseSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="min-h-64">
+      <SheetContent side={isMobile ? "left" : "bottom"} className="min-h-64">
         <SheetHeader>
           <SheetTitle>{course?.name}</SheetTitle>
           <SheetDescription>{course?.description}</SheetDescription>
         </SheetHeader>
+
         <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
           {parentArea && parentArea.courses.length > 0 && (
-            <div className="col-span-1 rounded-md border p-2">
+            <div className="col-span-1 max-h-48 rounded-md border p-2">
               <ul>
                 {parentArea.courses.map((alternative) => (
                   <li key={alternative.id} className="text-muted-foreground">
@@ -52,16 +57,26 @@ export default function CourseSheet({
             </div>
           )}
           {subareas.map((subarea) => (
-            <div key={subarea.id} className="col-span-1 rounded-md border p-2">
-              <h3 className="font-semibold">{subarea.name}</h3>
-              <ul>
-                {subarea.courses.map((alternative) => (
-                  <li key={alternative.id} className="text-muted-foreground">
-                    {alternative.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ScrollArea
+              key={subarea.id}
+              className="col-span-1 max-h-48 rounded-md border"
+            >
+              <div className="p-4">
+                <h4 className="mb-4 text-sm font-medium leading-none">
+                  {subarea.name}
+                </h4>
+                <ul>
+                  {subarea.courses.map((alternative) => (
+                    <li
+                      key={alternative.id}
+                      className="text-sm text-muted-foreground"
+                    >
+                      {alternative.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollArea>
           ))}
         </div>
       </SheetContent>
