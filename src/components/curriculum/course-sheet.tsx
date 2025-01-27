@@ -1,4 +1,4 @@
-import { CurriculumData, ModifiedCourse } from "@/types/curriculum";
+import type { CurriculumData, ModifiedCourse } from "@/types/curriculum";
 import {
   Sheet,
   SheetContent,
@@ -51,6 +51,26 @@ function getEligibleCourses(
   const electiveAreas = areas.filter((area) =>
     area.courseIds.includes(electiveId),
   );
+
+  if (electiveAreas.length === 1) {
+    const parentArea = electiveAreas[0]!;
+    const subareas = areas.filter((area) =>
+      parentArea.subareaIds.includes(area.id),
+    );
+
+    const electiveCourses = subareas
+      .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
+      .filter((course) => course !== undefined);
+
+    const electiveCourses2 = electiveAreas
+      .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
+      .filter((course) => course !== undefined);
+
+    return [
+      ...electiveCourses,
+      ...electiveCourses2.filter((course) => course.id !== electiveId),
+    ];
+  }
 
   const electiveCourses = electiveAreas
     .flatMap((area) => area.courseIds.map((id) => courses.get(id)))
