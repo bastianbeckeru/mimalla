@@ -86,6 +86,12 @@ export function Searchbar() {
                 Psicología
               </Link>
             </CommandItem>
+            <CommandSeparator />
+            <CommandItem asChild>
+              <Link href="/udp/derecho" onClick={() => setOpen(false)}>
+                Derecho
+              </Link>
+            </CommandItem>
           </CommandGroup>
           {/* <CommandSeparator /> */}
         </CommandList>
