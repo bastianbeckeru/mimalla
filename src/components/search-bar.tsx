@@ -7,7 +7,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -47,7 +46,7 @@ export function Searchbar() {
         <CommandInput placeholder="Escribe una carrera..." />
         <CommandList>
           <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-          <CommandGroup heading={"Universidad Diego Portales"}>
+          <CommandGroup heading={"Facultad de Ingeniería y Ciencias"}>
             <CommandItem asChild>
               <Link
                 href="/udp/ingenieria-civil-industrial"
@@ -80,20 +79,23 @@ export function Searchbar() {
                 Ingeniería Civil Plan Común
               </Link>
             </CommandItem>
-            <CommandSeparator />
+          </CommandGroup>
+
+          <CommandGroup heading={"Facultad de Psicología"}>
             <CommandItem asChild>
               <Link href="/udp/psicologia" onClick={() => setOpen(false)}>
                 Psicología
               </Link>
             </CommandItem>
-            <CommandSeparator />
+          </CommandGroup>
+
+          <CommandGroup heading={"Facultad de Derecho"}>
             <CommandItem asChild>
               <Link href="/udp/derecho" onClick={() => setOpen(false)}>
                 Derecho
               </Link>
             </CommandItem>
           </CommandGroup>
-          {/* <CommandSeparator /> */}
         </CommandList>
       </CommandDialog>
     </>
