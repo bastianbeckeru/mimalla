@@ -6,7 +6,11 @@ import type {
   PeriodWithEnrollments,
 } from "@/types/curriculum";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { getPeriodsWithEnrollments } from "@/utils/curriculum";
+import {
+  extractCourseIds,
+  getCurriculumStats,
+  getPeriodsWithEnrollments,
+} from "@/utils/curriculum";
 import { Loader2, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProgramData } from "../../utils/curriculum-data";
@@ -20,7 +24,6 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
 import { toast } from "@/hooks/use-toast";
-import type { EnrolledCourse } from "@/types/store";
 
 export default function ClientSideDashboard() {
   const {
@@ -136,11 +139,13 @@ export default function ClientSideDashboard() {
 
   const { institution, program, areas, courses } = data;
 
-  const { progress, earnedCredits, approvedCourses, failedCourses } =
-    getProgress(
-      history.present.flatMap((p) => p.enrollments),
-      new Map(courses.map((c) => [c.id, c])),
-    );
+  const enrollments = history.present.flatMap((p) => p.enrollments);
+  const coursesMap = new Map(courses.map((c) => [c.id, c]));
+
+  const stats = getCurriculumStats(enrollments, coursesMap);
+
+  const approvedCourseIds = extractCourseIds(enrollments, "APPROVED");
+  const failedCourseIds = extractCourseIds(enrollments, "FAILED");
 
   function handleEditMode() {
     if (history.past.length > 0) {
@@ -162,8 +167,7 @@ export default function ClientSideDashboard() {
         editMode={editMode}
         setEditMode={handleEditMode}
         areas={areas}
-        progress={progress}
-        approvedCredits={earnedCredits}
+        stats={stats}
         setHistory={setHistory}
       />
 
@@ -195,7 +199,7 @@ export default function ClientSideDashboard() {
             )}
           </header>
           <Progress
-            value={progress}
+            value={stats.progress}
             className="h-[.125rem] rounded-none md:hidden"
           />
         </div>
@@ -206,9 +210,9 @@ export default function ClientSideDashboard() {
           setHistory={setHistory}
           areas={areas}
           courses={new Map(courses.map((c) => [c.id, c]))}
-          approvedCourses={approvedCourses}
-          failedCourses={failedCourses}
-          approvedCredits={earnedCredits}
+          approvedCourseIds={approvedCourseIds}
+          failedCourseIds={failedCourseIds}
+          approvedCredits={stats.approvedCredits}
         />
       </SidebarInset>
     </SidebarProvider>
@@ -238,32 +242,4 @@ export default function ClientSideDashboard() {
     });
     updateCurriculumEnrollments(history.present.flatMap((p) => p.enrollments));
   }
-}
-
-function getProgress(
-  enrollments: EnrolledCourse[],
-  coursesMap: Map<number, CurriculumData["courses"][0]>,
-) {
-  const totalEnrollments = enrollments.length;
-
-  const approvedEnrollments = enrollments.filter(
-    (e) => e.status === "APPROVED",
-  );
-  const failedEnrollments = enrollments.filter((e) => e.status === "FAILED");
-
-  const approvedCourses = approvedEnrollments
-    .map((e) => e.courseId)
-    .filter((id) => id !== null && id !== undefined);
-  const failedCourses = failedEnrollments
-    .map((e) => e.courseId)
-    .filter((id) => id !== null && id !== undefined);
-
-  const earnedCredits = approvedCourses.reduce(
-    (acc, courseId) => acc + (coursesMap.get(courseId)?.credits ?? 0),
-    0,
-  );
-
-  const progress = (approvedEnrollments.length / totalEnrollments) * 100;
-
-  return { progress, earnedCredits, approvedCourses, failedCourses };
 }

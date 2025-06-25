@@ -1,0 +1,710 @@
+{
+  "institution": { "name": "Universidad Diego Portales", "acronym": "UDP" },
+  "department": {
+    "name": "Facultad de Psicología",
+    "acronym": "FP"
+  },
+  "program": {
+    "name": "Diseño",
+    "siesCode": "I3S1C67J1V1",
+    "demreCode": 38015,
+    "schedule": "DAYTIME"
+  },
+  "curriculum": {
+    "version": "v4",
+    "year": 2020,
+    "slots": [
+      { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 105 },
+      { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 106 },
+      { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 107 },
+      { "id": 4, "year": 1, "term": 1, "position": 4, "courseId": 108 },
+      { "id": 5, "year": 1, "term": 1, "position": 5, "courseId": 109 },
+      { "id": 6, "year": 1, "term": 1, "position": 6, "courseId": 110 },
+      { "id": 7, "year": 1, "term": 3, "position": 1, "courseId": 111 },
+      { "id": 8, "year": 1, "term": 3, "position": 2, "courseId": 112 },
+      { "id": 9, "year": 1, "term": 3, "position": 3, "courseId": 113 },
+      { "id": 10, "year": 1, "term": 3, "position": 4, "courseId": 114 },
+      { "id": 11, "year": 1, "term": 3, "position": 5, "courseId": 115 },
+      { "id": 12, "year": 1, "term": 3, "position": 6, "courseId": 116 },
+      { "id": 13, "year": 2, "term": 1, "position": 1, "courseId": 117 },
+      { "id": 14, "year": 2, "term": 1, "position": 2, "courseId": 118 },
+      { "id": 15, "year": 2, "term": 1, "position": 3, "courseId": 119 },
+      { "id": 16, "year": 2, "term": 1, "position": 4, "courseId": 120 },
+      { "id": 17, "year": 2, "term": 1, "position": 5, "courseId": 121 },
+      { "id": 18, "year": 2, "term": 1, "position": 6, "courseId": 122 },
+      { "id": 19, "year": 2, "term": 3, "position": 1, "courseId": 123 },
+      { "id": 20, "year": 2, "term": 3, "position": 2, "courseId": 124 },
+      { "id": 21, "year": 2, "term": 3, "position": 3, "courseId": 125 },
+      { "id": 22, "year": 2, "term": 3, "position": 4, "courseId": 126 },
+      { "id": 23, "year": 2, "term": 3, "position": 5, "courseId": 127 },
+      { "id": 24, "year": 2, "term": 3, "position": 6, "courseId": 10 },
+      { "id": 25, "year": 3, "term": 1, "position": 1, "courseId": 128 },
+      { "id": 26, "year": 3, "term": 1, "position": 2, "courseId": 129 },
+      { "id": 27, "year": 3, "term": 1, "position": 3, "courseId": 130 },
+      { "id": 28, "year": 3, "term": 1, "position": 4, "courseId": 131 },
+      { "id": 29, "year": 3, "term": 1, "position": 5, "courseId": 132 },
+      { "id": 30, "year": 3, "term": 1, "position": 6, "courseId": 10 },
+      { "id": 31, "year": 3, "term": 3, "position": 1, "courseId": 133 },
+      { "id": 32, "year": 3, "term": 3, "position": 2, "courseId": 134 },
+      { "id": 33, "year": 3, "term": 3, "position": 3, "courseId": 135 },
+      { "id": 34, "year": 3, "term": 3, "position": 4, "courseId": 136 },
+      { "id": 35, "year": 3, "term": 3, "position": 5, "courseId": 137 },
+      { "id": 36, "year": 4, "term": 1, "position": 1, "courseId": 138 },
+      { "id": 37, "year": 4, "term": 1, "position": 2, "courseId": 139 },
+      { "id": 38, "year": 4, "term": 1, "position": 3, "courseId": 140 },
+      { "id": 39, "year": 4, "term": 1, "position": 4, "courseId": 141 },
+      { "id": 40, "year": 4, "term": 1, "position": 6, "courseId": 10 },
+      { "id": 41, "year": 4, "term": 3, "position": 1, "courseId": 142 },
+      { "id": 42, "year": 4, "term": 3, "position": 2, "courseId": 143 },
+      { "id": 43, "year": 4, "term": 3, "position": 3, "courseId": 144 },
+      { "id": 44, "year": 4, "term": 3, "position": 4, "courseId": 145 },
+      { "id": 45, "year": 4, "term": 3, "position": 6, "courseId": 10 },
+      { "id": 46, "year": 5, "term": 1, "position": 1, "courseId": 146 },
+      { "id": 47, "year": 5, "term": 1, "position": 2, "courseId": 147 },
+      { "id": 48, "year": 5, "term": 1, "position": 3, "courseId": 148 },
+      { "id": 49, "year": 5, "term": 1, "position": 4, "courseId": 149 },
+      { "id": 50, "year": 5, "term": 3, "position": 1, "courseId": 150 },
+      { "id": 51, "year": 5, "term": 3, "position": 2, "courseId": 151 },
+      { "id": 52, "year": 5, "term": 3, "position": 3, "courseId": 148 }
+    ]
+  },
+  "areas": [
+    {
+      "id": 1,
+      "name": "Formación General e Inglés",
+      "color": "#FFFFFF",
+      "courseIds": [5, 10, 20, 21, 26, 41, 44, 45, 46, 110, 116, 122],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 9,
+      "name": "Fundamentos Biológicos, Sociales, Históricos y Filosóficos de la Psicología",
+      "color": "#FDC743",
+      "courseIds": [105, 106, 108, 111, 112],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 10,
+      "name": "Contenidos Básicos de la Psicología",
+      "color": "#F9DD92",
+      "courseIds": [107, 113, 114, 117, 118, 119, 120, 123, 125, 126, 130],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 11,
+      "name": "Campos Psicosociales",
+      "color": "#FDEDC8",
+      "courseIds": [131, 136, 138, 139, 141, 142, 143, 145, 147, 149],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 12,
+      "name": "Psicología Clínica",
+      "color": "#D2D3D5",
+      "courseIds": [124, 128, 129, 133, 134, 135, 140, 144, 146],
+      "electiveIds": [],
+      "subareaIds": []
+    },
+    {
+      "id": 13,
+      "name": "Investigación",
+      "color": "#818284",
+      "courseIds": [109, 115, 121, 127, 132, 137],
+      "electiveIds": [],
+      "subareaIds": []
+    }
+  ],
+  "courses": [
+    {
+      "id": 10,
+      "isElective": true,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "duration": 1
+    },
+    {
+      "id": 105,
+      "name": "Historia de la Psicología",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 106,
+      "name": "Fundamentos Biológicos del Comportamiento",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 107,
+      "name": "Psicología General",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 108,
+      "name": "Transformaciones Socioculturales",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 109,
+      "name": "Filosofía y Epistemiología de la Psicología",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 110,
+      "name": "Inglés I",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 111,
+      "name": "Análisis Crítico de la Psicología en Chile",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 112,
+      "name": "Neurociencias y Psicología",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 113,
+      "name": "Procesos Psicológicos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 114,
+      "name": "Psicología Social I",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 115,
+      "name": "Estadística",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 116,
+      "name": "Inglés II",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 117,
+      "name": "Psicología de la Infancia",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 118,
+      "name": "Psicología de la Adolescencia y Juventud",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 119,
+      "name": "Psicología de la Comunicación",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 120,
+      "name": "Psicología Social II",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 121,
+      "name": "Investigación I",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 122,
+      "name": "Inglés III",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 123,
+      "name": "Introducción a la Psicopatología",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 124,
+      "name": "Introducción a la Psicología Clínica",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 125,
+      "name": "Psicología de la Personalidad",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 126,
+      "name": "Psicología de la Adultez y la Tercera Edad",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 127,
+      "name": "Investigación II",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 128,
+      "name": "Psicopatología y Psiquiatría de Niños y Adolescentes",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 129,
+      "name": "Optativo de Perspectivas en Psicología Clínica I",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 130,
+      "name": "Introducción al Psicodiagnóstico",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 131,
+      "name": "Psicología y Salud",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 132,
+      "name": "Investigación III",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 133,
+      "name": "Psicopatología y Psiquiatría de Adulto",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 134,
+      "name": "Optativo de Perspectivas en Psicología Clínica II",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 135,
+      "name": "Psicodiagnóstico de Niños y Adolescentes",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 136,
+      "name": "Psicología y Educación",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 137,
+      "name": "Investigación IV",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 138,
+      "name": "Psicología y Justicia",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 139,
+      "name": "Psicología del Trabajo y las Organizaciones",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 140,
+      "name": "Psicodiagnóstico de Adultos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 141,
+      "name": "Psicología y Sujetos Sociales",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 142,
+      "name": "Gestión de Recursos Humanos",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 143,
+      "name": "Optativo de Intervención Psicosocial",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 144,
+      "name": "Optativo de Intervención Clínica",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 145,
+      "name": "Diseño y Evaluación de Proyectos de Intervención",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 146,
+      "name": "Taller de Intervención Clínica",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 147,
+      "name": "Taller de Intervención Psicosocial",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 148,
+      "name": "Curso de Profundización",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 149,
+      "name": "Estrategias de Trabajo Grupal",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 150,
+      "name": "Práctica Profesional",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    },
+    {
+      "id": 151,
+      "name": "Supervisión de Práctica",
+      "code": "",
+      "credits": 6,
+      "description": null,
+      "prerequisiteIds": [],
+      "prerequisiteCredits": 0,
+      "isElective": false,
+      "duration": 1
+    }
+  ],
+  "degrees": [
+    {
+      "id": 5,
+      "name": "Licenciatura en Diseño con Mención en Diseño Gráfico/ Industrial / Interacción Digital / Textil e Indumentaria",
+      "type": "ACADEMIC",
+      "requiredCourseIds": [105]
+    },
+    {
+      "id": 6,
+      "name": "Diseño",
+      "type": "PROFESSIONAL",
+      "requiredCourseIds": [105],
+      "requiredElectives": [10]
+    }
+  ],
+  "plans": [
+    {
+      "id": 1,
+      "name": "Psicología",
+      "type": "NONE",
+      "areCoursesMandatory": true,
+      "courseIds": [1, 2],
+      "subplanIds": [2, 3]
+    },
+    {
+      "id": 2,
+      "name": "Licenciatura en Psicología",
+      "type": "ACADEMIC",
+      "areCoursesMandatory": true,
+      "courseIds": [3, 4],
+      "subplanIds": [3]
+    },
+    {
+      "id": 3,
+      "name": "Psicología",
+      "type": "PROFESSIONAL",
+      "areCoursesMandatory": true,
+      "courseIds": [8],
+      "subplanIds": [4]
+    },
+    {
+      "id": 4,
+      "name": "Cursos de Formación General",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 20,
+      "courseIds": [5, 6, 7],
+      "subplanIds": []
+    },
+    {
+      "id": 5,
+      "name": "Electivos Profesionales",
+      "type": "NONE",
+      "areCoursesMandatory": false,
+      "requiredCredits": 36,
+      "courseIds": [8, 10, 11],
+      "subplanIds": []
+    }
+  ]
+}

@@ -57,8 +57,8 @@ type RBDndCurriculum = {
   areas: CurriculumData["areas"];
   courses: Map<number, CurriculumData["courses"][0]>;
   //
-  approvedCourses: number[];
-  failedCourses: number[];
+  approvedCourseIds: number[];
+  failedCourseIds: number[];
   approvedCredits: number;
 };
 
@@ -82,8 +82,8 @@ export default function RBDndCurriculum({
   setHistory,
   areas,
   courses,
-  approvedCourses,
-  failedCourses,
+  approvedCourseIds,
+  failedCourseIds,
   approvedCredits,
 }: RBDndCurriculum) {
   const { showTimeline, autoRescheduleFailed } = useSettingsStore();
@@ -119,7 +119,7 @@ export default function RBDndCurriculum({
 
   const coursesAllowedToAdd = Array.from(courses.values()).filter(
     (c) =>
-      (failedCourses.includes(c.id) && !approvedCourses.includes(c.id)) ||
+      (failedCourseIds.includes(c.id) && !approvedCourseIds.includes(c.id)) ||
       c.isElective,
   );
   //const coursesAllowedToAdd = Array.from(courses.values());
@@ -187,7 +187,7 @@ export default function RBDndCurriculum({
                       const isAvailable = !course
                         ? true
                         : course.prerequisiteIds.every((id) =>
-                            approvedCourses.includes(id),
+                            approvedCourseIds.includes(id),
                           ) && course.prerequisiteCredits <= approvedCredits;
 
                       return (
@@ -479,7 +479,7 @@ export default function RBDndCurriculum({
         course={activeEnrollment?.course}
         color={activeEnrollment?.color}
         courses={courses}
-        approvedCourses={approvedCourses}
+        approvedCourseIds={approvedCourseIds}
         approvedCredits={approvedCredits}
       />
 
@@ -798,7 +798,7 @@ export default function RBDndCurriculum({
       if (!c) return;
 
       c.subsequentIds.forEach((id) => {
-        if (approvedCourses.includes(id)) {
+        if (approvedCourseIds.includes(id)) {
           coursesToRevert.push(id);
           loop(id);
         }

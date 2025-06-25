@@ -41,8 +41,12 @@ type DashboardSidebar = {
   editMode: boolean;
   setEditMode: (editMode: boolean) => void;
   areas: CurriculumData["areas"];
-  progress: number;
-  approvedCredits: number;
+  stats: {
+    progress: number;
+    approvedCourses: number;
+    totalCourses: number;
+    approvedCredits: number;
+  };
   setHistory: (history: History<PeriodWithEnrollments[]>) => void;
 };
 
@@ -50,13 +54,12 @@ export default function DashboardSidebar({
   editMode,
   setEditMode,
   areas,
-  progress,
-  approvedCredits,
+  stats,
   setHistory,
   ...props
 }: DashboardSidebar) {
   const { resetStore } = useNewCurriculumStore();
-
+  const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
   const subareaIds = areas.flatMap((area) => area.subareaIds);
   const fixedAreas = areas
     .filter((area) => area.color !== null && !subareaIds.includes(area.id))
@@ -109,7 +112,9 @@ export default function DashboardSidebar({
           <SidebarGroupContent className="space-y-2">
             <Progress value={progress} />
             <div className="flex flex-row justify-between space-x-2">
-              <p>{progress.toFixed(2)}%</p>
+              <p>
+                {approvedCourses}/{totalCourses}
+              </p>
               <p>
                 {approvedCredits}
                 {" créditos"}

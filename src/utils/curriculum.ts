@@ -1,5 +1,5 @@
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
-import type { EnrolledCourse } from "@/types/store";
+import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
 export function getCourse({
   id,
@@ -125,5 +125,65 @@ export function getPeriodsWithEnrollments({
     nCols: sortedPeriods.length,
     nRows: maxRows,
     periods: sortedPeriods,
+  };
+}
+
+export function extractCourseIds(
+  enrollments: EnrolledCourse[],
+  status?: EnrolledCourseStatus,
+) {
+  const filtered = status
+    ? enrollments.filter((e) => e.status === status)
+    : enrollments;
+
+  return filtered
+    .map((e) => e.courseId)
+    .filter((id) => id !== null && id !== undefined);
+}
+
+export function getCurriculumStats(
+  enrollments: EnrolledCourse[],
+  coursesMap: Map<number, CurriculumData["courses"][0]>,
+) {
+  const groupedByCourse = new Map<number, EnrolledCourseStatus[]>();
+
+  for (const e of enrollments) {
+    if (e.courseId == null) continue;
+    if (!groupedByCourse.has(e.courseId)) {
+      groupedByCourse.set(e.courseId, []);
+    }
+    groupedByCourse.get(e.courseId)!.push(e.status);
+  }
+
+  let approvedCredits = 0;
+  let pendingCredits = 0;
+  let approvedCourses = 0;
+  let pendingCourses = 0;
+  let failedCourses = 0;
+
+  for (const [courseId, statuses] of groupedByCourse.entries()) {
+    const course = coursesMap.get(courseId);
+    if (!course) continue;
+
+    if (statuses.includes("APPROVED")) {
+      approvedCourses++;
+      approvedCredits += course.credits;
+    } else if (statuses.includes("PENDING")) {
+      pendingCourses++;
+      pendingCredits += course.credits;
+    } else if (statuses.includes("FAILED")) {
+      failedCourses++;
+    }
+  }
+
+  return {
+    progress: (approvedCourses / (approvedCourses + pendingCourses)) * 100,
+    approvedCredits,
+    pendingCredits,
+    totalCredits: approvedCredits + pendingCredits,
+    approvedCourses,
+    pendingCourses,
+    failedCourses,
+    totalCourses: approvedCourses + pendingCourses,
   };
 }

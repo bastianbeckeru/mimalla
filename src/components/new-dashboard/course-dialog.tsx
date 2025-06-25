@@ -11,7 +11,7 @@ type CourseDialogProps = {
   courses: Map<number, CurriculumData["courses"][0]>;
   course?: ModifiedCourse;
   color?: string;
-  approvedCourses: number[];
+  approvedCourseIds: number[];
   approvedCredits: number;
 };
 
@@ -21,7 +21,7 @@ export default function CourseDialog({
   courses,
   course,
   color = "#fafafa",
-  approvedCourses,
+  approvedCourseIds,
   approvedCredits,
 }: CourseDialogProps) {
   const rgbaColor = hexToRgba(parseHexColor(color), 0.2);
@@ -66,7 +66,7 @@ export default function CourseDialog({
                     />
                   )}
                   {course.prerequisiteIds.map((id) => {
-                    const isApproved = approvedCourses.includes(id);
+                    const isApproved = approvedCourseIds.includes(id);
                     const c = courses.get(id);
 
                     if (!c) return null;
@@ -96,7 +96,7 @@ export default function CourseDialog({
               {course.subsequentIds.length > 0 ? (
                 <>
                   {course.subsequentIds.map((id) => {
-                    const isApproved = approvedCourses.includes(id);
+                    const isApproved = approvedCourseIds.includes(id);
                     const c = courses.get(id);
 
                     if (!c) return null;
