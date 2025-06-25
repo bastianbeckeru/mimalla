@@ -143,35 +143,25 @@ export function extractCourseIds(
 
 export function getCurriculumStats(
   enrollments: EnrolledCourse[],
-  coursesMap: Map<number, CurriculumData["courses"][0]>,
+  curriculumCourses: Map<number, CurriculumData["courses"][0]>,
 ) {
-  const groupedByCourse = new Map<number, EnrolledCourseStatus[]>();
-
-  for (const e of enrollments) {
-    if (e.courseId == null) continue;
-    if (!groupedByCourse.has(e.courseId)) {
-      groupedByCourse.set(e.courseId, []);
-    }
-    groupedByCourse.get(e.courseId)!.push(e.status);
-  }
-
   let approvedCredits = 0;
   let pendingCredits = 0;
   let approvedCourses = 0;
   let pendingCourses = 0;
   let failedCourses = 0;
 
-  for (const [courseId, statuses] of groupedByCourse.entries()) {
-    const course = coursesMap.get(courseId);
+  for (const enrollment of enrollments) {
+    const course = curriculumCourses.get(enrollment.courseId);
     if (!course) continue;
 
-    if (statuses.includes("APPROVED")) {
+    if (enrollment.status === "APPROVED") {
       approvedCourses++;
       approvedCredits += course.credits;
-    } else if (statuses.includes("PENDING")) {
+    } else if (enrollment.status == "PENDING") {
       pendingCourses++;
       pendingCredits += course.credits;
-    } else if (statuses.includes("FAILED")) {
+    } else if (enrollment.status == "FAILED") {
       failedCourses++;
     }
   }
