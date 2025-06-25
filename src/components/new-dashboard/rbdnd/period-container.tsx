@@ -14,7 +14,7 @@ const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
     return (
       <ol className="flex min-w-32 select-none flex-col gap-2">
         <h3
-          className={`text-center text-xs font-bold tracking-wider text-muted-foreground ${isCurrent && "font-extrabold text-primary"}`}
+          className={`text-center text-xs  tracking-wider ${isCurrent ? "font-extrabold text-primary" : "font-bold text-muted-foreground"}`}
         >
           {label}
         </h3>
