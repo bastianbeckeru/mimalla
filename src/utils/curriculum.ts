@@ -1,5 +1,6 @@
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import { arabicToRoman } from "./numbers";
 
 export function getCourse({
   id,
@@ -175,5 +176,33 @@ export function getCurriculumStats(
     pendingCourses,
     failedCourses,
     totalCourses: approvedCourses + pendingCourses,
+  };
+}
+
+export function getPeriodInfo(id: PeriodKey) {
+  const [year, term] = id.split("-").map(Number);
+  const number = 2 * year! - (term === 1 ? 1 : 0);
+  let label = "SEMESTRE";
+  let isCurrent = false;
+
+  if (
+    year === new Date().getFullYear() &&
+    term === (new Date().getMonth() < 7 ? 1 : 3)
+  )
+    isCurrent = true;
+
+  if (term === 1 || term === 3) {
+    label = `SEMESTRE ${arabicToRoman(number)}`;
+  } else if (term === 2) {
+    label = `INVIERNO`;
+  } else if (term === 4) {
+    label = `VERANO`;
+  }
+
+  return {
+    year,
+    term,
+    label,
+    isCurrent,
   };
 }

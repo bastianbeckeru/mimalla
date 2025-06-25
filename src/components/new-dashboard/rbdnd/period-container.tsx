@@ -1,5 +1,5 @@
 import type { PeriodKey } from "@/types/curriculum";
-import { arabicToRoman } from "@/utils/numbers";
+import { getPeriodInfo } from "@/utils/curriculum";
 import { forwardRef } from "react";
 
 type PeriodContainerProps = {
@@ -7,26 +7,16 @@ type PeriodContainerProps = {
   children?: React.ReactNode;
 };
 
-function getPeriodLabel(id: PeriodKey) {
-  const [year, term] = id.split("-").map(Number);
-
-  if (term === 2) return "INVIERNO";
-  if (term === 4) return "VERANO";
-
-  const a = 2 * year! - (term === 1 ? 1 : 0);
-  return `SEMESTRE ${arabicToRoman(a)}`;
-}
-
 const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
   ({ id, children, ...props }, ref) => {
-    const periodLabel = getPeriodLabel(id);
+    const { label, isCurrent } = getPeriodInfo(id);
 
     return (
       <ol className="flex min-w-32 select-none flex-col gap-2">
         <h3
-          className={`text-center text-xs font-bold tracking-wider text-muted-foreground`}
+          className={`text-center text-xs font-bold tracking-wider text-muted-foreground ${isCurrent && "font-extrabold text-primary"}`}
         >
-          {periodLabel}
+          {label}
         </h3>
 
         <ul {...props} ref={ref} className="flex-grow">
