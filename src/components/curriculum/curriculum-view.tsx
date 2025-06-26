@@ -68,11 +68,11 @@ export default function CurriculumView({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    if (isSelected) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isSelected]);
 
   // Clean up timeout on unmount
   useEffect(() => {
@@ -218,10 +218,10 @@ export default function CurriculumView({
                     setIsOpen(true);
                   }}
                 >
-                  <CardContent className="flex h-full items-center justify-center p-2">
-                    <span className="text-center text-xs font-medium">
+                  <CardContent className="flex h-full select-none items-center justify-center p-2">
+                    <h3 className="text-center text-xs font-medium">
                       {course?.name ?? `Slot ${sIndex + 1}`}
-                    </span>
+                    </h3>
                   </CardContent>
                 </Card>
               );
