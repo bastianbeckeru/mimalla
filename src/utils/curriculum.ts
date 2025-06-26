@@ -1,6 +1,7 @@
 import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import { arabicToRoman } from "./numbers";
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
 
 export function getCourse({
   id,
@@ -71,8 +72,10 @@ export function getPeriods({
 }
 
 export function getPeriodsWithEnrollments({
+  year,
   enrollments,
 }: {
+  year: number;
   enrollments: EnrolledCourse[];
 }): {
   nCols: number;
@@ -81,14 +84,22 @@ export function getPeriodsWithEnrollments({
     id: PeriodKey;
     enrollments: EnrolledCourse[];
   }[];
+  hasToSave: boolean;
 } {
   const periodMap = new Map<PeriodKey, EnrolledCourse[]>();
   let maxRows = 1;
-  let minYear = Infinity,
-    maxYear = -Infinity;
+  let minYear = Infinity;
+  let maxYear = -Infinity;
+  let hasToSave = false;
 
   enrollments.forEach((e) => {
+    if (hasToSave === false && e.year < 1800) {
+      hasToSave = true; // ⚠️ Temp: Fix outdated year format
+    }
+    e.year = !hasToSave ? e.year : year + e.year - 1; // ⚠️ Temp: Fix outdated year format
+
     const periodKey: PeriodKey = `${e.year}-${e.term}`;
+
     if (!periodMap.has(periodKey)) {
       periodMap.set(periodKey, []);
     }
@@ -100,9 +111,9 @@ export function getPeriodsWithEnrollments({
     maxYear = Math.max(maxYear, e.year);
   });
 
-  for (let year = minYear; year <= maxYear; year++) {
-    const firstSemesterKey: PeriodKey = `${year}-1`;
-    const secondSemesterKey: PeriodKey = `${year}-3`;
+  for (let pYear = minYear; pYear <= maxYear; pYear++) {
+    const firstSemesterKey: PeriodKey = `${pYear}-1`;
+    const secondSemesterKey: PeriodKey = `${pYear}-3`;
 
     if (!periodMap.has(firstSemesterKey)) periodMap.set(firstSemesterKey, []);
     if (!periodMap.has(secondSemesterKey)) periodMap.set(secondSemesterKey, []);
@@ -126,6 +137,7 @@ export function getPeriodsWithEnrollments({
     nCols: sortedPeriods.length,
     nRows: maxRows,
     periods: sortedPeriods,
+    hasToSave,
   };
 }
 
@@ -179,16 +191,17 @@ export function getCurriculumStats(
   };
 }
 
-export function getPeriodInfo(id: PeriodKey) {
+export function getPeriodInfo(id: PeriodKey, startYear = 2020) {
   const [year, term] = id.split("-").map(Number);
-  const number = 2 * year! - (term === 1 ? 1 : 0);
-  const currentDate = new Date()
+
+  const number = 2 * (year! - startYear + 1) - (term === 1 ? 1 : 0);
+  const currentDate = new Date();
   let label = "SEMESTRE";
   let isCurrent = false;
 
   if (
-    year === currentDate.getFullYear() 
-    //&& term === (currentDate.getMonth() < 7 ? 1 : 3)
+    year === currentDate.getFullYear() &&
+    term === (currentDate.getMonth() < 7 ? 1 : 3)
   ) {
     isCurrent = true;
   }
@@ -206,5 +219,6 @@ export function getPeriodInfo(id: PeriodKey) {
     term,
     label,
     isCurrent,
+    number,
   };
 }

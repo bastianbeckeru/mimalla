@@ -1,6 +1,6 @@
 export function arabicToRoman(num: number): string {
   if (num < 1 || num > 100) {
-    throw new Error("El número debe estar entre 1 y 100.");
+    throw new Error(`El número debe estar entre 1 y 100. (${num})`);
   }
 
   const romanNumerals: { value: number; numeral: string }[] = [

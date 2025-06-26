@@ -1,6 +1,6 @@
 import type { CurriculumData } from "./curriculum";
 
-type StudentEnrollment = {
+export type StudentEnrollment = {
   id: string;
   path: string;
   year: number;

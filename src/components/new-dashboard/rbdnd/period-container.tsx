@@ -4,17 +4,18 @@ import { forwardRef } from "react";
 
 type PeriodContainerProps = {
   id: PeriodKey;
+  curriculumYear: number;
   children?: React.ReactNode;
 };
 
 const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
-  ({ id, children, ...props }, ref) => {
-    const { label, isCurrent } = getPeriodInfo(id);
+  ({ id, curriculumYear, children, ...props }, ref) => {
+    const { label, isCurrent } = getPeriodInfo(id, curriculumYear);
 
     return (
       <ol className="flex min-w-32 select-none flex-col gap-2">
         <h3
-          className={`text-center text-xs  tracking-wider ${isCurrent ? "font-extrabold text-primary" : "font-bold text-muted-foreground"}`}
+          className={`text-center text-xs font-bold uppercase tracking-wider text-muted-foreground ${isCurrent && "text-primary"}`}
         >
           {label}
         </h3>

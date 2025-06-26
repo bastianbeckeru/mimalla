@@ -152,7 +152,7 @@ export default function RBDndCurriculum({
                     key={year}
                     className="px-2 text-center text-xs font-bold tracking-wider text-muted-foreground/50"
                   >
-                    {Number(year) + enrolledYear - 1}
+                    {Number(year)}
                   </span>
                   <div className="h-px flex-grow bg-muted-foreground/50"></div>
                 </div>
@@ -175,6 +175,7 @@ export default function RBDndCurriculum({
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     id={period.id}
+                    curriculumYear={enrolledYear}
                   >
                     {period.enrollments.map((enrollment, eIndex) => {
                       const course = getCourse({
@@ -394,7 +395,7 @@ export default function RBDndCurriculum({
 
                     <button
                       className={cn(
-                        "hidden h-8 w-32 items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                        "hidden h-16 w-full items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                         editMode &&
                           "flex hover:bg-accent hover:text-accent-foreground",
                       )}
@@ -403,7 +404,7 @@ export default function RBDndCurriculum({
                         setSelectedPeriodId(period.id);
                       }}
                     >
-                      <Plus className="size-4" />
+                      <Plus />
                     </button>
                   </PeriodContainer>
                 )}
@@ -500,7 +501,7 @@ export default function RBDndCurriculum({
               Inscribir en el{" "}
               {selectedPeriodId && (
                 <span>
-                  {`${periodNames[selectedPeriodId.split("-").map(Number)[1]!]} del ${selectedPeriodId.split("-").map(Number)[0]! + enrolledYear - 1}`}
+                  {`${periodNames[selectedPeriodId.split("-").map(Number)[1]!]} del ${selectedPeriodId.split("-").map(Number)[0]!}`}
                 </span>
               )}
             </p>

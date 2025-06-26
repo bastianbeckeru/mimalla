@@ -37,6 +37,8 @@ export const useNewCurriculumStore = create(
             enrolledCourses: slots.map((slot) => ({
               ...slot,
               id: nanoid(),
+              year: year + (slot.year - 1),
+              term: term === 2 ? (slot.term === 1 ? 2 : 1) : slot.term,
               status: "PENDING",
             })) as EnrolledCourse[],
           };
@@ -72,7 +74,7 @@ export const useNewCurriculumStore = create(
       updateCurriculumEnrollments: (newEnrollments) =>
         set((state) => {
           if (!state || !state.activeCurriculumId) return state;
-
+          console.log("Updating enrollments...");
           const newCurriculums = state.curriculums.map((c) => {
             if (c.id !== state.activeCurriculumId) return c;
 

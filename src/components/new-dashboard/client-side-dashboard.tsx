@@ -24,11 +24,12 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
 import { toast } from "@/hooks/use-toast";
+import { StudentEnrollment } from "@/types/store";
 
 export default function ClientSideDashboard() {
   const {
-    curriculums,
     activeCurriculumId,
+    curriculums,
     selectCurriculum,
     updateCurriculumEnrollments,
   } = useNewCurriculumStore();
@@ -36,6 +37,7 @@ export default function ClientSideDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [data, setData] = useState<CurriculumData | null>(null);
+  const [curriculum, setCurriculum] = useState<StudentEnrollment | null>(null);
   const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
     past: [],
     present: [],
@@ -67,14 +69,17 @@ export default function ClientSideDashboard() {
     }
 
     if (isLoading && curriculums.length > 0) {
-      const present = curriculums.find((c) => c.id === activeCurriculumId);
+      const activeCurriculum = curriculums.find(
+        (c) => c.id === activeCurriculumId,
+      );
 
-      if (!present) {
+      if (!activeCurriculum) {
         setIsLoading(false);
         return;
       }
 
-      const [institutionAcronym, programSlug] = present.path.split("/");
+      const [institutionAcronym, programSlug] =
+        activeCurriculum.path.split("/");
 
       if (!institutionAcronym || !programSlug) {
         setIsLoading(false);
@@ -86,9 +91,14 @@ export default function ClientSideDashboard() {
         programSlug: programSlug,
       })
         .then((data) => {
-          const { periods } = getPeriodsWithEnrollments({
-            enrollments: present.enrolledCourses,
+          setCurriculum(activeCurriculum);
+          const { periods, hasToSave } = getPeriodsWithEnrollments({
+            year: activeCurriculum.year,
+            enrollments: activeCurriculum.enrolledCourses,
           });
+
+          if (hasToSave)
+            updateCurriculumEnrollments(periods.flatMap((p) => p.enrollments));
 
           setHistory({ ...history, present: periods });
           setData(data);
@@ -112,9 +122,14 @@ export default function ClientSideDashboard() {
 
       if (!activeCurriculum) return;
 
-      const { periods } = getPeriodsWithEnrollments({
+      setCurriculum(activeCurriculum);
+      const { periods, hasToSave } = getPeriodsWithEnrollments({
+        year: activeCurriculum.year,
         enrollments: activeCurriculum.enrolledCourses,
       });
+
+      if (hasToSave)
+        updateCurriculumEnrollments(periods.flatMap((p) => p.enrollments));
 
       setHistory({ ...history, present: periods });
     }
@@ -127,6 +142,7 @@ export default function ClientSideDashboard() {
     activeCurriculumId,
     selectCurriculum,
     history,
+    updateCurriculumEnrollments,
   ]);
 
   if (!isLoading && curriculums.length === 0)
