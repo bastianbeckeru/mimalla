@@ -25,8 +25,8 @@ export default function ProgramInfo({
   const { schedule, siesCode, demreCode } = program;
 
   return (
-    <Card className="bg-sidebar text-foreground max-w-96 min-w-64 rounded-none border-0">
-      <CardHeader>
+    <Card className="bg-sidebar text-foreground max-h-full max-w-96 min-w-64 rounded-none border-0">
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-2xl leading-tight font-bold">
           {program.name}
         </CardTitle>
@@ -34,8 +34,9 @@ export default function ProgramInfo({
           {institution.name}
         </span>
       </CardHeader>
-      <CardContent className="">
-        <div className="flex-1 space-y-3 overflow-y-auto">
+
+      <CardContent className="flex-1 overflow-y-auto">
+        <div className="space-y-4">
           <InfoItem
             label="Título Profesional"
             value={professionalTitle?.name}
@@ -53,7 +54,7 @@ export default function ProgramInfo({
         </div>
       </CardContent>
 
-      <CardFooter>{children}</CardFooter>
+      <CardFooter className="flex-shrink-0">{children}</CardFooter>
     </Card>
   );
 }

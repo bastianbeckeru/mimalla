@@ -11,7 +11,7 @@ export default async function IndexPage() {
       <section className="container flex max-w-[64rem] flex-col items-center space-y-4 py-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-balance md:text-7xl xl:text-8xl">
           Toma el{" "}
-          <span className="from-accent to-accent-foreground bg-gradient-to-r bg-clip-text font-extrabold text-transparent">
+          <span className="to-accent bg-gradient-to-r from-pink-700 bg-clip-text font-extrabold text-transparent">
             Control
           </span>{" "}
           de tu <span className="italic">Malla</span>

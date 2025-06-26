@@ -221,3 +221,16 @@
   #0000ff 59% 67%, 
   #8b00ff 67%);
 */
+
+/* SCROLLBAR */
+body::-webkit-scrollbar-thumb {
+  background-color: var(--muted-foreground);
+}
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+* {
+  scrollbar-color: var(--muted-foreground) transparent;
+  scrollbar-width: auto;
+}

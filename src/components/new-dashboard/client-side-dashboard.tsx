@@ -216,7 +216,7 @@ export default function ClientSideDashboard() {
           </header>
           <Progress
             value={stats.progress}
-            className="h-[.125rem] rounded-none md:hidden"
+            className="h-0.5 rounded-none md:hidden"
           />
         </div>
 
