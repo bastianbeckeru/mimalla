@@ -164,7 +164,7 @@
   );
   inset: -0.175rem;
   z-index: -1;
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) /* 0.25rem = 4px */ - 2px);
   animation: rotation 3s linear infinite;
 }
 
