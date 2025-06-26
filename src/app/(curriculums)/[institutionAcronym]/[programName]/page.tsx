@@ -48,28 +48,26 @@ export default async function ProgramPage({ params }: ProgramParams) {
   });
 
   return (
-    <div className="w-dvw border-t lg:border-none lg:p-4">
-      <div className="flex max-w-full flex-col lg:flex-row lg:rounded-md lg:border">
-        <CurriculumView
-          nCols={nCols}
-          nRows={nRows}
-          periods={periods}
-          data={data}
-          className="h-[31rem] w-auto lg:h-auto lg:w-3/4"
-        />
-        <ProgramInfo
+    <div className="lg:max-y-full mx-auto flex h-auto w-full max-w-full flex-col overflow-hidden border md:max-w-none lg:flex-row lg:rounded-md">
+      <CurriculumView
+        nCols={nCols}
+        nRows={nRows}
+        periods={periods}
+        data={data}
+        className="h-[31rem] overflow-auto lg:h-auto lg:flex-1"
+      />
+      <ProgramInfo
+        institution={institution}
+        program={program}
+        degrees={degrees}
+        duration={periods.length}
+      >
+        <ImportCurriculumButton
           institution={institution}
           program={program}
-          degrees={degrees}
-          duration={periods.length}
-        >
-          <ImportCurriculumButton
-            institution={institution}
-            program={program}
-            curriculum={data.curriculum}
-          />
-        </ProgramInfo>
-      </div>
+          curriculum={data.curriculum}
+        />
+      </ProgramInfo>
     </div>
   );
 }

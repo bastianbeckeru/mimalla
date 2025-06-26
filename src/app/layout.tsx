@@ -7,10 +7,10 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   creator: "Jnkyns",
@@ -38,8 +38,11 @@ export const metadata: Metadata = {
 };
 
 const montserrat = Montserrat({
-  subsets: ["latin"],
   variable: "--font-montserrat",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700", "800"], // base, medium, semi-bold, bold, extra-bold
+  display: "swap",
 });
 
 export default function RootLayout({
@@ -47,7 +50,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={cn("font-sans", montserrat.variable)}>
+      <body className={cn("font-sans", montserrat.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

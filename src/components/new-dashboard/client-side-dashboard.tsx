@@ -23,8 +23,9 @@ import useShortcuts from "@/hooks/use-shortcut";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { StudentEnrollment } from "@/types/store";
+import ScrollAreaWrapper from "../ScrollAreaWrapper";
 
 export default function ClientSideDashboard() {
   const {
@@ -150,7 +151,7 @@ export default function ClientSideDashboard() {
 
   if (isLoading || !data)
     return (
-      <Loader2 className="absolute left-[50%] top-[40%] size-8 animate-spin" />
+      <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
     );
 
   const { institution, program, areas, courses } = data;
@@ -165,8 +166,7 @@ export default function ClientSideDashboard() {
 
   function handleEditMode() {
     if (history.past.length > 0) {
-      toast({
-        title: "⚠️ Cambios sin guardar",
+      toast("⚠️ Cambios sin guardar", {
         description:
           "Guarda los cambios realizados antes de finalizar la edición.",
       });
@@ -187,9 +187,9 @@ export default function ClientSideDashboard() {
         setHistory={setHistory}
       />
 
-      <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr]">
+      <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
         <div>
-          <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-sidebar px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <header className="bg-sidebar relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <SidebarTrigger className="absolute left-2 md:hidden" />
 
             <div className="flex items-center justify-center px-2">
@@ -220,16 +220,18 @@ export default function ClientSideDashboard() {
           />
         </div>
 
-        <RBDndCurriculum
-          editMode={editMode}
-          history={history}
-          setHistory={setHistory}
-          areas={areas}
-          courses={new Map(courses.map((c) => [c.id, c]))}
-          approvedCourseIds={approvedCourseIds}
-          failedCourseIds={failedCourseIds}
-          approvedCredits={stats.approvedCredits}
-        />
+        <ScrollAreaWrapper className="h-[calc(100dvh-3.5rem)] w-dvw overflow-hidden lg:w-[calc(100dvw-18rem)]">
+          <RBDndCurriculum
+            editMode={editMode}
+            history={history}
+            setHistory={setHistory}
+            areas={areas}
+            courses={new Map(courses.map((c) => [c.id, c]))}
+            approvedCourseIds={approvedCourseIds}
+            failedCourseIds={failedCourseIds}
+            approvedCredits={stats.approvedCredits}
+          />
+        </ScrollAreaWrapper>
       </SidebarInset>
     </SidebarProvider>
   );

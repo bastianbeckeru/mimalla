@@ -24,7 +24,7 @@ import {
 
 import { MotionDiv } from "../../Motion";
 import CourseDialog from "../course-dialog";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Plus, Trash, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { cn } from "@/lib/utils";
@@ -134,219 +134,109 @@ export default function RBDndCurriculum({
         onDragStart={() => setIsDragging(true)}
         onDragEnd={handleOnDragEnd}
       >
-        <ScrollAreaWrapper>
-          {showTimeline && (
-            <div className="flex select-none flex-row space-x-2 px-4 pb-2 pt-4">
-              {years.map(({ year, count }) => (
-                <div
+        {showTimeline && (
+          <div className="flex flex-row space-x-2 px-4 pt-4 pb-2 select-none">
+            {years.map(({ year, count }) => (
+              <div
+                key={year}
+                className={cn(
+                  "flex min-w-32 flex-row items-center justify-center",
+                  count === 2 && "w-[16.5rem]",
+                  count === 3 && "w-[25.0rem]",
+                  count === 4 && "w-[33.5rem]",
+                )}
+              >
+                <div className="bg-muted-foreground/50 h-px flex-grow"></div>
+                <span
                   key={year}
-                  className={cn(
-                    "flex min-w-32 flex-row items-center justify-center",
-                    count === 2 && "w-[16.5rem]",
-                    count === 3 && "w-[25.0rem]",
-                    count === 4 && "w-[33.5rem]",
-                  )}
+                  className="text-muted-foreground/50 px-2 text-center text-xs font-bold tracking-wider"
                 >
-                  <div className="h-px flex-grow bg-muted-foreground/50"></div>
-                  <span
-                    key={year}
-                    className="px-2 text-center text-xs font-bold tracking-wider text-muted-foreground/50"
-                  >
-                    {Number(year)}
-                  </span>
-                  <div className="h-px flex-grow bg-muted-foreground/50"></div>
-                </div>
-              ))}
-            </div>
+                  {Number(year)}
+                </span>
+                <div className="bg-muted-foreground/50 h-px flex-grow"></div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={cn(
+            "flex h-max min-h-fit flex-row space-x-2 px-4 pb-4",
+            !showTimeline && "pt-4",
+            editMode && "h-dvh",
           )}
+        >
+          {history.present.map((period, pIndex) => (
+            <Droppable droppableId={period.id} key={period.id}>
+              {(provided) => (
+                <PeriodContainer
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  id={period.id}
+                  curriculumYear={enrolledYear}
+                >
+                  {period.enrollments.map((enrollment, eIndex) => {
+                    const course = getCourse({
+                      id: enrollment.courseId,
+                      courses: courses,
+                    });
+                    const area = course && getCourseArea(areas, course);
+                    const color = area?.color;
 
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={cn(
-              "flex h-max min-h-fit flex-row space-x-2 px-4 pb-4",
-              !showTimeline && "pt-4",
-            )}
-          >
-            {history.present.map((period, pIndex) => (
-              <Droppable droppableId={period.id} key={period.id}>
-                {(provided) => (
-                  <PeriodContainer
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    id={period.id}
-                    curriculumYear={enrolledYear}
-                  >
-                    {period.enrollments.map((enrollment, eIndex) => {
-                      const course = getCourse({
-                        id: enrollment.courseId,
-                        courses: courses,
-                      });
-                      const area = course && getCourseArea(areas, course);
-                      const color = area?.color;
+                    const isAvailable = !course
+                      ? true
+                      : course.prerequisiteIds.every((id) =>
+                          approvedCourseIds.includes(id),
+                        ) && course.prerequisiteCredits <= approvedCredits;
 
-                      const isAvailable = !course
-                        ? true
-                        : course.prerequisiteIds.every((id) =>
-                            approvedCourseIds.includes(id),
-                          ) && course.prerequisiteCredits <= approvedCredits;
+                    return (
+                      <Draggable
+                        key={enrollment.id}
+                        index={eIndex}
+                        draggableId={enrollment.id}
+                        isDragDisabled={!editMode}
+                      >
+                        {(provided, snapshot) => (
+                          <SlotCard
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                            enrollment={enrollment}
+                            course={course}
+                            color={color}
+                            isAvailable={isAvailable}
+                            isDragging={snapshot.isDragging}
+                            onClick={() => {
+                              if (snapshot.isDragging) return;
 
-                      return (
-                        <Draggable
-                          key={enrollment.id}
-                          index={eIndex}
-                          draggableId={enrollment.id}
-                          isDragDisabled={!editMode}
-                        >
-                          {(provided, snapshot) => (
-                            <SlotCard
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              ref={provided.innerRef}
-                              enrollment={enrollment}
-                              course={course}
-                              color={color}
-                              isAvailable={isAvailable}
-                              isDragging={snapshot.isDragging}
-                              onClick={() => {
-                                if (snapshot.isDragging) return;
+                              if (!editMode) {
+                                setActiveEnrollment({
+                                  ...enrollment,
+                                  course: course,
+                                  color: color,
+                                });
 
-                                if (!editMode) {
-                                  setActiveEnrollment({
-                                    ...enrollment,
-                                    course: course,
-                                    color: color,
-                                  });
+                                setOpenDialogId("course-info");
+                              } else {
+                                if (!isAvailable) return;
 
-                                  setOpenDialogId("course-info");
-                                } else {
-                                  if (!isAvailable) return;
+                                const newStatus =
+                                  statusTransitions[enrollment.status];
+                                const currentPeriods = [...history.present];
+                                let updatedPeriods = currentPeriods;
 
-                                  const newStatus =
-                                    statusTransitions[enrollment.status];
-                                  const currentPeriods = [...history.present];
-                                  let updatedPeriods = currentPeriods;
-
-                                  // 1. APPROVED: Change the status of the enrollment
-                                  // 2. PENDING: Revert the status of the enrollment and related enrollments
-                                  // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
-                                  if (
-                                    !course ||
-                                    course.isElective ||
-                                    newStatus === "APPROVED"
-                                  ) {
-                                    updatedPeriods = updatedPeriods.map((p) => {
-                                      if (p.id === period.id) {
-                                        const updatedEnrollments =
-                                          p.enrollments.map((e) => {
-                                            if (e.id === enrollment.id) {
-                                              return {
-                                                ...e,
-                                                status: newStatus,
-                                              };
-                                            }
-
-                                            return e;
-                                          });
-
-                                        return {
-                                          ...p,
-                                          enrollments: updatedEnrollments,
-                                        };
-                                      }
-                                      return p;
-                                    });
-                                  } else {
-                                    const coursesToRevert =
-                                      collectSubsequentCourses(
-                                        enrollment.courseId,
-                                      );
-                                    updatedPeriods = revert(
-                                      currentPeriods,
-                                      coursesToRevert,
-                                    );
-
-                                    // EXTRA LOGIC
-                                    if (
-                                      newStatus === "FAILED" &&
-                                      autoRescheduleFailed
-                                    ) {
-                                      // Add a new enrollment with the same course to the next period
-                                      const nextPeriod = updatedPeriods.at(
-                                        pIndex + 1,
-                                      );
-                                      const newEnrollment = {
-                                        id: nanoid(),
-                                        courseId: enrollment.courseId,
-                                        status:
-                                          "PENDING" as EnrolledCourseStatus,
-                                      };
-
-                                      if (!nextPeriod) {
-                                        const [year, term] = period.id
-                                          .split("-")
-                                          .map(Number);
-                                        const [newYear, newTerm] =
-                                          term === 2
-                                            ? [year! + 1, 1]
-                                            : [year!, 2];
-
-                                        updatedPeriods.push({
-                                          id: `${newYear}-${newTerm}`,
-                                          enrollments: [
-                                            {
-                                              ...newEnrollment,
-                                              position: 1,
-                                              year: newYear,
-                                              term: newTerm,
-                                            },
-                                          ],
-                                        });
-                                      } else {
-                                        if (
-                                          !nextPeriod.enrollments.some(
-                                            (e) =>
-                                              e.courseId ===
-                                              enrollment.courseId,
-                                          )
-                                        ) {
-                                          const [newYear, newTerm] =
-                                            nextPeriod.id
-                                              .split("-")
-                                              .map(Number);
-                                          const hasNextPeriodSubsequentCourses =
-                                            nextPeriod.enrollments.some((e) =>
-                                              course.subsequentIds.includes(
-                                                e.courseId,
-                                              ),
-                                            );
-
-                                          nextPeriod.enrollments.push({
-                                            ...newEnrollment,
-                                            position:
-                                              nextPeriod.enrollments.length + 1,
-                                            year: newYear!,
-                                            term: newTerm!,
-                                          });
-
-                                          if (hasNextPeriodSubsequentCourses) {
-                                            // Move every subsequent course to the next period
-                                            updatedPeriods =
-                                              moveSubsequentCourses(
-                                                updatedPeriods,
-                                                enrollment.courseId,
-                                              );
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-
-                                  function revert(
-                                    periods: PeriodWithEnrollments[],
-                                    coursesToRevert: number[] = [],
-                                  ) {
-                                    return periods.map((p) => {
+                                // 1. APPROVED: Change the status of the enrollment
+                                // 2. PENDING: Revert the status of the enrollment and related enrollments
+                                // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
+                                if (
+                                  !course ||
+                                  course.isElective ||
+                                  newStatus === "APPROVED"
+                                ) {
+                                  updatedPeriods = updatedPeriods.map((p) => {
+                                    if (p.id === period.id) {
                                       const updatedEnrollments =
                                         p.enrollments.map((e) => {
                                           if (e.id === enrollment.id) {
@@ -356,113 +246,219 @@ export default function RBDndCurriculum({
                                             };
                                           }
 
-                                          const shouldRevert =
-                                            coursesToRevert.includes(
-                                              e.courseId,
-                                            );
-                                          return {
-                                            ...e,
-                                            status: shouldRevert
-                                              ? "PENDING"
-                                              : e.status,
-                                          };
+                                          return e;
                                         });
 
                                       return {
                                         ...p,
                                         enrollments: updatedEnrollments,
                                       };
-                                    });
-                                  }
+                                    }
+                                    return p;
+                                  });
+                                } else {
+                                  const coursesToRevert =
+                                    collectSubsequentCourses(
+                                      enrollment.courseId,
+                                    );
+                                  updatedPeriods = revert(
+                                    currentPeriods,
+                                    coursesToRevert,
+                                  );
 
-                                  setHistory((prev) => {
+                                  // EXTRA LOGIC
+                                  if (
+                                    newStatus === "FAILED" &&
+                                    autoRescheduleFailed
+                                  ) {
+                                    // Add a new enrollment with the same course to the next period
+                                    const nextPeriod = updatedPeriods.at(
+                                      pIndex + 1,
+                                    );
+                                    const newEnrollment = {
+                                      id: nanoid(),
+                                      courseId: enrollment.courseId,
+                                      status: "PENDING" as EnrolledCourseStatus,
+                                    };
+
+                                    if (!nextPeriod) {
+                                      const [year, term] = period.id
+                                        .split("-")
+                                        .map(Number);
+                                      const [newYear, newTerm] =
+                                        term === 2
+                                          ? [year! + 1, 1]
+                                          : [year!, 2];
+
+                                      updatedPeriods.push({
+                                        id: `${newYear}-${newTerm}`,
+                                        enrollments: [
+                                          {
+                                            ...newEnrollment,
+                                            position: 1,
+                                            year: newYear,
+                                            term: newTerm,
+                                          },
+                                        ],
+                                      });
+                                    } else {
+                                      if (
+                                        !nextPeriod.enrollments.some(
+                                          (e) =>
+                                            e.courseId === enrollment.courseId,
+                                        )
+                                      ) {
+                                        const [newYear, newTerm] = nextPeriod.id
+                                          .split("-")
+                                          .map(Number);
+                                        const hasNextPeriodSubsequentCourses =
+                                          nextPeriod.enrollments.some((e) =>
+                                            course.subsequentIds.includes(
+                                              e.courseId,
+                                            ),
+                                          );
+
+                                        nextPeriod.enrollments.push({
+                                          ...newEnrollment,
+                                          position:
+                                            nextPeriod.enrollments.length + 1,
+                                          year: newYear!,
+                                          term: newTerm!,
+                                        });
+
+                                        if (hasNextPeriodSubsequentCourses) {
+                                          // Move every subsequent course to the next period
+                                          updatedPeriods =
+                                            moveSubsequentCourses(
+                                              updatedPeriods,
+                                              enrollment.courseId,
+                                            );
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+
+                                function revert(
+                                  periods: PeriodWithEnrollments[],
+                                  coursesToRevert: number[] = [],
+                                ) {
+                                  return periods.map((p) => {
+                                    const updatedEnrollments =
+                                      p.enrollments.map((e) => {
+                                        if (e.id === enrollment.id) {
+                                          return {
+                                            ...e,
+                                            status: newStatus,
+                                          };
+                                        }
+
+                                        const shouldRevert =
+                                          coursesToRevert.includes(e.courseId);
+                                        return {
+                                          ...e,
+                                          status: shouldRevert
+                                            ? "PENDING"
+                                            : e.status,
+                                        };
+                                      });
+
                                     return {
-                                      past: [...prev.past, prev.present].slice(
-                                        -MAX_HISTORY,
-                                      ),
-                                      present: updatedPeriods,
-                                      future: [],
+                                      ...p,
+                                      enrollments: updatedEnrollments,
                                     };
                                   });
                                 }
-                              }}
-                            />
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                    {provided.placeholder}
 
-                    <button
-                      className={cn(
-                        "hidden h-16 w-full items-center justify-center rounded-md border text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                        editMode &&
-                          "flex hover:bg-accent hover:text-accent-foreground",
-                      )}
-                      onClick={() => {
-                        setOpenDialogId("add-course");
-                        setSelectedPeriodId(period.id);
-                      }}
-                    >
-                      <Plus />
-                    </button>
-                  </PeriodContainer>
-                )}
-              </Droppable>
-            ))}
+                                setHistory((prev) => {
+                                  return {
+                                    past: [...prev.past, prev.present].slice(
+                                      -MAX_HISTORY,
+                                    ),
+                                    present: updatedPeriods,
+                                    future: [],
+                                  };
+                                });
+                              }
+                            }}
+                          />
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
 
-            <button
-              className={cn(
-                "hidden w-32 flex-col items-center justify-center rounded-md border p-2 text-muted-foreground transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                editMode && "flex hover:bg-accent hover:text-accent-foreground",
+                  <button
+                    className={cn(
+                      "text-muted-foreground hidden h-16 w-full items-center justify-center rounded-md border transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                      editMode &&
+                        "hover:bg-accent hover:text-accent-foreground flex",
+                    )}
+                    onClick={() => {
+                      setOpenDialogId("add-course");
+                      setSelectedPeriodId(period.id);
+                    }}
+                  >
+                    <Plus />
+                  </button>
+                </PeriodContainer>
               )}
-              onClick={() => setOpenDialogId("add-period")}
-            >
-              <Plus />
-            </button>
-          </MotionDiv>
-        </ScrollAreaWrapper>
+            </Droppable>
+          ))}
+
+          <button
+            className={cn(
+              "text-muted-foreground hidden w-32 flex-col items-center justify-center rounded-md border p-2 transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+              editMode && "hover:bg-accent hover:text-accent-foreground flex",
+            )}
+            onClick={() => setOpenDialogId("add-period")}
+          >
+            <Plus />
+          </button>
+        </MotionDiv>
 
         {editMode && (
-          <div className="m-2 grid grid-cols-3 items-center rounded-md bg-muted p-2 transition-transform md:bg-transparent">
-            <div></div>
+          <div className="absolute bottom-0 left-0 w-full p-2 transition-transform">
+            <div className="bg-muted grid grid-cols-3 items-center rounded-md p-2 md:bg-transparent">
+              <div></div>
 
-            <div className="mx-auto">
-              <Droppable droppableId="trash">
-                {(provided, snapshot) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    id="trash"
-                    className={cn(
-                      "flex h-10 w-24 items-center justify-center rounded-md bg-black/25 p-2 shadow-inner transition-all md:h-14 md:w-32 md:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                      snapshot.isDraggingOver &&
-                        "h-20 w-36 border-2 border-foreground bg-destructive md:h-20 md:w-36 md:bg-destructive",
-                    )}
+              <div className="mx-auto">
+                <Droppable droppableId="trash">
+                  {(provided, snapshot) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      id="trash"
+                      className={cn(
+                        "md:bg-muted flex h-10 w-24 items-center justify-center rounded-md bg-black/25 p-2 shadow-inner transition-all md:h-14 md:w-32 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                        snapshot.isDraggingOver &&
+                          "border-foreground bg-destructive md:bg-destructive h-20 w-36 border-2 md:h-20 md:w-36",
+                      )}
+                    >
+                      <Trash />
+                      <div className="absolute">{provided.placeholder}</div>
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+
+              <div className="flex size-full items-end justify-end">
+                <div className="bg-muted flex h-10 w-28 flex-row items-center justify-end rounded-md md:h-8 md:w-16">
+                  <button
+                    className="hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted flex size-full items-center justify-center rounded-l-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                    onClick={() => undo()}
+                    disabled={history.past.length === 0}
                   >
-                    <Trash />
-                    <div className="absolute">{provided.placeholder}</div>
-                  </div>
-                )}
-              </Droppable>
-            </div>
-
-            <div className="flex size-full items-end justify-end">
-              <div className="flex h-10 w-28 flex-row items-center justify-end rounded-md bg-muted md:h-8 md:w-16">
-                <button
-                  className="flex size-full items-center justify-center rounded-l-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                  onClick={() => undo()}
-                  disabled={history.past.length === 0}
-                >
-                  <Undo2 />
-                </button>
-                <button
-                  className="flex size-full items-center justify-center rounded-r-md transition-colors hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                  onClick={redo}
-                  disabled={history.future.length === 0}
-                >
-                  <Undo2 className="-scale-x-100" />
-                </button>
+                    <Undo2 />
+                  </button>
+                  <button
+                    className="hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted flex size-full items-center justify-center rounded-r-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                    onClick={redo}
+                    disabled={history.future.length === 0}
+                  >
+                    <Undo2 className="-scale-x-100" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -624,8 +620,7 @@ export default function RBDndCurriculum({
       if (p.id !== periodId) return p;
 
       if (p.enrollments.length >= 10) {
-        toast({
-          title: "❌ Límite de cursos",
+        toast("❌ Límite de cursos", {
           description: "No puedes añadir más de 10 cursos por periodo.",
         });
         return p;
@@ -636,8 +631,7 @@ export default function RBDndCurriculum({
         p.enrollments.some((e) => e.courseId === courseId) &&
         !course.isElective
       ) {
-        toast({
-          title: "❌ Curso duplicado",
+        toast("❌ Curso duplicado", {
           description: "No puedes añadir un curso que ya está en el periodo.",
         });
         return p;
@@ -733,8 +727,7 @@ export default function RBDndCurriculum({
     if (!sourceContainer || !destinationContainer) return;
 
     if (destinationContainer.enrollments.length >= 10) {
-      toast({
-        title: "❌ Límite de cursos",
+      toast("❌ Límite de cursos", {
         description:
           "No puedes mover un curso a un destino que contenga 10 cursos o más.",
       });
@@ -756,8 +749,7 @@ export default function RBDndCurriculum({
     );
 
     if (!isValid) {
-      toast({
-        title: "❌ Movimiento inválido",
+      toast("❌ Movimiento inválido", {
         description: error,
       });
       return;

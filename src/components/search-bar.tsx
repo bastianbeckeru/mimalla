@@ -31,12 +31,12 @@ export function Searchbar() {
     <>
       <Button
         variant="outline"
-        className="h-8 w-48 p-1.5 pl-3 text-muted-foreground"
+        className="text-muted-foreground h-8 w-48 cursor-pointer p-1.5 pl-3"
         onClick={() => setOpen(true)}
       >
         <p className="flex flex-grow text-sm">Buscar malla...</p>
         <p className="">
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-sm font-medium">
+          <kbd className="bg-muted pointer-events-none inline-flex h-5 items-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium select-none">
             <span className="text-xs">⌘</span>K
           </kbd>
         </p>

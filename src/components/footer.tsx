@@ -8,8 +8,8 @@ export default function Footer({
   className,
 }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <footer className={cn(className)}>
-      <div className="container flex flex-col items-center justify-between gap-4 py-8 text-muted-foreground md:h-20 md:flex-row md:py-0">
+    <footer className={cn("", className)}>
+      <div className="text-muted-foreground flex flex-col items-center justify-between gap-4 py-8 md:h-20 md:flex-row md:py-0">
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           {/* <Kanban className="hidden size-5 sm:block" /> */}
           <p className="text-center text-sm leading-relaxed md:text-left">
@@ -27,9 +27,9 @@ export default function Footer({
             target="_blank"
             rel="noreferrer"
             href="https://discord.gg/wez3cJDzXk"
-            className="flex items-center justify-center"
+            className="[&>svg]:hover:text-foreground flex items-center justify-center [&>svg]:size-5 [&>svg]:transition-colors"
           >
-            <DiscordIcon className="size-5 transition-colors hover:text-foreground" />
+            <DiscordIcon />
           </a>
           {/* <ModeToggle /> */}
         </div>

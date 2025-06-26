@@ -12,8 +12,8 @@ export default function Navbar({ className }: NavbarProps) {
   //const { data: session } = useSession();
 
   return (
-    <header className={cn("container z-10 h-16 py-4", className)}>
-      <nav className="flex items-center justify-between">
+    <header className={cn("z-10 px-4 lg:px-0", className)}>
+      <nav className="flex h-16 items-center justify-between py-4">
         <Logo />
         <Searchbar />
       </nav>

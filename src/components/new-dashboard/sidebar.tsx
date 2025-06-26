@@ -91,13 +91,13 @@ export default function DashboardSidebar({
               <SidebarMenuButton
                 tooltip="Modo edición"
                 onClick={() => setEditMode(!editMode)}
-                className="justify-start text-muted-foreground hover:text-foreground group-data-[collapsible=icon]:!p-1 [&>svg]:size-4 [&>svg]:text-foreground"
+                className="text-muted-foreground hover:text-foreground [&>svg]:text-foreground justify-start group-data-[collapsible=icon]:!p-1 [&>svg]:size-4"
               >
                 {editMode ? <PencilOff /> : <Pencil />}
-                <span className="flex-grow truncate text-foreground">
+                <span className="text-foreground flex-grow truncate">
                   {editMode ? "Deshabilitar" : "Habilitar"} edición
                 </span>
-                <kbd className="hidden h-5 items-center justify-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-sm font-medium md:inline-flex">
+                <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
                   <span className="text-[0.625rem]">⌘</span>E
                 </kbd>
               </SidebarMenuButton>
@@ -135,7 +135,7 @@ export default function DashboardSidebar({
                   className="flex w-full flex-row items-center space-x-2"
                 >
                   <div
-                    className="size-4 shrink-0 rounded-sm shadow-inner"
+                    className="size-4 shrink-0 rounded-xs shadow-inner"
                     style={{
                       backgroundColor: area.color,
                     }}
@@ -152,7 +152,7 @@ export default function DashboardSidebar({
         <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
-          className="my-4 block w-full text-center text-sm text-muted-foreground underline transition-colors duration-200 hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground my-4 block w-full text-center text-sm underline transition-colors duration-200"
         >
           ¡Ayudanos a mejorar!
         </a>

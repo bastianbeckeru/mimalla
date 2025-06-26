@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { createUrlSlug } from "@/utils/strings";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -125,8 +125,7 @@ export default function CurriculumForm({
 
       setData(data);
 
-      toast({
-        title: "✅ Malla importada",
+      toast("✅ Malla importada", {
         description: `${data.program.name} ${data.curriculum.year}`,
       });
     } catch (error) {
@@ -141,7 +140,7 @@ export default function CurriculumForm({
         href="/"
         className={cn(
           buttonVariants({ variant: "ghost" }),
-          "absolute left-4 top-4 md:left-8 md:top-8",
+          "absolute top-4 left-4 md:top-8 md:left-8",
         )}
       >
         <ChevronLeftIcon className="mr-2 size-4" />
@@ -155,7 +154,7 @@ export default function CurriculumForm({
               Crea tu malla de estudios
             </span>
           </h1>
-          <p className="text-left text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-left text-sm">
             Comienza seleccionando tu carrera y datos de ingreso
           </p>
         </div>
@@ -213,7 +212,7 @@ export default function CurriculumForm({
               {selectedProgram && (
                 <Link
                   href={`${selectedInstitution?.acronym.toLowerCase()}/${createUrlSlug(selectedProgram.name)}`}
-                  className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
                 >
                   Ver malla
                 </Link>
@@ -222,7 +221,7 @@ export default function CurriculumForm({
           </div>
 
           <div className="flex flex-col">
-            <h3 className="font-semibold text-muted-foreground">Ingreso</h3>
+            <h3 className="text-muted-foreground font-semibold">Ingreso</h3>
             <div className="flex flex-row gap-2">
               <Select
                 onValueChange={(value) => setYear(parseInt(value))}
@@ -280,14 +279,14 @@ export default function CurriculumForm({
             )}
           </Button>
 
-          <p className="px-4 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground px-4 text-center text-sm">
             ¿No encuentras tu carrera?{" "}
             <a
               aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
               target="_blank"
               rel="noreferrer"
               href="https://forms.gle/P6JjrCPn1y4fZyUNA"
-              className="underline underline-offset-4 hover:text-foreground"
+              className="hover:text-foreground underline underline-offset-4"
             >
               Haz clic aquí
             </a>

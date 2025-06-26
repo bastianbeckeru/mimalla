@@ -34,10 +34,9 @@ export default function InstitutionLayout({
   children,
 }: InstitutionParams & { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh grid-rows-[auto_1fr]">
-      <Navbar />
-      {/*       <div className="absolute inset-0 z-[-10] bg-[linear-gradient(to_right,#8080801e_1px,transparent_1px),linear-gradient(to_bottom,#8080801e_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] dark:bg-[linear-gradient(to_right,#4f4f4f1e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1e_1px,transparent_1px)]" /> */}
-      {children}
+    <div className="grid min-h-dvh w-dvw grid-rows-[auto_1fr] lg:px-16">
+      <Navbar className="" />
+      <main className="flex-1 overflow-hidden py-0 lg:py-4">{children}</main>
     </div>
   );
 }
