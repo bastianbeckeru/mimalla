@@ -23,6 +23,7 @@ import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { CurriculumData } from "@/types/curriculum";
 import { useRouter } from "next/navigation";
 import { createUrlSlug } from "@/utils/strings";
+import Link from "next/link";
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
 const periods = [
@@ -41,12 +42,20 @@ export default function ImportCurriculumButton({
   institution,
   program,
 }: Props) {
-  const { addCurriculum } = useNewCurriculumStore();
+  const { addCurriculum, curriculums } = useNewCurriculumStore();
   const [year, setYear] = useState<number>();
   const [period, setPeriod] = useState<number>();
   const router = useRouter();
 
   const path = `${institution.acronym.toLocaleLowerCase()}/${createUrlSlug(program.name)}`;
+
+  if (curriculums.some((c) => c.path === path)) {
+    return (
+      <Button className="w-full" asChild>
+        <Link href="/dashboard">Ir a mi malla</Link>
+      </Button>
+    );
+  }
 
   return (
     <Dialog>
@@ -70,12 +79,12 @@ export default function ImportCurriculumButton({
           </div>
           <div className="flex flex-col">
             <h3 className="font-semibold text-muted-foreground">Ingreso</h3>
-            <div className="flex flex-col gap-2 md:flex-row">
+            <div className="flex flex-row gap-2 md:flex-row">
               <Select
                 onValueChange={(value) => setYear(parseInt(value))}
                 value={year?.toString()}
               >
-                <SelectTrigger id="year">
+                <SelectTrigger id="year" className="w-1/3">
                   <SelectValue placeholder="Año" />
                 </SelectTrigger>
                 <SelectContent>
@@ -92,7 +101,7 @@ export default function ImportCurriculumButton({
                 onValueChange={(value) => setPeriod(parseInt(value))}
                 value={period?.toString()}
               >
-                <SelectTrigger id=" semester">
+                <SelectTrigger id=" semester" className="w-2/3">
                   <SelectValue placeholder="Semestre" />
                 </SelectTrigger>
                 <SelectContent>

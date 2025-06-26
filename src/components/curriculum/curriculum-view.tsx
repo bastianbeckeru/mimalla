@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { checkContrasts } from "@/utils/colors";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import type {
   CurriculumData,
@@ -38,7 +38,10 @@ export default function CurriculumView({
 }: CurriculumViewProps) {
   const { curriculum, areas } = data;
   const courses = new Map(data.courses.map((item) => [item.id, item]));
-  const [isHovering, setIsHovering] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+  const [tapTimeout, setTapTimeout] = useState<NodeJS.Timeout | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<ModifiedCourse | null>(
     null,
@@ -54,6 +57,69 @@ export default function CurriculumView({
     gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
     gap: `${GRID_GAP}rem`,
     padding: `${PADDING}rem`,
+  };
+
+  // Handle clicks outside the card
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setSelectedCourses([]);
+        setIsSelected(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tapTimeout) {
+        clearTimeout(tapTimeout);
+      }
+    };
+  }, [tapTimeout]);
+
+  const handleMouseEnter = (action: () => void) => {
+    // Only apply hover effect on non-touch devices
+    if (!("ontouchstart" in window)) {
+      setIsSelected(true);
+      action();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    // Only apply hover effect on non-touch devices
+    if (!("ontouchstart" in window)) {
+      setSelectedCourses([]);
+      setIsSelected(false);
+    }
+  };
+
+  const handleTouchStart = (action: () => void) => {
+    // Clear any existing timeout
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+    }
+
+    // Set timeout for 0.5s
+    const timeout = setTimeout(() => {
+      setIsSelected(true);
+      action();
+    }, 500);
+
+    setTapTimeout(timeout);
+  };
+
+  const handleTouchEnd = () => {
+    // Clear timeout if touch ends before 0.5s
+    if (tapTimeout) {
+      clearTimeout(tapTimeout);
+      setTapTimeout(null);
+    }
   };
 
   return (
@@ -109,41 +175,42 @@ export default function CurriculumView({
 
               const isRelated = course && selectedCourses.includes(course.id);
 
+              function handleSelection() {
+                if (!course) return;
+
+                const relatedPaths = getRelatedPaths({
+                  originSlot: slot,
+                  slots: curriculum.slots,
+                  periods: periods,
+                  course: course,
+                });
+
+                setSelectedCourses([
+                  ...course.prerequisiteIds,
+                  ...course.subsequentIds,
+                  ...[course.id],
+                ]);
+                setRelatedPaths(relatedPaths);
+                setIsSelected(true);
+              }
+
               return (
                 <Card
                   key={`${slot.year}-${slot.term}-${slot.position}`}
+                  ref={cardRef}
                   className={cn(
                     "cursor-pointer select-none transition-opacity hover:border hover:border-foreground hover:brightness-95 dark:hover:brightness-105",
                     hasLowBackgroundElementContrast &&
                       "border border-foreground/50",
                     hasLowElementTextContrast && "text-background",
-                    isHovering && !isRelated && "opacity-25",
+                    isSelected && !isRelated && "opacity-25",
                   )}
                   style={slotStyle}
-                  onMouseEnter={() => {
-                    if (!course) return;
-
-                    const relatedPaths = getRelatedPaths({
-                      originSlot: slot,
-                      slots: curriculum.slots,
-                      periods: periods,
-                      course: course,
-                    });
-
-                    setSelectedCourses([
-                      ...course.prerequisiteIds,
-                      ...course.subsequentIds,
-                      ...[course.id],
-                    ]);
-                    setRelatedPaths(relatedPaths);
-                    setIsHovering(true);
-                  }}
-                  onMouseLeave={() => {
-                    if (!course) return;
-
-                    setSelectedCourses([]);
-                    setIsHovering(false);
-                  }}
+                  onTouchStart={() => handleTouchStart(handleSelection)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchMove={handleTouchEnd}
+                  onMouseEnter={() => handleMouseEnter(handleSelection)}
+                  onMouseLeave={handleMouseLeave}
                   onClick={() => {
                     if (!course?.isElective) return;
 
@@ -160,7 +227,7 @@ export default function CurriculumView({
               );
             })}
             <svg className="absolute left-0 top-0 -z-50 size-full">
-              {isHovering &&
+              {isSelected &&
                 relatedPaths.map((related) => {
                   return related.paths.map((path, pIndex) => (
                     <Path key={pIndex} path={path} color={related.color} />
