@@ -7,7 +7,7 @@ export default async function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-16 grid min-h-dvh grid-rows-[auto_1fr_auto]">
+    <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] lg:mx-16">
       <Navbar />
       {children}
       <Footer />

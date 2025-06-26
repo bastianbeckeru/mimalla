@@ -8,7 +8,7 @@ export default function Footer({
   className,
 }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <footer className={cn("", className)}>
+    <footer className={cn("px-4 lg:px-0", className)}>
       <div className="text-muted-foreground flex flex-col items-center justify-between gap-4 py-8 md:h-20 md:flex-row md:py-0">
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           {/* <Kanban className="hidden size-5 sm:block" /> */}

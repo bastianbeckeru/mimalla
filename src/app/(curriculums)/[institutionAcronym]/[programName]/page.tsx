@@ -48,7 +48,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
   });
 
   return (
-    <div className="lg:max-y-full mx-auto flex h-auto w-full max-w-full flex-col overflow-hidden border md:max-w-none lg:flex-row lg:rounded-md">
+    <div className="lg:max-y-full mx-auto flex h-auto w-full max-w-full flex-col overflow-hidden border-t lg:flex-row lg:rounded-md lg:border">
       <CurriculumView
         nCols={nCols}
         nRows={nRows}
