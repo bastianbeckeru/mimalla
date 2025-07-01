@@ -179,8 +179,8 @@
     {
       "id": 177,
       "name": "Fundamentos Histórico-Sociales del Derecho Privado",
-      "code": "",
-      "credits": 0,
+      "code": "DER06111",
+      "credits": 5,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -190,8 +190,8 @@
     {
       "id": 178,
       "name": "Instituciones Políticas y Derechos Humanos",
-      "code": "",
-      "credits": 0,
+      "code": "DER06112",
+      "credits": 5,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -201,8 +201,8 @@
     {
       "id": 179,
       "name": "Taller de Razonamiento Jurídico",
-      "code": "",
-      "credits": 0,
+      "code": "DER06113",
+      "credits": 10,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -212,8 +212,8 @@
     {
       "id": 180,
       "name": "Taller de Investigación y Escritural Legal",
-      "code": "",
-      "credits": 0,
+      "code": "DER06114",
+      "credits": 5,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -223,8 +223,8 @@
     {
       "id": 181,
       "name": "Comunicación Oral",
-      "code": "",
-      "credits": 0,
+      "code": "DER06115",
+      "credits": 3,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -234,10 +234,10 @@
     {
       "id": 182,
       "name": "Persona y Acto Jurídico",
-      "code": "",
-      "credits": 0,
+      "code": "DER06121",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [177],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -245,10 +245,10 @@
     {
       "id": 183,
       "name": "Derecho Constitucional Orgánico",
-      "code": "",
-      "credits": 0,
+      "code": "DER06122",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [178],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -256,10 +256,10 @@
     {
       "id": 184,
       "name": "Introducción al Derecho I",
-      "code": "",
-      "credits": 0,
+      "code": "DER06123",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [179],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -267,10 +267,10 @@
     {
       "id": 185,
       "name": "Bases Generales del Derecho Procesal",
-      "code": "",
-      "credits": 0,
+      "code": "DER06124",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [179],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -278,10 +278,10 @@
     {
       "id": 186,
       "name": "Derechos Reales y Derecho Inmobiliario",
-      "code": "",
-      "credits": 0,
+      "code": "DER06211",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [182],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -289,10 +289,10 @@
     {
       "id": 187,
       "name": "Derechos Fundamentales",
-      "code": "",
-      "credits": 0,
+      "code": "DER06212",
+      "credits": 7,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [183],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -300,10 +300,10 @@
     {
       "id": 188,
       "name": "Introducción al Derecho II",
-      "code": "",
-      "credits": 0,
+      "code": "DER06213",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [184],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -311,10 +311,10 @@
     {
       "id": 189,
       "name": "Economía y Derecho",
-      "code": "",
-      "credits": 0,
+      "code": "DER06214",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [180],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -322,10 +322,10 @@
     {
       "id": 190,
       "name": "Derecho de las Obligaciones",
-      "code": "",
-      "credits": 0,
+      "code": "DER06221",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [186],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -333,10 +333,10 @@
     {
       "id": 191,
       "name": "Derecho Penal Parte General I",
-      "code": "",
-      "credits": 0,
+      "code": "DER06222",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [184],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -344,10 +344,10 @@
     {
       "id": 192,
       "name": "Taller Destrezas Litigación Oral",
-      "code": "",
-      "credits": 0,
+      "code": "DER06223",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [181, 185, 186, 187, 188],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -355,10 +355,10 @@
     {
       "id": 193,
       "name": "Derecho Regulatorio",
-      "code": "",
-      "credits": 0,
+      "code": "DER06224",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [189],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -366,10 +366,10 @@
     {
       "id": 194,
       "name": "Derecho de Daños",
-      "code": "",
-      "credits": 0,
+      "code": "DER06311",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [190],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -377,21 +377,21 @@
     {
       "id": 195,
       "name": "Derecho Internacional Público",
-      "code": "",
-      "credits": 0,
+      "code": "DER06312",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [187],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
     {
       "id": 196,
-      "name": "Dereco Penal Parte General II",
-      "code": "",
-      "credits": 0,
+      "name": "Derecho Penal Parte General II",
+      "code": "DER06313",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [188, 191],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -399,10 +399,10 @@
     {
       "id": 197,
       "name": "Procedimientos Judiciales",
-      "code": "",
-      "credits": 0,
+      "code": "DER06314",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [192],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -410,10 +410,10 @@
     {
       "id": 198,
       "name": "Derecho Comercial",
-      "code": "",
-      "credits": 0,
+      "code": "DER06315",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [193],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -421,10 +421,10 @@
     {
       "id": 199,
       "name": "Contratos",
-      "code": "",
-      "credits": 0,
+      "code": "DER06321",
+      "credits": 7,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [180, 194],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -432,10 +432,10 @@
     {
       "id": 200,
       "name": "Derecho Administrativo",
-      "code": "",
-      "credits": 0,
+      "code": "DER06322",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [192, 193],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -443,10 +443,10 @@
     {
       "id": 201,
       "name": "Derecho Penal Parte Especial",
-      "code": "",
-      "credits": 0,
+      "code": "DER06323",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [196],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -454,10 +454,10 @@
     {
       "id": 202,
       "name": "Derecho Societario",
-      "code": "",
-      "credits": 0,
+      "code": "DER06324",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [198],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
