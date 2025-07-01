@@ -392,7 +392,7 @@ export default function RBDndCurriculum({
                     className={cn(
                       "text-muted-foreground hidden h-16 w-full items-center justify-center rounded-md border transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                       editMode &&
-                        "hover:bg-accent hover:text-accent-foreground flex",
+                        "hover:bg-background/10 hover:text-accent-foreground flex",
                     )}
                     onClick={() => {
                       setOpenDialogId("add-course");

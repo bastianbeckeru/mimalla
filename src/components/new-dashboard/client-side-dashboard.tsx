@@ -204,7 +204,7 @@ export default function ClientSideDashboard() {
                 className={cn(
                   "absolute right-4",
                   history.past.length !== 0 &&
-                    "bg-secondary hover:bg-secondary/80",
+                    "bg-accent-foreground hover:bg-accent-foreground/80",
                 )}
                 disabled={history.past.length === 0}
                 onClick={handleSaveChanges}

@@ -11,8 +11,12 @@
     "schedule": "DAYTIME"
   },
   "curriculum": {
-    "version": "v4",
-    "year": 2020,
+    "curriculum_name": "Derecho 2023",
+    "version": "v6.0",
+    "year": 2023,
+    "start_year": 2023,
+    "end_year": null,
+    "is_current": true,
     "slots": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 177 },
       { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 178 },
