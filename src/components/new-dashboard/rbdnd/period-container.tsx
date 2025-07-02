@@ -1,3 +1,4 @@
+import { MotionOl, MotionUl } from "@/components/motion-";
 import type { PeriodKey } from "@/types/curriculum";
 import { getPeriodInfo } from "@/utils/curriculum";
 import { forwardRef } from "react";
@@ -12,18 +13,37 @@ const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
   ({ id, curriculumYear, children, ...props }, ref) => {
     const { label, isCurrent } = getPeriodInfo(id, curriculumYear);
 
+    const columnVariants = {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1 },
+    };
+
+    const ulVariants = {
+      visible: {
+        transition: { staggerChildren: 0.2 },
+      },
+    };
+
     return (
-      <ol className="flex min-w-32 select-none flex-col gap-2">
+      <MotionOl
+        variants={columnVariants}
+        className="flex min-w-32 flex-col gap-2 select-none"
+      >
         <h3
-          className={`text-center text-xs font-bold uppercase tracking-wider text-muted-foreground ${isCurrent && "text-primary"}`}
+          className={`text-muted-foreground text-center text-xs font-bold tracking-wider uppercase ${isCurrent && "text-primary"}`}
         >
           {label}
         </h3>
 
-        <ul {...props} ref={ref} className="flex-grow">
+        <MotionUl
+          variants={ulVariants}
+          ref={ref}
+          className="flex-grow"
+          {...props}
+        >
           {children}
-        </ul>
-      </ol>
+        </MotionUl>
+      </MotionOl>
     );
   },
 );

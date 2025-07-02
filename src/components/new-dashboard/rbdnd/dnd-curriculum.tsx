@@ -11,7 +11,6 @@ import type {
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
 import { getCourse, getCourseArea } from "@/utils/curriculum";
-import ScrollAreaWrapper from "../../scroll-area-wrapper";
 import SlotCard from "./slot-card";
 import PeriodContainer from "./period-container";
 
@@ -22,7 +21,7 @@ import {
   type DropResult,
 } from "react-beautiful-dnd";
 
-import { MotionDiv } from "../../Motion";
+import { MotionDiv } from "@/components/motion-";
 import CourseDialog from "../course-dialog";
 import { toast } from "sonner";
 import { Plus, Trash, Undo2 } from "lucide-react";
@@ -128,6 +127,15 @@ export default function RBDndCurriculum({
   const enrolledYear =
     curriculums.find((c) => c.id === activeCurriculumId)?.year ?? 2020;
 
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
   return (
     <>
       <DragDropContext
@@ -160,8 +168,9 @@ export default function RBDndCurriculum({
         )}
 
         <MotionDiv
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           className={cn(
             "flex h-max min-h-fit flex-row space-x-2 px-4 pb-4",
             !showTimeline && "pt-4",
