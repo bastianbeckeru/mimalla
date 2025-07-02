@@ -25,22 +25,27 @@ import { type AdapterAccount } from "next-auth/adapters";
 //export const createTable = pgTableCreator((name) => `mimalla_${name}`);
 export const createTable = pgTable;
 
-export const users = createTable("user", {
-  id: uuid("id")
+export const users = createTable("user", (d) => ({
+  id: d
+    .uuid()
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("email_verified", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: varchar("image", { length: 255 }),
-  joinedAt: timestamp("joined_at", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-});
+  name: d.varchar({ length: 255 }),
+  image: d.varchar({ length: 255 }),
+  email: d.varchar({ length: 255 }).notNull(),
+  emailVerified: d
+    .timestamp({
+      mode: "date",
+      withTimezone: true,
+    })
+    .default(sql`CURRENT_TIMESTAMP`),
+  joinedAt: d
+    .timestamp({
+      mode: "date",
+      withTimezone: true,
+    })
+    .default(sql`CURRENT_TIMESTAMP`),
+}));
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -48,31 +53,26 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const accounts = createTable(
   "account",
-  {
-    userId: uuid("user_id")
+  (d) => ({
+    userId: d
+      .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
-    type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("provider_account_id", {
-      length: 255,
-    }).notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-    userIdIdx: index("account_user_id_idx").on(account.userId),
+    type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
+    provider: d.varchar({ length: 255 }).notNull(),
+    providerAccountId: d.varchar({ length: 255 }).notNull(),
+    refresh_token: d.text(),
+    access_token: d.text(),
+    expires_at: d.integer(),
+    token_type: d.varchar({ length: 255 }),
+    scope: d.varchar({ length: 255 }),
+    id_token: d.text(),
+    session_state: d.varchar({ length: 255 }),
   }),
+  (t) => [
+    primaryKey({ columns: [t.provider, t.providerAccountId] }),
+    index("account_user_id_idx").on(t.userId),
+  ],
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -81,21 +81,15 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 
 export const sessions = createTable(
   "session",
-  {
-    sessionToken: varchar("session_token", { length: 255 })
-      .notNull()
-      .primaryKey(),
-    userId: uuid("user_id")
+  (d) => ({
+    sessionToken: d.varchar({ length: 255 }).notNull().primaryKey(),
+    userId: d
+      .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
-    expires: timestamp("expires", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  (session) => ({
-    userIdIdx: index("session_user_id_idx").on(session.userId),
+    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
   }),
+  (t) => [index("session_user_id_idx").on(t.userId)],
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -104,19 +98,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export const verificationTokens = createTable(
   "verification_token",
-  {
-    identifier: varchar("identifier", { length: 255 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull(),
-    expires: timestamp("expires", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  (verificationToken) => ({
-    compoundKey: primaryKey({
-      columns: [verificationToken.identifier, verificationToken.token],
-    }),
+  (d) => ({
+    identifier: d.varchar({ length: 255 }).notNull(),
+    token: d.varchar({ length: 255 }).notNull(),
+    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
   }),
+  (t) => [primaryKey({ columns: [t.identifier, t.token] })],
 );
 
 // MiMalla Schema for Curriculums
