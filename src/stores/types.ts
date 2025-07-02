@@ -1,4 +1,4 @@
-import type { DropResult } from "react-beautiful-dnd";
+import type { DropResult } from "@hello-pangea/dnd";
 import type { TaskProps } from "./curriculum";
 import type {
   AreaProps,
