@@ -2,7 +2,7 @@ import type { InstitutionParams } from "../layout";
 
 import fs from "fs";
 import path from "path";
-import { createUrlSlug } from "@/utils/strings";
+import { slugify } from "@/utils/strings";
 
 import CurriculumView from "@/components/curriculum/curriculum-view";
 import { getPeriods } from "@/utils/curriculum";
@@ -28,7 +28,7 @@ export async function generateStaticParams({ params }: InstitutionParams) {
     .map((file) => path.basename(file, ".json"));
 
   return institutionPrograms.map((programName) => ({
-    programName: createUrlSlug(programName),
+    programName: slugify(programName),
   }));
 }
 

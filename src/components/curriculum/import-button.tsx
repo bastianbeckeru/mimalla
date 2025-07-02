@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { CurriculumData } from "@/types/curriculum";
 import { useRouter } from "next/navigation";
-import { createUrlSlug } from "@/utils/strings";
+import { slugify } from "@/utils/strings";
 import Link from "next/link";
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
@@ -47,7 +47,7 @@ export default function ImportCurriculumButton({
   const [period, setPeriod] = useState<number>();
   const router = useRouter();
 
-  const path = `${institution.acronym.toLocaleLowerCase()}/${createUrlSlug(program.name)}`;
+  const path = slugify(institution.acronym, program.name);
 
   if (curriculums.some((c) => c.path === path)) {
     return (
@@ -78,7 +78,7 @@ export default function ImportCurriculumButton({
             </div>
           </div>
           <div className="flex flex-col">
-            <h3 className="font-semibold text-muted-foreground">Ingreso</h3>
+            <h3 className="text-muted-foreground font-semibold">Ingreso</h3>
             <div className="flex flex-row gap-2 md:flex-row">
               <Select
                 onValueChange={(value) => setYear(parseInt(value))}
