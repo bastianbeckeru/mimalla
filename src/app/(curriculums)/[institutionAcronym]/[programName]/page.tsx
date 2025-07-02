@@ -2,24 +2,24 @@ import type { InstitutionParams } from "../layout";
 
 import fs from "fs";
 import path from "path";
-import { slugify } from "@/utils/strings";
 
 import CurriculumView from "@/components/curriculum/curriculum-view";
-import { getPeriods } from "@/utils/curriculum";
 import ProgramInfo from "@/components/curriculum/program-info";
-import { getProgramData } from "@/utils/curriculum-data";
 import ImportCurriculumButton from "@/components/curriculum/import-button";
+import { getPeriods } from "@/utils/curriculum";
+import { getProgramData } from "@/utils/curriculum-data";
+import { slugify } from "@/utils/strings";
 
 export const dynamicParams = false;
-
 export async function generateStaticParams({ params }: InstitutionParams) {
+  const resolvedParams = await params;
   const institutionPath = path.join(
     process.cwd(),
     "src",
     "server",
     "db",
     "curriculums",
-    params.institutionAcronym,
+    resolvedParams.institutionAcronym,
   );
   const files = fs.readdirSync(institutionPath);
 
@@ -32,12 +32,15 @@ export async function generateStaticParams({ params }: InstitutionParams) {
   }));
 }
 
-type ProgramParams = InstitutionParams & { params: { programName: string } };
+type ProgramParams = InstitutionParams & {
+  params: Promise<{ programName: string }>;
+};
 
 export default async function ProgramPage({ params }: ProgramParams) {
+  const resolvedParams = await params;
   const data = await getProgramData({
-    institutionAcronym: params.institutionAcronym,
-    programSlug: params.programName,
+    institutionAcronym: resolvedParams.institutionAcronym,
+    programSlug: resolvedParams.programName,
   });
 
   if (!data) return <div>Error al cargar el programa</div>;

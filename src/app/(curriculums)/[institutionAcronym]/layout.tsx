@@ -1,10 +1,10 @@
+import type { PropsWithChildren } from "react";
+
 import fs from "fs";
 import path from "path";
-
 import Navbar from "@/components/navbar";
 
 export const dynamicParams = false;
-
 export async function generateStaticParams() {
   const curriculumsDir = path.join(
     process.cwd(),
@@ -25,14 +25,14 @@ export async function generateStaticParams() {
 }
 
 export type InstitutionParams = {
-  params: {
+  params: Promise<{
     institutionAcronym: string;
-  };
+  }>;
 };
 
 export default function InstitutionLayout({
   children,
-}: InstitutionParams & { children: React.ReactNode }) {
+}: InstitutionParams & PropsWithChildren) {
   return (
     <div className="grid min-h-dvh w-dvw grid-rows-[auto_1fr] lg:px-16">
       <Navbar className="" />
