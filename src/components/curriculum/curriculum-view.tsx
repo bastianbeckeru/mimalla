@@ -22,6 +22,7 @@ import {
   GRID_GAP,
   PADDING,
 } from "@/utils/curriculum-grid";
+import SelectableCard from "./selectable-card";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -40,18 +41,34 @@ export default function CurriculumView({
 }: CurriculumViewProps) {
   const { curriculum, areas } = data;
   const courses = new Map(data.courses.map((item) => [item.id, item]));
-  const [isSelected, setIsSelected] = useState(false);
-  const [tapTimeout, setTapTimeout] = useState<NodeJS.Timeout | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<ModifiedCourse | null>(
     null,
   );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [relatedPaths, setRelatedPaths] = useState<
     { paths: string[]; color: string }[]
   >([]);
+
+  useEffect(() => {
+    if (!selectedId) return;
+
+    function handleOutside(event: MouseEvent | TouchEvent) {
+      const el = event.target as HTMLElement;
+      if (el.closest(".selectable-card")?.id !== selectedId) {
+        setSelectedId(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [selectedId]);
 
   const curriculumStyle = {
     display: "grid",
@@ -59,69 +76,6 @@ export default function CurriculumView({
     gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
     gap: `${GRID_GAP}rem`,
     padding: `${PADDING}rem`,
-  };
-
-  // Handle clicks outside the card
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setSelectedCourses([]);
-        setIsSelected(false);
-      }
-    };
-
-    if (isSelected) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isSelected]);
-
-  // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (tapTimeout) {
-        clearTimeout(tapTimeout);
-      }
-    };
-  }, [tapTimeout]);
-
-  const handleMouseEnter = (action: () => void) => {
-    // Only apply hover effect on non-touch devices
-    if (!("ontouchstart" in window)) {
-      setIsSelected(true);
-      action();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    // Only apply hover effect on non-touch devices
-    if (!("ontouchstart" in window)) {
-      setSelectedCourses([]);
-      setIsSelected(false);
-    }
-  };
-
-  const handleTouchStart = (action: () => void) => {
-    // Clear any existing timeout
-    if (tapTimeout) {
-      clearTimeout(tapTimeout);
-    }
-
-    // Set timeout for 0.5s
-    const timeout = setTimeout(() => {
-      setIsSelected(true);
-      action();
-    }, 500);
-
-    setTapTimeout(timeout);
-  };
-
-  const handleTouchEnd = () => {
-    // Clear timeout if touch ends before 0.5s
-    if (tapTimeout) {
-      clearTimeout(tapTimeout);
-      setTapTimeout(null);
-    }
   };
 
   return (
@@ -163,6 +117,9 @@ export default function CurriculumView({
               const area = course && getCourseArea(areas, course);
               // const enrollment = enrollments.get(slot.id);
 
+              const cardId = `${slot.year}-${slot.term}-${slot.position}`;
+              const isRelated = course && selectedCourses.includes(course.id);
+
               const color = area?.color ?? "#fafafa";
               const {
                 hasLowBackgroundElementContrast,
@@ -175,62 +132,61 @@ export default function CurriculumView({
                 gridRow: `${position.y} / span ${1}`,
               };
 
-              const isRelated = course && selectedCourses.includes(course.id);
-
-              function handleSelection() {
+              function handleOnSelect(id: string | null) {
                 if (!course) return;
 
-                const relatedPaths = getRelatedPaths({
-                  originSlot: slot,
-                  slots: curriculum.slots,
-                  periods: periods,
-                  course: course,
-                });
+                if (id === null) {
+                  setSelectedId(null);
+                  setSelectedCourses([]);
+                } else {
+                  const relatedPaths = getRelatedPaths({
+                    originSlot: slot,
+                    slots: curriculum.slots,
+                    periods: periods,
+                    course: course,
+                  });
 
-                setSelectedCourses([
-                  ...course.prerequisiteIds,
-                  ...course.subsequentIds,
-                  ...[course.id],
-                ]);
-                setRelatedPaths(relatedPaths);
-                setIsSelected(true);
+                  setSelectedCourses([
+                    ...course.prerequisiteIds,
+                    ...course.subsequentIds,
+                    ...[course.id],
+                  ]);
+                  setRelatedPaths(relatedPaths);
+                  setSelectedId(id);
+                }
+              }
+
+              function handleOnClick() {
+                if (!course?.isElective) return;
+
+                setSelectedCourse(course);
+                setIsOpen(true);
               }
 
               return (
-                <Card
-                  key={`${slot.year}-${slot.term}-${slot.position}`}
-                  ref={cardRef}
+                <SelectableCard
+                  key={cardId}
+                  id={cardId}
                   className={cn(
-                    "hover:border-accent-foreground cursor-pointer transition-opacity select-none hover:border-3 hover:brightness-95 dark:hover:brightness-105",
+                    "cursor-pointer transition-[filter] select-none",
                     hasLowBackgroundElementContrast &&
                       "border-foreground/50 border",
                     hasLowElementTextContrast && "text-background",
-                    isSelected && !isRelated && "opacity-25",
+                    selectedId && !isRelated && "brightness-[25%]",
                   )}
                   style={slotStyle}
-                  onTouchStart={() => handleTouchStart(handleSelection)}
-                  onTouchEnd={handleTouchEnd}
-                  onTouchMove={handleTouchEnd}
-                  onMouseEnter={() => handleMouseEnter(handleSelection)}
-                  onMouseLeave={handleMouseLeave}
-                  onFocus={() => handleTouchStart(handleSelection)}
-                  onClick={() => {
-                    if (!course?.isElective) return;
-
-                    setSelectedCourse(course);
-                    setIsOpen(true);
-                  }}
+                  selectedId={selectedId}
+                  onSelect={(id: any) => handleOnSelect(id)}
+                  onClick={handleOnClick}
                 >
-                  <CardContent className="flex h-full items-center justify-center p-2">
-                    <h3 className="text-center text-xs font-medium">
-                      {course?.name ?? `Slot ${sIndex + 1}`}
-                    </h3>
-                  </CardContent>
-                </Card>
+                  <h3 className="text-center text-xs font-medium">
+                    {course?.name ?? `Slot ${sIndex + 1}`}
+                  </h3>
+                </SelectableCard>
               );
             })}
             <svg className="absolute top-0 left-0 -z-50 size-full">
-              {isSelected &&
+              {selectedId &&
                 relatedPaths.map((related) => {
                   return related.paths.map((path, pIndex) => (
                     <Path key={pIndex} path={path} color={related.color} />
