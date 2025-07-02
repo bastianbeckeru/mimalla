@@ -11,7 +11,7 @@ import type {
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
 import { getCourse, getCourseArea } from "@/utils/curriculum";
-import ScrollAreaWrapper from "../../ScrollAreaWrapper";
+import ScrollAreaWrapper from "../../scroll-area-wrapper";
 import SlotCard from "./slot-card";
 import PeriodContainer from "./period-container";
 
@@ -37,7 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -390,9 +390,9 @@ export default function RBDndCurriculum({
 
                   <button
                     className={cn(
-                      "text-muted-foreground hidden h-16 w-full items-center justify-center rounded-md border transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                      editMode &&
-                        "hover:bg-background/10 hover:text-accent-foreground flex",
+                      buttonVariants({ variant: "ghost" }),
+                      "text-muted-foreground hidden h-16 w-full rounded-md border",
+                      editMode && "flex",
                     )}
                     onClick={() => {
                       setOpenDialogId("add-course");
@@ -408,8 +408,9 @@ export default function RBDndCurriculum({
 
           <button
             className={cn(
-              "text-muted-foreground hidden w-32 flex-col items-center justify-center rounded-md border p-2 transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-              editMode && "hover:bg-accent hover:text-accent-foreground flex",
+              buttonVariants({ variant: "ghost" }),
+              "text-muted-foreground hidden h-auto w-32 rounded-md border",
+              editMode && "flex",
             )}
             onClick={() => setOpenDialogId("add-period")}
           >
@@ -443,16 +444,16 @@ export default function RBDndCurriculum({
               </div>
 
               <div className="flex size-full items-end justify-end">
-                <div className="bg-muted flex h-10 w-28 flex-row items-center justify-end rounded-md md:h-8 md:w-16">
+                <div className="bg-card flex h-10 w-28 flex-row items-center justify-end rounded-md md:h-8 md:w-16">
                   <button
-                    className="hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted flex size-full items-center justify-center rounded-l-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                    className="hover:bg-muted flex size-full cursor-pointer items-center justify-center rounded-l-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
                     onClick={() => undo()}
                     disabled={history.past.length === 0}
                   >
                     <Undo2 />
                   </button>
                   <button
-                    className="hover:bg-muted-foreground disabled:text-muted-foreground disabled:hover:bg-muted flex size-full items-center justify-center rounded-r-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                    className="hover:bg-muted flex size-full cursor-pointer items-center justify-center rounded-r-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
                     onClick={redo}
                     disabled={history.future.length === 0}
                   >

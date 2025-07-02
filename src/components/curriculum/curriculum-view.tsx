@@ -11,7 +11,7 @@ import type {
   PeriodKey,
 } from "@/types/curriculum";
 import { getCourse, getCourseArea } from "@/utils/curriculum";
-import ScrollAreaWrapper from "../ScrollAreaWrapper";
+import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { arabicToRoman } from "@/utils/numbers";
 import CourseSheet from "./course-sheet";
 import {

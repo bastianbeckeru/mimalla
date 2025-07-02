@@ -15,7 +15,7 @@ import {
 
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { createUrlSlug } from "@/utils/strings";
+import { slugify } from "@/utils/strings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
@@ -72,6 +72,10 @@ const institutions = [
         name: "Facultad de Psicología",
         programs: [{ name: "Psicología", siesCode: "I3S1C12J1V1" }],
       },
+      {
+        name: "Facultad de Derecho",
+        programs: [{ name: "Derecho", siesCode: "I3S1C12J122" }],
+      },
     ],
   },
 ];
@@ -108,7 +112,7 @@ export default function CurriculumForm({
     setIsCreating(true);
 
     const institutionAcronym = selectedInstitution.acronym.toLowerCase();
-    const programSlug = createUrlSlug(selectedProgram.name);
+    const programSlug = slugify(selectedProgram.name);
 
     try {
       const data = await getProgramData({
@@ -143,12 +147,12 @@ export default function CurriculumForm({
           "absolute top-4 left-4 md:top-8 md:left-8",
         )}
       >
-        <ChevronLeftIcon className="mr-2 size-4" />
+        <ChevronLeftIcon className="mr-2" />
         Volver
       </Link>
 
-      <div className="flex w-full flex-col justify-center space-y-2 px-2 sm:w-[350px]">
-        <div className="mb-2 flex flex-col space-y-2 text-center">
+      <div className="flex w-full flex-col justify-center gap-6 px-2 sm:w-[350px]">
+        <div className="flex flex-col gap-2 text-center">
           <h1 className="flex items-center gap-2">
             <span className="text-2xl font-semibold tracking-tight">
               Crea tu malla de estudios
@@ -159,76 +163,86 @@ export default function CurriculumForm({
           </p>
         </div>
 
-        <div className="space-y-2">
-          <div className="space-y-2">
-            <Select
-              onValueChange={(value) => {
-                const selected = institutions.find(
-                  (inst) => inst.acronym === value,
-                );
-                setSelectedInstitution(selected);
-              }}
-              value={selectedInstitution?.acronym}
-              disabled={institutions.length === 1}
-            >
-              <SelectTrigger id="institution">
-                <SelectValue placeholder="Selecciona una universidad" />
-              </SelectTrigger>
-              <SelectContent className="w-96">
-                {institutions.map((institution) => (
-                  <SelectItem
-                    key={institution.acronym}
-                    value={institution.acronym}
-                  >
-                    {institution.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="gap-3">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-muted-foreground hidden font-semibold">
+              Carrera
+            </h3>
 
-            <div className="flex h-14 w-full flex-col items-end justify-start">
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    disabled={!selectedInstitution}
-                  >
-                    {selectedProgram ? (
-                      <>{selectedProgram.name}</>
-                    ) : (
-                      <>Selecciona una carrera</>
+            <div className="flex flex-col gap-2">
+              <Select
+                value={selectedInstitution?.acronym}
+                onValueChange={(value) => {
+                  const selected = institutions.find(
+                    (inst) => inst.acronym === value,
+                  );
+                  setSelectedInstitution(selected);
+                }}
+                disabled={institutions.length === 1}
+              >
+                <SelectTrigger id="institution" className="w-full">
+                  <SelectValue placeholder="Selecciona una universidad" />
+                </SelectTrigger>
+                <SelectContent>
+                  {institutions.map((institution) => (
+                    <SelectItem
+                      key={institution.acronym}
+                      value={institution.acronym}
+                    >
+                      {institution.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex h-14 w-full flex-col items-end justify-start">
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      disabled={!selectedInstitution}
+                    >
+                      {selectedProgram ? (
+                        <>{selectedProgram.name}</>
+                      ) : (
+                        <>Selecciona una carrera</>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 p-0" align="start">
+                    <ProgramList
+                      departments={selectedInstitution?.departments ?? []}
+                      setOpen={setOpen}
+                      setSelectedProgram={setSelectedProgram}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {selectedProgram && (
+                  <Link
+                    href={slugify(
+                      selectedInstitution!.acronym,
+                      selectedProgram!.name,
                     )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-96 p-0" align="start">
-                  <ProgramList
-                    departments={selectedInstitution?.departments ?? []}
-                    setOpen={setOpen}
-                    setSelectedProgram={setSelectedProgram}
-                  />
-                </PopoverContent>
-              </Popover>
-              {selectedProgram && (
-                <Link
-                  href={`${selectedInstitution?.acronym.toLowerCase()}/${createUrlSlug(selectedProgram.name)}`}
-                  className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
-                >
-                  Ver malla
-                </Link>
-              )}
+                    className="text-muted-foreground hover:text-foreground text-xs underline underline-offset-4"
+                  >
+                    Ver malla
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <h3 className="text-muted-foreground font-semibold">Ingreso</h3>
+
             <div className="flex flex-row gap-2">
               <Select
-                onValueChange={(value) => setYear(parseInt(value))}
                 value={year?.toString()}
+                onValueChange={(value) => setYear(parseInt(value))}
                 disabled={!selectedProgram}
               >
-                <SelectTrigger id="year">
+                <SelectTrigger id="year" className="min-w-24">
                   <SelectValue placeholder="Año" />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,11 +256,11 @@ export default function CurriculumForm({
                 </SelectContent>
               </Select>
               <Select
-                onValueChange={(value) => setPeriod(parseInt(value))}
                 value={period?.toString()}
+                onValueChange={(value) => setPeriod(parseInt(value))}
                 disabled={!selectedProgram}
               >
-                <SelectTrigger id=" semester">
+                <SelectTrigger id="semester" className="flex-1">
                   <SelectValue placeholder="Semestre" />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,7 +280,7 @@ export default function CurriculumForm({
           </div>
         </div>
 
-        <div className="space-y-px">
+        <div className="gap-1">
           <Button
             className="w-full"
             disabled={!selectedProgram || !year || !period || isCreating}
@@ -279,7 +293,7 @@ export default function CurriculumForm({
             )}
           </Button>
 
-          <p className="text-muted-foreground px-4 text-center text-sm">
+          <p className="text-muted-foreground text-left text-xs">
             ¿No encuentras tu carrera?{" "}
             <a
               aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
@@ -309,7 +323,7 @@ function ProgramList({
   return (
     <Command>
       <CommandInput placeholder="Escribe una carrera..." />
-      <CommandList>
+      <CommandList className="max-h-64 overflow-y-auto">
         <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
         {departments.map((department) => (
           <CommandGroup key={department.name} heading={department.name}>
@@ -321,6 +335,7 @@ function ProgramList({
                   setSelectedProgram(program);
                   setOpen(false);
                 }}
+                className="truncate"
               >
                 {program.name}
               </CommandItem>

@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { Progress } from "../ui/progress";
 import { toast } from "sonner";
 import { StudentEnrollment } from "@/types/store";
-import ScrollAreaWrapper from "../ScrollAreaWrapper";
+import ScrollAreaWrapper from "../scroll-area-wrapper";
 
 export default function ClientSideDashboard() {
   const {
@@ -189,7 +189,7 @@ export default function ClientSideDashboard() {
 
       <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
         <div>
-          <header className="bg-sidebar relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <header className="bg-card relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <SidebarTrigger className="absolute left-2 md:hidden" />
 
             <div className="flex items-center justify-center px-2">
@@ -204,7 +204,7 @@ export default function ClientSideDashboard() {
                 className={cn(
                   "absolute right-4",
                   history.past.length !== 0 &&
-                    "bg-accent-foreground hover:bg-accent-foreground/80",
+                    "hover:bg-accent-foreground/80 bg-accent",
                 )}
                 disabled={history.past.length === 0}
                 onClick={handleSaveChanges}
