@@ -4,79 +4,75 @@ import type { CurriculumData } from "@/types/curriculum";
 
 import { checkContrasts } from "@/utils/colors";
 import {
+  ComponentProps,
   type ComponentPropsWithoutRef,
   forwardRef,
   PropsWithChildren,
 } from "react";
 import type { EnrolledCourse } from "@/types/store";
+import { MotionLi } from "@/components/motion";
 
 type SlotProps = {
   color?: string;
-  isDragging?: boolean;
   isAvailable?: boolean;
   enrollment: EnrolledCourse;
   course?: CurriculumData["courses"][0] | null;
   className?: string;
-} & PropsWithChildren &
-  ComponentPropsWithoutRef<"li">;
+  onClick?: ComponentProps<"li">["onClick"];
+} & PropsWithChildren;
 
-const SlotCard = forwardRef<HTMLLIElement, SlotProps>(
-  (
-    {
-      color = "#fafafa",
-      isDragging = false,
-      isAvailable = true,
-      enrollment,
-      course,
-      className,
-      children,
-      ...props
-    },
-    ref,
-  ) => {
-    const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
-      checkContrasts({
-        elementColor: color,
-      });
+export default function SlotCard({
+  color = "#fafafa",
+  isAvailable = true,
+  enrollment,
+  course,
+  className,
+  children,
+  ...props
+}: SlotProps) {
+  const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
+    checkContrasts({
+      elementColor: color,
+    });
 
-    const style = {
-      backgroundColor: color,
-      ...props.style,
-    };
+  const style = {
+    backgroundColor: color,
+  };
 
-    return (
-      <li
-        {...props}
-        ref={ref}
-        style={style}
-        className={cn(
-          "bg-card text-card-foreground relative mb-2 flex h-16 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-md p-2 shadow-sm transition-[filter] select-none hover:brightness-110",
-          hasLowBackgroundElementContrast && "border-foreground/50 border",
-          hasLowElementTextContrast && "text-background",
-          !isAvailable && "brightness-[25%] hover:brightness-[35%]",
-          isDragging && "shadow-2xl",
-          className,
-        )}
-      >
-        <span className="text-center text-xs font-medium">
-          {course ? course.name : "Vacío"}
-        </span>
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
 
-        {children}
+  return (
+    <MotionLi
+      {...props}
+      variants={itemVariants}
+      style={style}
+      className={cn(
+        "bg-card text-card-foreground relative mb-2 flex h-16 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-md p-2 shadow-sm transition-[filter] select-none hover:brightness-110",
+        hasLowBackgroundElementContrast && "border-foreground/50 border",
+        hasLowElementTextContrast && "text-background",
+        !isAvailable && "brightness-[25%] hover:brightness-[35%]",
+        className,
+      )}
+      onClick={props.onClick}
+    >
+      <span className="text-center text-xs font-medium">
+        {course ? course.name : "Vacío"}
+      </span>
 
-        {/* Strikethrough */}
-        {enrollment.status !== "PENDING" && (
-          <div
-            className={cn(
-              "diagonal-line",
-              enrollment.status === "APPROVED" ? "bg-black" : "bg-red-700",
-            )}
-          />
-        )}
-      </li>
-    );
-  },
-);
-SlotCard.displayName = "SlotCard";
+      {children}
 
-export default SlotCard;
+      {/* Strikethrough */}
+      {enrollment.status !== "PENDING" && (
+        <div
+          className={cn(
+            "diagonal-line",
+            enrollment.status === "APPROVED" ? "bg-black" : "bg-red-700",
+          )}
+        />
+      )}
+    </MotionLi>
+  );
+}
