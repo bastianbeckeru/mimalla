@@ -3,7 +3,11 @@ import { cn } from "@/lib/utils";
 import type { CurriculumData } from "@/types/curriculum";
 
 import { checkContrasts } from "@/utils/colors";
-import { type ComponentPropsWithoutRef, forwardRef } from "react";
+import {
+  type ComponentPropsWithoutRef,
+  forwardRef,
+  PropsWithChildren,
+} from "react";
 import type { EnrolledCourse } from "@/types/store";
 
 type SlotProps = {
@@ -13,12 +17,10 @@ type SlotProps = {
   enrollment: EnrolledCourse;
   course?: CurriculumData["courses"][0] | null;
   className?: string;
-  children?: React.ReactNode;
-};
+} & PropsWithChildren &
+  ComponentPropsWithoutRef<"li">;
 
-type ExtendedSlotProps = SlotProps & ComponentPropsWithoutRef<"li">;
-
-const SlotCard = forwardRef<HTMLLIElement, ExtendedSlotProps>(
+const SlotCard = forwardRef<HTMLLIElement, SlotProps>(
   (
     {
       color = "#fafafa",

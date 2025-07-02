@@ -19,9 +19,9 @@ import {
   Draggable,
   Droppable,
   type DropResult,
-} from "react-beautiful-dnd";
+} from "@hello-pangea/dnd";
 
-import { MotionDiv } from "@/components/motion-";
+import { MotionDiv } from "@/components/motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "sonner";
 import { Plus, Trash, Undo2 } from "lucide-react";

@@ -1,28 +1,29 @@
-import { MotionOl, MotionUl } from "@/components/motion-";
+import { MotionOl, MotionUl } from "@/components/motion";
 import type { PeriodKey } from "@/types/curriculum";
 import { getPeriodInfo } from "@/utils/curriculum";
-import { forwardRef } from "react";
+import { forwardRef, type PropsWithChildren } from "react";
 
 type PeriodContainerProps = {
   id: PeriodKey;
   curriculumYear: number;
-  children?: React.ReactNode;
+} & PropsWithChildren;
+
+const columnVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const ulVariants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
 };
 
 const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
   ({ id, curriculumYear, children, ...props }, ref) => {
     const { label, isCurrent } = getPeriodInfo(id, curriculumYear);
-
-    const columnVariants = {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1 },
-    };
-
-    const ulVariants = {
-      visible: {
-        transition: { staggerChildren: 0.2 },
-      },
-    };
 
     return (
       <MotionOl

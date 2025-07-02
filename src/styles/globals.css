@@ -178,11 +178,11 @@
 .diagonal-line {
   position: absolute;
   bottom: 0;
-  left: 0;
+  right: 0;
   width: 150%;
   height: 4px;
-  transform: rotate(-25deg);
-  transform-origin: bottom left;
+  transform: rotate(25deg);
+  transform-origin: bottom right;
 }
 
 .rainbow-text {
