@@ -144,21 +144,19 @@ export default function CurriculumForm({
         href="/"
         className={cn(
           buttonVariants({ variant: "ghost" }),
-          "absolute top-4 left-4 md:top-8 md:left-8",
+          "absolute top-0 left-0 m-4 md:top-8 md:left-8",
         )}
       >
         <ChevronLeftIcon className="mr-2" />
         Volver
       </Link>
 
-      <div className="flex w-full flex-col justify-center gap-6 px-2 sm:w-[350px]">
-        <div className="flex flex-col gap-2 text-center">
-          <h1 className="flex items-center gap-2">
-            <span className="text-2xl font-semibold tracking-tight">
-              Crea tu malla de estudios
-            </span>
+      <div className="mx-10 flex w-full flex-col justify-center gap-6 md:w-80">
+        <div className="flex flex-col gap-2 text-left">
+          <h1 className="text-2xl font-semibold tracking-tight text-balance md:text-center">
+            Crea tu malla de estudios
           </h1>
-          <p className="text-muted-foreground text-left text-sm">
+          <p className="text-muted-foreground">
             Comienza seleccionando tu carrera y datos de ingreso
           </p>
         </div>
@@ -195,7 +193,7 @@ export default function CurriculumForm({
                 </SelectContent>
               </Select>
 
-              <div className="flex h-14 w-full flex-col items-end justify-start">
+              <div className="flex h-14 w-full flex-col items-end justify-start gap-1">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -218,6 +216,7 @@ export default function CurriculumForm({
                     />
                   </PopoverContent>
                 </Popover>
+
                 {selectedProgram && (
                   <Link
                     href={slugify(
@@ -280,7 +279,7 @@ export default function CurriculumForm({
           </div>
         </div>
 
-        <div className="gap-1">
+        <div className="flex flex-col gap-2">
           <Button
             className="w-full"
             disabled={!selectedProgram || !year || !period || isCreating}
