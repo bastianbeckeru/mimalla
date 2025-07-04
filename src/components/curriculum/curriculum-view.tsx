@@ -55,16 +55,37 @@ export default function CurriculumView({
   useEffect(() => {
     if (!selectedId) return;
 
-    function handleOutside(event: MouseEvent | TouchEvent) {
-      const el = event.target as HTMLElement;
-      if (el.closest(".selectable-card")?.id !== selectedId) {
-        setSelectedId(null);
+    let touchStartTime = 0;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (event.pointerType === "touch") {
+        touchStartTime = Date.now();
       }
     }
 
-    document.addEventListener("touchstart", handleOutside);
+    function handlePointerUp(event: PointerEvent) {
+      if (event.pointerType === "touch") {
+        const duration = Date.now() - touchStartTime;
+        if (duration < 300) {
+          // ajusta 300ms a tu gusto
+          const el = event.target as HTMLElement;
+          if (el.closest(".selectable-card")?.id !== selectedId) {
+            setSelectedId(null);
+          }
+        }
+      } else if (event.pointerType === "mouse") {
+        const el = event.target as HTMLElement;
+        if (el.closest(".selectable-card")?.id !== selectedId) {
+          setSelectedId(null);
+        }
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("pointerup", handlePointerUp);
     return () => {
-      document.removeEventListener("touchstart", handleOutside);
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("pointerup", handlePointerUp);
     };
   }, [selectedId]);
 
@@ -75,10 +96,6 @@ export default function CurriculumView({
     gap: `${GRID_GAP}rem`,
     padding: `${PADDING}rem`,
   };
-
-  function handleMouseEnter(id: string) {
-    if ("ontouchstart" in document.documentElement) return;
-  }
 
   return (
     <>
