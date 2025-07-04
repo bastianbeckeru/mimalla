@@ -62,10 +62,8 @@ export default function CurriculumView({
       }
     }
 
-    document.addEventListener("mousedown", handleOutside);
     document.addEventListener("touchstart", handleOutside);
     return () => {
-      document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("touchstart", handleOutside);
     };
   }, [selectedId]);
@@ -77,6 +75,10 @@ export default function CurriculumView({
     gap: `${GRID_GAP}rem`,
     padding: `${PADDING}rem`,
   };
+
+  function handleMouseEnter(id: string) {
+    if ("ontouchstart" in document.documentElement) return;
+  }
 
   return (
     <>

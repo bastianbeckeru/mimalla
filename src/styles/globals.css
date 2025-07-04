@@ -35,8 +35,8 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* --secondary pink-700 */
-/* --secondary-foreground rose-400 */
+/* --accent pink-700 */
+/* --accent-foreground rose-400 */
 
 .dark {
   --background: oklch(0.145 0 0);
@@ -47,8 +47,8 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.514 0.222 16.935);
-  --accent-foreground: oklch(0.712 0.194 13.428);
+  --accent: oklch(0.645 0.246 16.439);
+  --accent-foreground: oklch(0.941 0.03 12.58);
   --destructive: oklch(0.505 0.213 27.518);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);

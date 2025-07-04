@@ -99,7 +99,6 @@ export default function RBDndCurriculum({
   const [selectedPeriodId, setSelectedPeriodId] = useState<PeriodKey | null>(
     null,
   );
-  const [isDragging, setIsDragging] = useState(false);
 
   useShortcuts([
     {
@@ -139,7 +138,7 @@ export default function RBDndCurriculum({
   return (
     <>
       <DragDropContext
-        onDragStart={() => setIsDragging(true)}
+        /* onDragStart={() => void} */
         onDragEnd={handleOnDragEnd}
       >
         {showTimeline && (
@@ -745,7 +744,6 @@ export default function RBDndCurriculum({
           future: [],
         };
       });
-      setIsDragging(false);
     }
     if (!sourceContainer || !destinationContainer) return;
 
@@ -800,7 +798,6 @@ export default function RBDndCurriculum({
         future: [],
       };
     });
-    setIsDragging(false);
   }
 
   function collectSubsequentCourses(courseId: number) {

@@ -34,6 +34,15 @@ export default function SelectableCard({
     if (touchTimeout.current) clearTimeout(touchTimeout.current);
   }
 
+  function handleMouseEnter() {
+    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+    onSelect(id);
+  }
+
+  function handleMouseLeave() {
+    onSelect(null);
+  }
+
   const isSelected = selectedId === id;
 
   return (
@@ -41,12 +50,12 @@ export default function SelectableCard({
       id={id}
       className={cn(
         "selectable-card",
-        isSelected && "border-accent-foreground border-3",
+        isSelected && "border-accent border-3",
         className,
       )}
       /* onFocus={() => onSelect(id)} */
-      onMouseEnter={() => onSelect(id)}
-      onMouseLeave={() => onSelect(null)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchEnd}
       onTouchEnd={handleTouchEnd}

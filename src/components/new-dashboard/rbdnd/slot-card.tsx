@@ -1,15 +1,9 @@
 import "@/styles/curriculum.css";
 import { cn } from "@/lib/utils";
 import type { CurriculumData } from "@/types/curriculum";
-
-import { checkContrasts } from "@/utils/colors";
-import {
-  ComponentProps,
-  type ComponentPropsWithoutRef,
-  forwardRef,
-  PropsWithChildren,
-} from "react";
+import type { ComponentProps, PropsWithChildren } from "react";
 import type { EnrolledCourse } from "@/types/store";
+import { checkContrasts } from "@/utils/colors";
 import { MotionLi } from "@/components/motion";
 
 type SlotProps = {
@@ -40,8 +34,8 @@ export default function SlotCard({
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
   };
 
   return (
