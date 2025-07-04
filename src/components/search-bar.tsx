@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import useShortcuts from "@/hooks/use-shortcut";
+import { Search } from "lucide-react";
 
 export function Searchbar() {
   const posthog = usePostHog();
@@ -37,15 +38,17 @@ export function Searchbar() {
     <>
       <Button
         variant="outline"
-        className="text-muted-foreground h-8 w-48 cursor-pointer p-1.5 pl-3"
+        className="text-muted-foreground h-8 w-40 items-center justify-center gap-2 p-1.5 lg:w-48"
         onClick={() => handleEditMode("button")}
       >
-        <p className="flex flex-grow text-sm">Buscar malla...</p>
-        <p className="">
-          <kbd className="bg-muted pointer-events-none inline-flex h-5 items-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium select-none">
-            <span className="text-xs">⌘</span>K
+        <p className="ml-0.5 flex-1 text-left text-sm">Buscar malla...</p>
+
+        <div>
+          <Search className="mr-0.5 lg:hidden" />
+          <kbd className="bg-muted pointer-events-none hidden rounded-sm border px-1.5 text-center text-sm font-medium select-none lg:inline-flex">
+            <span className="scale-75">⌘</span>K
           </kbd>
-        </p>
+        </div>
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
