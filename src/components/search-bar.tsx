@@ -11,28 +11,34 @@ import {
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePostHog } from "posthog-js/react";
+import useShortcuts from "@/hooks/use-shortcut";
 
 export function Searchbar() {
+  const posthog = usePostHog();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((open) => !open);
-      }
-    };
+  function handleEditMode(source?: string) {
+    setOpen((open) => !open);
 
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
+    if (source) {
+      posthog.capture("searchbar_opened", { source: source });
+    }
+  }
+
+  useShortcuts([
+    {
+      keys: ["Control", "k"],
+      handler: () => handleEditMode("keyboard_shortcut"),
+    },
+  ]);
 
   return (
     <>
       <Button
         variant="outline"
         className="text-muted-foreground h-8 w-48 cursor-pointer p-1.5 pl-3"
-        onClick={() => setOpen(true)}
+        onClick={() => handleEditMode("button")}
       >
         <p className="flex flex-grow text-sm">Buscar malla...</p>
         <p className="">
