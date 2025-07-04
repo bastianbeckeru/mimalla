@@ -151,13 +151,15 @@ export default function CurriculumView({
                 gridRow: `${position.y} / span ${1}`,
               };
 
-              function handleOnSelect(id: string | null) {
+              function handleOnSelect(newCardId: string | null) {
                 if (!course) return;
 
-                if (id === null) {
+                const isSelecting = newCardId !== null && selectedId === null;
+
+                if (!isSelecting) {
                   setSelectedId(null);
                   setSelectedCourses([]);
-                } else {
+                } else if (isSelecting) {
                   const relatedPaths = getRelatedPaths({
                     originSlot: slot,
                     slots: curriculum.slots,
@@ -165,13 +167,13 @@ export default function CurriculumView({
                     course: course,
                   });
 
+                  setRelatedPaths(relatedPaths);
                   setSelectedCourses([
                     ...course.prerequisiteIds,
                     ...course.subsequentIds,
                     ...[course.id],
                   ]);
-                  setRelatedPaths(relatedPaths);
-                  setSelectedId(id);
+                  setSelectedId(newCardId);
                 }
               }
 
