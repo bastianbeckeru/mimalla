@@ -13,7 +13,8 @@
   "curriculum": {
     "version": "v4",
     "year": 2020,
-    "slots": [
+    "isCurrent": true,
+    "structure": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 105 },
       { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 106 },
       { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 107 },
@@ -66,6 +67,45 @@
       { "id": 50, "year": 5, "term": 3, "position": 1, "courseId": 150 },
       { "id": 51, "year": 5, "term": 3, "position": 2, "courseId": 151 },
       { "id": 52, "year": 5, "term": 3, "position": 3, "courseId": 148 }
+    ],
+    "plans": [
+      {
+        "id": 5,
+        "name": "Diseño",
+        "type": "PROFESSIONAL",
+        "requiredCourseIds": [105],
+        "subplanIds": [6]
+      },
+      {
+        "id": 6,
+        "name": "Licenciatura en Diseño con Mención en Diseño Gráfico/ Industrial / Interacción Digital / Textil e Indumentaria",
+        "type": "ACADEMIC",
+        "requiredCourseIds": [105]
+      },
+      {
+        "id": 7,
+        "name": "Diseño Gráfico",
+        "type": "MENTION",
+        "requiredCourseIds": []
+      },
+      {
+        "id": 8,
+        "name": "Industrial",
+        "type": "MENTION",
+        "requiredCourseIds": []
+      },
+      {
+        "id": 9,
+        "name": "Interacción Digital",
+        "type": "MENTION",
+        "requiredCourseIds": []
+      },
+      {
+        "id": 10,
+        "name": "Textil e Indumentaria",
+        "type": "MENTION",
+        "requiredCourseIds": []
+      }
     ]
   },
   "areas": [
@@ -646,65 +686,6 @@
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
-    }
-  ],
-  "degrees": [
-    {
-      "id": 5,
-      "name": "Licenciatura en Diseño con Mención en Diseño Gráfico/ Industrial / Interacción Digital / Textil e Indumentaria",
-      "type": "ACADEMIC",
-      "requiredCourseIds": [105]
-    },
-    {
-      "id": 6,
-      "name": "Diseño",
-      "type": "PROFESSIONAL",
-      "requiredCourseIds": [105],
-      "requiredElectives": [10]
-    }
-  ],
-  "plans": [
-    {
-      "id": 1,
-      "name": "Psicología",
-      "type": "NONE",
-      "areCoursesMandatory": true,
-      "courseIds": [1, 2],
-      "subplanIds": [2, 3]
-    },
-    {
-      "id": 2,
-      "name": "Licenciatura en Psicología",
-      "type": "ACADEMIC",
-      "areCoursesMandatory": true,
-      "courseIds": [3, 4],
-      "subplanIds": [3]
-    },
-    {
-      "id": 3,
-      "name": "Psicología",
-      "type": "PROFESSIONAL",
-      "areCoursesMandatory": true,
-      "courseIds": [8],
-      "subplanIds": [4]
-    },
-    {
-      "id": 4,
-      "name": "Cursos de Formación General",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 20,
-      "courseIds": [5, 6, 7],
-      "subplanIds": []
-    },
-    {
-      "id": 5,
-      "name": "Electivos Profesionales",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 36,
-      "courseIds": [8, 10, 11],
-      "subplanIds": []
     }
   ]
 }

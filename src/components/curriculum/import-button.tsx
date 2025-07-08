@@ -136,7 +136,7 @@ export default function ImportCurriculumButton({
                 year: year,
                 term: period,
                 path: path,
-                slots: curriculum.slots,
+                slots: curriculum.structure,
               });
               router.push("/dashboard");
             }}

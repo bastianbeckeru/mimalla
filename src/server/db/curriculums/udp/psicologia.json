@@ -13,7 +13,7 @@
   "curriculum": {
     "version": "v4",
     "year": 2020,
-    "slots": [
+    "structure": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 105 },
       { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 106 },
       { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 107 },
@@ -37,13 +37,27 @@
       { "id": 21, "year": 2, "term": 3, "position": 3, "courseId": 125 },
       { "id": 22, "year": 2, "term": 3, "position": 4, "courseId": 126 },
       { "id": 23, "year": 2, "term": 3, "position": 5, "courseId": 127 },
-      { "id": 24, "year": 2, "term": 3, "position": 6, "courseId": 10 },
+      {
+        "id": 24,
+        "year": 2,
+        "term": 3,
+        "position": 6,
+        "courseId": 10,
+        "isElective": true
+      },
       { "id": 25, "year": 3, "term": 1, "position": 1, "courseId": 128 },
       { "id": 26, "year": 3, "term": 1, "position": 2, "courseId": 129 },
       { "id": 27, "year": 3, "term": 1, "position": 3, "courseId": 130 },
       { "id": 28, "year": 3, "term": 1, "position": 4, "courseId": 131 },
       { "id": 29, "year": 3, "term": 1, "position": 5, "courseId": 132 },
-      { "id": 30, "year": 3, "term": 1, "position": 6, "courseId": 10 },
+      {
+        "id": 30,
+        "year": 3,
+        "term": 1,
+        "position": 6,
+        "courseId": 10,
+        "isElective": true
+      },
       { "id": 31, "year": 3, "term": 3, "position": 1, "courseId": 133 },
       { "id": 32, "year": 3, "term": 3, "position": 2, "courseId": 134 },
       { "id": 33, "year": 3, "term": 3, "position": 3, "courseId": 135 },
@@ -53,12 +67,26 @@
       { "id": 37, "year": 4, "term": 1, "position": 2, "courseId": 139 },
       { "id": 38, "year": 4, "term": 1, "position": 3, "courseId": 140 },
       { "id": 39, "year": 4, "term": 1, "position": 4, "courseId": 141 },
-      { "id": 40, "year": 4, "term": 1, "position": 6, "courseId": 10 },
+      {
+        "id": 40,
+        "year": 4,
+        "term": 1,
+        "position": 6,
+        "courseId": 10,
+        "isElective": true
+      },
       { "id": 41, "year": 4, "term": 3, "position": 1, "courseId": 142 },
       { "id": 42, "year": 4, "term": 3, "position": 2, "courseId": 143 },
       { "id": 43, "year": 4, "term": 3, "position": 3, "courseId": 144 },
       { "id": 44, "year": 4, "term": 3, "position": 4, "courseId": 145 },
-      { "id": 45, "year": 4, "term": 3, "position": 6, "courseId": 10 },
+      {
+        "id": 45,
+        "year": 4,
+        "term": 3,
+        "position": 6,
+        "courseId": 10,
+        "isElective": true
+      },
       { "id": 46, "year": 5, "term": 1, "position": 1, "courseId": 146 },
       { "id": 47, "year": 5, "term": 1, "position": 2, "courseId": 147 },
       { "id": 48, "year": 5, "term": 1, "position": 3, "courseId": 148 },
@@ -66,6 +94,40 @@
       { "id": 50, "year": 5, "term": 3, "position": 1, "courseId": 150 },
       { "id": 51, "year": 5, "term": 3, "position": 2, "courseId": 151 },
       { "id": 52, "year": 5, "term": 3, "position": 3, "courseId": 148 }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "Psicología",
+        "type": "PROFESSIONAL",
+        "requiredCredits": -1,
+        "courseIds": [1, 2, 8],
+        "subplanIds": [2, 4]
+      },
+      {
+        "id": 2,
+        "name": "Licenciatura en Psicología",
+        "type": "ACADEMIC",
+        "requiredCredits": -1,
+        "courseIds": [3, 4],
+        "subplanIds": [3]
+      },
+      {
+        "id": 4,
+        "name": "Cursos de Formación General",
+        "type": "NONE",
+        "requiredCredits": 20,
+        "courseIds": [5, 6, 7],
+        "subplanIds": []
+      },
+      {
+        "id": 5,
+        "name": "Electivos Profesionales",
+        "type": "NONE",
+        "requiredCredits": 36,
+        "courseIds": [8, 10, 11],
+        "subplanIds": []
+      }
     ]
   },
   "areas": [
@@ -74,7 +136,6 @@
       "name": "Formación General e Inglés",
       "color": "#FFFFFF",
       "courseIds": [5, 10, 20, 21, 26, 41, 44, 45, 46, 110, 116, 122],
-      "electiveIds": [],
       "subareaIds": []
     },
     {
@@ -82,7 +143,7 @@
       "name": "Fundamentos Biológicos, Sociales, Históricos y Filosóficos de la Psicología",
       "color": "#FDC743",
       "courseIds": [105, 106, 108, 111, 112],
-      "electiveIds": [],
+
       "subareaIds": []
     },
     {
@@ -90,7 +151,7 @@
       "name": "Contenidos Básicos de la Psicología",
       "color": "#F9DD92",
       "courseIds": [107, 113, 114, 117, 118, 119, 120, 123, 125, 126, 130],
-      "electiveIds": [],
+
       "subareaIds": []
     },
     {
@@ -98,7 +159,7 @@
       "name": "Campos Psicosociales",
       "color": "#FDEDC8",
       "courseIds": [131, 136, 138, 139, 141, 142, 143, 145, 147, 149],
-      "electiveIds": [],
+
       "subareaIds": []
     },
     {
@@ -106,7 +167,7 @@
       "name": "Psicología Clínica",
       "color": "#D2D3D5",
       "courseIds": [124, 128, 129, 133, 134, 135, 140, 144, 146],
-      "electiveIds": [],
+
       "subareaIds": []
     },
     {
@@ -114,7 +175,7 @@
       "name": "Investigación",
       "color": "#818284",
       "courseIds": [109, 115, 121, 127, 132, 137],
-      "electiveIds": [],
+
       "subareaIds": []
     }
   ],
@@ -257,7 +318,7 @@
       "code": "",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [110],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -323,7 +384,7 @@
       "code": "",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [116],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -646,65 +707,6 @@
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
-    }
-  ],
-  "degrees": [
-    {
-      "id": 5,
-      "name": "Licenciatura en Psicología",
-      "type": "ACADEMIC",
-      "requiredCourseIds": [105]
-    },
-    {
-      "id": 6,
-      "name": "Psicología",
-      "type": "PROFESSIONAL",
-      "requiredCourseIds": [105],
-      "requiredElectives": [10]
-    }
-  ],
-  "plans": [
-    {
-      "id": 1,
-      "name": "Psicología",
-      "type": "NONE",
-      "areCoursesMandatory": true,
-      "courseIds": [1, 2],
-      "subplanIds": [2, 3]
-    },
-    {
-      "id": 2,
-      "name": "Licenciatura en Psicología",
-      "type": "ACADEMIC",
-      "areCoursesMandatory": true,
-      "courseIds": [3, 4],
-      "subplanIds": [3]
-    },
-    {
-      "id": 3,
-      "name": "Psicología",
-      "type": "PROFESSIONAL",
-      "areCoursesMandatory": true,
-      "courseIds": [8],
-      "subplanIds": [4]
-    },
-    {
-      "id": 4,
-      "name": "Cursos de Formación General",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 20,
-      "courseIds": [5, 6, 7],
-      "subplanIds": []
-    },
-    {
-      "id": 5,
-      "name": "Electivos Profesionales",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 36,
-      "courseIds": [8, 10, 11],
-      "subplanIds": []
     }
   ]
 }

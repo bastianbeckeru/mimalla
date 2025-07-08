@@ -124,7 +124,7 @@ export default function CurriculumForm({
         year: year,
         term: period,
         path: `${institutionAcronym}/${programSlug}`,
-        slots: data.curriculum.slots,
+        slots: data.curriculum.structure,
       });
 
       setData(data);

@@ -265,8 +265,8 @@ function SidebarTrigger({
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
-      size="icon"
-      className={cn("size-7", className)}
+      size="default"
+      className={cn("h-9 min-w-9 px-2", className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
@@ -362,7 +362,7 @@ function SidebarSeparator({
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn("bg-card-border w-auto px-2", className)}
+      className={cn("bg-muted w-auto px-2", className)}
       {...props}
     />
   );

@@ -24,7 +24,7 @@ import {
 import { MotionDiv } from "@/components/motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "sonner";
-import { Plus, Trash, Undo2 } from "lucide-react";
+import { Plus, Save, Trash, Undo2 } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { cn } from "@/lib/utils";
 import { nanoid } from "nanoid";
@@ -59,6 +59,8 @@ type RBDndCurriculum = {
   approvedCourseIds: number[];
   failedCourseIds: number[];
   approvedCredits: number;
+  //
+  handleSaveChanges: () => void;
 };
 
 const MAX_HISTORY = 50;
@@ -84,6 +86,7 @@ export default function RBDndCurriculum({
   approvedCourseIds,
   failedCourseIds,
   approvedCredits,
+  handleSaveChanges,
 }: RBDndCurriculum) {
   const { showTimeline, autoRescheduleFailed } = useSettingsStore();
   const { curriculums, activeCurriculumId } = useNewCurriculumStore();
@@ -440,48 +443,36 @@ export default function RBDndCurriculum({
         </MotionDiv>
 
         {editMode && (
-          <div className="absolute bottom-0 left-0 w-full p-2 transition-transform">
-            <div className="bg-muted grid grid-cols-3 items-center rounded-md p-2 md:bg-transparent">
-              <div></div>
+          <div className="absolute bottom-0 left-0 mb-1 w-full">
+            {/* SAVE */}
+            <Button
+              aria-label="Save Changes"
+              variant="outline"
+              size="sm"
+              className="disabled:bg-muted bg-accent absolute bottom-2 left-2 hover:brightness-110 md:hidden"
+              disabled={history.past.length === 0}
+              onClick={handleSaveChanges}
+            >
+              <Save />
+              <span className="sr-only">Guardar</span>
+            </Button>
 
-              <div className="mx-auto">
-                <Droppable droppableId="trash">
-                  {(provided, snapshot) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      id="trash"
-                      className={cn(
-                        "md:bg-muted flex h-10 w-24 items-center justify-center rounded-md bg-black/25 p-2 shadow-inner transition-all md:h-14 md:w-32 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-                        snapshot.isDraggingOver &&
-                          "border-foreground bg-destructive md:bg-destructive h-20 w-36 border-2 md:h-20 md:w-36",
-                      )}
-                    >
-                      <Trash />
-                      <div className="absolute">{provided.placeholder}</div>
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-
-              <div className="flex size-full items-end justify-end">
-                <div className="bg-card flex h-10 w-28 flex-row items-center justify-end rounded-md md:h-8 md:w-16">
-                  <button
-                    className="hover:bg-muted flex size-full cursor-pointer items-center justify-center rounded-l-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                    onClick={() => undo()}
-                    disabled={history.past.length === 0}
-                  >
-                    <Undo2 />
-                  </button>
-                  <button
-                    className="hover:bg-muted flex size-full cursor-pointer items-center justify-center rounded-r-md transition-colors [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                    onClick={redo}
-                    disabled={history.future.length === 0}
-                  >
-                    <Undo2 className="-scale-x-100" />
-                  </button>
-                </div>
-              </div>
+            {/* UNDO & REDO */}
+            <div className="absolute right-2 bottom-2 flex h-9 w-24 flex-row items-center rounded-md md:h-8 md:w-16">
+              <button
+                className="bg-muted flex size-full cursor-pointer items-center justify-center rounded-l-md transition-[filter,colors] hover:brightness-110 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                onClick={undo}
+                disabled={history.past.length === 0}
+              >
+                <Undo2 />
+              </button>
+              <button
+                className="bg-muted flex size-full cursor-pointer items-center justify-center rounded-r-md transition-[filter,colors] hover:brightness-110 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                onClick={redo}
+                disabled={history.future.length === 0}
+              >
+                <Undo2 className="-scale-x-100" />
+              </button>
             </div>
           </div>
         )}

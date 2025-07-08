@@ -11,13 +11,10 @@
     "schedule": "DAYTIME"
   },
   "curriculum": {
-    "curriculum_name": "Derecho 2023",
     "version": "v6.0",
     "year": 2023,
-    "start_year": 2023,
-    "end_year": null,
-    "is_current": true,
-    "slots": [
+    "isCurrent": true,
+    "structure": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 177 },
       { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 178 },
       { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 179 },
@@ -71,6 +68,40 @@
       { "id": 51, "year": 5, "term": 3, "position": 2, "courseId": 214 },
       { "id": 52, "year": 5, "term": 3, "position": 3, "courseId": 215 },
       { "id": 52, "year": 5, "term": 3, "position": 4, "courseId": 210 }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "Derecho",
+        "type": "PROFESSIONAL",
+        "requiredCredits": -1,
+        "courseIds": [1, 2],
+        "subplanIds": [2, 4]
+      },
+      {
+        "id": 2,
+        "name": "Licenciatura en Ciencias Jurídicas y Sociales",
+        "type": "ACADEMIC",
+        "requiredCredits": -1,
+        "courseIds": [3, 4],
+        "subplanIds": [3]
+      },
+      {
+        "id": 3,
+        "name": "Cursos de Formación General",
+        "type": "NONE",
+        "requiredCredits": 20,
+        "courseIds": [5, 6, 7],
+        "subplanIds": []
+      },
+      {
+        "id": 4,
+        "name": "Electivos Profesionales",
+        "type": "NONE",
+        "requiredCredits": 36,
+        "courseIds": [8, 10, 11],
+        "subplanIds": []
+      }
     ]
   },
   "areas": [
@@ -78,104 +109,101 @@
       "id": 1,
       "name": "Formación General e Inglés",
       "color": "#FFFFFF",
-      "courseIds": [5, 21, 41, 44, 45],
-      "electiveIds": [],
-      "subareaIds": []
+      "courseIds": [5, 21, 41, 44, 45, 20, 26, 46, 87, 97, 103],
+      "subareaIds": [2, 3, 4]
     },
     {
-      "id": 21,
+      "id": 2,
       "name": "Formación General",
       "color": "#FFFFFF",
       "courseIds": [10],
-      "electiveIds": [],
-      "subareaIds": [23]
+      "subareaIds": []
     },
     {
-      "id": 22,
+      "id": 3,
       "name": "Formación en Inglés General",
       "color": "#FFFFFF",
-      "courseIds": [15, 20, 26, 110, 116, 122],
-      "electiveIds": [],
+      "courseIds": [15, 20, 26],
       "subareaIds": []
     },
     {
-      "id": 24,
-      "name": "Derecho Privado",
-      "color": "#A87796",
-      "courseIds": [177, 182, 186, 190, 194, 199, 203],
-      "electiveIds": [],
-      "subareaIds": []
-    },
-    {
-      "id": 25,
-      "name": "Derecho Público",
-      "color": "#575656",
-      "courseIds": [178, 183, 187, 195, 200, 204],
-      "electiveIds": [],
-      "subareaIds": []
-    },
-    {
-      "id": 26,
-      "name": "Derecho Procesal",
-      "color": "#9B9B9B",
-      "courseIds": [185, 192, 197, 206],
-      "electiveIds": [],
+      "id": 4,
+      "name": "Formación General Deportiva",
+      "color": "#FFFFFF",
+      "courseIds": [
+        261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274,
+        275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286
+      ],
       "subareaIds": []
     },
     {
       "id": 27,
-      "name": "Derecho Penal",
-      "color": "#1C1C1C",
-      "courseIds": [191, 196, 201, 205],
-      "electiveIds": [],
+      "name": "Derecho Privado",
+      "color": "#A87796",
+      "courseIds": [177, 182, 186, 190, 194, 199, 203],
       "subareaIds": []
     },
     {
       "id": 28,
-      "name": "Derecho de los Negocios",
-      "color": "#DCC8D5",
-      "courseIds": [189, 193, 198, 202, 207, 208],
-      "electiveIds": [],
+      "name": "Derecho Público",
+      "color": "#575656",
+      "courseIds": [178, 183, 187, 195, 200, 204],
       "subareaIds": []
     },
     {
       "id": 29,
-      "name": "Teoría y Filosofía del Derecho",
-      "color": "#DADAD9",
-      "courseIds": [184, 188, 211],
-      "electiveIds": [],
+      "name": "Derecho Procesal",
+      "color": "#9B9B9B",
+      "courseIds": [185, 192, 197, 206],
       "subareaIds": []
     },
     {
       "id": 30,
-      "name": "Destrezas para la Profesión",
-      "color": "#CAADC0",
-      "courseIds": [179, 180, 181, 212, 215],
-      "electiveIds": [],
+      "name": "Derecho Penal",
+      "color": "#1C1C1C",
+      "courseIds": [191, 196, 201, 205],
       "subareaIds": []
     },
     {
       "id": 31,
-      "name": "Clínicas Jurídicas",
-      "color": "#EDE3EA",
-      "courseIds": [209],
-      "electiveIds": [],
+      "name": "Derecho de los Negocios",
+      "color": "#DCC8D5",
+      "courseIds": [189, 193, 198, 202, 207, 208],
       "subareaIds": []
     },
     {
       "id": 32,
-      "name": "Cursos Optativos de Especialización",
-      "color": "#EDE3EA",
-      "courseIds": [210],
-      "electiveIds": [],
+      "name": "Teoría y Filosofía del Derecho",
+      "color": "#DADAD9",
+      "courseIds": [184, 188, 211],
       "subareaIds": []
     },
     {
       "id": 33,
+      "name": "Destrezas para la Profesión",
+      "color": "#CAADC0",
+      "courseIds": [179, 180, 181, 212, 215],
+      "subareaIds": []
+    },
+    {
+      "id": 34,
+      "name": "Clínicas Jurídicas",
+      "color": "#EDE3EA",
+      "courseIds": [209],
+      "subareaIds": []
+    },
+    {
+      "id": 35,
+      "name": "Cursos Optativos de Especialización",
+      "color": "#EDE3EA",
+      "courseIds": [210],
+      "subareaIds": []
+    },
+    {
+      "id": 36,
       "name": "Curso de Integración y Actividad de Licenciatura",
       "color": "#FFFFFF",
       "courseIds": [213],
-      "electiveIds": [],
       "subareaIds": []
     }
   ],
@@ -652,65 +680,6 @@
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
-    }
-  ],
-  "degrees": [
-    {
-      "id": 5,
-      "name": "Licenciatura en Ciencias Jurídicas y Sociales",
-      "type": "ACADEMIC",
-      "requiredCourseIds": [213]
-    },
-    {
-      "id": 6,
-      "name": "Abogado",
-      "type": "PROFESSIONAL",
-      "requiredCourseIds": [213],
-      "requiredElectives": [10]
-    }
-  ],
-  "plans": [
-    {
-      "id": 1,
-      "name": "Derecho",
-      "type": "NONE",
-      "areCoursesMandatory": true,
-      "courseIds": [1, 2],
-      "subplanIds": [2, 3]
-    },
-    {
-      "id": 2,
-      "name": "Licenciatura en Ciencias Jurídicas y Sociales",
-      "type": "ACADEMIC",
-      "areCoursesMandatory": true,
-      "courseIds": [3, 4],
-      "subplanIds": [3]
-    },
-    {
-      "id": 3,
-      "name": "Derecho",
-      "type": "PROFESSIONAL",
-      "areCoursesMandatory": true,
-      "courseIds": [8],
-      "subplanIds": [4]
-    },
-    {
-      "id": 4,
-      "name": "Cursos de Formación General",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 20,
-      "courseIds": [5, 6, 7],
-      "subplanIds": []
-    },
-    {
-      "id": 5,
-      "name": "Electivos Profesionales",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 36,
-      "courseIds": [8, 10, 11],
-      "subplanIds": []
     }
   ]
 }

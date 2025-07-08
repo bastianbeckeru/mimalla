@@ -31,7 +31,7 @@ export type useNewCurriculumStoreProps = {
     year: number;
     term: number;
     path: string;
-    slots: CurriculumData["curriculum"]["slots"];
+    slots: CurriculumData["curriculum"]["structure"];
   }) => void;
   removeCurriculum: (curriculumId: string) => void;
   updateCurriculumEnrollments: (newEnrollments: EnrolledCourse[]) => void;

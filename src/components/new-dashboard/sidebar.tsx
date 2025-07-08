@@ -85,27 +85,6 @@ export default function DashboardSidebar({
       </SidebarHeader>
 
       <SidebarContent className="p-2 text-sm">
-        <SidebarGroup>
-          <SidebarMenu className="flex items-center justify-between">
-            <SidebarMenuItem className="w-full">
-              <SidebarMenuButton
-                tooltip="Modo edición"
-                onClick={() => setEditMode(!editMode)}
-                className="text-muted-foreground hover:text-foreground [&>svg]:text-foreground justify-start group-data-[collapsible=icon]:!p-1 [&>svg]:size-4"
-              >
-                {editMode ? <PencilOff /> : <Pencil />}
-                <span className="text-foreground flex-grow truncate">
-                  {editMode ? "Deshabilitar" : "Habilitar"} edición
-                </span>
-                <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
-                  <span className="text-[0.625rem]">⌘</span>E
-                </kbd>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
-
-        <SidebarSeparator />
         {/* PROGRESS */}
         <SidebarGroup>
           <SidebarGroupLabel>Progreso</SidebarGroupLabel>

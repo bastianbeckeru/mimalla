@@ -45,9 +45,9 @@ export default async function ProgramPage({ params }: ProgramParams) {
 
   if (!data) return <div>Error al cargar el programa</div>;
 
-  const { institution, program, degrees } = data;
+  const { institution, program, curriculum } = data;
   const { periods, nCols, nRows } = getPeriods({
-    enrollments: data.curriculum.slots,
+    slots: data.curriculum.structure,
   });
 
   return (
@@ -62,7 +62,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
       <ProgramInfo
         institution={institution}
         program={program}
-        degrees={degrees}
+        plans={curriculum.plans}
         duration={periods.length}
       >
         <ImportCurriculumButton

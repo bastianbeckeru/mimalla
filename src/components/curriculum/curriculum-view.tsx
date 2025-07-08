@@ -130,7 +130,7 @@ export default function CurriculumView({
           </div>
 
           <div style={curriculumStyle} className="relative">
-            {curriculum.slots.map((slot, sIndex) => {
+            {curriculum.structure.map((slot, sIndex) => {
               const position = getPosition(periods, slot);
               const course = getCourse({ id: slot.courseId, courses: courses });
               const area = course && getCourseArea(areas, course);
@@ -162,7 +162,7 @@ export default function CurriculumView({
                 } else if (isSelecting) {
                   const relatedPaths = getRelatedPaths({
                     originSlot: slot,
-                    slots: curriculum.slots,
+                    slots: curriculum.structure,
                     periods: periods,
                     course: course,
                   });

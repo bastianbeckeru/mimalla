@@ -97,6 +97,10 @@ export type CurriculumData = {
     name: string;
     acronym: string;
   };
+  department: {
+    name: string;
+    acronym: string;
+  };
   program: {
     name: string;
     acronym: string;
@@ -105,14 +109,21 @@ export type CurriculumData = {
     schedule: string;
   };
   curriculum: {
+    version: string;
     year: number;
-    slots: {
+    isCurrent: boolean;
+    structure: {
       id: number | string;
       year: number;
       term: number;
       position: number;
-      //type: 'MANDATORY' | 'ELECTIVE';
       courseId: number;
+      //type: 'MANDATORY' | 'ELECTIVE';
+    }[];
+    plans: {
+      id: number;
+      name: string;
+      type: string;
     }[];
   };
   areas: {
@@ -133,11 +144,6 @@ export type CurriculumData = {
     credits: number;
     prerequisiteCredits: number;
     prerequisiteIds: number[];
-  }[];
-  degrees: {
-    id: number;
-    name: string;
-    type: string;
   }[];
 };
 

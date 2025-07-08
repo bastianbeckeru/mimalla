@@ -13,7 +13,8 @@
   "curriculum": {
     "version": "v4",
     "year": 2020,
-    "slots": [
+    "isCurrent": true,
+    "structure": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 1 },
       { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 2 },
       { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 3 },
@@ -70,6 +71,40 @@
       { "id": 54, "year": 5, "term": 3, "position": 4, "courseId": 68 },
       { "id": 55, "year": 5, "term": 3, "position": 5, "courseId": 73 },
       { "id": 56, "year": 6, "term": 1, "position": 1, "courseId": 74 }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "Ingeniería Civil en Informática y Telecomunicaciones",
+        "type": "PROFESSIONAL",
+        "requiredCredits": -1,
+        "courseIds": [1, 2],
+        "subplanIds": [2, 4]
+      },
+      {
+        "id": 2,
+        "name": "Licenciatura en Ciencias de la Ingeniería",
+        "type": "ACADEMIC",
+        "requiredCredits": -1,
+        "courseIds": [3, 4],
+        "subplanIds": [3]
+      },
+      {
+        "id": 3,
+        "name": "Cursos de Formación General",
+        "type": "NONE",
+        "requiredCredits": 20,
+        "courseIds": [5, 6, 7],
+        "subplanIds": []
+      },
+      {
+        "id": 4,
+        "name": "Electivos Profesionales",
+        "type": "NONE",
+        "requiredCredits": 36,
+        "courseIds": [8, 10, 11],
+        "subplanIds": []
+      }
     ]
   },
   "areas": [
@@ -77,62 +112,79 @@
       "id": 1,
       "name": "Formación General e Inglés",
       "color": "#FFFFFF",
-      "courseIds": [5, 10, 20, 21, 26, 41, 44, 45, 46, 87, 97, 103],
-      "electiveIds": [],
-      "subareaIds": []
+      "courseIds": [5, 21, 41, 44, 45, 20, 26, 46, 87, 97, 103],
+      "subareaIds": [2, 3, 4]
     },
     {
       "id": 2,
-      "name": "Formación en Ciencias Básicas",
-      "color": "#34C1CD",
-      "courseIds": [1, 2, 3, 6, 7, 8, 11, 12, 13, 18],
-      "electiveIds": [],
+      "name": "Formación General",
+      "color": "#FFFFFF",
+      "courseIds": [10],
       "subareaIds": []
     },
     {
       "id": 3,
+      "name": "Formación en Inglés General",
+      "color": "#FFFFFF",
+      "courseIds": [15, 20, 26],
+      "subareaIds": []
+    },
+    {
+      "id": 4,
+      "name": "Formación General Deportiva",
+      "color": "#FFFFFF",
+      "courseIds": [
+        261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274,
+        275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286
+      ],
+      "subareaIds": []
+    },
+    {
+      "id": 5,
+      "name": "Formación en Ciencias Básicas",
+      "color": "#34C1CD",
+      "courseIds": [1, 2, 3, 6, 7, 8, 11, 12, 13, 18],
+      "subareaIds": []
+    },
+    {
+      "id": 6,
       "name": "Formación en Ciencias de la Ingeniería",
       "color": "#BBE5EB",
       "courseIds": [
         4, 9, 14, 16, 17, 19, 22, 23, 24, 25, 28, 29, 30, 49, 59, 75, 76, 77,
         78, 82, 85, 86
       ],
-      "electiveIds": [],
-      "subareaIds": []
+      "subareaIds": [11]
     },
     {
-      "id": 4,
+      "id": 7,
       "name": "Formación en Ingeniería Aplicada",
       "color": "#818284",
       "courseIds": [
         27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 43, 79, 80, 81, 83, 84,
         88, 89, 90, 91, 92, 93, 94, 95, 96, 98, 99, 100, 101, 102
       ],
-      "electiveIds": [],
-      "subareaIds": []
+      "subareaIds": [18]
     },
     {
-      "id": 5,
+      "id": 8,
       "name": "Formación en Ingeniería Aplicada: Informática",
       "color": "#AFCEC3",
-      "courseIds": [47, 50, 51, 55, 58, 60, 62, 68, 71],
-      "electiveIds": [],
-      "subareaIds": []
+      "courseIds": "47, 50, 51, 55, 58, 60, 62, 68, 71",
+      "subareaIds": ""
     },
     {
-      "id": 6,
+      "id": 9,
       "name": "Formación en Ingeniería Aplicada: Telecomunicaciones",
       "color": "#719FC0",
       "courseIds": [48, 53, 56, 57, 61, 63, 64, 69, 70],
-      "electiveIds": [],
       "subareaIds": []
     },
     {
-      "id": 7,
+      "id": 10,
       "name": "Formación en Ingeniería Aplicada: Proyectos e Integración",
       "color": "#AFC7DA",
       "courseIds": [54, 66, 72, 73],
-      "electiveIds": [],
       "subareaIds": []
     }
   ],
@@ -675,65 +727,6 @@
       "prerequisiteCredits": 336,
       "isElective": true,
       "duration": 1
-    }
-  ],
-  "degrees": [
-    {
-      "id": 1,
-      "name": "Licenciatura en Ciencias de la Ingeniería",
-      "type": "ACADEMIC",
-      "requiredCourseIds": [1, 2]
-    },
-    {
-      "id": 2,
-      "name": "Ingeniería Civil en Informática y Telecomunicaciones",
-      "type": "PROFESSIONAL",
-      "requiredCourseIds": [1, 2],
-      "requiredElectives": [1]
-    }
-  ],
-  "plans": [
-    {
-      "id": 1,
-      "name": "Ingeniería Civil en Informática y Telecomunicaciones",
-      "type": "NONE",
-      "areCoursesMandatory": true,
-      "courseIds": [1, 2],
-      "subplanIds": [2, 3]
-    },
-    {
-      "id": 2,
-      "name": "Licenciatura en Ciencias de la Ingeniería",
-      "type": "ACADEMIC",
-      "areCoursesMandatory": true,
-      "courseIds": [3, 4],
-      "subplanIds": [3]
-    },
-    {
-      "id": 3,
-      "name": "Ingeniería Civil en Informática y Telecomunicaciones",
-      "type": "PROFESSIONAL",
-      "areCoursesMandatory": true,
-      "courseIds": [8],
-      "subplanIds": [4]
-    },
-    {
-      "id": 4,
-      "name": "Cursos de Formación General",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 20,
-      "courseIds": [5, 6, 7],
-      "subplanIds": []
-    },
-    {
-      "id": 5,
-      "name": "Electivos Profesionales",
-      "type": "NONE",
-      "areCoursesMandatory": false,
-      "requiredCredits": 36,
-      "courseIds": [8, 10, 11],
-      "subplanIds": []
     }
   ]
 }

@@ -11,7 +11,7 @@ import {
   getCurriculumStats,
   getPeriodsWithEnrollments,
 } from "@/utils/curriculum";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Lock, LockOpen, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProgramData } from "../../utils/curriculum-data";
 import Sidebar from "./sidebar";
@@ -26,6 +26,7 @@ import { Progress } from "../ui/progress";
 import { toast } from "sonner";
 import { StudentEnrollment } from "@/types/store";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
+import { Toggle } from "../ui/toggle";
 
 export default function ClientSideDashboard() {
   const {
@@ -192,27 +193,43 @@ export default function ClientSideDashboard() {
           <header className="bg-card relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <SidebarTrigger className="absolute left-2 md:hidden" />
 
-            <div className="flex items-center justify-center px-2">
-              <h1 className="font-bold">{program.name}</h1>
+            <div className="flex items-center justify-center px-2 font-bold">
+              <h1>{program.name}</h1>
             </div>
 
-            {editMode && (
-              <Button
-                aria-label="Save Changes"
+            <div className="absolute right-2 flex flex-row items-center gap-2">
+              {editMode && (
+                <Button
+                  aria-label="save changes"
+                  variant="outline"
+                  className="disabled:bg-muted bg-accent hidden hover:brightness-110 md:flex"
+                  disabled={history.past.length === 0}
+                  onClick={handleSaveChanges}
+                >
+                  <Save />
+                  <span className="sr-only hidden md:inline">Guardar</span>
+                  <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
+                    <span className="text-[0.625rem]">⌘</span>S
+                  </kbd>
+                </Button>
+              )}
+
+              <Toggle
+                title="Habilitar edición"
+                aria-label="toggle edit mode"
                 variant="outline"
-                size="sm"
-                className={cn(
-                  "absolute right-4",
-                  history.past.length !== 0 &&
-                    "hover:bg-accent-foreground/80 bg-accent",
-                )}
-                disabled={history.past.length === 0}
-                onClick={handleSaveChanges}
+                data-state={editMode ? "on" : "off"}
+                onClick={handleEditMode}
               >
-                <Save />
-                <span className="hidden md:inline">Guardar</span>
-              </Button>
-            )}
+                {editMode ? <LockOpen /> : <Lock />}
+                <span className="sr-only hidden md:inline">
+                  {editMode ? "Deshabilitar" : "Habilitar"} edición
+                </span>
+                <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
+                  <span className="text-[0.625rem]">⌘</span>E
+                </kbd>
+              </Toggle>
+            </div>
           </header>
           <Progress
             value={stats.progress}
@@ -230,6 +247,7 @@ export default function ClientSideDashboard() {
             approvedCourseIds={approvedCourseIds}
             failedCourseIds={failedCourseIds}
             approvedCredits={stats.approvedCredits}
+            handleSaveChanges={handleSaveChanges}
           />
         </ScrollAreaWrapper>
       </SidebarInset>

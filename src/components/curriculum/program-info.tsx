@@ -10,18 +10,18 @@ import {
 export default function ProgramInfo({
   institution,
   program,
-  degrees,
+  plans,
   duration,
   children,
 }: {
   institution: CurriculumData["institution"];
   program: CurriculumData["program"];
-  degrees: CurriculumData["degrees"];
+  plans: CurriculumData["curriculum"]["plans"];
   duration: number;
   children?: React.ReactNode;
 }) {
-  const professionalTitle = degrees.find((d) => d.type === "PROFESSIONAL");
-  const academicTitle = degrees.find((d) => d.type === "ACADEMIC");
+  const professionalTitle = plans.find((p) => p.type === "PROFESSIONAL");
+  const academicTitle = plans.find((p) => p.type === "ACADEMIC");
   const { schedule, siesCode, demreCode } = program;
 
   return (

@@ -46,9 +46,9 @@ export function getCourseArea(
 }
 
 export function getPeriods({
-  enrollments,
+  slots,
 }: {
-  enrollments: CurriculumData["curriculum"]["slots"];
+  slots: CurriculumData["curriculum"]["structure"];
 }): {
   nCols: number;
   nRows: number;
@@ -57,9 +57,9 @@ export function getPeriods({
   const periodSet = new Set<PeriodKey>();
   let maxRows = 1;
 
-  enrollments.forEach((e) => {
-    periodSet.add(`${e.year}-${e.term}`);
-    maxRows = Math.max(maxRows, e.position);
+  slots.forEach((s) => {
+    periodSet.add(`${s.year}-${s.term}`);
+    maxRows = Math.max(maxRows, s.position);
   });
 
   const sortedPeriods = Array.from(periodSet).sort((a, b) => {
