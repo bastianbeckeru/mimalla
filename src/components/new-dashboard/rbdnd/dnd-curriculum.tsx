@@ -24,7 +24,7 @@ import {
 import { MotionDiv } from "@/components/motion";
 import CourseDialog from "../course-dialog";
 import { toast } from "sonner";
-import { Plus, Save, Trash, Undo2 } from "lucide-react";
+import { Check, Clock, Plus, Save, Trash, Undo2, X } from "lucide-react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { cn } from "@/lib/utils";
 import { nanoid } from "nanoid";
@@ -47,6 +47,13 @@ import {
 import AddPeriodDialog from "../add-period-dialog";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import { useSettingsStore } from "@/stores/settings";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -215,195 +222,187 @@ export default function RBDndCurriculum({
                             ref={provided.innerRef}
                             className="mb-2 h-16 w-32 overflow-hidden rounded-md"
                           >
-                            <SlotCard
-                              className={cn(
-                                "size-full",
-                                editMode && "cursor-grab",
-                                snapshot.isDragging && "shadow-2xl",
-                              )}
-                              enrollment={enrollment}
-                              course={course}
-                              color={color}
-                              isAvailable={isAvailable}
-                              onClick={() => {
-                                if (snapshot.isDragging) return;
+                            <ContextMenu>
+                              <ContextMenuTrigger asChild disabled={!editMode}>
+                                <SlotCard
+                                  className={cn(
+                                    "size-full",
+                                    editMode && "cursor-grab",
+                                    snapshot.isDragging && "shadow-2xl",
+                                  )}
+                                  enrollment={enrollment}
+                                  course={course}
+                                  color={color}
+                                  isAvailable={isAvailable}
+                                  onClick={() => {
+                                    if (snapshot.isDragging) return;
 
-                                if (!editMode) {
-                                  setActiveEnrollment({
-                                    ...enrollment,
-                                    course: course,
-                                    color: color,
-                                  });
+                                    if (!editMode) {
+                                      setActiveEnrollment({
+                                        ...enrollment,
+                                        course: course,
+                                        color: color,
+                                      });
 
-                                  setOpenDialogId("course-info");
-                                } else {
-                                  if (!isAvailable) return;
+                                      setOpenDialogId("course-info");
+                                    } else {
+                                      if (!isAvailable) return;
 
-                                  const newStatus =
-                                    statusTransitions[enrollment.status];
-                                  const currentPeriods = [...history.present];
-                                  let updatedPeriods = currentPeriods;
+                                      const newStatus =
+                                        statusTransitions[enrollment.status];
+                                      let updatedPeriods = [...history.present];
 
-                                  // 1. APPROVED: Change the status of the enrollment
-                                  // 2. PENDING: Revert the status of the enrollment and related enrollments
-                                  // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
-                                  if (
-                                    !course ||
-                                    course.isElective ||
-                                    newStatus === "APPROVED"
-                                  ) {
-                                    updatedPeriods = updatedPeriods.map((p) => {
-                                      if (p.id === period.id) {
-                                        const updatedEnrollments =
-                                          p.enrollments.map((e) => {
-                                            if (e.id === enrollment.id) {
-                                              return {
-                                                ...e,
-                                                status: newStatus,
-                                              };
-                                            }
-
-                                            return e;
+                                      // 1. APPROVED: Change the status of the enrollment
+                                      // 2. PENDING: Revert the status of the enrollment and related enrollments
+                                      // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
+                                      if (newStatus === "APPROVED") {
+                                        updatedPeriods =
+                                          updateCourseEnrollmentStatus({
+                                            periods: history.present,
+                                            periodId: period.id,
+                                            enrollmentId: enrollment.id,
+                                            newStatus: "APPROVED",
                                           });
-
-                                        return {
-                                          ...p,
-                                          enrollments: updatedEnrollments,
-                                        };
-                                      }
-                                      return p;
-                                    });
-                                  } else {
-                                    const coursesToRevert =
-                                      collectSubsequentCourses(
-                                        enrollment.courseId,
-                                      );
-                                    updatedPeriods = revert(
-                                      currentPeriods,
-                                      coursesToRevert,
-                                    );
-
-                                    // EXTRA LOGIC
-                                    if (
-                                      newStatus === "FAILED" &&
-                                      autoRescheduleFailed
-                                    ) {
-                                      // Add a new enrollment with the same course to the next period
-                                      const nextPeriod = updatedPeriods.at(
-                                        pIndex + 1,
-                                      );
-                                      const newEnrollment = {
-                                        id: nanoid(),
-                                        courseId: enrollment.courseId,
-                                        status:
-                                          "PENDING" as EnrolledCourseStatus,
-                                      };
-
-                                      if (!nextPeriod) {
-                                        const [year, term] = period.id
-                                          .split("-")
-                                          .map(Number);
-                                        const [newYear, newTerm] =
-                                          term === 2
-                                            ? [year! + 1, 1]
-                                            : [year!, 2];
-
-                                        updatedPeriods.push({
-                                          id: `${newYear}-${newTerm}`,
-                                          enrollments: [
-                                            {
-                                              ...newEnrollment,
-                                              position: 1,
-                                              year: newYear,
-                                              term: newTerm,
-                                            },
-                                          ],
-                                        });
                                       } else {
-                                        if (
-                                          !nextPeriod.enrollments.some(
-                                            (e) =>
-                                              e.courseId ===
-                                              enrollment.courseId,
-                                          )
-                                        ) {
-                                          const [newYear, newTerm] =
-                                            nextPeriod.id
-                                              .split("-")
-                                              .map(Number);
-                                          const hasNextPeriodSubsequentCourses =
-                                            nextPeriod.enrollments.some((e) =>
-                                              course.subsequentIds.includes(
-                                                e.courseId,
-                                              ),
-                                            );
-
-                                          nextPeriod.enrollments.push({
-                                            ...newEnrollment,
-                                            position:
-                                              nextPeriod.enrollments.length + 1,
-                                            year: newYear!,
-                                            term: newTerm!,
-                                          });
-
-                                          if (hasNextPeriodSubsequentCourses) {
-                                            // Move every subsequent course to the next period
-                                            updatedPeriods =
-                                              moveSubsequentCourses(
-                                                updatedPeriods,
+                                        updatedPeriods =
+                                          updateCourseEnrollmentStatusWithRevert(
+                                            {
+                                              periods: history.present,
+                                              courses: courses,
+                                              approvedCourseIds:
+                                                approvedCourseIds,
+                                              enrollmentId: enrollment.id,
+                                              enrollmentCourseId:
                                                 enrollment.courseId,
-                                              );
-                                          }
-                                        }
+                                              newStatus: "PENDING",
+                                            },
+                                          );
                                       }
+
+                                      setHistory((prev) => {
+                                        return {
+                                          past: [
+                                            ...prev.past,
+                                            prev.present,
+                                          ].slice(-MAX_HISTORY),
+                                          present: updatedPeriods,
+                                          future: [],
+                                        };
+                                      });
                                     }
-                                  }
+                                  }}
+                                />
+                              </ContextMenuTrigger>
+                              <ContextMenuContent className="w-52">
+                                <ContextMenuItem
+                                  disabled={enrollment.status === "APPROVED"}
+                                  onClick={() => {
+                                    const newPresent =
+                                      updateCourseEnrollmentStatus({
+                                        periods: history.present,
+                                        periodId: period.id,
+                                        enrollmentId: enrollment.id,
+                                        newStatus: "APPROVED",
+                                      });
 
-                                  function revert(
-                                    periods: PeriodWithEnrollments[],
-                                    coursesToRevert: number[] = [],
-                                  ) {
-                                    return periods.map((p) => {
-                                      const updatedEnrollments =
-                                        p.enrollments.map((e) => {
-                                          if (e.id === enrollment.id) {
-                                            return {
-                                              ...e,
-                                              status: newStatus,
-                                            };
-                                          }
-
-                                          const shouldRevert =
-                                            coursesToRevert.includes(
-                                              e.courseId,
-                                            );
-                                          return {
-                                            ...e,
-                                            status: shouldRevert
-                                              ? "PENDING"
-                                              : e.status,
-                                          };
-                                        });
-
+                                    setHistory((prev) => {
                                       return {
-                                        ...p,
-                                        enrollments: updatedEnrollments,
+                                        past: [
+                                          ...prev.past,
+                                          prev.present,
+                                        ].slice(-MAX_HISTORY),
+                                        present: newPresent,
+                                        future: [],
                                       };
                                     });
-                                  }
+                                  }}
+                                >
+                                  <Check />
+                                  Marcar como aprobado
+                                </ContextMenuItem>
+                                <ContextMenuItem
+                                  disabled={enrollment.status === "PENDING"}
+                                  onClick={() => {
+                                    const newPresent =
+                                      updateCourseEnrollmentStatusWithRevert({
+                                        periods: history.present,
+                                        courses: courses,
+                                        approvedCourseIds: approvedCourseIds,
+                                        enrollmentId: enrollment.id,
+                                        enrollmentCourseId: enrollment.courseId,
+                                        newStatus: "PENDING",
+                                      });
 
-                                  setHistory((prev) => {
-                                    return {
-                                      past: [...prev.past, prev.present].slice(
-                                        -MAX_HISTORY,
-                                      ),
-                                      present: updatedPeriods,
-                                      future: [],
-                                    };
-                                  });
-                                }
-                              }}
-                            />
+                                    setHistory((prev) => {
+                                      return {
+                                        past: [
+                                          ...prev.past,
+                                          prev.present,
+                                        ].slice(-MAX_HISTORY),
+                                        present: newPresent,
+                                        future: [],
+                                      };
+                                    });
+                                  }}
+                                >
+                                  <Clock />
+                                  Marcar como pendiente
+                                </ContextMenuItem>
+                                <ContextMenuItem
+                                  disabled={enrollment.status === "FAILED"}
+                                  onClick={() => {
+                                    const newPresent =
+                                      updateCourseEnrollmentStatusWithRevert({
+                                        periods: history.present,
+                                        courses: courses,
+                                        approvedCourseIds: approvedCourseIds,
+                                        enrollmentId: enrollment.id,
+                                        enrollmentCourseId: enrollment.courseId,
+                                        newStatus: "FAILED",
+                                      });
+
+                                    setHistory((prev) => {
+                                      return {
+                                        past: [
+                                          ...prev.past,
+                                          prev.present,
+                                        ].slice(-MAX_HISTORY),
+                                        present: newPresent,
+                                        future: [],
+                                      };
+                                    });
+                                  }}
+                                >
+                                  <X />
+                                  Marcar como reprobado
+                                </ContextMenuItem>
+                                <ContextMenuSeparator />
+                                <ContextMenuItem
+                                  variant="destructive"
+                                  onClick={() => {
+                                    const newPresent = deleteCourseEnrollment({
+                                      periods: history.present,
+                                      periodId: period.id,
+                                      enrollmentId: enrollment.id,
+                                    });
+
+                                    setHistory((prev) => {
+                                      return {
+                                        past: [
+                                          ...prev.past,
+                                          prev.present,
+                                        ].slice(-MAX_HISTORY),
+                                        present: newPresent,
+                                        future: [],
+                                      };
+                                    });
+                                  }}
+                                >
+                                  <Trash />
+                                  Eliminar
+                                </ContextMenuItem>
+                              </ContextMenuContent>
+                            </ContextMenu>
                           </div>
                         )}
                       </Draggable>
@@ -798,26 +797,6 @@ export default function RBDndCurriculum({
     });
   }
 
-  function collectSubsequentCourses(courseId: number) {
-    const coursesToRevert: number[] = [];
-
-    function loop(courseId: number) {
-      const c = getCourse({
-        id: courseId,
-        courses,
-      });
-      if (!c) return;
-
-      c.subsequentIds.forEach((id) => {
-        if (approvedCourseIds.includes(id)) {
-          coursesToRevert.push(id);
-          loop(id);
-        }
-      });
-    }
-    loop(courseId);
-    return coursesToRevert;
-  }
   function moveSubsequentCourses(
     periods: PeriodWithEnrollments[],
     courseId: number,
@@ -1018,3 +997,218 @@ function countYearOccurrences(periods: PeriodWithEnrollments[]) {
     count,
   }));
 }
+
+function getAllSubsequentCourses({
+  courses,
+  courseId,
+  approvedCourseIds,
+}: {
+  courses: Map<number, CurriculumData["courses"][0]>;
+  courseId: number;
+  approvedCourseIds: number[];
+}) {
+  const coursesToRevert: number[] = [];
+
+  function loop(courseId: number) {
+    const c = getCourse({
+      id: courseId,
+      courses,
+    });
+    if (!c) return;
+
+    c.subsequentIds.forEach((id) => {
+      if (approvedCourseIds.includes(id)) {
+        coursesToRevert.push(id);
+        loop(id);
+      }
+    });
+  }
+
+  loop(courseId);
+  return coursesToRevert;
+}
+
+function updateCourseEnrollmentStatusWithRevert({
+  periods,
+  courses,
+  approvedCourseIds,
+  enrollmentId,
+  enrollmentCourseId,
+  newStatus = "PENDING",
+}: {
+  periods: PeriodWithEnrollments[];
+  courses: Map<number, CurriculumData["courses"][0]>;
+  approvedCourseIds: number[];
+  enrollmentId: string;
+  enrollmentCourseId: number;
+  newStatus: EnrolledCourseStatus;
+}) {
+  const subsequentCoursesToRevert = getAllSubsequentCourses({
+    courses: courses,
+    courseId: enrollmentCourseId,
+    approvedCourseIds: approvedCourseIds,
+  });
+
+  return periods.map((p) => {
+    const updatedEnrollments = p.enrollments.map((e) => {
+      if (e.id !== enrollmentId) {
+        const shouldRevert = subsequentCoursesToRevert.includes(e.courseId);
+
+        return {
+          ...e,
+          status: shouldRevert ? "PENDING" : e.status,
+        };
+      }
+
+      return {
+        ...e,
+        status: newStatus,
+      };
+    });
+
+    return {
+      ...p,
+      enrollments: updatedEnrollments,
+    };
+  });
+}
+
+function updateCourseEnrollmentStatus({
+  periods,
+  periodId,
+  enrollmentId,
+  newStatus,
+}: {
+  periods: PeriodWithEnrollments[];
+  periodId: string;
+  enrollmentId: string;
+  newStatus: EnrolledCourseStatus;
+}) {
+  return periods.map((p) => {
+    if (p.id === periodId) {
+      const updatedEnrollments = p.enrollments.map((e) => {
+        if (e.id === enrollmentId) {
+          return {
+            ...e,
+            status: newStatus,
+          };
+        }
+
+        return e;
+      });
+
+      return {
+        ...p,
+        enrollments: updatedEnrollments,
+      };
+    }
+    return p;
+  });
+}
+
+function deleteCourseEnrollment({
+  periods,
+  periodId,
+  enrollmentId,
+}: {
+  periods: PeriodWithEnrollments[];
+  periodId: string;
+  enrollmentId: string;
+}) {
+  return periods.map((p) => {
+    if (p.id === periodId) {
+      const updatedEnrollments = p.enrollments.filter(
+        (e) => e.id !== enrollmentId,
+      );
+
+      return {
+        ...p,
+        enrollments: updatedEnrollments,
+      };
+    }
+    return p;
+  });
+}
+
+/*
+
+
+                                        // EXTRA LOGIC
+                                        if (
+                                          newStatus === "FAILED" &&
+                                          autoRescheduleFailed
+                                        ) {
+                                          // Add a new enrollment with the same course to the next period
+                                          const nextPeriod = updatedPeriods.at(
+                                            pIndex + 1,
+                                          );
+                                          const newEnrollment = {
+                                            id: nanoid(),
+                                            courseId: enrollment.courseId,
+                                            status:
+                                              "PENDING" as EnrolledCourseStatus,
+                                          };
+
+                                          if (!nextPeriod) {
+                                            const [year, term] = period.id
+                                              .split("-")
+                                              .map(Number);
+                                            const [newYear, newTerm] =
+                                              term === 2
+                                                ? [year! + 1, 1]
+                                                : [year!, 2];
+
+                                            updatedPeriods.push({
+                                              id: `${newYear}-${newTerm}`,
+                                              enrollments: [
+                                                {
+                                                  ...newEnrollment,
+                                                  position: 1,
+                                                  year: newYear,
+                                                  term: newTerm,
+                                                },
+                                              ],
+                                            });
+                                          } else {
+                                            if (
+                                              !nextPeriod.enrollments.some(
+                                                (e) =>
+                                                  e.courseId ===
+                                                  enrollment.courseId,
+                                              )
+                                            ) {
+                                              const [newYear, newTerm] =
+                                                nextPeriod.id
+                                                  .split("-")
+                                                  .map(Number);
+                                              const hasNextPeriodSubsequentCourses =
+                                                nextPeriod.enrollments.some(
+                                                  (e) =>
+                                                    course.subsequentIds.includes(
+                                                      e.courseId,
+                                                    ),
+                                                );
+
+                                              nextPeriod.enrollments.push({
+                                                ...newEnrollment,
+                                                position:
+                                                  nextPeriod.enrollments
+                                                    .length + 1,
+                                                year: newYear!,
+                                                term: newTerm!,
+                                              });
+
+                                              if (
+                                                hasNextPeriodSubsequentCourses
+                                              ) {
+                                                // Move every subsequent course to the next period
+                                                updatedPeriods =
+                                                  moveSubsequentCourses(
+                                                    updatedPeriods,
+                                                    enrollment.courseId,
+                                                  );
+                                              }
+                                            }
+                                          }
+                                        }
+*/
