@@ -9,7 +9,7 @@ export const FONTSIZE = 16; // px
 // COURSE FUNCTIONS
 export function getPosition(
   periods: PeriodKey[],
-  slot: CurriculumData["curriculum"]["slots"][0],
+  slot: CurriculumData["curriculum"]["structure"][0],
 ) {
   const x = periods.findIndex((pKey) => pKey === `${slot.year}-${slot.term}`); // Start from 0
   const y = slot.position; // Start from 1
@@ -82,8 +82,8 @@ export function getRelatedPaths({
   periods,
   course,
 }: {
-  originSlot: CurriculumData["curriculum"]["slots"][0];
-  slots: CurriculumData["curriculum"]["slots"];
+  originSlot: CurriculumData["curriculum"]["structure"][0];
+  slots: CurriculumData["curriculum"]["structure"];
   periods: PeriodKey[];
   course: CurriculumData["courses"][0] & { subsequentIds: number[] };
 }) {
