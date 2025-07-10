@@ -280,7 +280,7 @@
       "credits": 6,
       "duration": 1,
       "prerequisiteCredits": 0,
-      "prerequisiteIds": [9, 75],
+      "prerequisiteIds": [3, 4],
       "corequisiteIds": []
     }
   ]

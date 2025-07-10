@@ -145,7 +145,7 @@ export default function RBDndCurriculum({
         onDragEnd={handleOnDragEnd}
       >
         {showTimeline && (
-          <div className="flex flex-row space-x-2 px-4 pt-4 pb-2 select-none">
+          <div className="flex flex-row space-x-2 px-4 pt-4 select-none">
             {years.map(({ year, count }) => (
               <div
                 key={year}
@@ -176,7 +176,6 @@ export default function RBDndCurriculum({
           className={cn(
             "flex h-max min-h-fit flex-row space-x-2 px-4 pb-4",
             !showTimeline && "pt-4",
-            editMode && "h-dvh",
           )}
         >
           {history.present.map((period, pIndex) => (
@@ -443,36 +442,44 @@ export default function RBDndCurriculum({
         </MotionDiv>
 
         {editMode && (
-          <div className="absolute bottom-0 left-0 mb-1 w-full">
-            {/* SAVE */}
-            <Button
-              aria-label="Save Changes"
-              variant="outline"
-              size="sm"
-              className="disabled:bg-muted bg-accent absolute bottom-2 left-2 hover:brightness-110 md:hidden"
-              disabled={history.past.length === 0}
-              onClick={handleSaveChanges}
-            >
-              <Save />
-              <span className="sr-only">Guardar</span>
-            </Button>
-
-            {/* UNDO & REDO */}
-            <div className="absolute right-2 bottom-2 flex h-9 w-24 flex-row items-center rounded-md md:h-8 md:w-16">
-              <button
-                className="bg-muted flex size-full cursor-pointer items-center justify-center rounded-l-md transition-[filter,colors] hover:brightness-110 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                onClick={undo}
+          <div className="absolute right-0 bottom-0 mb-1 w-full p-2 md:right-3 md:bottom-3 md:mb-0 md:size-fit md:p-0">
+            <div className="bg-muted/75 flex size-full items-center justify-between rounded-md p-2 md:p-0">
+              {/* SAVE */}
+              <Button
+                aria-label="Save Changes"
+                size="sm"
+                variant="outline"
+                className="bg-accent text-accent-foreground disabled:bg-transparent md:hidden"
                 disabled={history.past.length === 0}
+                onClick={handleSaveChanges}
               >
-                <Undo2 />
-              </button>
-              <button
-                className="bg-muted flex size-full cursor-pointer items-center justify-center rounded-r-md transition-[filter,colors] hover:brightness-110 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                onClick={redo}
-                disabled={history.future.length === 0}
-              >
-                <Undo2 className="-scale-x-100" />
-              </button>
+                <Save />
+                <span className="sr-only">Guardar</span>
+              </Button>
+
+              {/* UNDO & REDO */}
+              <div className="flex flex-row items-center rounded-md">
+                <Button
+                  aria-label="Undo Changes"
+                  size="icon"
+                  variant="ghost"
+                  className="w-10 rounded-r-none md:w-8"
+                  disabled={history.past.length === 0}
+                  onClick={undo}
+                >
+                  <Undo2 />
+                </Button>
+                <Button
+                  aria-label="Redo Changes"
+                  size="icon"
+                  variant="ghost"
+                  className="w-10 rounded-l-none md:w-8"
+                  disabled={history.future.length === 0}
+                  onClick={redo}
+                >
+                  <Undo2 className="-scale-x-100" />
+                </Button>
+              </div>
             </div>
           </div>
         )}

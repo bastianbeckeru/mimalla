@@ -29,3 +29,15 @@ function Progress({
 }
 
 export { Progress };
+
+/*
+        <MotionDiv
+          initial={{ x: "-100%" }}
+          animate={{ x: `-${100 - (value || 0)}%` }}
+          transition={{
+            duration: 1.2,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="bg-accent h-full w-full flex-1"
+        />
+*/

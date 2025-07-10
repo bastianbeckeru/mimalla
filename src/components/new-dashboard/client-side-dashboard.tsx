@@ -188,7 +188,7 @@ export default function ClientSideDashboard() {
         setHistory={setHistory}
       />
 
-      <SidebarInset className="grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
+      <SidebarInset className="relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
         <div>
           <header className="bg-card relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <SidebarTrigger className="absolute left-2 md:hidden" />
@@ -215,7 +215,6 @@ export default function ClientSideDashboard() {
               )}
 
               <Toggle
-                title="Habilitar edición"
                 aria-label="toggle edit mode"
                 variant="outline"
                 data-state={editMode ? "on" : "off"}
