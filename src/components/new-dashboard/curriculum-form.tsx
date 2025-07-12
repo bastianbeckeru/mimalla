@@ -30,6 +30,7 @@ import {
 } from "../ui/command";
 import { getProgramData } from "@/utils/curriculum-data";
 import type { CurriculumData } from "@/types/curriculum";
+import { institutions } from "@/server/db/data";
 
 type Institution = {
   acronym: string;
@@ -46,39 +47,6 @@ type Program = {
   name: string;
   siesCode: string;
 };
-
-// Should we add "isAvailable" field to the program object?
-const institutions = [
-  {
-    acronym: "UDP",
-    name: "Universidad Diego Portales",
-    departments: [
-      {
-        name: "Facultad de Ingeniería y Ciencias",
-        programs: [
-          { name: "Ingeniería Civil Industrial", siesCode: "I3S1C10J1V1" },
-          {
-            name: "Ingeniería Civil en Informática y Telecomunicaciones",
-            siesCode: "I3S1C11J1V1",
-          },
-          {
-            name: "Ingeniería Civil en Obras Civiles",
-            siesCode: "I3S1C49J1V1",
-          },
-          { name: "Ingeniería Civil Plan Común", siesCode: "I3S1C300J1V1" },
-        ],
-      },
-      {
-        name: "Facultad de Psicología",
-        programs: [{ name: "Psicología", siesCode: "I3S1C12J1V1" }],
-      },
-      {
-        name: "Facultad de Derecho",
-        programs: [{ name: "Derecho", siesCode: "I3S1C12J122" }],
-      },
-    ],
-  },
-];
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
 

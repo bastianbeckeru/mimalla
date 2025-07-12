@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/command";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import useShortcuts from "@/hooks/use-shortcut";
 import { Search } from "lucide-react";
+import { institutions } from "@/server/db/data";
+import { slugify } from "@/utils/strings";
 
 export function Searchbar() {
   const posthog = usePostHog();
@@ -55,56 +57,20 @@ export function Searchbar() {
         <CommandInput placeholder="Escribe una carrera..." />
         <CommandList>
           <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-          <CommandGroup heading={"Facultad de Ingeniería y Ciencias"}>
-            <CommandItem asChild>
-              <Link
-                href="/udp/ingenieria-civil-industrial"
-                onClick={() => setOpen(false)}
-              >
-                Ingeniería Civil Industrial
-              </Link>
-            </CommandItem>
-            <CommandItem asChild>
-              <Link
-                href="/udp/ingenieria-civil-en-informatica-y-telecomunicaciones"
-                onClick={() => setOpen(false)}
-              >
-                Ingeniería Civil en Informática y Telecomunicaciones
-              </Link>
-            </CommandItem>
-            <CommandItem asChild>
-              <Link
-                href="/udp/ingenieria-civil-en-obras-civiles"
-                onClick={() => setOpen(false)}
-              >
-                Ingeniería Civil en Obras Civiles
-              </Link>
-            </CommandItem>
-            <CommandItem asChild>
-              <Link
-                href="/udp/ingenieria-civil-plan-comun"
-                onClick={() => setOpen(false)}
-              >
-                Ingeniería Civil Plan Común
-              </Link>
-            </CommandItem>
-          </CommandGroup>
-
-          <CommandGroup heading={"Facultad de Psicología"}>
-            <CommandItem asChild>
-              <Link href="/udp/psicologia" onClick={() => setOpen(false)}>
-                Psicología
-              </Link>
-            </CommandItem>
-          </CommandGroup>
-
-          <CommandGroup heading={"Facultad de Derecho"}>
-            <CommandItem asChild>
-              <Link href="/udp/derecho" onClick={() => setOpen(false)}>
-                Derecho
-              </Link>
-            </CommandItem>
-          </CommandGroup>
+          {institutions[0]?.departments.map((department) => (
+            <CommandGroup heading={department.name} key={department.name}>
+              {department.programs.map((program) => (
+                <CommandItem asChild key={program.siesCode}>
+                  <Link
+                    href={`/udp/${slugify(program.name)}`}
+                    onClick={() => setOpen(false)}
+                  >
+                    {program.name}
+                  </Link>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
         </CommandList>
       </CommandDialog>
     </>

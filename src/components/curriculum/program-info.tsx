@@ -30,7 +30,7 @@ export default function ProgramInfo({
         <CardTitle className="text-2xl leading-tight font-bold">
           {program.name}
         </CardTitle>
-        <span className="text-muted-foreground mt-1 block text-base font-normal">
+        <span className="text-muted-foreground text-sm font-normal">
           {institution.name}
         </span>
       </CardHeader>
@@ -68,10 +68,10 @@ const InfoItem = ({
 }) =>
   value && (
     <div>
-      <h3 className="text-muted-foreground text-sm">
+      <h3 className="text-muted-foreground text-sm font-medium">
         {label}
         {": "}
       </h3>
-      <span className="text-foreground">{value}</span>
+      <span className="text-foreground text-base font-normal">{value}</span>
     </div>
   );

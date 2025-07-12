@@ -144,7 +144,7 @@ export function getRelatedPaths({
     .filter((item) => item !== null);
 
   return [
-    { paths: prerequisitePaths, color: "#dc2626" },
-    { paths: subsequentPaths, color: "#22c55e" },
+    { paths: prerequisitePaths, color: "#f87171" }, // Tailwind Red 400
+    { paths: subsequentPaths, color: "#4ADE80" }, // Tailwind Green 400
   ];
 }
