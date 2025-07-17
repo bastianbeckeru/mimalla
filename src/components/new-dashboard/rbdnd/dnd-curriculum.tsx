@@ -78,10 +78,10 @@ const statusTransitions: Record<EnrolledCourseStatus, EnrolledCourseStatus> = {
 };
 
 const periodNames: Record<number, string> = {
-  1: "primer semestre",
-  2: "inverno",
-  3: "segundo semestre",
-  4: "verano",
+  1: "Primer semestre",
+  2: "Inverno",
+  3: "Segundo semestre",
+  4: "Verano",
 };
 
 export default function RBDndCurriculum({
@@ -509,35 +509,49 @@ export default function RBDndCurriculum({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Añadir Inscripción</DialogTitle>
+            <DialogTitle>Añadir inscripción</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 py-2">
-            <p>
-              Inscribir en el{" "}
-              {selectedPeriodId && (
-                <span>
-                  {`${periodNames[selectedPeriodId.split("-").map(Number)[1]!]} del ${selectedPeriodId.split("-").map(Number)[0]!}`}
-                </span>
-              )}
-            </p>
 
-            <Select
-              onValueChange={(value) => {
-                setSelectedCourseId(Number(value));
-              }}
-              value={selectedCourseId ? String(selectedCourseId) : ""}
-            >
-              <SelectTrigger id="courseId">
-                <SelectValue placeholder="Selecciona un curso" />
-              </SelectTrigger>
-              <SelectContent className="w-96">
-                {coursesAllowedToAdd.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-4 pb-4">
+            {selectedPeriodId && (
+              <dl>
+                <div className="flex flex-row gap-2">
+                  <dt className="text-muted-foreground font-medium">Año:</dt>
+                  <dd className="text-foreground flex-1">
+                    {selectedPeriodId.split("-").map(Number)[0]!}
+                  </dd>
+                </div>
+                <div className="flex flex-row gap-2">
+                  <dt className="text-muted-foreground font-medium">
+                    Periodo:
+                  </dt>
+                  <dd className="text-foreground flex-1">
+                    {periodNames[selectedPeriodId.split("-").map(Number)[1]!]}
+                  </dd>
+                </div>
+              </dl>
+            )}
+
+            <div className="flex flex-row items-center gap-2">
+              <h3 className="text-muted-foreground font-medium">Curso:</h3>
+              <Select
+                value={selectedCourseId ? String(selectedCourseId) : ""}
+                onValueChange={(value) => {
+                  setSelectedCourseId(Number(value));
+                }}
+              >
+                <SelectTrigger id="courseId" className="w-96">
+                  <SelectValue placeholder="Selecciona un curso" />
+                </SelectTrigger>
+                <SelectContent className="w-96">
+                  {coursesAllowedToAdd.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <DialogFooter>

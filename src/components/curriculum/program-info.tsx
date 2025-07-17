@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 export default function ProgramInfo({
   institution,
@@ -36,22 +37,38 @@ export default function ProgramInfo({
       </CardHeader>
 
       <CardContent className="flex-1 overflow-y-auto">
-        <div className="space-y-4">
-          <InfoItem
-            label="Título Profesional"
-            value={professionalTitle?.name}
-          />
-          <InfoItem label="Grado Académico" value={academicTitle?.name} />
-          <InfoItem label="Duración" value={`${duration} semestres`} />
-          <InfoItem
-            label="Jornada"
-            value={schedule === "DAYTIME" ? "Diurna" : "Vespertina"}
-          />
-          <div className="flex flex-col justify-between space-y-2 border-t py-2">
-            <InfoItem label="Código SIES" value={siesCode} />
-            <InfoItem label="Código DEMRE" value={demreCode} />
+        <dl className="space-y-4">
+          {professionalTitle && (
+            <InfoItem
+              label="Título Profesional"
+              value={professionalTitle.name}
+            />
+          )}
+          {academicTitle && (
+            <InfoItem label="Grado Académico" value={academicTitle.name} />
+          )}
+
+          {(professionalTitle || academicTitle) && <Separator />}
+
+          <div className="grid grid-cols-2 gap-8">
+            <InfoItem
+              label="Jornada"
+              value={schedule === "DAYTIME" ? "Diurna" : "Vespertina"}
+            />
+            <InfoItem
+              label="Duración"
+              value={`${duration} semestres`}
+              type="time"
+            />
           </div>
-        </div>
+
+          <Separator />
+
+          <div className="grid grid-cols-2 gap-8">
+            <InfoItem label="Código SIES" value={siesCode} type="code" />
+            <InfoItem label="Código DEMRE" value={demreCode} type="code" />
+          </div>
+        </dl>
       </CardContent>
 
       <CardFooter className="flex-shrink-0">{children}</CardFooter>
@@ -62,16 +79,27 @@ export default function ProgramInfo({
 const InfoItem = ({
   label,
   value,
+  type = "text",
 }: {
   label: string;
-  value?: string | number | null;
-}) =>
-  value && (
+  value: string | number;
+  type?: "text" | "code" | "time";
+}) => {
+  const renderValue = () => {
+    switch (type) {
+      case "code":
+        return <code>{value}</code>;
+      case "time":
+        return <time dateTime={String(value)}>{value}</time>;
+      default:
+        return value;
+    }
+  };
+
+  return (
     <div>
-      <h3 className="text-muted-foreground text-sm font-medium">
-        {label}
-        {": "}
-      </h3>
-      <span className="text-foreground text-base font-normal">{value}</span>
+      <dt className="text-muted-foreground text-sm font-medium">{label}</dt>
+      <dd className="text-foreground text-base font-normal">{renderValue()}</dd>
     </div>
   );
+};
