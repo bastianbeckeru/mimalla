@@ -71,7 +71,9 @@ export default function ProgramInfo({
         </dl>
       </CardContent>
 
-      <CardFooter className="flex-shrink-0">{children}</CardFooter>
+      <CardFooter className="grid flex-shrink-0 grid-cols-1 gap-2">
+        {children}
+      </CardFooter>
     </Card>
   );
 }

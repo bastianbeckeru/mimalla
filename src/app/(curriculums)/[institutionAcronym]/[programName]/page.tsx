@@ -9,6 +9,7 @@ import ImportCurriculumButton from "@/components/curriculum/import-button";
 import { getPeriods } from "@/utils/curriculum";
 import { getProgramData } from "@/utils/curriculum-data";
 import { slugify } from "@/utils/strings";
+import ProgramModal from "@/components/curriculum/program-modal";
 
 export const dynamicParams = false;
 export async function generateStaticParams({ params }: InstitutionParams) {
@@ -45,8 +46,8 @@ export default async function ProgramPage({ params }: ProgramParams) {
 
   if (!data) return <div>Error al cargar el programa</div>;
 
-  const { institution, program, curriculum } = data;
-  const { periods, nCols, nRows } = getPeriods({
+  const { institution, program, curriculum, stats } = data;
+  const { periods } = getPeriods({
     slots: data.curriculum.structure,
   });
 
@@ -67,6 +68,7 @@ export default async function ProgramPage({ params }: ProgramParams) {
           program={program}
           curriculum={data.curriculum}
         />
+        <ProgramModal program={{ ...program, stats }} />
       </ProgramInfo>
     </div>
   );

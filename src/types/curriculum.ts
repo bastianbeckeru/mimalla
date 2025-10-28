@@ -1,3 +1,4 @@
+import { Program } from "@/components/curriculum/program-stats";
 import type { EnrolledCourse } from "./store";
 
 export type AreaProps = {
@@ -108,6 +109,42 @@ export type CurriculumData = {
     demreCode: number;
     schedule: string;
   };
+  stats: Array<{
+    year: number;
+    admissions: {
+      paesRequirements: {
+        nem: number;
+        ranking: number;
+        language: number;
+        science: number;
+        history: number;
+        math1: number;
+        math2: number;
+      };
+      averageScore: number;
+      vacancies: number;
+    };
+    academics: {
+      firstYearRetentionRate: number;
+      avgRealDuration: number;
+      avgRealDurationUnit: string;
+      totalEnrollment: number;
+      freshmenEnrollment: number;
+      graduates: number;
+      acreditationYears: number;
+    };
+    employment: {
+      employmentRate1stYear: number;
+      employmentRate2ndYear: number;
+      avgIncome4thYear: {
+        min: number;
+        max: number;
+      };
+    };
+    costs: {
+      annualTuition: number;
+    };
+  }>;
   curriculum: {
     version: string;
     year: number;
