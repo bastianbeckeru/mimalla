@@ -1,17 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { checkContrasts } from "@/utils/colors";
-import type {
-  CurriculumData,
-  ModifiedCourse,
-  PeriodKey,
-} from "@/types/curriculum";
+import type { CurriculumData } from "@/types/curriculum";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { arabicToRoman } from "@/utils/numbers";
 import {
-  getPosition,
   getRelatedPaths,
   getCurriculumGridData,
   GRID_CELL_HEIGHT,
@@ -19,11 +14,10 @@ import {
   GRID_GAP,
   PADDING,
 } from "@/utils/curriculum-grid";
-import SelectableCard from "./selectable-card";
 import CourseDialog from "./course-dialog";
 import PathsOverlay, { PathData } from "./paths-overlay";
 import { useLongPress } from "@/hooks/use-long-press";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 type CurriculumViewProps = {
   data: CurriculumData;
