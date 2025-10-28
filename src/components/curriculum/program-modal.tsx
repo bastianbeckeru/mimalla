@@ -35,13 +35,15 @@ export default function ProgramModal({ program }: ProgramModalProps) {
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline">Program Stats</Button>
+          <Button variant="outline">Ver estadísticas</Button>
         </SheetTrigger>
         <SheetContent
           side="bottom"
-          className="h-[32rem] max-h-[32rem] min-h-[16rem]"
+          className="h-[75dvh] max-h-[75dvh] min-h-[25dvh] overflow-y-auto"
         >
-          <SheetTitle hidden>{program.name}</SheetTitle>
+          <SheetHeader>
+            <SheetTitle hidden>{program.name}</SheetTitle>
+          </SheetHeader>
 
           <ProgramStats program={program} />
         </SheetContent>
@@ -52,10 +54,12 @@ export default function ProgramModal({ program }: ProgramModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Program Stats</Button>
+        <Button variant="outline">Ver estadísticas</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-10/12">
-        <DialogTitle hidden>{program.name}</DialogTitle>
+      <DialogContent className="max-h-[80dvh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle hidden>{program.name}</DialogTitle>
+        </DialogHeader>
         <ProgramStats program={program} />
       </DialogContent>
     </Dialog>

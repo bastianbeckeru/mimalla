@@ -17,70 +17,68 @@ export function ProgramStats({ program }: { program: Program }) {
   if (currentStats === undefined) return null;
 
   return (
-    <div className="max-h-10/12 overflow-y-auto">
-      <div className="space-y-4">
-        {/* Year selector if multiple years */}
-        {program.stats.length > 1 && (
-          <div className="flex gap-2 border-b pb-2">
-            {program.stats.map((stat, index) => (
-              <button
-                key={stat.year}
-                onClick={() => setSelectedYearIndex(index)}
-                className={`rounded-md px-3 py-1 text-sm transition-colors ${
-                  index === selectedYearIndex
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary hover:bg-secondary/80"
-                }`}
-                aria-pressed={index === selectedYearIndex}
-              >
-                {stat.year}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-3">
-          {/* Admisión */}
-          <AdmissionCard stats={currentStats} />
-
-          {/* Retención */}
-          <StatCard
-            icon="📚"
-            title="Retención"
-            value={`${(currentStats.academics.firstYearRetentionRate * 100).toFixed(1)}%`}
-            subtitle="Primer año"
-            valueClassName="text-green-600"
-          />
-
-          {/* Duración Real */}
-          <StatCard
-            icon="⏱️"
-            title="Duración real"
-            value={currentStats.academics.avgRealDuration.toString()}
-            subtitle="semestres (promedio)"
-          />
-
-          {/* Empleabilidad */}
-          <EmploymentCard labor={currentStats.employment} />
-
-          {/* Ingresos */}
-          <IncomeCard labor={currentStats.employment} />
-
-          {/* Arancel */}
-          <TuitionCard
-            amount={currentStats.costs.annualTuition}
-            year={currentStats.year}
-          />
-
-          {/* Matrícula */}
-          <EnrollmentCard academic={currentStats.academics} />
+    <div className="space-y-4">
+      {/* Year selector if multiple years */}
+      {program.stats.length > 1 && (
+        <div className="flex gap-2 border-b pb-2">
+          {program.stats.map((stat, index) => (
+            <button
+              key={stat.year}
+              onClick={() => setSelectedYearIndex(index)}
+              className={`rounded-md px-3 py-1 text-sm transition-colors ${
+                index === selectedYearIndex
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary hover:bg-secondary/80"
+              }`}
+              aria-pressed={index === selectedYearIndex}
+            >
+              {stat.year}
+            </button>
+          ))}
         </div>
+      )}
 
-        {/* Footer note */}
-        <p className="text-muted-foreground border-t pt-2 text-center text-xs italic">
-          Datos oficiales año {currentStats.year} SIES.
-        </p>
+      <div className="grid grid-cols-1 gap-3">
+        {/* Admisión */}
+        <AdmissionCard stats={currentStats} />
+
+        {/* Retención */}
+        <StatCard
+          icon="📚"
+          title="Retención"
+          value={`${(currentStats.academics.firstYearRetentionRate * 100).toFixed(1)}%`}
+          subtitle="Primer año"
+          valueClassName="text-green-600"
+        />
+
+        {/* Duración Real */}
+        <StatCard
+          icon="⏱️"
+          title="Duración real"
+          value={currentStats.academics.avgRealDuration.toString()}
+          subtitle="semestres (promedio)"
+        />
+
+        {/* Empleabilidad */}
+        <EmploymentCard labor={currentStats.employment} />
+
+        {/* Ingresos */}
+        <IncomeCard labor={currentStats.employment} />
+
+        {/* Arancel */}
+        <TuitionCard
+          amount={currentStats.costs.annualTuition}
+          year={currentStats.year}
+        />
+
+        {/* Matrícula */}
+        <EnrollmentCard academic={currentStats.academics} />
       </div>
+
+      {/* Footer note */}
+      <p className="text-muted-foreground border-t pt-2 text-center text-xs italic">
+        Datos oficiales año {currentStats.year} SIES.
+      </p>
     </div>
   );
 }
@@ -208,7 +206,7 @@ function IncomeCard({
 
 function TuitionCard({ amount, year }: { amount: number; year: number }) {
   return (
-    <div className="bg-card rounded-lg border p-3">
+    <div className="bg-card col-span-2 rounded-lg border p-3">
       <h3 className="text-muted-foreground mb-2 text-sm font-semibold">
         💳 Arancel anual
       </h3>
