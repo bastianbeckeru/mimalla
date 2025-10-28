@@ -1,4 +1,4 @@
-"use client";
+//"use client";
 
 import { Kbd } from "@/components/ui/kbd";
 
@@ -10,13 +10,16 @@ export default function KbdModifier({
   className?: string;
   children: React.ReactNode;
 }) {
-  const isApple = (
+  const isApple = true;
+
+  /* PENDIENTE
+  (
     navigator.userAgent || // preferido
     navigator.platform || // fallback
     ""
   )
     .toUpperCase()
-    .includes("MAC");
+    .includes("MAC"); */
 
   const modifierKey = isApple ? "⌘" : "Ctrl";
 
