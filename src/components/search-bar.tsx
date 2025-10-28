@@ -55,7 +55,7 @@ export function Searchbar() {
 
         <div>
           <Search className="mr-0.5 lg:hidden" />
-          <KbdGroup>
+          <KbdGroup className="hidden lg:inline-flex">
             <KbdModifier>+ K</KbdModifier>
           </KbdGroup>
         </div>

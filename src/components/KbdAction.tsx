@@ -10,7 +10,7 @@ export default function KbdModifier({
   className?: string;
   children: React.ReactNode;
 }) {
-  const isApple = true;
+  const isApple = false;
 
   /* PENDIENTE
   (
