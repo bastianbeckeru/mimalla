@@ -1,6 +1,5 @@
 "use client";
 
-import { useOperatingSystem } from "@/hooks/use-os";
 import { Kbd } from "@/components/ui/kbd";
 
 export default function KbdModifier({
@@ -11,7 +10,15 @@ export default function KbdModifier({
   className?: string;
   children: React.ReactNode;
 }) {
-  const { modifierKey } = useOperatingSystem();
+  const isApple = (
+    navigator.userAgent || // preferido
+    navigator.platform || // fallback
+    ""
+  )
+    .toUpperCase()
+    .includes("MAC");
+
+  const modifierKey = isApple ? "⌘" : "Ctrl";
 
   return (
     <Kbd className={className} {...props}>
