@@ -176,7 +176,6 @@ export default function CurriculumView({
                   key={cardId}
                   id={cardId}
                   className={cn(
-                    "selectable-card",
                     "cursor-pointer transition-[filter] select-none",
                     hasLowBackgroundElementContrast &&
                       "border-foreground/50 border",

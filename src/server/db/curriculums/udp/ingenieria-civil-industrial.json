@@ -234,7 +234,7 @@
       "name": "Álgebra y Geometría",
       "code": "CBM1000",
       "credits": 7,
-      "description": null,
+      "description": "Curso en el que se aprende sobre álgebra, geometría y números complejos. Se entregan herramientas para resolver problemas matemáticos aplicados y desarrollar habilidades lógicas y de demostración. Se incluye lógica proposicional, inducción matemática, sumatorias, trigonometría, geometría analítica y números complejos.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
