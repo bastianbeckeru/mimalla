@@ -17,7 +17,7 @@ type CourseSheetProps = {
   areas: CurriculumData["areas"];
 };
 
-export default function CourseSheet({
+export default function CourseSheet2({
   isOpen,
   onOpenChange,
   course,
@@ -62,14 +62,14 @@ export default function CourseSheet({
               className="col-span-1 max-h-48 rounded-md border"
             >
               <div className="p-4">
-                <h4 className="mb-4 text-sm font-medium leading-none">
+                <h4 className="mb-4 text-sm leading-none font-medium">
                   {subarea.name}
                 </h4>
                 <ul>
                   {subarea.courses.map((alternative) => (
                     <li
                       key={alternative.id}
-                      className="text-sm text-muted-foreground"
+                      className="text-muted-foreground text-sm"
                     >
                       {alternative.name}
                     </li>

@@ -23,8 +23,8 @@ export const useLongPress = (
     onHover,
     onHoverEnd,
     onScroll,
-    threshold = 500,
-    hoverDelay = 150,
+    threshold = 700,
+    hoverDelay = 100,
   } = options;
 
   const timeout = useRef<NodeJS.Timeout | null>(null);

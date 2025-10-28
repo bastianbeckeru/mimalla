@@ -16,6 +16,8 @@ import useShortcuts from "@/hooks/use-shortcut";
 import { Search } from "lucide-react";
 import { institutions } from "@/server/db/data";
 import { slugify } from "@/utils/strings";
+import { Kbd, KbdGroup } from "./ui/kbd";
+import KbdModifier from "./KbdAction";
 
 export function Searchbar() {
   const posthog = usePostHog();
@@ -36,6 +38,12 @@ export function Searchbar() {
     },
   ]);
 
+  /* 
+  
+            <kbd className="bg-muted pointer-events-none hidden rounded-sm border px-1.5 text-center text-sm font-medium select-none lg:inline-flex">
+            <span className="scale-75">⌘</span>K
+          </kbd>*/
+
   return (
     <>
       <Button
@@ -43,13 +51,13 @@ export function Searchbar() {
         className="text-muted-foreground h-8 w-40 items-center justify-center gap-2 p-1.5 lg:w-48"
         onClick={() => handleEditMode("button")}
       >
-        <p className="ml-0.5 flex-1 text-left text-sm">Buscar malla...</p>
+        <p className="ml-0.5 flex-1 text-left text-sm">Buscar carrera...</p>
 
         <div>
           <Search className="mr-0.5 lg:hidden" />
-          <kbd className="bg-muted pointer-events-none hidden rounded-sm border px-1.5 text-center text-sm font-medium select-none lg:inline-flex">
-            <span className="scale-75">⌘</span>K
-          </kbd>
+          <KbdGroup>
+            <KbdModifier>+ K</KbdModifier>
+          </KbdGroup>
         </div>
       </Button>
 

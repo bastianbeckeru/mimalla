@@ -14,10 +14,10 @@ import {
   GRID_GAP,
   PADDING,
 } from "@/utils/curriculum-grid";
-import CourseDialog from "./course-dialog";
 import PathsOverlay, { PathData } from "./paths-overlay";
 import { useLongPress } from "@/hooks/use-long-press";
 import { Card, CardContent } from "@/components/ui/card";
+import CourseModal from "./course-modal";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -165,7 +165,7 @@ export default function CurriculumView({
                 onHover: () => handleSelectCard(cardId, slot),
                 onHoverEnd: () => handleSelectCard(null, slot),
                 hoverDelay: 50,
-                threshold: 500,
+                threshold: 700,
               });
 
               const isSelected = selectedId === cardId;
@@ -190,7 +190,7 @@ export default function CurriculumView({
                   }}
                 >
                   <CardContent className="flex h-full items-center justify-center p-2">
-                    <h3 className="text-center text-xs font-medium">
+                    <h3 className="text-center text-xs font-medium text-balance">
                       {course?.name ?? `Slot ${sIndex + 1}`}
                     </h3>
                   </CardContent>
@@ -203,15 +203,7 @@ export default function CurriculumView({
         </div>
       </ScrollAreaWrapper>
 
-      {/* <CourseSheet
-        isOpen={isOpen}
-        onOpenChange={() => setIsOpen(!isOpen)}
-        course={selectedCourse}
-        courses={courses}
-        areas={areas}
-      /> */}
-
-      <CourseDialog
+      <CourseModal
         isOpen={isOpen}
         onOpenChange={() => setIsOpen(!isOpen)}
         slot={selectedSlot}
