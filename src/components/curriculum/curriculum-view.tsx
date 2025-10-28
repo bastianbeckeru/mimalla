@@ -57,8 +57,7 @@ export default function CurriculumView({
     (newCardId: string | null, slot: any) => {
       const course = slot.course;
 
-      if (!course) return;
-      if (isOpen) return;
+      if (!course || isOpen) return;
 
       const relatedPaths = getRelatedPaths({
         originSlot: slot,
