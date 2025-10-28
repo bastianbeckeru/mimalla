@@ -1,101 +1,107 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { checkContrasts } from "@/utils/colors";
-
-import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "../ui/card";
 import type {
   CurriculumData,
   ModifiedCourse,
   PeriodKey,
 } from "@/types/curriculum";
-import { getCourse, getCourseArea } from "@/utils/curriculum";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { arabicToRoman } from "@/utils/numbers";
-import CourseSheet from "./course-sheet";
 import {
   getPosition,
   getRelatedPaths,
+  getCurriculumGridData,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
   PADDING,
 } from "@/utils/curriculum-grid";
 import SelectableCard from "./selectable-card";
+import CourseDialog from "./course-dialog";
+import PathsOverlay, { PathData } from "./paths-overlay";
+import { useLongPress } from "@/hooks/use-long-press";
+import { Card, CardContent } from "../ui/card";
 
 type CurriculumViewProps = {
   data: CurriculumData;
   className?: string;
-  periods: PeriodKey[];
-  nCols: number;
-  nRows: number;
 };
 
 export default function CurriculumView({
   data,
-  periods,
-  nCols,
-  nRows,
   className,
 }: CurriculumViewProps) {
   const { curriculum, areas } = data;
-  const courses = new Map(data.courses.map((item) => [item.id, item]));
+  const { courses, periods, nCols, nRows, creditsMode, slots } =
+    getCurriculumGridData(data);
 
-  const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<ModifiedCourse | null>(
-    null,
-  );
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [relatedPaths, setRelatedPaths] = useState<
     { paths: string[]; color: string }[]
   >([]);
 
-  useEffect(() => {
-    if (!selectedId) return;
+  const processedPaths = useMemo<PathData[]>(() => {
+    if (!selectedId || relatedPaths.length === 0) return [];
 
-    let touchStartTime = 0;
+    return relatedPaths.flatMap((related, rIdx) =>
+      related.paths.map((path, pIdx) => ({
+        id: `${rIdx}-${pIdx}`,
+        path,
+        color: related.color,
+      })),
+    );
+  }, [selectedId, relatedPaths]);
 
-    function handlePointerDown(event: PointerEvent) {
-      if (event.pointerType === "touch") {
-        touchStartTime = Date.now();
+  const handleSelectCard = useCallback(
+    (newCardId: string | null, slot: any) => {
+      const course = slot.course;
+
+      if (!course) return;
+      if (isOpen) return;
+
+      const relatedPaths = getRelatedPaths({
+        originSlot: slot,
+        slots: curriculum.structure, // cambiar por serializedSlots
+        periods: periods,
+        course: course,
+      });
+
+      setRelatedPaths(relatedPaths);
+      setSelectedCourses([
+        ...course.prerequisiteIds,
+        ...course.subsequentIds,
+        course.id,
+      ]);
+      setSelectedId(newCardId);
+    },
+    [selectedId, curriculum.structure, periods],
+  );
+
+  const handleClickCard = useCallback(
+    (slot: any) => {
+      const course = slot.course;
+
+      if (!course) return;
+      if (!selectedCourses.includes(course.id)) {
+        setSelectedId(null);
+        setSelectedCourses([]);
+        setRelatedPaths([]);
+
+        return;
       }
-    }
 
-    function handlePointerUp(event: PointerEvent) {
-      if (event.pointerType === "touch") {
-        const duration = Date.now() - touchStartTime;
-        if (duration < 300) {
-          // ajusta 300ms a tu gusto
-          const el = event.target as HTMLElement;
-          if (el.closest(".selectable-card")?.id !== selectedId) {
-            setSelectedId(null);
-          }
-        }
-      } else if (event.pointerType === "mouse") {
-        const el = event.target as HTMLElement;
-        if (el.closest(".selectable-card")?.id !== selectedId) {
-          setSelectedId(null);
-        }
-      }
-    }
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("pointerup", handlePointerUp);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [selectedId]);
-
-  const curriculumStyle = {
-    display: "grid",
-    gridTemplateColumns: `repeat(${nCols}, ${GRID_CELL_WIDTH}rem)`,
-    gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
-    gap: `${GRID_GAP}rem`,
-    padding: `${PADDING}rem`,
-  };
+      setSelectedSlot(slot);
+      setIsOpen(true);
+    },
+    [selectedCourses],
+  );
 
   return (
     <>
@@ -129,116 +135,88 @@ export default function CurriculumView({
             })}
           </div>
 
-          <div style={curriculumStyle} className="relative">
-            {curriculum.structure.map((slot, sIndex) => {
-              const position = getPosition(periods, slot);
-              const course = getCourse({ id: slot.courseId, courses: courses });
-              const area = course && getCourseArea(areas, course);
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${nCols}, ${GRID_CELL_WIDTH}rem)`,
+              gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
+              gap: `${GRID_GAP}rem`,
+              padding: `${PADDING}rem`,
+            }}
+            className="relative"
+          >
+            {slots.map((slot, sIndex) => {
+              const { course, color, x, y, w, h } = slot;
               // const enrollment = enrollments.get(slot.id);
 
               const cardId = `${slot.year}-${slot.term}-${slot.position}`;
               const isRelated = course && selectedCourses.includes(course.id);
 
-              const color = area?.color ?? "#fafafa";
               const {
                 hasLowBackgroundElementContrast,
                 hasLowElementTextContrast,
               } = checkContrasts({ elementColor: color });
 
-              const slotStyle = {
-                backgroundColor: color,
-                gridColumn: `${position.x} / span ${course?.duration ?? 1}`,
-                gridRow: `${position.y} / span ${1}`,
-              };
+              const handleLongPress = (event: MouseEvent | TouchEvent) =>
+                handleSelectCard(cardId, slot);
 
-              function handleOnSelect(newCardId: string | null) {
-                if (!course) return;
+              const longPressHandlers = useLongPress(handleLongPress, {
+                onClick: () => handleClickCard(slot),
+                onHover: () => handleSelectCard(cardId, slot),
+                onHoverEnd: () => handleSelectCard(null, slot),
+                hoverDelay: 50,
+                threshold: 500,
+              });
 
-                const isSelecting = newCardId !== null && selectedId === null;
-
-                if (!isSelecting) {
-                  setSelectedId(null);
-                  setSelectedCourses([]);
-                } else if (isSelecting) {
-                  const relatedPaths = getRelatedPaths({
-                    originSlot: slot,
-                    slots: curriculum.structure,
-                    periods: periods,
-                    course: course,
-                  });
-
-                  setRelatedPaths(relatedPaths);
-                  setSelectedCourses([
-                    ...course.prerequisiteIds,
-                    ...course.subsequentIds,
-                    ...[course.id],
-                  ]);
-                  setSelectedId(newCardId);
-                }
-              }
-
-              function handleOnClick() {
-                if (!course?.isElective) return;
-
-                setSelectedCourse(course);
-                setIsOpen(true);
-              }
+              const isSelected = selectedId === cardId;
 
               return (
-                <SelectableCard
+                <Card
+                  {...longPressHandlers}
                   key={cardId}
                   id={cardId}
                   className={cn(
+                    "selectable-card",
                     "cursor-pointer transition-[filter] select-none",
                     hasLowBackgroundElementContrast &&
                       "border-foreground/50 border",
                     hasLowElementTextContrast && "text-background",
                     selectedId && !isRelated && "brightness-[25%]",
+                    isSelected && "ring-accent border-accent border-1 ring-1",
                   )}
-                  style={slotStyle}
-                  selectedId={selectedId}
-                  onSelect={(id: any) => handleOnSelect(id)}
-                  onClick={handleOnClick}
+                  style={{
+                    backgroundColor: color,
+                    gridColumn: `${x} / span ${w}`,
+                    gridRow: `${y} / span ${h}`,
+                  }}
                 >
-                  <h3 className="text-center text-xs font-medium">
-                    {course?.name ?? `Slot ${sIndex + 1}`}
-                  </h3>
-                </SelectableCard>
+                  <CardContent className="flex h-full items-center justify-center p-2">
+                    <h3 className="text-center text-xs font-medium">
+                      {course?.name ?? `Slot ${sIndex + 1}`}
+                    </h3>
+                  </CardContent>
+                </Card>
               );
             })}
-            <svg className="absolute top-0 left-0 -z-50 size-full">
-              {selectedId &&
-                relatedPaths.map((related) => {
-                  return related.paths.map((path, pIndex) => (
-                    <Path key={pIndex} path={path} color={related.color} />
-                  ));
-                })}
-            </svg>
+
+            <PathsOverlay paths={processedPaths} />
           </div>
         </div>
       </ScrollAreaWrapper>
 
-      <CourseSheet
+      {/* <CourseSheet
         isOpen={isOpen}
         onOpenChange={() => setIsOpen(!isOpen)}
         course={selectedCourse}
         courses={courses}
         areas={areas}
+      /> */}
+
+      <CourseDialog
+        isOpen={isOpen}
+        onOpenChange={() => setIsOpen(!isOpen)}
+        slot={selectedSlot}
       />
     </>
-  );
-}
-
-function Path({ path, color }: { path: string; color: string }) {
-  return (
-    <path
-      d={path}
-      fill="none"
-      stroke={color}
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="animate-dash"
-    />
   );
 }

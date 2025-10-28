@@ -9,6 +9,7 @@ import ImportCurriculumButton from "@/components/curriculum/import-button";
 import { getPeriods } from "@/utils/curriculum";
 import { getProgramData } from "@/utils/curriculum-data";
 import { slugify } from "@/utils/strings";
+import GridDashboard from "@/components/new-dashboard/gridstack/grid-dashboard";
 
 export const dynamicParams = false;
 export async function generateStaticParams({ params }: InstitutionParams) {
@@ -53,9 +54,6 @@ export default async function ProgramPage({ params }: ProgramParams) {
   return (
     <div className="lg:max-y-full flex h-auto w-full max-w-full flex-col overflow-hidden border-t lg:max-h-[35.5rem] lg:flex-row lg:rounded-md lg:border">
       <CurriculumView
-        nCols={nCols}
-        nRows={nRows}
-        periods={periods}
         data={data}
         className="h-[31rem] overflow-auto lg:h-auto lg:flex-1"
       />
