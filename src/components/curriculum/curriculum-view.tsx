@@ -83,10 +83,7 @@ export default function CurriculumView({
 
       if (!course) return;
       if (selectedId && !selectedCourses.includes(course.id)) {
-        setSelectedId(null);
-        setSelectedCourses([]);
-        setRelatedPaths([]);
-
+        handleClearSelection();
         return;
       }
 
@@ -95,6 +92,12 @@ export default function CurriculumView({
     },
     [selectedCourses],
   );
+
+  function handleClearSelection() {
+    setSelectedId(null);
+    setSelectedCourses([]);
+    setRelatedPaths([]);
+  }
 
   return (
     <>
@@ -137,6 +140,10 @@ export default function CurriculumView({
               padding: `${PADDING}rem`,
             }}
             className="relative"
+            onClick={(e) => {
+              if (!selectedId) return;
+              if (e.target === e.currentTarget) handleClearSelection();
+            }}
           >
             {slots.map((slot, sIndex) => {
               const { course, color, x, y, w, h } = slot;

@@ -73,7 +73,8 @@ export const useLongPress = (
 
   const start = useCallback(
     (event: React.PointerEvent) => {
-      // Guardar el tipo de pointer (mouse, touch, pen)
+      event.stopPropagation();
+
       currentPointerType.current = event.pointerType;
 
       isPressing.current = true;
@@ -130,6 +131,8 @@ export const useLongPress = (
   // Solo activar hover para mouse (no touch ni pen)
   const handlePointerEnter = useCallback(
     (event: React.PointerEvent) => {
+      event.stopPropagation();
+
       if (event.pointerType === "mouse") {
         hoverTimeout.current = setTimeout(() => {
           if (onHoverRef.current) {
@@ -143,6 +146,8 @@ export const useLongPress = (
 
   // Solo ejecutar onHoverEnd si fue mouse
   const handlePointerLeave = useCallback((event: React.PointerEvent) => {
+    event.stopPropagation();
+
     if (event.pointerType === "mouse") {
       if (hoverTimeout.current) {
         clearTimeout(hoverTimeout.current);
