@@ -26,6 +26,7 @@ type ProgramModalProps = {
 
 export default function ProgramModal({ program }: ProgramModalProps) {
   if (!program) return null;
+  if (!program.stats) return null;
   if (program.stats.length === 0) return null;
 
   const isMobile = useIsMobile();
