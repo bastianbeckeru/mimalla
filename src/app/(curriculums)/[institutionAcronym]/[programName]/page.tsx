@@ -9,7 +9,6 @@ import ImportCurriculumButton from "@/components/curriculum/import-button";
 import { getPeriods } from "@/utils/curriculum";
 import { getProgramData } from "@/utils/curriculum-data";
 import { slugify } from "@/utils/strings";
-import GridDashboard from "@/components/new-dashboard/gridstack/grid-dashboard";
 
 export const dynamicParams = false;
 export async function generateStaticParams({ params }: InstitutionParams) {
