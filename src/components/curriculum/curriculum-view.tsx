@@ -83,7 +83,7 @@ export default function CurriculumView({
       const course = slot.course;
 
       if (!course) return;
-      if (!selectedCourses.includes(course.id)) {
+      if (selectedId && !selectedCourses.includes(course.id)) {
         setSelectedId(null);
         setSelectedCourses([]);
         setRelatedPaths([]);
@@ -138,6 +138,11 @@ export default function CurriculumView({
               padding: `${PADDING}rem`,
             }}
             className="relative"
+            onClick={() => {
+              setSelectedId(null);
+              setSelectedCourses([]);
+              setRelatedPaths([]);
+            }}
           >
             {slots.map((slot, sIndex) => {
               const { course, color, x, y, w, h } = slot;
