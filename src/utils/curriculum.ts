@@ -2,6 +2,7 @@ import type { CurriculumData, PeriodKey } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import { arabicToRoman } from "./numbers";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import { getPosition } from "./curriculum-grid";
 
 export function getCourse({
   id,
@@ -11,14 +12,14 @@ export function getCourse({
   courses: Map<number, CurriculumData["courses"][0]>;
 }) {
   const course = courses.get(id);
+
   if (!course) return null;
 
-  const subsequentIds =
-    (course &&
-      Array.from(courses.values())
+  const subsequentIds = course
+    ? Array.from(courses.values())
         .filter((c) => c.prerequisiteIds.includes(course.id))
-        .map((c) => c.id)) ??
-    [];
+        .map((c) => c.id)
+    : [];
 
   return { ...course, subsequentIds: subsequentIds };
 }
@@ -222,3 +223,12 @@ export function getPeriodInfo(id: PeriodKey, startYear = 2020) {
     number,
   };
 }
+
+/*
+
+areas
+periods array
+courses map
+slots with x,y and course data 
+
+*/
