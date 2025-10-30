@@ -17,6 +17,7 @@ import {
 import PathsOverlay, { PathData } from "./paths-overlay";
 import CourseModal from "./course-modal";
 import CourseCard from "./course-card";
+import { MotionDiv } from "../motion";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -80,12 +81,7 @@ export default function CurriculumView({
 
       if (!course) return;
 
-      if (!focusedSlot) {
-        setModal({
-          isOpen: true,
-          slot: newSlot,
-        });
-      } else {
+      if (focusedSlot) {
         const connectedCourseIds = [
           focusedSlot.slot.courseId,
           ...focusedSlot.slot.course!.prerequisiteIds,
@@ -94,16 +90,31 @@ export default function CurriculumView({
 
         if (!connectedCourseIds.includes(course.id)) {
           setFocusedSlot(null);
+          return;
         }
       }
+
+      setModal({
+        isOpen: true,
+        slot: newSlot,
+      });
     },
     [focusedSlot],
   );
 
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.025, // 0.05 con periods
+      },
+    },
+  };
+
   return (
     <>
       <ScrollAreaWrapper className={cn(className)}>
-        <div className="p-2 pb-4">
+        <section aria-label="Malla curricular" className="p-2 pb-4">
           <div
             className="flex flex-row gap-2"
             style={{
@@ -132,7 +143,10 @@ export default function CurriculumView({
             })}
           </div>
 
-          <div
+          <MotionDiv
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
             style={{
               display: "grid",
               gridTemplateColumns: `repeat(${nCols}, ${GRID_CELL_WIDTH}rem)`,
@@ -146,41 +160,52 @@ export default function CurriculumView({
                 setFocusedSlot(null);
             }}
           >
-            {slots.map((slot, sIndex) => {
-              const slotId = `${slot.year}-${slot.term}-${slot.position}`; // TEMPORARY UNTIL DB
-              const focusedSlotId = focusedSlot
-                ? `${focusedSlot.slot.year}-${focusedSlot.slot.term}-${focusedSlot.slot.position}`
-                : ""; // TEMPORARY UNTIL DB
+            <div
+              role="group"
+              aria-labelledby="sem-test"
+              style={{
+                display: "contents",
+              }}
+            >
+              <h3 id="sem-test" className="sr-only">
+                test container
+              </h3>
+              {slots.map((slot, sIndex) => {
+                const slotId = `${slot.year}-${slot.term}-${slot.position}`; // TEMPORARY UNTIL DB
+                const focusedSlotId = focusedSlot
+                  ? `${focusedSlot.slot.year}-${focusedSlot.slot.term}-${focusedSlot.slot.position}`
+                  : ""; // TEMPORARY UNTIL DB
 
-              const connectedCourseIds = focusedSlot
-                ? [
-                    focusedSlot.slot.courseId,
-                    ...focusedSlot.slot.course!.prerequisiteIds,
-                    ...focusedSlot.slot.course!.subsequentIds,
-                  ]
-                : [];
+                const connectedCourseIds = focusedSlot
+                  ? [
+                      focusedSlot.slot.courseId,
+                      ...focusedSlot.slot.course!.prerequisiteIds,
+                      ...focusedSlot.slot.course!.subsequentIds,
+                    ]
+                  : [];
 
-              return (
-                <CourseCard
-                  key={slotId}
-                  index={sIndex}
-                  slot={slot}
-                  isSelected={focusedSlotId === slotId}
-                  isNotRelated={
-                    !!focusedSlotId &&
-                    !(
-                      slot.course && connectedCourseIds.includes(slot.course.id)
-                    )
-                  }
-                  handleClick={handleClickCard}
-                  handleSelect={handleSelectCard}
-                />
-              );
-            })}
-
+                return (
+                  <CourseCard
+                    key={slotId}
+                    index={sIndex}
+                    slot={slot}
+                    isSelected={focusedSlotId === slotId}
+                    isNotRelated={
+                      !!focusedSlotId &&
+                      !(
+                        slot.course &&
+                        connectedCourseIds.includes(slot.course.id)
+                      )
+                    }
+                    handleClick={handleClickCard}
+                    handleSelect={handleSelectCard}
+                  />
+                );
+              })}
+            </div>
             <PathsOverlay paths={focusedSlot ? focusedSlot.relatedPaths : []} />
-          </div>
-        </div>
+          </MotionDiv>
+        </section>
       </ScrollAreaWrapper>
 
       <CourseModal

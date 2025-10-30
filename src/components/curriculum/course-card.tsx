@@ -4,6 +4,7 @@ import { checkContrasts } from "@/utils/colors";
 import { SlotExtended } from "@/utils/curriculum-grid";
 import { useLongPress } from "@/hooks/use-long-press";
 import { memo } from "react";
+import { MotionDiv } from "../motion";
 
 type CourseCard = {
   index: number;
@@ -27,8 +28,6 @@ const CourseCard = memo(function CourseCard({
 }: CourseCard) {
   const { course, color, x, y, w, h } = slot;
 
-  const id = `${slot.year}-${slot.term}-${slot.position}`;
-
   const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
     checkContrasts({ elementColor: color });
 
@@ -37,14 +36,20 @@ const CourseCard = memo(function CourseCard({
     onClick: () => handleClick(slot),
     onHover: () => handleSelect(slot),
     onHoverEnd: () => handleSelect(null),
-    hoverDelay: 50,
+    hoverDelay: 100,
   });
 
+  const itemVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
   return (
-    <Card
+    <MotionDiv
       {...longPressHandlers}
+      variants={itemVariants}
       className={cn(
-        "cursor-pointer transition-[filter] select-none",
+        "bg-card text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
         hasLowBackgroundElementContrast && "border-foreground/50 border",
         hasLowElementTextContrast && "text-background",
         isSelected && "glow glow-hover",
@@ -63,7 +68,7 @@ const CourseCard = memo(function CourseCard({
           {course?.name ?? `Slot ${index + 1}`}
         </h3>
       </CardContent>
-    </Card>
+    </MotionDiv>
   );
 });
 

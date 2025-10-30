@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Target, Users } from "lucide-react";
+import { LandingButton } from "@/components/landing-button";
 
 export default async function IndexPage() {
   return (
@@ -23,16 +24,7 @@ export default async function IndexPage() {
         </p>
 
         <div className="flex flex-col items-center justify-center gap-2 p-2 md:flex-row md:space-x-4">
-          <Link
-            href="/dashboard"
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "glow glow-active hover:bg-accent hover:text-accent-foreground rounded-md",
-            )}
-          >
-            Comenzar
-            <ArrowRight />
-          </Link>
+          <LandingButton />
         </div>
       </section>
 
