@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Separator } from "../ui/separator";
+import InfoItem from "./info-item";
 
 export default function ProgramInfo({
   institution,
@@ -77,31 +78,3 @@ export default function ProgramInfo({
     </Card>
   );
 }
-
-const InfoItem = ({
-  label,
-  value,
-  type = "text",
-}: {
-  label: string;
-  value: string | number;
-  type?: "text" | "code" | "time";
-}) => {
-  const renderValue = () => {
-    switch (type) {
-      case "code":
-        return <code>{value}</code>;
-      case "time":
-        return <time dateTime={String(value)}>{value}</time>;
-      default:
-        return value;
-    }
-  };
-
-  return (
-    <div>
-      <dt className="text-muted-foreground text-sm font-medium">{label}</dt>
-      <dd className="text-foreground text-base font-normal">{renderValue()}</dd>
-    </div>
-  );
-};

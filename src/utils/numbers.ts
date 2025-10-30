@@ -26,3 +26,26 @@ export function arabicToRoman(num: number): string {
 
   return result;
 }
+
+export const formatCurrency = (
+  value: number,
+  notation: "standard" | "compact" = "standard",
+) => {
+  const formatted = new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    notation: notation,
+    minimumFractionDigits: notation === "standard" ? 0 : 1,
+    maximumFractionDigits: 1,
+  }).format(value);
+
+  return notation === "compact" ? formatted.replace(/\s/g, "") : formatted;
+};
+
+export const formatPercentage = (value: number) => {
+  return new Intl.NumberFormat("es-CL", {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value);
+};
