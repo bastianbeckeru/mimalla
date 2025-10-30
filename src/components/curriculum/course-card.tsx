@@ -48,10 +48,10 @@ const CourseCard = memo(function CourseCard({
       {...handlers}
       variants={itemVariants}
       className={cn(
-        "bg-card text-card-foreground glow flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
+        "bg-card text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
         hasLowBackgroundElementContrast && "border-foreground/50 border",
         hasLowElementTextContrast && "text-background",
-        isSelected && "glow-active",
+        isSelected && "glow glow-active",
         isNotRelated && "brightness-[25%]",
         className,
       )}
