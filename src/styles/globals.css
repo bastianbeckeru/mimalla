@@ -111,66 +111,92 @@
   }
 }
 
-/* SVG Line Dash */
-@keyframes dash {
-  to {
-    stroke-dashoffset: -10;
+@layer utilities {
+  @keyframes shine {
+    0% {
+      background-position: 0 0;
+    }
+    75% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
-}
-.animate-dash {
-  animation: dash 0.5s linear infinite;
-  stroke-dasharray: 5, 5;
+  .animate-shine {
+    animation: shine 4.1s linear infinite;
+  }
+
+  /* SVG Line Dash */
+  @keyframes dash {
+    to {
+      stroke-dashoffset: -10;
+    }
+  }
+  .animate-dash {
+    animation: dash 0.5s linear infinite;
+    stroke-dasharray: 5, 5;
+  }
 }
 
 /* Glow Border */
-.glow {
-  position: relative;
-  transition-property: box-shadow;
-  transition-timing-function: ease-out;
-  transition-duration: 150ms;
-}
-
-.glow:hover {
-  box-shadow:
-    0 0 0.125rem var(--color-pink-500),
-    0 0 0.25rem var(--color-pink-500),
-    0 0 0.5rem var(--color-pink-500);
-}
-
-.glow::before,
-.glow::after {
-  content: "";
-  position: absolute;
-  filter: blur(0.25rem);
-  background-image: conic-gradient(
-    from var(--gradient-angle),
-    /* pink-900 */ var(--color-pink-900),
-    /* pink-700 */ var(--color-pink-700),
-    /* pink-500 */ var(--color-pink-500),
-    /* pink-700 */ var(--color-pink-700),
-    /* pink-900 */ var(--color-pink-900)
-  );
-  inset: -0.175rem;
-  z-index: -1;
-  border-radius: calc(var(--radius) /* 0.25rem = 4px */ - 2px);
-  animation: rotation 3s linear infinite;
-}
-
-.glow::after {
-  filter: blur(3.5rem);
-}
-
 @property --gradient-angle {
   syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
 
+.glow {
+  position: relative;
+  transition: box-shadow 150ms ease-out;
+}
+
+.glow:hover {
+  box-shadow:
+    0 0 0.125rem var(--color-pink-500),
+    0 0 0.25rem var(--color-pink-500);
+}
+
+.glow::before,
+.glow::after {
+  content: "";
+  position: absolute;
+  inset: -0.125rem;
+  z-index: -1;
+  background-image: conic-gradient(
+    from var(--gradient-angle),
+    var(--color-pink-900),
+    var(--color-pink-700),
+    var(--color-pink-500),
+    var(--color-pink-700),
+    var(--color-pink-900)
+  );
+  filter: blur(0.125rem);
+  border-radius: calc(var(--radius) /* 0.25rem = 4px */ - 2px);
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.glow::after {
+  filter: blur(3.5rem);
+}
+
+.glow-hover:hover::before,
+.glow-hover:hover::after {
+  animation: rotation 3s linear infinite;
+  opacity: 1;
+}
+
+.glow-active::before,
+.glow-active::after {
+  inset: -0.175rem;
+  animation: rotation 3s linear infinite;
+  opacity: 1;
+}
+
 @keyframes rotation {
-  0% {
-    --gradient-angle: 0deg;
-  }
-  100% {
+  to {
     --gradient-angle: 360deg;
   }
 }

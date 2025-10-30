@@ -27,7 +27,7 @@ export default async function IndexPage() {
             href="/dashboard"
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
-              "glow hover:bg-accent hover:text-accent-foreground rounded-md",
+              "glow glow-active hover:bg-accent hover:text-accent-foreground rounded-md",
             )}
           >
             Comenzar

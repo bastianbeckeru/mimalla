@@ -23,9 +23,6 @@ const PathsOverlay = memo(({ paths, className }: PathsOverlayProps) => {
       className={cn("absolute top-0 left-0 -z-50 size-full", className)}
       aria-hidden="true"
     >
-      <defs>
-        {/* Aquí puedes agregar definiciones reutilizables como gradientes */}
-      </defs>
       {paths.map((item) => (
         <Path key={item.id} path={item.path} color={item.color} />
       ))}

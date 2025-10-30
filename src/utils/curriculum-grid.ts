@@ -27,31 +27,40 @@ export function getPosition(periods: PeriodKey[], slot: Slot) {
   return { x: x + 1, y: y };
 }
 
-function getCoordinates(position: Coordinate) {
+function getCellCenterCoordinates(
+  position: Coordinate,
+  dimensions: Dimensions = { w: 1, h: 1 },
+) {
   const { x, y } = position;
+  const { w, h } = dimensions;
 
-  const calculatePosition = (pos: number, size: number) =>
-    (pos - 1) * (size + GRID_GAP) + size / 2 + PADDING;
+  // Cell Center + Column or Row GAP Adjustment + Dimension GAP Adjustment + Padding Adjustment
+  const calculatePosition = (pos: number, dim: number, size: number) =>
+    (size * dim + GRID_GAP * (dim - 1)) * 0.5 +
+    (pos - 1) * (size + GRID_GAP) +
+    PADDING;
 
   return {
-    x: FONTSIZE * calculatePosition(x, GRID_CELL_WIDTH),
-    y: FONTSIZE * calculatePosition(y, GRID_CELL_HEIGHT),
+    x: FONTSIZE * calculatePosition(x, w, GRID_CELL_WIDTH),
+    y: FONTSIZE * calculatePosition(y, h, GRID_CELL_HEIGHT),
   };
 }
 
 /* SVG */
 export type Coordinate = { x: number; y: number };
+export type Dimensions = { w: number; h: number };
+
+const midY = (GRID_CELL_HEIGHT + GRID_GAP) * 0.5 * FONTSIZE;
+const midX = (GRID_CELL_WIDTH + GRID_GAP) * 0.5 * FONTSIZE;
 
 export function getStepPathPoints({
   source,
   target,
 }: {
-  source: Coordinate;
-  target: Coordinate;
+  source: Coordinate & Dimensions;
+  target: Coordinate & Dimensions;
 }): Coordinate[] {
   const directionY = Math.pow(-1, source.y >= target.y ? 1 : 2);
-  const midX = ((GRID_CELL_WIDTH + GRID_GAP) * FONTSIZE) / 2;
-  const midY = (((GRID_CELL_HEIGHT + GRID_GAP) * FONTSIZE) / 2) * directionY;
 
   // Case 1: Next column and same row
   const points = [
@@ -62,8 +71,8 @@ export function getStepPathPoints({
   // Case 2: Next column but different row
   if (source.y !== target.y && target.x - source.x === midX * 2) {
     const newPoints = [
-      { x: source.x + midX, y: source.y },
-      { x: source.x + midX, y: target.y },
+      { x: source.x + source.w * midX, y: source.y },
+      { x: source.x + source.w * midX, y: target.y },
     ];
 
     points.splice(1, 0, ...newPoints);
@@ -71,10 +80,22 @@ export function getStepPathPoints({
   // Case 3: Different column and row
   else if (target.x - source.x > midX * 2) {
     const newPoints = [
-      { x: source.x + midX, y: source.y },
-      { x: source.x + midX, y: source.y + midY },
-      { x: target.x - midX, y: source.y + midY },
-      { x: target.x - midX, y: target.y },
+      {
+        x: source.x + source.w * midX,
+        y: source.y,
+      },
+      {
+        x: source.x + source.w * midX,
+        y: source.y + midY * directionY,
+      },
+      {
+        x: target.x - target.w * midX,
+        y: source.y + midY * directionY,
+      },
+      {
+        x: target.x - target.w * midX,
+        y: target.y,
+      },
     ];
 
     points.splice(1, 0, ...newPoints);
@@ -90,21 +111,25 @@ export function generatePathData(points: Coordinate[]) {
 export function getRelatedPaths({
   originSlot,
   slots,
-  periods,
-  course,
 }: {
-  originSlot: CurriculumData["curriculum"]["structure"][0];
-  slots: CurriculumData["curriculum"]["structure"];
-  periods: PeriodKey[];
-  course: CurriculumData["courses"][0] & { subsequentIds: number[] };
+  originSlot: SlotExtended;
+  slots: SlotExtended[];
 }) {
+  if (!originSlot.course) return [];
+
+  const { year, term, course } = originSlot;
   const { prerequisiteIds, subsequentIds } = course;
-  const { year, term } = originSlot;
 
-  const originCoordinates = getCoordinates(getPosition(periods, originSlot));
+  const originCoordinates = getCellCenterCoordinates(
+    {
+      x: originSlot.x,
+      y: originSlot.y,
+    },
+    { w: originSlot.w, h: originSlot.h },
+  );
 
-  // Considerando que se obtienen todos los paths de un tipo, estos se podrían optimizar
-  // evitando repetir los mismos paths. Por ahora, se deja así para simplificar.
+  // Si A es requisito de B, entonces los path subsequent de A y los prerequisite de B son iguales, con distinto color y orientación.
+  // Se puede evitar repetir los mismos paths. Por ahora, se deja así para simplificar.
   const prerequisitePaths = prerequisiteIds
     .map((id) => {
       // 1. Busca al slot relacionado
@@ -113,15 +138,18 @@ export function getRelatedPaths({
           slot.courseId === id &&
           ((slot.year === year && slot.term < term) || slot.year < year),
       );
+
       if (!relatedSlot) return null;
 
-      const relatedPosition = getPosition(periods, relatedSlot);
-      const relatedCoordinates = getCoordinates(relatedPosition);
+      const relatedCoordinates = getCellCenterCoordinates(
+        { x: relatedSlot.x, y: relatedSlot.y },
+        { w: relatedSlot.w, h: relatedSlot.h },
+      );
 
       // 2. Generar los puntos de la ruta
       const points = getStepPathPoints({
-        source: relatedCoordinates,
-        target: originCoordinates,
+        source: { ...relatedCoordinates, w: relatedSlot.w, h: relatedSlot.h },
+        target: { ...originCoordinates, w: originSlot.w, h: relatedSlot.h },
       });
 
       // 3. Generar el path
@@ -140,13 +168,15 @@ export function getRelatedPaths({
 
       if (!relatedSlot) return null;
 
-      const relatedPosition = getPosition(periods, relatedSlot);
-      const relatedCoordinates = getCoordinates(relatedPosition);
+      const relatedCoordinates = getCellCenterCoordinates(
+        { x: relatedSlot.x, y: relatedSlot.y },
+        { w: relatedSlot.w, h: relatedSlot.h },
+      );
 
       // 2. Generar los puntos de la ruta
       const points = getStepPathPoints({
-        source: originCoordinates,
-        target: relatedCoordinates,
+        source: { ...originCoordinates, w: originSlot.w, h: relatedSlot.h },
+        target: { ...relatedCoordinates, w: relatedSlot.w, h: relatedSlot.h },
       });
 
       // 3. Generar el path
@@ -154,10 +184,20 @@ export function getRelatedPaths({
     })
     .filter((item) => item !== null);
 
-  return [
-    { paths: prerequisitePaths, color: "#f87171" }, // Tailwind Red 400
-    { paths: subsequentPaths, color: "#4ADE80" }, // Tailwind Green 400
+  const relatedPaths = [
+    ...prerequisitePaths.map((path, idx) => ({
+      id: `prerequisite-${idx}`,
+      path,
+      color: "#f87171", // Tailwind Red 400
+    })),
+    ...subsequentPaths.map((path, idx) => ({
+      id: `subsequent-${idx}`,
+      path,
+      color: "#34d399", // Tailwind Green 400
+    })),
   ];
+
+  return relatedPaths;
 }
 
 export function getCurriculumGridData(data: CurriculumData) {
