@@ -154,7 +154,7 @@ export default function CurriculumView({
               gap: `${GRID_GAP}rem`,
               padding: `${PADDING}rem`,
             }}
-            className="relative"
+            className="relative select-none"
             onClick={(e) => {
               if (focusedSlot && e.target === e.currentTarget)
                 setFocusedSlot(null);

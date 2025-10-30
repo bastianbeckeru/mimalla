@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "../ui/card";
 import { checkContrasts } from "@/utils/colors";
 import { SlotExtended } from "@/utils/curriculum-grid";
-import { useLongPress } from "@/hooks/use-long-press";
+import useInteractions from "@/hooks/use-long-press";
 import { memo } from "react";
 import { MotionDiv } from "../motion";
 
@@ -31,12 +31,11 @@ const CourseCard = memo(function CourseCard({
   const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
     checkContrasts({ elementColor: color });
 
-  const longPressHandlers = useLongPress(() => handleSelect(slot), {
-    threshold: 700,
-    onClick: () => handleClick(slot),
-    onHover: () => handleSelect(slot),
+  const handlers = useInteractions({
+    onLongPress: () => handleSelect(slot),
+    onHoverStart: () => handleSelect(slot),
     onHoverEnd: () => handleSelect(null),
-    hoverDelay: 100,
+    onClick: () => handleClick(slot),
   });
 
   const itemVariants = {
@@ -46,13 +45,13 @@ const CourseCard = memo(function CourseCard({
 
   return (
     <MotionDiv
-      {...longPressHandlers}
+      {...handlers}
       variants={itemVariants}
       className={cn(
-        "bg-card text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
+        "bg-card text-card-foreground glow flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
         hasLowBackgroundElementContrast && "border-foreground/50 border",
         hasLowElementTextContrast && "text-background",
-        isSelected && "glow glow-hover",
+        isSelected && "glow-active",
         isNotRelated && "brightness-[25%]",
         className,
       )}

@@ -182,15 +182,8 @@
   filter: blur(3.5rem);
 }
 
-.glow-hover:hover::before,
-.glow-hover:hover::after {
-  animation: rotation 3s linear infinite;
-  opacity: 1;
-}
-
 .glow-active::before,
 .glow-active::after {
-  inset: -0.175rem;
   animation: rotation 3s linear infinite;
   opacity: 1;
 }

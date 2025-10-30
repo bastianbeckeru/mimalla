@@ -28,7 +28,7 @@ export function getPosition(periods: PeriodKey[], slot: Slot) {
 }
 
 function getCellCenterCoordinates(
-  position: Coordinate,
+  position: Coordinates,
   dimensions: Dimensions = { w: 1, h: 1 },
 ) {
   const { x, y } = position;
@@ -47,7 +47,7 @@ function getCellCenterCoordinates(
 }
 
 /* SVG */
-export type Coordinate = { x: number; y: number };
+export type Coordinates = { x: number; y: number };
 export type Dimensions = { w: number; h: number };
 
 const midY = (GRID_CELL_HEIGHT + GRID_GAP) * 0.5 * FONTSIZE;
@@ -57,9 +57,9 @@ export function getStepPathPoints({
   source,
   target,
 }: {
-  source: Coordinate & Dimensions;
-  target: Coordinate & Dimensions;
-}): Coordinate[] {
+  source: Coordinates & Dimensions;
+  target: Coordinates & Dimensions;
+}): Coordinates[] {
   const directionY = Math.pow(-1, source.y >= target.y ? 1 : 2);
 
   // Case 1: Next column and same row
@@ -104,7 +104,7 @@ export function getStepPathPoints({
   return points;
 }
 
-export function generatePathData(points: Coordinate[]) {
+export function generatePathData(points: Coordinates[]) {
   return points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
 }
 

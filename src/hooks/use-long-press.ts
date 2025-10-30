@@ -1,30 +1,27 @@
+import { Coordinates } from "@/utils/curriculum-grid";
 import { useRef, useCallback, useEffect } from "react";
 
-interface LongPressOptions {
+type UseInteractionsOptions = {
+  onLongPress?: (event: PointerEvent) => void;
   onClick?: (event: PointerEvent) => void;
-  onHover?: () => void;
+  onHoverStart?: () => void;
   onHoverEnd?: () => void;
   onScroll?: (event: PointerEvent) => void;
-  threshold?: number;
+  longPressThreshold?: number;
   hoverDelay?: number;
-}
+  moveTolerance?: number;
+};
 
-interface Coordinates {
-  x: number;
-  y: number;
-}
-
-export const useLongPress = (
-  callback: (event: PointerEvent) => void,
-  options: LongPressOptions = {},
-) => {
+export const useInteractions = (options: UseInteractionsOptions = {}) => {
   const {
+    onLongPress,
     onClick,
-    onHover,
+    onHoverStart,
     onHoverEnd,
     onScroll,
-    threshold = 700,
+    longPressThreshold = 700,
     hoverDelay = 100,
+    moveTolerance = 10,
   } = options;
 
   const timeout = useRef<NodeJS.Timeout | null>(null);
@@ -33,23 +30,23 @@ export const useLongPress = (
   const isPressing = useRef(false);
   const longPressTriggered = useRef(false);
   const currentPointerType = useRef<string>(""); // 'mouse', 'touch', 'pen'
-  const callbackRef = useRef(callback);
+  const callbackRef = useRef(onLongPress);
   const onClickRef = useRef(onClick);
-  const onHoverRef = useRef(onHover);
+  const onHoverRef = useRef(onHoverStart);
   const onHoverEndRef = useRef(onHoverEnd);
   const onScrollRef = useRef(onScroll);
 
   useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+    callbackRef.current = onLongPress;
+  }, [onLongPress]);
 
   useEffect(() => {
     onClickRef.current = onClick;
   }, [onClick]);
 
   useEffect(() => {
-    onHoverRef.current = onHover;
-  }, [onHover]);
+    onHoverRef.current = onHoverStart;
+  }, [onHoverStart]);
 
   useEffect(() => {
     onHoverEndRef.current = onHoverEnd;
@@ -63,7 +60,7 @@ export const useLongPress = (
     return { x: event.clientX, y: event.clientY };
   };
 
-  const isScrolling = (event: PointerEvent, tolerance = 10): boolean => {
+  const isScrolling = (event: PointerEvent, tolerance = 5): boolean => {
     const current = getCoordinates(event);
     return (
       Math.abs(current.x - startCoords.current.x) > tolerance ||
@@ -87,9 +84,9 @@ export const useLongPress = (
           callbackRef.current(event.nativeEvent);
         }
         isPressing.current = false;
-      }, threshold);
+      }, longPressThreshold);
     },
-    [threshold],
+    [longPressThreshold],
   );
 
   const clear = useCallback(
@@ -184,3 +181,5 @@ export const useLongPress = (
     onPointerLeave: handlePointerLeave,
   };
 };
+
+export default useInteractions;
