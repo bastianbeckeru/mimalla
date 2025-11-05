@@ -123,11 +123,15 @@ export function ProgramStats({ program }: { program: Program }) {
 
         <Separator />
 
-        <div className="space-y-2">
-          <h3 className="inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
+        <div className="[>div]:col-span-1 grid grid-cols-2 gap-3">
+          <h3 className="col-span-2 inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
             <Coins />
             Costos
           </h3>
+          <InfoItem
+            label="Matricula anual"
+            value={formatCurrency(currentStats.costs.annualEnrollment)}
+          />
           <InfoItem
             label="Arancel anual"
             value={formatCurrency(currentStats.costs.annualTuition)}

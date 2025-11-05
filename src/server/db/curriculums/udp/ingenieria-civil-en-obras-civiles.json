@@ -10,6 +10,46 @@
     "demreCode": 38176,
     "schedule": "DAYTIME"
   },
+  "stats": [
+    {
+      "year": 2024,
+      "admissions": {
+        "paesRequirements": {
+          "nem": 10,
+          "ranking": 30,
+          "language": 10,
+          "science": 10,
+          "history": 10,
+          "math1": 35,
+          "math2": 5
+        },
+        "averageScore": 636.4,
+        "vacancies": 80
+      },
+      "academics": {
+        "firstYearRetentionRate": 0.787,
+        "avgRealDuration": 14.9,
+        "avgRealDurationUnit": "SEMESTERS",
+        "totalEnrollment": 493,
+        "freshmenEnrollment": 86,
+        "graduates": 58,
+        "acreditationYears": 6
+      },
+      "employment": {
+        "employmentRate1stYear": 0.844,
+        "employmentRate2ndYear": 0.898,
+        "avgIncome4thYear": {
+          "min": 1700000,
+          "max": 1800000
+        }
+      },
+      "costs": {
+        "annualTuition": 6969000,
+        "annualEnrollment": 696000,
+        "currency": "CLP"
+      }
+    }
+  ],
   "curriculum": {
     "version": "v4",
     "year": 2020,

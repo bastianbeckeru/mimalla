@@ -143,6 +143,7 @@ export type CurriculumData = {
     };
     costs: {
       annualTuition: number;
+      annualEnrollment: number;
     };
   }>;
   curriculum: {

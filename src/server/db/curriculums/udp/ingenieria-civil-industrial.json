@@ -46,6 +46,7 @@
       },
       "costs": {
         "annualTuition": 6969000,
+        "annualEnrollment": 696000,
         "currency": "CLP"
       }
     }
