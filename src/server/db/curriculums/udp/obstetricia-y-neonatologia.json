@@ -490,7 +490,7 @@
       "name": "Inglés II",
       "code": "CIG1013",
       "description": null,
-      "credits": 6,
+      "credits": 5,
       "duration": 1,
       "prerequisiteCredits": 0,
       "prerequisiteIds": [15]
@@ -500,7 +500,7 @@
       "name": "Inglés III",
       "code": "CIG1014",
       "description": null,
-      "credits": 6,
+      "credits": 5,
       "duration": 1,
       "prerequisiteCredits": 0,
       "prerequisiteIds": [20]

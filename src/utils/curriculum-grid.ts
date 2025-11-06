@@ -1,5 +1,6 @@
 import { CurriculumData, ModifiedCourse, PeriodKey } from "@/types/curriculum";
 import { getCourse, getCourseArea } from "./curriculum";
+import { calculateMedian } from "./numbers";
 
 export const GRID_CELL_WIDTH = 8;
 export const GRID_CELL_HEIGHT = 4;
@@ -204,8 +205,8 @@ export function getCurriculumGridData(data: CurriculumData) {
   const { periods, nCols, nRows } = getPeriods({
     slots: data.curriculum.structure,
   });
-  const creditsMode = getMostFrequentCredits(data.courses);
 
+  const creditsMedian = calculateMedian(data.courses.map((c) => c.credits));
   const courses = new Map(data.courses.map((item) => [item.id, item]));
 
   const serializedSlots = data.curriculum.structure.map((slot) => {
@@ -219,8 +220,10 @@ export function getCurriculumGridData(data: CurriculumData) {
       y: position.y,
       w: course?.duration ?? 1,
       h:
-        course && creditsMode > 0
-          ? Math.round(course.credits / creditsMode)
+        course && course.credits > 0 && creditsMedian > 0
+          ? Math.trunc(course.credits / creditsMedian) > 0
+            ? Math.trunc(course.credits / creditsMedian)
+            : 1
           : 1,
       color: area?.color ?? "#fafafa",
       course: course ? { ...course, areaId: area?.id ?? null } : null,
@@ -232,7 +235,6 @@ export function getCurriculumGridData(data: CurriculumData) {
     periods,
     nCols,
     nRows,
-    creditsMode,
     slots: serializedSlots,
   };
 }

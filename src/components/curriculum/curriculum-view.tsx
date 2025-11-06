@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { CurriculumData } from "@/types/curriculum";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
@@ -38,8 +38,7 @@ export default function CurriculumView({
   data,
   className,
 }: CurriculumViewProps) {
-  const { courses, periods, nCols, nRows, creditsMode, slots } =
-    getCurriculumGridData(data);
+  const { courses, periods, nCols, nRows, slots } = getCurriculumGridData(data);
 
   const [modal, setModal] = useState<Modal | null>(null);
   const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
