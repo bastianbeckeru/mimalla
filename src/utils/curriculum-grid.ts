@@ -214,28 +214,32 @@ export function getCurriculumGridData(data: CurriculumData) {
     const course = getCourse({ id: slot.courseId, courses });
     const area = course ? getCourseArea(data.areas, course) : null;
 
+    const calculateHeight = () => {
+      if (!course || course.credits <= 0 || creditsMedian <= 0) return 1;
+
+      const ratio = Math.trunc(course.credits / creditsMedian);
+      return Math.max(ratio, 1);
+    };
+
     return {
       ...slot,
       x: position.x,
       y: position.y,
       w: course?.duration ?? 1,
-      h:
-        course && course.credits > 0 && creditsMedian > 0
-          ? Math.trunc(course.credits / creditsMedian) > 0
-            ? Math.trunc(course.credits / creditsMedian)
-            : 1
-          : 1,
+      h: calculateHeight(),
       color: area?.color ?? "#fafafa",
       course: course ? { ...course, areaId: area?.id ?? null } : null,
     };
   });
+
+  const fixedSlots = resolveGridCollisions(serializedSlots);
 
   return {
     courses,
     periods,
     nCols,
     nRows,
-    slots: serializedSlots,
+    slots: fixedSlots,
   };
 }
 
@@ -282,4 +286,66 @@ function getPeriods({ slots }: { slots: Slot[] }): {
   const nRows = Math.max(1, ...slots.map((s) => s.position));
 
   return { periods: sortedPeriods, nCols, nRows };
+}
+
+function resolveGridCollisions(elements: SlotExtended[]) {
+  // Clonar para no mutar el array original
+  const items = elements.map((item) => ({ ...item }));
+
+  // Ordenar por posición (arriba-izquierda primero)
+  items.sort((a, b) => a.y - b.y || a.x - b.x);
+
+  // Mapa de celdas ocupadas: "x,y" -> true
+  const occupied = new Map();
+
+  // Marcar celdas como ocupadas
+  function markOccupied(x: number, y: number, w: number, h: number) {
+    for (let row = y; row < y + h; row++) {
+      for (let col = x; col < x + w; col++) {
+        occupied.set(`${col},${row}`, true);
+      }
+    }
+  }
+
+  // Verificar si una posición está libre
+  function isAreaFree(x: number, y: number, w: number, h: number) {
+    for (let row = y; row < y + h; row++) {
+      for (let col = x; col < x + w; col++) {
+        if (occupied.has(`${col},${row}`)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // Buscar la siguiente posición libre (solo hacia abajo, manteniendo x)
+  function findNextFreeY(x: number, startY: number, w: number, h: number) {
+    let y = startY;
+
+    while (!isAreaFree(x, y, w, h)) {
+      y++;
+    }
+
+    return y;
+  }
+
+  // Procesar cada elemento
+  const resolved = items.map((item) => {
+    const { x, y, w, h } = item;
+
+    // Buscar primera Y libre manteniendo X fija
+    const newY = findNextFreeY(x, y, w, h);
+
+    // Marcar celdas como ocupadas
+    markOccupied(x, newY, w, h);
+
+    return {
+      ...item,
+      x: x, // X nunca cambia
+      y: newY, // Solo Y puede cambiar
+    };
+  });
+
+  return resolved;
 }

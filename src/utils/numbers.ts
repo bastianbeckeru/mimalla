@@ -109,11 +109,12 @@ export function calculateStatistics(numbers: number[]) {
   };
 }
 
-export function calculateMedian(sortedArray: number[]): number {
-  if (sortedArray.length === 0) {
+export function calculateMedian(array: number[]): number {
+  if (array.length === 0) {
     throw new Error("Cannot calculate median of an empty array");
   }
 
+  const sortedArray = [...array].sort((a, b) => a - b);
   const length = sortedArray.length;
   const mid = Math.floor(length / 2);
 
