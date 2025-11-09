@@ -1,4 +1,4 @@
-import { Coordinates } from "@/utils/curriculum-grid";
+import type { Coordinates } from "@/utils/pathfinding";
 import { useRef, useCallback, useEffect } from "react";
 
 type UseInteractionsOptions = {
