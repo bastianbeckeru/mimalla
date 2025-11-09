@@ -119,7 +119,7 @@
         "requiredCredits": -1,
         "courseIds": [1, 2],
         "subplanIds": [2, 4],
-        "grantsCredential": {
+        "credential": {
           "type": "PROFESSIONAL",
           "name": "Ingeniero/a Civil en Informática y Telecomunicaciones"
         }
@@ -130,7 +130,7 @@
         "requiredCredits": -1,
         "courseIds": [3, 4],
         "subplanIds": [3],
-        "grantsCredential": {
+        "credential": {
           "type": "ACADEMIC",
           "name": "Licenciado/a en Ciencias de la Ingeniería"
         }
@@ -141,7 +141,7 @@
         "requiredCredits": 20,
         "courseIds": [5, 6, 7],
         "subplanIds": [],
-        "grantsCredential": null
+        "credential": null
       },
       {
         "id": 4,
@@ -149,7 +149,7 @@
         "requiredCredits": 36,
         "courseIds": [8, 10, 11],
         "subplanIds": [],
-        "grantsCredential": null
+        "credential": null
       }
     ]
   },

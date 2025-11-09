@@ -61,16 +61,26 @@
     "plans": [
       {
         "id": 5,
-        "name": "Matrón (a)",
-        "type": "PROFESSIONAL",
-        "requiredCourseIds": [],
-        "subplanIds": [6]
+        "name": "Obstetricia y Neonatología",
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [6],
+        "credential": {
+          "type": "PROFESSIONAL",
+          "name": "Matrón/a"
+        }
       },
       {
         "id": 6,
         "name": "Licenciatura en Obstetricia y Neonatología",
         "type": "ACADEMIC",
-        "requiredCourseIds": []
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Obstetricia y Neonatología"
+        }
       }
     ]
   },

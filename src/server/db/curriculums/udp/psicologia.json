@@ -99,34 +99,40 @@
       {
         "id": 1,
         "name": "Psicología",
-        "type": "PROFESSIONAL",
         "requiredCredits": -1,
         "courseIds": [1, 2, 8],
-        "subplanIds": [2, 4]
+        "subplanIds": [2, 4],
+        "credential": {
+          "type": "PROFESSIONAL",
+          "name": "Psicólogo/a"
+        }
       },
       {
         "id": 2,
         "name": "Licenciatura en Psicología",
-        "type": "ACADEMIC",
         "requiredCredits": -1,
         "courseIds": [3, 4],
-        "subplanIds": [3]
+        "subplanIds": [3],
+        "credential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Psicología"
+        }
       },
       {
         "id": 4,
         "name": "Cursos de Formación General",
-        "type": "NONE",
         "requiredCredits": 20,
         "courseIds": [5, 6, 7],
-        "subplanIds": []
+        "subplanIds": [],
+        "credential": null
       },
       {
         "id": 5,
         "name": "Electivos Profesionales",
-        "type": "NONE",
         "requiredCredits": 36,
         "courseIds": [8, 10, 11],
-        "subplanIds": []
+        "subplanIds": [],
+        "credential": null
       }
     ]
   },

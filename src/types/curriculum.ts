@@ -152,8 +152,13 @@ export type Plan = {
   credential: Credential | null;
 };
 
+export type CredentialType =
+  | "PROFESSIONAL"
+  | "ACADEMIC"
+  | "TECHNICAL"
+  | "CERTIFICATE";
 type Credential = {
-  type: "PROFESSIONAL" | "ACADEMIC" | "TECHNICAL" | "CERTIFICATE";
+  type: CredentialType;
   name: string;
 };
 

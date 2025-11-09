@@ -121,7 +121,7 @@
         "requiredCredits": -1,
         "courseIds": [44, 45],
         "subplanIds": [2, 4, 5],
-        "grantsCredential": {
+        "credential": {
           "type": "PROFESSIONAL",
           "name": "Ingeniero/a Civil Industrial"
         }
@@ -136,7 +136,7 @@
           39, 40, 41, 42
         ],
         "subplanIds": [3],
-        "grantsCredential": {
+        "credential": {
           "type": "ACADEMIC",
           "name": "Licenciado/a en Ciencias de la Ingeniería"
         }
@@ -147,7 +147,7 @@
         "requiredCredits": 20,
         "courseIds": [10],
         "subplanIds": [],
-        "grantsCredential": null
+        "credential": null
       },
       {
         "id": 4,
@@ -155,7 +155,7 @@
         "requiredCredits": 36,
         "courseIds": [43],
         "subplanIds": [],
-        "grantsCredential": null
+        "credential": null
       },
       {
         "id": 5,
@@ -163,7 +163,7 @@
         "requiredCredits": 30,
         "courseIds": [46],
         "subplanIds": [],
-        "grantsCredential": null
+        "credential": null
       }
     ]
   },
