@@ -5,9 +5,8 @@ import { cn } from "@/lib/utils";
 import Path from "./path";
 
 export type PathData = {
-  id: string;
-  path: string;
-  color: string;
+  data: string;
+  color?: string;
 };
 
 type PathsOverlayProps = {
@@ -23,8 +22,8 @@ const PathsOverlay = memo(({ paths, className }: PathsOverlayProps) => {
       className={cn("absolute top-0 left-0 -z-50 size-full", className)}
       aria-hidden="true"
     >
-      {paths.map((item) => (
-        <Path key={item.id} path={item.path} color={item.color} />
+      {paths.map((item, idx) => (
+        <Path key={idx} path={item.data} color={item.color ?? "white"} />
       ))}
     </svg>
   );

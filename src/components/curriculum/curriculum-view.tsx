@@ -6,7 +6,6 @@ import type { CurriculumData } from "@/types/curriculum";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { arabicToRoman } from "@/utils/numbers";
 import {
-  getRelatedPaths,
   getCurriculumGridData,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -18,6 +17,7 @@ import PathsOverlay, { PathData } from "./paths-overlay";
 import CourseModal from "./course-modal";
 import CourseCard from "./course-card";
 import { MotionDiv } from "../motion";
+import { createConnectionPaths } from "@/utils/pathfinding";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -39,6 +39,7 @@ export default function CurriculumView({
   className,
 }: CurriculumViewProps) {
   const { courses, periods, nCols, nRows, slots } = getCurriculumGridData(data);
+  const paths = createConnectionPaths(nRows, nCols, slots);
 
   const [modal, setModal] = useState<Modal | null>(null);
   const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
@@ -47,29 +48,25 @@ export default function CurriculumView({
     (newSlot: SlotExtended | null) => {
       if (newSlot === null) {
         setFocusedSlot(null);
-
         return;
       }
 
       if (!newSlot || !newSlot.course || modal?.isOpen) return;
 
-      const relatedPaths = getRelatedPaths({
-        originSlot: newSlot,
-        slots: slots,
-      });
-
       setFocusedSlot({
         slot: newSlot,
-        relatedPaths: relatedPaths,
+        relatedPaths: paths
+          .filter(
+            (p) =>
+              p.originCardId === String(newSlot.id) ||
+              p.destinationCardId === String(newSlot.id),
+          )
+          .map((p) => ({
+            ...p,
+            color:
+              p.originCardId === String(newSlot.id) ? "#34d399" : "#f87171",
+          })),
       });
-
-      /* 
-        slotId: `${newSlot.year}-${newSlot.term}-${newSlot.position}`,
-        connectedCourseIds: [
-          ...newSlot.course.prerequisiteIds,
-          ...newSlot.course.subsequentIds,
-          newSlot.course.id,
-        ], */
     },
     [focusedSlot, slots, periods],
   );
@@ -202,6 +199,7 @@ export default function CurriculumView({
                 );
               })}
             </div>
+
             <PathsOverlay paths={focusedSlot ? focusedSlot.relatedPaths : []} />
           </MotionDiv>
         </section>
