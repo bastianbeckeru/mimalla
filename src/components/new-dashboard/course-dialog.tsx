@@ -1,6 +1,6 @@
 "use client";
 
-import type { ModifiedCourse, CurriculumData } from "@/types/curriculum";
+import type { Course, ExtendedCourse } from "@/types/curriculum";
 import { hexToRgba, parseHexColor } from "@/utils/colors";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Check, Ghost, Minus } from "lucide-react";
@@ -8,8 +8,8 @@ import { Check, Ghost, Minus } from "lucide-react";
 type CourseDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
-  courses: Map<number, CurriculumData["courses"][0]>;
-  course?: ModifiedCourse;
+  courses: Map<number, Course>;
+  course?: ExtendedCourse | null;
   color?: string;
   approvedCourseIds: number[];
   approvedCredits: number;
@@ -37,7 +37,7 @@ export default function CourseDialog({
       <DialogContent tabIndex={-1} className="min-h-64 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-left text-xl">{course.name}</DialogTitle>
-          <div className="mt-1 flex flex-row items-center space-x-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-1 flex flex-row items-center space-x-2 text-sm">
             {course.code && (
               <p className="min-w-fit rounded-md px-2 py-px" style={style}>
                 {course.code}
@@ -51,7 +51,7 @@ export default function CourseDialog({
 
         <div className="flex size-full min-h-48 flex-col gap-2 md:flex-row">
           <div className="rounded-md border md:w-1/2">
-            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
+            <h2 className="text-muted-foreground border-b px-2 py-1 font-semibold">
               Prerequisitos
             </h2>
             <ul className="flex min-h-32 flex-col space-y-1 p-2">
@@ -83,13 +83,13 @@ export default function CourseDialog({
                 </>
               ) : (
                 <div className="flex h-28 items-center justify-center">
-                  <Ghost className="size-8 text-muted" />
+                  <Ghost className="text-muted size-8" />
                 </div>
               )}
             </ul>
           </div>
           <div className="rounded-md border md:w-1/2">
-            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
+            <h2 className="text-muted-foreground border-b px-2 py-1 font-semibold">
               Desbloquea
             </h2>
             <ul className="flex min-h-32 flex-col space-y-1 p-2">
@@ -113,7 +113,7 @@ export default function CourseDialog({
                 </>
               ) : (
                 <div className="flex h-28 items-center justify-center">
-                  <Ghost className="size-8 text-muted" />
+                  <Ghost className="text-muted size-8" />
                 </div>
               )}
             </ul>
@@ -141,7 +141,7 @@ const RelatedElement = ({
       {isChecked ? (
         <Check className="size-4 text-green-500" />
       ) : (
-        <Minus className="size-4 text-muted-foreground" />
+        <Minus className="text-muted-foreground size-4" />
       )}
     </div>
   </li>

@@ -1,4 +1,9 @@
-import type { CurriculumData, PeriodKey } from "@/types/curriculum";
+import type {
+  Area,
+  CurriculumData,
+  ExtendedCourse,
+  PeriodKey,
+} from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import { arabicToRoman } from "./numbers";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
@@ -9,7 +14,7 @@ export function getCourse({
   courses,
 }: {
   id: number;
-  courses: Map<number, CurriculumData["courses"][0]>;
+  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
 }) {
   const course = courses.get(id);
 
@@ -25,8 +30,8 @@ export function getCourse({
 }
 
 export function getCourseArea(
-  areas: CurriculumData["areas"],
-  course: CurriculumData["courses"][0],
+  areas: Area[],
+  course: ExtendedCourse & { isElective: boolean },
 ) {
   const { id, isElective } = course;
 

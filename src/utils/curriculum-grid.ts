@@ -1,4 +1,10 @@
-import { CurriculumData, ModifiedCourse, PeriodKey } from "@/types/curriculum";
+import {
+  CurriculumData,
+  PeriodKey,
+  Slot,
+  Course,
+  ExtendedSlot,
+} from "@/types/curriculum";
 import { getCourse, getCourseArea } from "./curriculum";
 import { calculateMedian } from "./numbers";
 
@@ -8,17 +14,6 @@ export const GRID_GAP = 0.5;
 export const GRID_MARGIN = 0.25;
 export const PADDING = 0.5;
 export const FONTSIZE = 16; // px
-
-type Slot = CurriculumData["curriculum"]["structure"][0];
-type Course = CurriculumData["courses"][0];
-export type SlotExtended = Slot & {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  color: string;
-  course: ModifiedCourse | null;
-};
 
 // COURSE FUNCTIONS
 export function getPosition(periods: PeriodKey[], slot: Slot) {
@@ -113,8 +108,8 @@ export function getRelatedPaths({
   originSlot,
   slots,
 }: {
-  originSlot: SlotExtended;
-  slots: SlotExtended[];
+  originSlot: ExtendedSlot;
+  slots: ExtendedSlot[];
 }) {
   if (!originSlot.course) return [];
 
@@ -288,7 +283,7 @@ function getPeriods({ slots }: { slots: Slot[] }): {
   return { periods: sortedPeriods, nCols, nRows };
 }
 
-function resolveGridCollisions(elements: SlotExtended[]) {
+function resolveGridCollisions(elements: ExtendedSlot[]) {
   // Clonar para no mutar el array original
   const items = elements.map((item) => ({ ...item }));
 

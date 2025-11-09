@@ -1,20 +1,21 @@
-import type { CurriculumData, ModifiedCourse } from "@/types/curriculum";
+import type { Area, Course, CurriculumData } from "@/types/curriculum";
+
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "../ui/sheet";
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ScrollArea } from "../ui/scroll-area";
 
 type CourseSheetProps = {
   isOpen: boolean;
   onOpenChange: () => void;
-  course: ModifiedCourse;
-  courses: Map<number, CurriculumData["courses"][0]>;
-  areas: CurriculumData["areas"];
+  course: Course;
+  courses: Map<number, Course>;
+  areas: Area[];
 };
 
 export default function CourseSheet2({

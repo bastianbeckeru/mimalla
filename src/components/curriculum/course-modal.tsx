@@ -1,4 +1,3 @@
-import { ModifiedCourse } from "@/types/curriculum";
 import {
   Dialog,
   DialogContent,
@@ -6,8 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SlotExtended } from "@/utils/curriculum-grid";
-import { getContrastingShade, hexToRgba, parseHexColor } from "@/utils/colors";
+import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import {
   Sheet,
   SheetContent,
@@ -16,11 +14,12 @@ import {
   SheetTitle,
 } from "../ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ExtendedSlot } from "@/types/curriculum";
 
 type CourseDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
-  slot: SlotExtended | null;
+  slot: ExtendedSlot | null;
 };
 
 export default function CourseModal({

@@ -4,9 +4,10 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import type {
   CurriculumData,
   History,
-  ModifiedCourse,
+  ExtendedCourse,
   PeriodKey,
   PeriodWithEnrollments,
+  Area,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
@@ -60,8 +61,8 @@ type RBDndCurriculum = {
   history: History<PeriodWithEnrollments[]>;
   setHistory: Dispatch<SetStateAction<History<PeriodWithEnrollments[]>>>;
   //
-  areas: CurriculumData["areas"];
-  courses: Map<number, CurriculumData["courses"][0]>;
+  areas: Area[];
+  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
   //
   approvedCourseIds: number[];
   failedCourseIds: number[];
@@ -99,7 +100,7 @@ export default function RBDndCurriculum({
   const { curriculums, activeCurriculumId } = useNewCurriculumStore();
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
-        course: ModifiedCourse;
+        course: ExtendedCourse | null;
         color?: string;
       })
     | null
@@ -931,7 +932,7 @@ function isValidMove(
   currentPeriods: PeriodWithEnrollments[],
   sourceContainerIndex: number,
   destinationContainerIndex: number,
-  course: ModifiedCourse | null,
+  course: (ExtendedCourse & { isElective: boolean }) | null,
 ): { isValid: boolean; error?: string } {
   // 💡 Maybe add credits limit. 30 credits per term, for example, 0 by default. User can change it.
 
@@ -1017,7 +1018,7 @@ function getAllSubsequentCourses({
   courseId,
   approvedCourseIds,
 }: {
-  courses: Map<number, CurriculumData["courses"][0]>;
+  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
   courseId: number;
   approvedCourseIds: number[];
 }) {
@@ -1051,7 +1052,7 @@ function updateCourseEnrollmentStatusWithRevert({
   newStatus = "PENDING",
 }: {
   periods: PeriodWithEnrollments[];
-  courses: Map<number, CurriculumData["courses"][0]>;
+  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
   approvedCourseIds: number[];
   enrollmentId: string;
   enrollmentCourseId: number;

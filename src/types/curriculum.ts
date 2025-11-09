@@ -90,6 +90,19 @@ export type ModifiedCourseProps = {
   prerequisiteCredits: number;
 };
 
+export type PeriodWithEnrollments = {
+  id: PeriodKey;
+  enrollments: EnrolledCourse[];
+};
+
+export type PeriodKey = `${number}-${number}`;
+
+export type History<T> = {
+  past: T[];
+  present: T;
+  future: T[];
+};
+
 //////////////////////////////////////////
 // NEW MIMALLA v0.3.0
 //////////////////////////////////////////
@@ -110,32 +123,6 @@ export type CurriculumData = {
   areas: Area[];
   courses: Course[];
   //categories: Category[];
-};
-
-export type ModifiedCourse = {
-  id: number;
-  isElective: boolean;
-  name: string;
-  code: string | null;
-  description: string | null;
-  duration: number;
-  credits: number;
-  prerequisiteCredits: number;
-  prerequisiteIds: number[];
-  subsequentIds: number[];
-} | null;
-
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: EnrolledCourse[];
-};
-
-export type PeriodKey = `${number}-${number}`;
-
-export type History<T> = {
-  past: T[];
-  present: T;
-  future: T[];
 };
 
 export type Institution = {
@@ -170,7 +157,7 @@ type Credential = {
   name: string;
 };
 
-type Area = {
+export type Area = {
   id: number;
   name: string;
   color: string;
@@ -217,7 +204,7 @@ type Stat = {
   };
 };
 
-type Course = {
+export type Course = {
   id: number;
   code: string;
   name: string;
@@ -231,6 +218,9 @@ type Course = {
   //areaId: number;
   //isElective: boolean
 };
+export type ExtendedCourse = Course & {
+  subsequentIds: number[];
+};
 
 /* type Category = {
   id: number;
@@ -238,7 +228,7 @@ type Course = {
 };
  */
 
-type Slot = {
+export type Slot = {
   id: number;
   year: number;
   term: number;
@@ -248,4 +238,13 @@ type Slot = {
   //forceElection?: boolean;
   //electiveGroupId: number,
   //type: 'MANDATORY' || 'ELECTIVE'
+};
+
+export type ExtendedSlot = Slot & {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  color: string;
+  course: ExtendedCourse | null;
 };

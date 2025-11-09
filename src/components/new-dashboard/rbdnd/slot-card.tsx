@@ -31,6 +31,14 @@ export default function SlotCard({
 
   const style = {
     backgroundColor: color,
+    gridColumn:
+      course?.name === "Práctica Profesional I"
+        ? `${1} / span ${2}`
+        : "1 / span 1",
+    gridRow:
+      course?.name === "Actividad de Titulación"
+        ? `${1} / span ${5}`
+        : "1 / span 1",
   };
 
   const itemVariants = {
