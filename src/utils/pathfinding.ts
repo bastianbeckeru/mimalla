@@ -1,9 +1,9 @@
+import { ExtendedSlot } from "@/types/curriculum";
 import {
   FONTSIZE,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-  SlotExtended,
 } from "./curriculum-grid";
 
 type Point = { row: number; col: number };
@@ -34,7 +34,7 @@ const GAP_PX = GRID_GAP * FONTSIZE;
 export function createConnectionPaths(
   rows: number,
   cols: number,
-  cards: SlotExtended[],
+  cards: ExtendedSlot[],
 ): Path[] {
   const grid = createNavigationGrid(rows, cols, cards);
   const paths: Path[] = [];
