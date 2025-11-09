@@ -8,6 +8,7 @@ import {
 } from "../ui/card";
 import { Separator } from "../ui/separator";
 import InfoItem from "./info-item";
+import { Plan } from "@/types/newStructure";
 
 export default function ProgramInfo({
   institution,
@@ -18,12 +19,16 @@ export default function ProgramInfo({
 }: {
   institution: CurriculumData["institution"];
   program: CurriculumData["program"];
-  plans: CurriculumData["curriculum"]["plans"];
+  plans: Plan[];
   duration: number;
   children?: React.ReactNode;
 }) {
-  const professionalTitle = plans.find((p) => p.type === "PROFESSIONAL");
-  const academicTitle = plans.find((p) => p.type === "ACADEMIC");
+  const professionalCredential = plans.find(
+    (p) => p.credential?.type === "PROFESSIONAL",
+  );
+  const academicCredential = plans.find(
+    (p) => p.credential?.type === "ACADEMIC",
+  );
   const { schedule, siesCode, demreCode } = program;
 
   return (
@@ -39,17 +44,17 @@ export default function ProgramInfo({
 
       <CardContent className="flex-1 overflow-y-auto">
         <dl className="space-y-4">
-          {professionalTitle && (
+          {professionalCredential && (
             <InfoItem
               label="Título Profesional"
-              value={professionalTitle.name}
+              value={professionalCredential.name}
             />
           )}
-          {academicTitle && (
-            <InfoItem label="Grado Académico" value={academicTitle.name} />
+          {academicCredential && (
+            <InfoItem label="Grado Académico" value={academicCredential.name} />
           )}
 
-          {(professionalTitle || academicTitle) && <Separator />}
+          {(professionalCredential || academicCredential) && <Separator />}
 
           <div className="grid grid-cols-2 gap-8">
             <InfoItem

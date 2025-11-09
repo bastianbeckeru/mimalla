@@ -55,15 +55,19 @@ type CurriculumSlot = {
   //electiveGroupId: number,
 };
 
-type DegreeType = "PROFESSIONAL" | "ACADEMIC" | "NONE";
-type Plan = {
+export type Plan = {
   id: number;
   name: string;
-  type: DegreeType;
   description?: string;
   courseIds: number[];
   subplanIds: number[];
-  requiredCredits: number;
+  requiredCredits: number; // (-1) All courses and subplans. (>0) X courses until reach that amount.
+  credential: Credential | null;
+};
+
+type Credential = {
+  type: "PROFESSIONAL" | "ACADEMIC" | "TECHNICAL" | "CERTIFICATE";
+  name: string;
 };
 
 export type DataSchema = {

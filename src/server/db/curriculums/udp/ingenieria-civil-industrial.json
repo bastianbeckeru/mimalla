@@ -120,43 +120,50 @@
         "type": "PROFESSIONAL",
         "requiredCredits": -1,
         "courseIds": [44, 45],
-        "subplanIds": [2, 4, 5]
+        "subplanIds": [2, 4, 5],
+        "grantsCredential": {
+          "type": "PROFESSIONAL",
+          "name": "Ingeniero/a Civil Industrial"
+        }
       },
       {
         "id": 2,
         "name": "Licenciatura en Ciencias de la Ingeniería",
-        "type": "ACADEMIC",
         "requiredCredits": -1,
         "courseIds": [
           1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
           22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
           39, 40, 41, 42
         ],
-        "subplanIds": [3]
+        "subplanIds": [3],
+        "grantsCredential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Ciencias de la Ingeniería"
+        }
       },
       {
         "id": 3,
         "name": "Cursos de Formación General",
-        "type": "NONE",
         "requiredCredits": 20,
         "courseIds": [10],
-        "subplanIds": []
+        "subplanIds": [],
+        "grantsCredential": null
       },
       {
         "id": 4,
         "name": "Electivos Profesionales",
-        "type": "NONE",
         "requiredCredits": 36,
         "courseIds": [43],
-        "subplanIds": []
+        "subplanIds": [],
+        "grantsCredential": null
       },
       {
         "id": 5,
         "name": "Actividad de Titulación",
-        "type": "NONE",
         "requiredCredits": 30,
         "courseIds": [46],
-        "subplanIds": []
+        "subplanIds": [],
+        "grantsCredential": null
       }
     ]
   },

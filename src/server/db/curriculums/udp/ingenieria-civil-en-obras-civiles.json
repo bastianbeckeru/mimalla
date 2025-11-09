@@ -116,34 +116,40 @@
       {
         "id": 1,
         "name": "Ingeniería Civil en Obras Civiles",
-        "type": "PROFESSIONAL",
         "requiredCredits": -1,
         "courseIds": [1, 2],
-        "subplanIds": [2, 4]
+        "subplanIds": [2, 4],
+        "grantsCredential": {
+          "type": "PROFESSIONAL",
+          "name": "Ingeniero/a Civil en Obras Civiles"
+        }
       },
       {
         "id": 2,
         "name": "Licenciatura en Ciencias de la Ingeniería",
-        "type": "ACADEMIC",
         "requiredCredits": -1,
         "courseIds": [3, 4],
-        "subplanIds": [3]
+        "subplanIds": [3],
+        "grantsCredential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Ciencias de la Ingeniería"
+        }
       },
       {
         "id": 3,
         "name": "Cursos de Formación General",
-        "type": "NONE",
         "requiredCredits": 20,
         "courseIds": [5, 6, 7],
-        "subplanIds": []
+        "subplanIds": [],
+        "grantsCredential": null
       },
       {
         "id": 4,
         "name": "Electivos Profesionales",
-        "type": "NONE",
         "requiredCredits": 36,
         "courseIds": [8, 10, 11],
-        "subplanIds": []
+        "subplanIds": [],
+        "grantsCredential": null
       }
     ]
   },
