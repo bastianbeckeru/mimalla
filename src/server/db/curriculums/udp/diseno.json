@@ -72,39 +72,68 @@
       {
         "id": 5,
         "name": "Diseño",
-        "type": "PROFESSIONAL",
-        "requiredCourseIds": [105],
-        "subplanIds": [6]
+        "requiredCredits": -1,
+        "courseIds": [105],
+        "subplanIds": [6],
+        "credential": {
+          "type": "PROFESSIONAL",
+          "name": "Diseñador/a"
+        }
       },
       {
         "id": 6,
-        "name": "Licenciatura en Diseño con Mención en Diseño Gráfico/ Industrial / Interacción Digital / Textil e Indumentaria",
-        "type": "ACADEMIC",
-        "requiredCourseIds": [105]
+        "name": "Licenciatura en Diseño con Mención en Diseño Gráfico / Industrial / Interacción Digital / Textil e Indumentaria",
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Diseño con Mención en Diseño Gráfico / Industrial / Interacción Digital / Textil e Indumentaria"
+        }
       },
       {
         "id": 7,
         "name": "Diseño Gráfico",
-        "type": "MENTION",
-        "requiredCourseIds": []
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "MENTION",
+          "name": "Mención en Diseño Gráfico"
+        }
       },
       {
         "id": 8,
-        "name": "Industrial",
-        "type": "MENTION",
-        "requiredCourseIds": []
+        "name": "Diseño Industrial",
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "MENTION",
+          "name": "Mención en Diseño Industrial"
+        }
       },
       {
         "id": 9,
-        "name": "Interacción Digital",
-        "type": "MENTION",
-        "requiredCourseIds": []
+        "name": "Diseño en Interacción Digital",
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "MENTION",
+          "name": "Mención en Interacción Digital"
+        }
       },
       {
         "id": 10,
-        "name": "Textil e Indumentaria",
-        "type": "MENTION",
-        "requiredCourseIds": []
+        "name": "Diseño Textil e Indumentaria",
+        "requiredCredits": -1,
+        "courseIds": [],
+        "subplanIds": [],
+        "credential": {
+          "type": "MENTION",
+          "name": "Mención en Diseño Textil e Indumentaria"
+        }
       }
     ]
   },
