@@ -8,6 +8,7 @@ import type {
   PeriodKey,
   PeriodWithEnrollments,
   Area,
+  Course,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 
@@ -62,7 +63,7 @@ type RBDndCurriculum = {
   setHistory: Dispatch<SetStateAction<History<PeriodWithEnrollments[]>>>;
   //
   areas: Area[];
-  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
+  courses: Map<number, Course>;
   //
   approvedCourseIds: number[];
   failedCourseIds: number[];
@@ -1018,7 +1019,7 @@ function getAllSubsequentCourses({
   courseId,
   approvedCourseIds,
 }: {
-  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
+  courses: Map<number, Course>;
   courseId: number;
   approvedCourseIds: number[];
 }) {
@@ -1052,7 +1053,7 @@ function updateCourseEnrollmentStatusWithRevert({
   newStatus = "PENDING",
 }: {
   periods: PeriodWithEnrollments[];
-  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
+  courses: Map<number, Course>;
   approvedCourseIds: number[];
   enrollmentId: string;
   enrollmentCourseId: number;

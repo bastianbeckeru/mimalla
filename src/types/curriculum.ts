@@ -216,7 +216,7 @@ export type Course = {
   //corequisiteIds: number[];
   //subsequentIds: number[]
   //areaId: number;
-  //isElective: boolean
+  isElective: boolean;
 };
 export type ExtendedCourse = Course & {
   subsequentIds: number[];

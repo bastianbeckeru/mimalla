@@ -1,20 +1,19 @@
 import type {
-  Area,
   CurriculumData,
-  ExtendedCourse,
+  Area,
   PeriodKey,
+  Course,
+  ExtendedCourse,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import { arabicToRoman } from "./numbers";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { getPosition } from "./curriculum-grid";
 
 export function getCourse({
   id,
   courses,
 }: {
   id: number;
-  courses: Map<number, ExtendedCourse & { isElective: boolean }>;
+  courses: Map<number, Course>;
 }) {
   const course = courses.get(id);
 
