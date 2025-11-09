@@ -54,3 +54,14 @@ export const institutions = [
     ],
   },
 ];
+
+/**
+       * name: Opción de articulación con Magíster en Ciencias de la Ingeniería*
+       * description: Si optas por el programa de continuidad impartido en la Facultad
+          (Magíster en Ciencias de la Ingeniería) podrás convalidar hasta seis
+          electivos de la línea Civil Industrial desde el magíster en ciencias
+          de la ingeniería mención Industrial hacia la carrera de pregrado. Una
+          vez finalizada su tesis de magíster, podrás homologarla por la memoria
+          de titulación de ingeniería civil.
+       * 
+       */

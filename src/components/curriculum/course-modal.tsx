@@ -1,3 +1,5 @@
+import type { ExtendedSlot } from "@/types/curriculum";
+
 import {
   Dialog,
   DialogContent,
@@ -5,16 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "../ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+
+import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ExtendedSlot } from "@/types/curriculum";
 
 type CourseDialogProps = {
   isOpen: boolean;
@@ -38,14 +40,14 @@ export default function CourseModal({
 
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetContent
-          side="bottom"
-          className="h-[24rem] max-h-[32rem] min-h-[16rem]"
+      <Drawer open={isOpen} onOpenChange={onOpenChange}>
+        <DrawerContent
+          //side="bottom"
+          className="h-auto max-h-4/5 min-h-3/5"
         >
-          <SheetHeader>
-            <SheetTitle>{course.name}</SheetTitle>
-            <div className="text-muted-foreground mt-1 flex flex-row items-center space-x-2 text-sm">
+          <DrawerHeader>
+            <DrawerTitle>{course.name}</DrawerTitle>
+            <div className="text-muted-foreground mt-1 mb-2 flex flex-row items-center space-x-2 text-sm">
               {course.code && (
                 <p
                   className="min-w-fit rounded-sm px-2 py-px font-medium"
@@ -61,10 +63,17 @@ export default function CourseModal({
                 {course.credits} créditos
               </p>
             </div>
-            <SheetDescription>{course.description}</SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+            <DrawerDescription>{course.description}</DrawerDescription>
+          </DrawerHeader>
+
+          <ul>
+            <h4></h4>
+            {course.subsequentIds.map((s) => (
+              <li key={s}>s</li>
+            ))}
+          </ul>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
