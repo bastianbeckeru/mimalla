@@ -1,18 +1,18 @@
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { checkContrasts } from "@/utils/colors";
-import { SlotExtended } from "@/utils/curriculum-grid";
 import useInteractions from "@/hooks/use-long-press";
 import { memo } from "react";
 import { MotionDiv } from "../motion";
+import { ExtendedSlot } from "@/types/curriculum";
 
 type CourseCard = {
   index: number;
-  slot: SlotExtended;
+  slot: ExtendedSlot;
   isSelected: boolean;
   isNotRelated: boolean;
-  handleClick: (newSlot: SlotExtended) => void;
-  handleSelect: (newSlot: SlotExtended | null) => void;
+  handleClick: (newSlot: ExtendedSlot) => void;
+  handleSelect: (newSlot: ExtendedSlot | null) => void;
   className?: string;
 };
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { CurriculumData } from "@/types/curriculum";
+import type { CurriculumData, ExtendedSlot } from "@/types/curriculum";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { arabicToRoman } from "@/utils/numbers";
 import {
@@ -11,7 +11,6 @@ import {
   GRID_CELL_WIDTH,
   GRID_GAP,
   PADDING,
-  SlotExtended,
 } from "@/utils/curriculum-grid";
 import PathsOverlay, { PathData } from "./paths-overlay";
 import CourseModal from "./course-modal";
@@ -25,13 +24,13 @@ type CurriculumViewProps = {
 };
 
 type FocusedSlot = {
-  slot: SlotExtended;
+  slot: ExtendedSlot;
   relatedPaths: PathData[];
 };
 
 type Modal = {
   isOpen: boolean;
-  slot: SlotExtended;
+  slot: ExtendedSlot;
 };
 
 export default function CurriculumView({
@@ -45,7 +44,7 @@ export default function CurriculumView({
   const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
 
   const handleSelectCard = useCallback(
-    (newSlot: SlotExtended | null) => {
+    (newSlot: ExtendedSlot | null) => {
       if (newSlot === null) {
         setFocusedSlot(null);
         return;
@@ -72,7 +71,7 @@ export default function CurriculumView({
   );
 
   const handleClickCard = useCallback(
-    (newSlot: SlotExtended) => {
+    (newSlot: ExtendedSlot) => {
       const course = newSlot.course;
 
       if (!course) return;
