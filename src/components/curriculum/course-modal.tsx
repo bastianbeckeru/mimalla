@@ -41,10 +41,7 @@ export default function CourseModal({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
-        <DrawerContent
-          //side="bottom"
-          className="h-auto max-h-4/5 min-h-3/5"
-        >
+        <DrawerContent className="max-h-4/5 min-h-3/5">
           <DrawerHeader>
             <DrawerTitle>{course.name}</DrawerTitle>
             <div className="text-muted-foreground mt-1 mb-2 flex flex-row items-center space-x-2 text-sm">
@@ -69,7 +66,7 @@ export default function CourseModal({
           <ul>
             <h4></h4>
             {course.subsequentIds.map((s) => (
-              <li key={s}>s</li>
+              <li key={s}>{s}</li>
             ))}
           </ul>
         </DrawerContent>
