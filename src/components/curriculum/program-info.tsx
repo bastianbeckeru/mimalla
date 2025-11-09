@@ -1,14 +1,15 @@
-import type { CurriculumData } from "@/types/curriculum";
+import type { ReactNode } from "react";
+import type { Institution, Program, Plan } from "@/types/curriculum";
+
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Separator } from "../ui/separator";
-import InfoItem from "./info-item";
-import { Plan } from "@/types/newStructure";
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import InfoItem from "@/components/curriculum/info-item";
 
 export default function ProgramInfo({
   institution,
@@ -17,11 +18,11 @@ export default function ProgramInfo({
   duration,
   children,
 }: {
-  institution: CurriculumData["institution"];
-  program: CurriculumData["program"];
+  institution: Institution;
+  program: Program;
   plans: Plan[];
   duration: number;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }) {
   const professionalCredential = plans.find(
     (p) => p.credential?.type === "PROFESSIONAL",

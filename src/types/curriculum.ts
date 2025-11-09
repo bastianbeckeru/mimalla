@@ -1,4 +1,3 @@
-import { Program } from "@/components/curriculum/program-stats";
 import type { EnrolledCourse } from "./store";
 
 export type AreaProps = {
@@ -91,98 +90,26 @@ export type ModifiedCourseProps = {
   prerequisiteCredits: number;
 };
 
-// NEW MIMALLA v0.2.0
+//////////////////////////////////////////
+// NEW MIMALLA v0.3.0
+//////////////////////////////////////////
+
 export type CurriculumData = {
   //version: string; // MiMalla version
-  institution: {
-    name: string;
-    acronym: string;
-  };
-  department: {
-    name: string;
-    acronym: string;
-  };
-  program: {
-    name: string;
-    acronym: string;
-    siesCode: string;
-    demreCode: number;
-    schedule: string;
-  };
-  stats: Array<{
-    year: number;
-    admissions: {
-      paesRequirements: {
-        nem: number;
-        ranking: number;
-        language: number;
-        science: number;
-        history: number;
-        math1: number;
-        math2: number;
-      };
-      averageScore: number;
-      vacancies: number;
-    };
-    academics: {
-      firstYearRetentionRate: number;
-      avgRealDuration: number;
-      avgRealDurationUnit: string;
-      totalEnrollment: number;
-      freshmenEnrollment: number;
-      graduates: number;
-      acreditationYears: number;
-    };
-    employment: {
-      employmentRate1stYear: number;
-      employmentRate2ndYear: number;
-      avgIncome4thYear: {
-        min: number;
-        max: number;
-      };
-    };
-    costs: {
-      annualTuition: number;
-      annualEnrollment: number;
-    };
-  }>;
+  institution: Institution;
+  department: Department;
+  program: Program;
+  stats: Stat[];
   curriculum: {
     version: string;
     year: number;
     isCurrent: boolean;
-    structure: {
-      id: number | string;
-      year: number;
-      term: number;
-      position: number;
-      courseId: number;
-      //type: 'MANDATORY' | 'ELECTIVE';
-    }[];
-    plans: {
-      id: number;
-      name: string;
-      type: string;
-    }[];
+    structure: Slot[];
+    plans: Plan[];
   };
-  areas: {
-    id: number;
-    name: string;
-    color: string;
-    subareaIds: number[];
-    courseIds: number[];
-    electiveIds: number[];
-  }[];
-  courses: {
-    id: number;
-    isElective: boolean;
-    name: string;
-    code: string | null;
-    description: string | null;
-    duration: number;
-    credits: number;
-    prerequisiteCredits: number;
-    prerequisiteIds: number[];
-  }[];
+  areas: Area[];
+  courses: Course[];
+  //categories: Category[];
 };
 
 export type ModifiedCourse = {
@@ -209,4 +136,116 @@ export type History<T> = {
   past: T[];
   present: T;
   future: T[];
+};
+
+export type Institution = {
+  name: string;
+  acronym: string;
+};
+
+type Department = {
+  name: string;
+  acronym: string;
+};
+
+export type Program = {
+  name: string;
+  siesCode: string;
+  demreCode: number;
+  schedule: "DAYTIME" | "EVENING";
+};
+
+export type Plan = {
+  id: number;
+  name: string;
+  description?: string;
+  courseIds: number[];
+  subplanIds: number[];
+  requiredCredits: number; // (-1) All courses and subplans. (>0) X courses until reach that amount.
+  credential: Credential | null;
+};
+
+type Credential = {
+  type: "PROFESSIONAL" | "ACADEMIC" | "TECHNICAL" | "CERTIFICATE";
+  name: string;
+};
+
+type Area = {
+  id: number;
+  name: string;
+  color: string;
+  courseIds: number[];
+  subareaIds: number[];
+  electiveIds: number[];
+};
+
+type Stat = {
+  year: number;
+  admissions: {
+    paesRequirements: {
+      nem: number;
+      ranking: number;
+      language: number;
+      science: number;
+      history: number;
+      math1: number;
+      math2: number;
+    };
+    averageScore: number;
+    vacancies: number;
+  };
+  academics: {
+    firstYearRetentionRate: number;
+    avgRealDuration: number;
+    avgRealDurationUnit: string;
+    totalEnrollment: number;
+    freshmenEnrollment: number;
+    graduates: number;
+    acreditationYears: number;
+  };
+  employment: {
+    employmentRate1stYear: number;
+    employmentRate2ndYear: number;
+    avgIncome4thYear: {
+      min: number;
+      max: number;
+    };
+  };
+  costs: {
+    annualTuition: number;
+    annualEnrollment: number;
+  };
+};
+
+type Course = {
+  id: number;
+  code: string;
+  name: string;
+  credits: number;
+  description?: string;
+  duration: number;
+  prerequisiteCredits: number;
+  prerequisiteIds: number[];
+  //corequisiteIds: number[];
+  //subsequentIds: number[]
+  //areaId: number;
+  //isElective: boolean
+};
+
+/* type Category = {
+  id: number;
+  name: string;
+};
+ */
+
+type Slot = {
+  id: number;
+  year: number;
+  term: number;
+  position: number;
+  courseId: number;
+  isElective?: boolean;
+  //forceElection?: boolean;
+  //electiveGroupId: number,
+  //type: 'MANDATORY' || 'ELECTIVE'
 };
