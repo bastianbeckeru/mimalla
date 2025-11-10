@@ -27,7 +27,18 @@ type CourseDialogProps = {
   slot: ExtendedSlot | null;
 };
 
-const snapPoints = [0.2, 0.5, 1];
+/* POSSIBLE NEW FEATURE AND CONTRIBUTION TO OPEN SOURCE
+ *
+ * Actualmente el Drawer (Vaul) no soporta un modal dinámico, para permitir o no la interacción
+ * con el background del drawer. Se podría hacer un fork de Vault y apoyar con esta feature.
+ * ¿Es necesaria y/o útil esta feature?
+ *
+ * const snapPoints = [0.2, 0.5, 1];
+ * <Drawer ... snapPoints={snapPoints} fadeFromIndex={1} modal={snap !== snapPoints[0]} />
+ *
+ */
+
+const snapPoints = [0.5, 1];
 
 export default function CourseModal({
   open,
