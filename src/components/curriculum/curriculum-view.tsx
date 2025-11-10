@@ -205,7 +205,7 @@ export default function CurriculumView({
       </ScrollAreaWrapper>
 
       <CourseModal
-        isOpen={!!modal && modal.isOpen}
+        open={!!modal && modal.isOpen}
         onOpenChange={() => setModal(null)}
         slot={modal && modal.slot}
       />

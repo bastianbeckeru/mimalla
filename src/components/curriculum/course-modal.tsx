@@ -1,3 +1,5 @@
+"use client";
+
 import type { ExtendedSlot } from "@/types/curriculum";
 
 import {
@@ -17,30 +19,36 @@ import {
 
 import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useRef } from "react";
 
 type CourseDialogProps = {
-  isOpen: boolean;
+  open: boolean;
   onOpenChange: () => void;
   slot: ExtendedSlot | null;
 };
 
 export default function CourseModal({
-  isOpen,
+  open,
   onOpenChange,
   slot,
+  ...props
 }: CourseDialogProps) {
-  if (!slot) return null;
-
-  const { course, color } = slot;
-
-  if (!course) return null;
-
   const isMobile = useIsMobile();
+  const lastValidSlot = useRef<ExtendedSlot | null>(null);
+
+  useEffect(() => {
+    if (slot && slot.course) lastValidSlot.current = slot;
+  }, [slot]);
+
+  const displaySlot = slot?.course ? slot : lastValidSlot.current;
+  if (!displaySlot || !displaySlot.course) return null;
+
+  const { course, color } = displaySlot;
   const complementaryColor = getContrastingShade(parseHexColor(color));
 
   if (isMobile) {
     return (
-      <Drawer open={isOpen} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={onOpenChange} {...props}>
         <DrawerContent className="max-h-4/5 min-h-3/5">
           <DrawerHeader>
             <DrawerTitle>{course.name}</DrawerTitle>
@@ -75,7 +83,7 @@ export default function CourseModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} {...props}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{course.name}</DialogTitle>

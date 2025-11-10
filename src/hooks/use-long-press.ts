@@ -21,7 +21,7 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     onScroll,
     longPressThreshold = 700,
     hoverDelay = 100,
-    moveTolerance = 10,
+    moveTolerance = 5,
   } = options;
 
   const timeout = useRef<NodeJS.Timeout | null>(null);
@@ -29,42 +29,34 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
   const startCoords = useRef<Coordinates>({ x: 0, y: 0 });
   const isPressing = useRef(false);
   const longPressTriggered = useRef(false);
-  const currentPointerType = useRef<string>(""); // 'mouse', 'touch', 'pen'
-  const callbackRef = useRef(onLongPress);
-  const onClickRef = useRef(onClick);
-  const onHoverRef = useRef(onHoverStart);
-  const onHoverEndRef = useRef(onHoverEnd);
-  const onScrollRef = useRef(onScroll);
+
+  const callbacksRef = useRef({
+    onLongPress,
+    onClick,
+    onHoverStart,
+    onHoverEnd,
+    onScroll,
+  });
 
   useEffect(() => {
-    callbackRef.current = onLongPress;
-  }, [onLongPress]);
-
-  useEffect(() => {
-    onClickRef.current = onClick;
-  }, [onClick]);
-
-  useEffect(() => {
-    onHoverRef.current = onHoverStart;
-  }, [onHoverStart]);
-
-  useEffect(() => {
-    onHoverEndRef.current = onHoverEnd;
-  }, [onHoverEnd]);
-
-  useEffect(() => {
-    onScrollRef.current = onScroll;
-  }, [onScroll]);
+    callbacksRef.current = {
+      onLongPress,
+      onClick,
+      onHoverStart,
+      onHoverEnd,
+      onScroll,
+    };
+  }, [onLongPress, onClick, onHoverStart, onHoverEnd, onScroll]);
 
   const getCoordinates = (event: PointerEvent): Coordinates => {
     return { x: event.clientX, y: event.clientY };
   };
 
-  const isScrolling = (event: PointerEvent, tolerance = 5): boolean => {
+  const isScrolling = (event: PointerEvent): boolean => {
     const current = getCoordinates(event);
     return (
-      Math.abs(current.x - startCoords.current.x) > tolerance ||
-      Math.abs(current.y - startCoords.current.y) > tolerance
+      Math.abs(current.x - startCoords.current.x) > moveTolerance ||
+      Math.abs(current.y - startCoords.current.y) > moveTolerance
     );
   };
 
@@ -72,16 +64,14 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     (event: React.PointerEvent) => {
       event.stopPropagation();
 
-      currentPointerType.current = event.pointerType;
-
       isPressing.current = true;
       longPressTriggered.current = false;
       startCoords.current = getCoordinates(event.nativeEvent);
 
       timeout.current = setTimeout(() => {
-        if (callbackRef.current) {
+        if (callbacksRef.current.onLongPress) {
           longPressTriggered.current = true;
-          callbackRef.current(event.nativeEvent);
+          callbacksRef.current.onLongPress(event.nativeEvent);
         }
         isPressing.current = false;
       }, longPressThreshold);
@@ -99,16 +89,13 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
       if (isPressing.current) {
         if (
           shouldTriggerClick &&
-          onClickRef.current &&
+          callbacksRef.current.onClick &&
           !longPressTriggered.current
         ) {
-          onClickRef.current(event);
+          callbacksRef.current.onClick(event);
         }
         isPressing.current = false;
       }
-
-      // Reset pointer type
-      currentPointerType.current = "";
     },
     [],
   );
@@ -117,9 +104,7 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     (event: PointerEvent) => {
       if (isPressing.current && isScrolling(event)) {
         clear(event, false);
-        if (onScrollRef.current) {
-          onScrollRef.current(event);
-        }
+        callbacksRef.current.onScroll?.(event);
       }
     },
     [clear],
@@ -132,9 +117,7 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
 
       if (event.pointerType === "mouse") {
         hoverTimeout.current = setTimeout(() => {
-          if (onHoverRef.current) {
-            onHoverRef.current();
-          }
+          callbacksRef.current.onHoverStart?.();
         }, hoverDelay);
       }
     },
@@ -150,9 +133,7 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
         clearTimeout(hoverTimeout.current);
         hoverTimeout.current = null;
       }
-      if (onHoverEndRef.current) {
-        onHoverEndRef.current();
-      }
+      callbacksRef.current.onHoverEnd?.();
     }
   }, []);
 
@@ -164,12 +145,9 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     window.addEventListener("pointermove", handlePointerMove);
 
     return () => {
-      if (timeout.current) {
-        clearTimeout(timeout.current);
-      }
-      if (hoverTimeout.current) {
-        clearTimeout(hoverTimeout.current);
-      }
+      if (timeout.current) clearTimeout(timeout.current);
+      if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointermove", handlePointerMove);
     };
