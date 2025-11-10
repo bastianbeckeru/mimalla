@@ -19,13 +19,15 @@ import {
 
 import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type CourseDialogProps = {
   open: boolean;
   onOpenChange: () => void;
   slot: ExtendedSlot | null;
 };
+
+const snapPoints = [0.2, 0.5, 1];
 
 export default function CourseModal({
   open,
@@ -35,9 +37,13 @@ export default function CourseModal({
 }: CourseDialogProps) {
   const isMobile = useIsMobile();
   const lastValidSlot = useRef<ExtendedSlot | null>(null);
+  const [snap, setSnap] = useState<string | number | null>(snapPoints[1]!);
 
   useEffect(() => {
-    if (slot && slot.course) lastValidSlot.current = slot;
+    if (slot && slot.course) {
+      setSnap(snapPoints[1]!);
+      lastValidSlot.current = slot;
+    }
   }, [slot]);
 
   const displaySlot = slot?.course ? slot : lastValidSlot.current;
@@ -48,8 +54,17 @@ export default function CourseModal({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange} {...props}>
-        <DrawerContent className="max-h-4/5 min-h-3/5">
+      <Drawer
+        open={open}
+        onOpenChange={onOpenChange}
+        snapPoints={snapPoints}
+        activeSnapPoint={snap}
+        setActiveSnapPoint={setSnap}
+        fadeFromIndex={1}
+        //modal={false}
+        {...props}
+      >
+        <DrawerContent className="h-full">
           <DrawerHeader>
             <DrawerTitle>{course.name}</DrawerTitle>
             <div className="text-muted-foreground mt-1 mb-2 flex flex-row items-center space-x-2 text-sm">
