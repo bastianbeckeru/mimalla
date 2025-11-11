@@ -1,6 +1,6 @@
 "use client";
 
-import type { ExtendedSlot } from "@/types/curriculum";
+import type { Course, ExtendedCourse, ExtendedSlot } from "@/types/curriculum";
 
 import {
   Dialog,
@@ -20,11 +20,16 @@ import {
 import { getContrastingShade, parseHexColor } from "@/utils/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useRef, useState } from "react";
+import { Badge } from "../ui/badge";
+import { ArrowDownCircle, Lock, Unlock } from "lucide-react";
 
 type CourseDialogProps = {
   open: boolean;
   onOpenChange: () => void;
   slot: ExtendedSlot | null;
+  //course: ExtendedCourse;
+  courses: Map<string | number, Course>;
+  //areas:  Map<string | number, Area>;
 };
 
 /* POSSIBLE NEW FEATURE AND CONTRIBUTION TO OPEN SOURCE
@@ -44,6 +49,7 @@ export default function CourseModal({
   open,
   onOpenChange,
   slot,
+  courses,
   ...props
 }: CourseDialogProps) {
   const isMobile = useIsMobile();
@@ -52,7 +58,7 @@ export default function CourseModal({
 
   useEffect(() => {
     if (slot && slot.course) {
-      setSnap(snapPoints[1]!);
+      setSnap(snapPoints[0]!);
       lastValidSlot.current = slot;
     }
   }, [slot]);
@@ -60,8 +66,18 @@ export default function CourseModal({
   const displaySlot = slot?.course ? slot : lastValidSlot.current;
   if (!displaySlot || !displaySlot.course) return null;
 
+  // Probablemente lo más lógico es recibir únicamente el curso, no el slot completo.
+  // De esta manera si por alguna razón se abre el mismo curso, no se reabre el modal, sino que se mantiene.
   const { course, color } = displaySlot;
   const complementaryColor = getContrastingShade(parseHexColor(color));
+
+  const prerequisiteCourses = course.prerequisiteIds
+    .map((id) => courses.get(id))
+    .filter((c): c is Course => c !== undefined);
+
+  const subsequentCourses = course.subsequentIds
+    .map((id) => courses.get(id))
+    .filter((c): c is Course => c !== undefined);
 
   if (isMobile) {
     return (
@@ -71,38 +87,76 @@ export default function CourseModal({
         snapPoints={snapPoints}
         activeSnapPoint={snap}
         setActiveSnapPoint={setSnap}
-        fadeFromIndex={1}
-        //modal={false}
         {...props}
       >
         <DrawerContent className="h-full">
           <DrawerHeader>
             <DrawerTitle>{course.name}</DrawerTitle>
-            <div className="text-muted-foreground mt-1 mb-2 flex flex-row items-center space-x-2 text-sm">
-              {course.code && (
-                <p
-                  className="min-w-fit rounded-sm px-2 py-px font-medium"
-                  style={{
-                    backgroundColor: color,
-                    color: complementaryColor,
-                  }}
-                >
-                  {course.code}
-                </p>
-              )}
-              <p className="min-w-fit rounded-md py-px">
-                {course.credits} créditos
-              </p>
-            </div>
-            <DrawerDescription>{course.description}</DrawerDescription>
+            <DrawerDescription>
+              <div className="flex items-center gap-2">
+                {course.code && (
+                  <Badge
+                    className="uppercase"
+                    style={{
+                      backgroundColor: color,
+                      color: complementaryColor,
+                    }}
+                  >
+                    {course.code}
+                  </Badge>
+                )}
+                <span>{course.credits} créditos</span>
+              </div>
+              <p>{course.description}</p>
+            </DrawerDescription>
           </DrawerHeader>
 
-          <ul>
-            <h4></h4>
-            {course.subsequentIds.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
+          {/* CURSOS RELACIONADOS */}
+          <div className="space-y-4 px-4 py-2">
+            <div className="space-y-2">
+              <div className="text-muted-foreground flex items-center gap-2">
+                <Lock className="size-4 shrink-0" />
+                <h4 className="text-xs font-bold tracking-wide uppercase">
+                  Requiere
+                </h4>
+              </div>
+              {prerequisiteCourses.length > 0 ? (
+                <ul className="flex flex-wrap gap-2">
+                  {prerequisiteCourses.map((relatedCourse) => (
+                    <li key={relatedCourse.id}>
+                      <Badge variant="secondary" className="rounded-sm">
+                        {relatedCourse.name}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground text-sm">Ninguno</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-muted-foreground flex items-center gap-2">
+                <Unlock className="size-4 shrink-0" />
+                <h4 className="text-xs font-bold tracking-wide uppercase">
+                  Desbloquea
+                </h4>
+              </div>
+              {subsequentCourses.length > 0 ? (
+                <ul className="flex flex-wrap gap-2">
+                  {subsequentCourses.map((relatedCourse) => (
+                    <li key={relatedCourse.id}>
+                      <Badge variant="secondary" className="rounded-sm">
+                        {relatedCourse.name}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground text-sm">Ninguno</p>
+              )}
+            </div>
+          </div>
         </DrawerContent>
       </Drawer>
     );
@@ -113,24 +167,71 @@ export default function CourseModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{course.name}</DialogTitle>
-          <div className="text-muted-foreground mt-1 flex flex-row items-center space-x-2 text-sm">
-            {course.code && (
-              <p
-                className="min-w-fit rounded-sm px-2 py-px font-medium"
-                style={{
-                  backgroundColor: color,
-                  color: complementaryColor,
-                }}
-              >
-                {course.code}
-              </p>
-            )}
-            <p className="min-w-fit rounded-md py-px">
-              {course.credits} créditos
-            </p>
-          </div>
-          <DialogDescription>{course.description}</DialogDescription>
+          <DialogDescription>
+            <div className="flex items-center gap-2">
+              {course.code && (
+                <Badge
+                  className="uppercase"
+                  style={{
+                    backgroundColor: color,
+                    color: complementaryColor,
+                  }}
+                >
+                  {course.code}
+                </Badge>
+              )}
+              <span>{course.credits} créditos</span>
+            </div>
+            <p>{course.description}</p>
+          </DialogDescription>
         </DialogHeader>
+
+        {/* CURSOS RELACIONADOS */}
+        <div className="space-y-4 px-0 py-2">
+          <div className="space-y-2">
+            <div className="text-muted-foreground flex items-center gap-2">
+              <Lock className="size-4 shrink-0" />
+              <h4 className="text-xs font-bold tracking-wide uppercase">
+                Requiere
+              </h4>
+            </div>
+            {prerequisiteCourses.length > 0 ? (
+              <ul className="flex flex-wrap gap-2">
+                {prerequisiteCourses.map((relatedCourse) => (
+                  <li key={relatedCourse.id}>
+                    <Badge variant="secondary" className="rounded-sm">
+                      {relatedCourse.name}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground text-sm">Ninguno</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <div className="text-muted-foreground flex items-center gap-2">
+              <Unlock className="size-4 shrink-0" />
+              <h4 className="text-xs font-bold tracking-wide uppercase">
+                Desbloquea
+              </h4>
+            </div>
+            {subsequentCourses.length > 0 ? (
+              <ul className="flex flex-wrap gap-2">
+                {subsequentCourses.map((relatedCourse) => (
+                  <li key={relatedCourse.id}>
+                    <Badge variant="secondary" className="rounded-sm">
+                      {relatedCourse.name}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground text-sm">Ninguno</p>
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

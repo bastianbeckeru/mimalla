@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -9,45 +11,54 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Program, ProgramStats } from "./program-stats";
-import { Button } from "../ui/button";
 
 type ProgramModalProps = {
   program: Program | null;
 };
 
+const snapPoints = [0.5, 1];
+
 export default function ProgramModal({ program }: ProgramModalProps) {
-  if (!program) return null;
-  if (!program.stats) return null;
-  if (program.stats.length === 0) return null;
+  if (!program || !program.stats || program.stats.length === 0) return null;
 
   const isMobile = useIsMobile();
+  const [snap, setSnap] = useState<string | number | null>(snapPoints[0]!);
 
   if (isMobile) {
     return (
-      <Sheet>
-        <SheetTrigger asChild>
+      <Drawer
+        snapPoints={snapPoints}
+        activeSnapPoint={snap}
+        setActiveSnapPoint={setSnap}
+        fadeFromIndex={0}
+      >
+        <DrawerTrigger asChild>
           <Button variant="outline">Ver estadísticas</Button>
-        </SheetTrigger>
-        <SheetContent
-          side="bottom"
-          className="h-[75dvh] max-h-[75dvh] min-h-[25dvh] overflow-y-auto"
-        >
-          <SheetHeader>
-            <SheetTitle hidden>{program.name}</SheetTitle>
-          </SheetHeader>
-
-          <ProgramStats program={program} />
-        </SheetContent>
-      </Sheet>
+        </DrawerTrigger>
+        <DrawerContent className="h-full">
+          <DrawerHeader>
+            <DrawerTitle>Estadísticas</DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Visualización de estadísticas del programa académico{" "}
+              {program.name}.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex-1 overflow-y-auto p-6">
+            <ProgramStats program={program} />
+          </div>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
@@ -58,8 +69,12 @@ export default function ProgramModal({ program }: ProgramModalProps) {
       </DialogTrigger>
       <DialogContent className="max-h-[80dvh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle hidden>{program.name}</DialogTitle>
+          <DialogTitle>Estadísticas</DialogTitle>
+          <DialogDescription className="sr-only">
+            Visualización de estadísticas del programa académico {program.name}.
+          </DialogDescription>
         </DialogHeader>
+
         <ProgramStats program={program} />
       </DialogContent>
     </Dialog>

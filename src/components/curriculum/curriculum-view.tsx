@@ -208,6 +208,7 @@ export default function CurriculumView({
         open={!!modal && modal.isOpen}
         onOpenChange={() => setModal(null)}
         slot={modal && modal.slot}
+        courses={courses}
       />
     </>
   );

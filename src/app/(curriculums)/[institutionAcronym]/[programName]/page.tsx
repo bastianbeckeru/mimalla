@@ -63,12 +63,12 @@ export default async function ProgramPage({ params }: ProgramParams) {
         plans={curriculum.plans}
         duration={periods.length}
       >
+        <ProgramModal program={{ ...program, stats }} />
         <ImportCurriculumButton
           institution={institution}
           program={program}
           curriculum={data.curriculum}
         />
-        <ProgramModal program={{ ...program, stats }} />
       </ProgramInfo>
     </div>
   );
