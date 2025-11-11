@@ -45,7 +45,7 @@ export function ProgramStats({ program }: { program: Program }) {
 
       <div className="flex flex-col gap-4">
         <div className="[>div]:col-span-1 grid grid-cols-2 gap-3">
-          <h3 className="col-span-2 inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
+          <h3 className="col-span-2 inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
             <GraduationCap />
             Admisión
           </h3>
@@ -86,7 +86,7 @@ export function ProgramStats({ program }: { program: Program }) {
         <Separator />
 
         <div className="[>div]:col-span-1 grid grid-cols-2 gap-3">
-          <h3 className="col-span-2 inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
+          <h3 className="col-span-2 inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
             <BookOpen />
             Académico
           </h3>
@@ -105,7 +105,7 @@ export function ProgramStats({ program }: { program: Program }) {
         <Separator />
 
         <div className="[>div]:col-span-1 grid grid-cols-2 gap-3">
-          <h3 className="col-span-2 inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
+          <h3 className="col-span-2 inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
             <Briefcase />
             Laboral
           </h3>
@@ -124,7 +124,7 @@ export function ProgramStats({ program }: { program: Program }) {
         <Separator />
 
         <div className="[>div]:col-span-1 grid grid-cols-2 gap-3">
-          <h3 className="col-span-2 inline-flex items-center gap-2 font-semibold [&_svg]:size-4">
+          <h3 className="col-span-2 inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
             <Coins />
             Costos
           </h3>
