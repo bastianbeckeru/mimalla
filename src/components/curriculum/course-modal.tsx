@@ -101,9 +101,9 @@ export default function CourseModal({
         fadeFromIndex={0}
         {...props}
       >
-        <DrawerContent className="h-full">
-          <DrawerHeader>
-            <DrawerTitle>{course.name}</DrawerTitle>
+        <DrawerContent className="h-full px-4">
+          <DrawerHeader className="">
+            <DrawerTitle className="pb-1.5">{course.name}</DrawerTitle>
             <div className="text-muted-foreground space-y-3 text-sm">
               <div className="flex items-center gap-2">
                 {course.code && (

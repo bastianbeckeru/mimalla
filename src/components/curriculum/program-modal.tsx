@@ -27,7 +27,7 @@ type ProgramModalProps = {
   program: Program | null;
 };
 
-const snapPoints = [0.5, 1];
+const snapPoints = [0.6, 1];
 
 export default function ProgramModal({ program }: ProgramModalProps) {
   if (!program || !program.stats || program.stats.length === 0) return null;
@@ -47,14 +47,14 @@ export default function ProgramModal({ program }: ProgramModalProps) {
           <Button variant="outline">Ver estadísticas</Button>
         </DrawerTrigger>
         <DrawerContent className="h-full">
-          <DrawerHeader>
+          <DrawerHeader className="">
             <DrawerTitle>Estadísticas</DrawerTitle>
             <DrawerDescription className="sr-only">
               Visualización de estadísticas del programa académico{" "}
               {program.name}.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4">
             <ProgramStats program={program} />
           </div>
         </DrawerContent>
