@@ -15,7 +15,7 @@ const Path = memo(({ path, color, strokeWidth = 1.5 }: PathProps) => {
       fill="none"
       stroke={color}
       strokeWidth={strokeWidth}
-      strokeLinecap="round"
+      strokeLinecap="butt"
       strokeLinejoin="round"
       className="animate-dash"
     />

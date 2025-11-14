@@ -1,0 +1,46 @@
+.long-press-card {
+  position: relative;
+  transform: scale(var(--scale, 1));
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Transición suave cuando se está presionando */
+.long-press-card:active {
+  transition: none;
+}
+
+/* Estado seleccionado con ring */
+.long-press-card.selected {
+  transform: scale(1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.long-press-card.selected::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #3b82f6;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: ring-appear 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes ring-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Opcional: efecto de cancelación rápida */
+.long-press-card:not(.selected):not(:active) {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 1, 1);
+}

@@ -2,9 +2,10 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { checkContrasts } from "@/utils/colors";
 import useInteractions from "@/hooks/use-long-press";
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { MotionDiv } from "../motion";
 import { ExtendedSlot } from "@/types/curriculum";
+import { animate, useMotionValue, useTransform } from "motion/react";
 
 type CourseCard = {
   index: number;
@@ -26,13 +27,17 @@ const CourseCard = memo(function CourseCard({
   className,
   ...props
 }: CourseCard) {
+  const progress = useMotionValue(0);
+  const scale = useTransform(progress, [0, 1], [1, 0.97]);
+  const animation = useRef<any>(null);
+
   const { course, color, x, y, w, h } = slot;
 
   const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
     checkContrasts({ elementColor: color });
 
   const handlers = useInteractions({
-    onLongPress: () => handleSelect(slot),
+    onLongPress: () => completePress(),
     onHoverStart: () => handleSelect(slot),
     onHoverEnd: () => handleSelect(null),
     onClick: () => handleClick(slot),
@@ -43,15 +48,30 @@ const CourseCard = memo(function CourseCard({
     visible: { opacity: 1 },
   };
 
+  const startPress = () => {
+    if (isSelected) return;
+    animation.current = animate(progress, 1, { duration: 0.7 });
+  };
+
+  const endPress = () => {
+    animation.current?.stop();
+    animate(progress, 0, { duration: 0.15 });
+  };
+
+  const completePress = () => {
+    animate(progress, 0, { duration: 0.2 });
+    handleSelect(slot);
+  };
+
   return (
     <MotionDiv
       {...handlers}
       variants={itemVariants}
       className={cn(
-        "bg-card clickeable text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border py-6 shadow-sm transition-[filter] select-none",
-        hasLowBackgroundElementContrast && "border-foreground/50 border",
+        "bg-card clickeable text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border border-transparent py-6 shadow-sm transition-[filter] select-none",
+        hasLowBackgroundElementContrast && "border-foreground/50",
         hasLowElementTextContrast && "text-background",
-        isSelected && "glow glow-active",
+        isSelected && "ring-2 ring-rose-500",
         isNotRelated && "brightness-[25%]",
         className,
       )}
@@ -59,6 +79,16 @@ const CourseCard = memo(function CourseCard({
         backgroundColor: color,
         gridColumn: `${x} / span ${w}`,
         gridRow: `${y} / span ${h}`,
+        scale: isSelected ? 1 : scale,
+      }}
+      onPointerDown={(e) => {
+        startPress();
+        handlers.onPointerDown(e);
+      }}
+      onPointerUp={endPress}
+      onPointerLeave={(e) => {
+        endPress();
+        handlers.onPointerLeave(e);
       }}
       {...props}
     >
