@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { checkContrasts } from "@/utils/colors";
-import useInteractions from "@/hooks/use-long-press";
+import useInteractions from "@/hooks/use-interactions";
 import { memo, useRef } from "react";
 import { MotionDiv } from "../motion";
 import { ExtendedSlot } from "@/types/curriculum";

@@ -10,9 +10,10 @@ type UseInteractionsOptions = {
   longPressThreshold?: number;
   hoverDelay?: number;
   moveTolerance?: number;
+  clickThreshold?: number; // NUEVO
 };
 
-export const useInteractions = (options: UseInteractionsOptions = {}) => {
+const useInteractions = (options: UseInteractionsOptions = {}) => {
   const {
     onLongPress,
     onClick,
@@ -22,11 +23,13 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     longPressThreshold = 700,
     hoverDelay = 100,
     moveTolerance = 5,
+    clickThreshold = 200, // NUEVO: umbral para considerar un click válido
   } = options;
 
   const timeout = useRef<NodeJS.Timeout | null>(null);
   const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
   const startCoords = useRef<Coordinates>({ x: 0, y: 0 });
+  const pressStartTime = useRef<number>(0); // NUEVO
   const isPressing = useRef(false);
   const longPressTriggered = useRef(false);
 
@@ -66,6 +69,7 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
 
       isPressing.current = true;
       longPressTriggered.current = false;
+      pressStartTime.current = Date.now(); // NUEVO
       startCoords.current = getCoordinates(event.nativeEvent);
 
       timeout.current = setTimeout(() => {
@@ -87,17 +91,21 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
       }
 
       if (isPressing.current) {
+        const pressDuration = Date.now() - pressStartTime.current; // NUEVO
+        const isValidClick = pressDuration < clickThreshold; // NUEVO
+
         if (
           shouldTriggerClick &&
           callbacksRef.current.onClick &&
-          !longPressTriggered.current
+          !longPressTriggered.current &&
+          isValidClick // NUEVO: solo ejecutar onClick si fue un click rápido
         ) {
           callbacksRef.current.onClick(event);
         }
         isPressing.current = false;
       }
     },
-    [],
+    [clickThreshold], // NUEVO
   );
 
   const handleMove = useCallback(
@@ -110,7 +118,6 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     [clear],
   );
 
-  // Solo activar hover para mouse (no touch ni pen)
   const handlePointerEnter = useCallback(
     (event: React.PointerEvent) => {
       event.stopPropagation();
@@ -124,7 +131,6 @@ export const useInteractions = (options: UseInteractionsOptions = {}) => {
     [hoverDelay],
   );
 
-  // Solo ejecutar onHoverEnd si fue mouse
   const handlePointerLeave = useCallback((event: React.PointerEvent) => {
     event.stopPropagation();
 
