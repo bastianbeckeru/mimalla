@@ -17,7 +17,7 @@ import { Search } from "lucide-react";
 import { institutions } from "@/server/db/data";
 import { slugify } from "@/utils/strings";
 import { KbdGroup } from "./ui/kbd";
-import KbdModifier from "./kbd-action";
+import KbdModifier from "./kbd-modifier";
 
 export function Searchbar() {
   const posthog = usePostHog();
@@ -34,7 +34,7 @@ export function Searchbar() {
   useShortcuts([
     {
       keys: ["Control", "k"],
-      handler: () => handleOpen("keyboard_shortcut"),
+      callback: () => handleOpen("keyboard_shortcut"),
     },
   ]);
 
@@ -50,7 +50,7 @@ export function Searchbar() {
         <div>
           <Search className="mr-0.5 lg:hidden" />
           <KbdGroup className="hidden lg:inline-flex">
-            <KbdModifier>+ K</KbdModifier>
+            <KbdModifier>+K</KbdModifier>
           </KbdGroup>
         </div>
       </Button>

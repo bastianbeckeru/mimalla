@@ -25,7 +25,8 @@ export default function KbdModifier({
 
   return (
     <Kbd className={className} {...props}>
-      {modifierKey} {children}
+      {modifierKey}
+      {children}
     </Kbd>
   );
 }
