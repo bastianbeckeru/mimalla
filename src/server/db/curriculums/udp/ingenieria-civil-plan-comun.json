@@ -276,7 +276,7 @@
       "id": 104,
       "name": "Programación Avanzada o Ingeniería de los Materiales",
       "code": "CIT1010 / COC2001",
-      "description": "Curso que entrega los conocimientos en programación orientada a objetos y cómo almacenar y gestionar datos de manera eficiente junto con el diseño de programas. Por otro lado, cómo funcionan los materiales compuestos y las bases cuantificables y descriptivas de los materiales en general, para aplicarlos al mundo de la ingeniería.",
+      "description": "Curso que entrega los conocimientos en programación orientada a objetos y cómo almacenar y gestionar datos de manera eficiente junto con el diseño de programas. Además, cómo funcionan los materiales compuestos y las bases cuantificables y descriptivas de los materiales en general, para aplicarlos al mundo de la ingeniería.",
       "credits": 6,
       "duration": 1,
       "prerequisiteCredits": 0,

@@ -35,7 +35,7 @@ import {
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
-import { Pencil, PencilOff, Trash } from "lucide-react";
+import { Pencil, PencilOff, RotateCcw, Trash } from "lucide-react";
 
 type DashboardSidebar = {
   editMode: boolean;
@@ -131,15 +131,21 @@ export default function DashboardSidebar({
         <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
-          className="text-muted-foreground hover:text-foreground my-4 block w-full text-center text-sm underline transition-colors duration-200"
+          className="text-muted-foreground hover:text-foreground my-4 hidden w-full text-center text-sm underline transition-colors duration-200"
         >
           ¡Ayudanos a mejorar!
         </a>
+
+        <Button variant="outlineDestructive" className="w-full">
+          <RotateCcw />
+          Reiniciar malla
+        </Button>
+
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outlineDestructive" className="w-full gap-2">
-              <Trash className="size-4" />
-              Eliminar Malla
+            <Button variant="outlineDestructive" className="w-full">
+              <Trash />
+              Eliminar malla
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">

@@ -11,7 +11,7 @@ import {
   getCurriculumStats,
   getPeriodsWithEnrollments,
 } from "@/utils/curriculum";
-import { Loader2, Lock, LockOpen, Save } from "lucide-react";
+import { Loader2, Lock, LockOpen, Save, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getProgramData } from "../../utils/curriculum-data";
 import Sidebar from "./sidebar";
@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import { StudentEnrollment } from "@/types/store";
 import ScrollAreaWrapper from "../scroll-area-wrapper";
 import { Toggle } from "../ui/toggle";
+import { KbdGroup } from "../ui/kbd";
+import KbdModifier from "../kbd-modifier";
 
 export default function ClientSideDashboard() {
   const {
@@ -49,12 +51,16 @@ export default function ClientSideDashboard() {
   useShortcuts([
     {
       keys: ["Control", "e"],
-      handler: handleEditMode,
+      callback: handleEditMode,
     },
     {
       keys: ["Control", "s"],
-      handler: handleSaveChanges,
+      callback: handleSaveChanges,
     },
+    /*     {
+      keys: ["Control", "escape"],
+      handler: handleCancelEditMode(),
+    }, */
   ]);
 
   // Wait for the store to be hydrated
@@ -207,10 +213,10 @@ export default function ClientSideDashboard() {
                   onClick={handleSaveChanges}
                 >
                   <Save />
-                  <span className="sr-only hidden md:inline">Guardar</span>
-                  <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
-                    <span className="text-[0.625rem]">⌘</span>S
-                  </kbd>
+                  <span className="hidden md:inline">Guardar</span>
+                  <KbdGroup className="sr-only">
+                    <KbdModifier>+S</KbdModifier>
+                  </KbdGroup>
                 </Button>
               )}
 
@@ -220,13 +226,11 @@ export default function ClientSideDashboard() {
                 data-state={editMode ? "on" : "off"}
                 onClick={handleEditMode}
               >
-                {editMode ? <LockOpen /> : <Lock />}
-                <span className="sr-only hidden md:inline">
-                  {editMode ? "Deshabilitar" : "Habilitar"} edición
-                </span>
-                <kbd className="bg-muted hidden h-5 items-center justify-center gap-1 rounded-sm border px-1.5 font-mono text-sm font-medium md:inline-flex">
-                  <span className="text-[0.625rem]">⌘</span>E
-                </kbd>
+                <SquarePen />
+                <span className="hidden md:inline">Editar</span>
+                <KbdGroup className="sr-only">
+                  <KbdModifier>+E</KbdModifier>
+                </KbdGroup>
               </Toggle>
             </div>
           </header>

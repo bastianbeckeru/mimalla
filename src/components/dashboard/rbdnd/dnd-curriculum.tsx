@@ -115,13 +115,13 @@ export default function RBDndCurriculum({
   useShortcuts([
     {
       keys: ["Control", "z"],
-      handler: () => {
+      callback: () => {
         if (editMode) undo();
       },
     },
     {
       keys: ["Control", "Shift", "Z"],
-      handler: () => {
+      callback: () => {
         if (editMode) redo();
       },
     },
