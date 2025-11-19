@@ -10,8 +10,44 @@
     "demreCode": 38005,
     "schedule": "DAYTIME"
   },
+  "stats": [
+    {
+      "year": 2024,
+      "admissions": {
+        "paesRequirements": {
+          "nem": 10,
+          "ranking": 20,
+          "language": 35,
+          "math1": 25,
+          "math2": 0,
+          "history": 10,
+          "science": 10
+        },
+        "averageScore": 796.2,
+        "vacancies": 206
+      },
+      "academics": {
+        "firstYearRetentionRate": 0.956,
+        "avgRealDuration": 11.9,
+        "avgRealDurationUnit": "SEMESTERS",
+        "acreditationYears": 6
+      },
+      "employment": {
+        "employmentRate1stYear": 0.677,
+        "avgIncome4thYear": {
+          "min": 1200000,
+          "max": 1300000
+        }
+      },
+      "costs": {
+        "annualTuition": 7095000,
+        "annualEnrollment": 712000,
+        "currency": "CLP"
+      }
+    }
+  ],
   "curriculum": {
-    "version": "v4",
+    "version": "4.2",
     "year": 2020,
     "structure": [
       { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 105 },
@@ -192,7 +228,7 @@
       "name": "Curso de Formación General",
       "code": "CFGXXXX",
       "credits": 5,
-      "description": null,
+      "description": "Curso que busca integrar los conocimientos generales y las habilidades propias de una educación liberal en artes y ciencias con el fin de abordar las preguntas permanentes del ser humano, comprender los problemas del entorno y entregar una formación en diálogo con diversas perpectivas.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "duration": 1
@@ -200,9 +236,9 @@
     {
       "id": 105,
       "name": "Historia de la Psicología",
-      "code": "",
+      "code": "PSI4121",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender, de manera crítica y reflexiva, algunos aspectos históricos de la psicología, como discurso y práctica social; reconocer las tensiones y transformaciones que caracterizan la complejidad y pluralidad teórica y profesional de la psicología contemporánea, y su aplicación al contexto chileno.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -211,9 +247,9 @@
     {
       "id": 106,
       "name": "Fundamentos Biológicos del Comportamiento",
-      "code": "",
+      "code": "PSI4112",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de identificar y analizar diversos aspectos y sistemas biológicos relevantes del cuerpo, y su relación con procesos psicológicos y con el comportamiento de las personas.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -222,9 +258,9 @@
     {
       "id": 107,
       "name": "Psicología General",
-      "code": "",
+      "code": "PSI4113",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender el surgimiento de la Psicología y su objeto de estudio; reconocer sus principales paradigmas y corrientes teóricas y sus campos de aplicación e intervención.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -233,9 +269,9 @@
     {
       "id": 108,
       "name": "Transformaciones Socioculturales",
-      "code": "",
+      "code": "PSI4114",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender los principales debates sobre modernidad y los principales procesos de modernización y cambio social acaecidos entre los siglos XIX y XXI, con un foco prioritario en las sociedades latinoamericanas y chilena. Tendrán la capacidad de analizar las relaciones entre los procesos históricos, la estructura social y trayectorias individuales, con énfasis en el modo en que se despliegan en las sociedades contemporáneas.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -244,7 +280,7 @@
     {
       "id": 109,
       "name": "Filosofía y Epistemiología de la Psicología",
-      "code": "",
+      "code": "PSI4117",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -257,7 +293,7 @@
       "name": "Inglés I",
       "code": "",
       "credits": 5,
-      "description": null,
+      "description": "Curso que busca lograr en el estudiante el nivel B1 o B1+ de competencia del idioma.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -266,7 +302,7 @@
     {
       "id": 111,
       "name": "Análisis Crítico de la Psicología en Chile",
-      "code": "",
+      "code": "PSI4124",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -277,10 +313,10 @@
     {
       "id": 112,
       "name": "Neurociencias y Psicología",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4122",
+      "credits": 4,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [106],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -288,10 +324,10 @@
     {
       "id": 113,
       "name": "Procesos Psicológicos",
-      "code": "",
+      "code": "PSI4123",
       "credits": 6,
-      "description": null,
-      "prerequisiteIds": [],
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender los procesos psicológicos básicos y su relación con la emergencia del fenómeno mental y la experiencia humana.",
+      "prerequisiteIds": [107],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -299,9 +335,9 @@
     {
       "id": 114,
       "name": "Psicología Social I",
-      "code": "",
+      "code": "PSI4214",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y analizar críticamente los principales conceptos y teorías de la psicología social sociocognitiva, considerando su relevancia, especificidad, desarrollos investigativos contemporáneos y campos de aplicación.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -310,7 +346,7 @@
     {
       "id": 115,
       "name": "Estadística",
-      "code": "",
+      "code": "PSI4125",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -323,7 +359,7 @@
       "name": "Inglés II",
       "code": "",
       "credits": 5,
-      "description": null,
+      "description": "Curso que busca lograr en el estudiante el nivel B1 o B1+ de competencia del idioma.",
       "prerequisiteIds": [110],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -332,8 +368,8 @@
     {
       "id": 117,
       "name": "Psicología de la Infancia",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4211",
+      "credits": 4,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -343,8 +379,8 @@
     {
       "id": 118,
       "name": "Psicología de la Adolescencia y Juventud",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4212",
+      "credits": 4,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -354,9 +390,9 @@
     {
       "id": 119,
       "name": "Psicología de la Comunicación",
-      "code": "",
-      "credits": 6,
-      "description": null,
+      "code": "PSI4213",
+      "credits": 4,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender los principios y conceptos básicos de la comunicación humana, abordados desde una perspectiva psicológica e interaccional",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -365,10 +401,10 @@
     {
       "id": 120,
       "name": "Psicología Social II",
-      "code": "",
-      "credits": 6,
-      "description": null,
-      "prerequisiteIds": [],
+      "code": "PSI4224",
+      "credits": 4,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y analizar los principales marcos teóricos y categorías analíticas de las corrientes de psicología social vinculada a tradiciones críticas, interpretativas y discursivas, considerando su relevancia, especificidad, desarrollos investigativos contemporáneos y campos de aplicación.",
+      "prerequisiteIds": [114],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -376,9 +412,9 @@
     {
       "id": 121,
       "name": "Investigación I",
-      "code": "",
+      "code": "PSI4215",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y aplicar enfoques de investigación cuantitativa y procedimientos de análisis estadístico para la elaboración y comunicación de un proyecto de investigación, desarrollando habilidades para el trabajo colaborativo y en equipo, orientado a la producción y comunicación de conocimientos de relevancia social y disciplinar en distintas áreas de la psicología, promoviendo la responsabilidad ética de la toma de decisiones basada en la evidencia científica para la praxis de la psicología.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -389,7 +425,7 @@
       "name": "Inglés III",
       "code": "",
       "credits": 5,
-      "description": null,
+      "description": "Curso que busca lograr en el estudiante el nivel B1 o B1+ de competencia del idioma.",
       "prerequisiteIds": [116],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -398,8 +434,8 @@
     {
       "id": 123,
       "name": "Introducción a la Psicopatología",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4221",
+      "credits": 4,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -409,7 +445,7 @@
     {
       "id": 124,
       "name": "Introducción a la Psicología Clínica",
-      "code": "",
+      "code": "PSI4222",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -420,9 +456,9 @@
     {
       "id": 125,
       "name": "Psicología de la Personalidad",
-      "code": "",
-      "credits": 6,
-      "description": null,
+      "code": "PSI4223",
+      "credits": 4,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de reconocer, desde diversos marcos teóricos, las principales problemáticas de la psicología de la personalidad, integrando aspectos descriptivos, dinámicos, procesuales y estructurales de la personalidad, y dimensiones contextuales, culturales y de género que explican diferencias interindividuales, reconociendo su aporte en el quehacer del psicólogo/a en distintos campos ocupacionales.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -431,8 +467,8 @@
     {
       "id": 126,
       "name": "Psicología de la Adultez y la Tercera Edad",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4216",
+      "credits": 4,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -442,10 +478,10 @@
     {
       "id": 127,
       "name": "Investigación II",
-      "code": "",
+      "code": "PSI4225",
       "credits": 6,
-      "description": null,
-      "prerequisiteIds": [],
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y aplicar enfoques de investigación cuantitativa y procedimientos de análisis estadístico para la ejecución de un proyecto de investigación, desarrollando habilidades para el trabajo colaborativo y en equipo, orientado a la producción y comunicación de conocimientos de relevancia social y disciplinar en distintas áreas de la psicología, promoviendo la responsabilidad ética de la toma de decisiones basada en la evidencia científica para la praxis de la psicología.",
+      "prerequisiteIds": [121],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -453,10 +489,10 @@
     {
       "id": 128,
       "name": "Psicopatología y Psiquiatría de Niños y Adolescentes",
-      "code": "",
+      "code": "PSI4311",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [123],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -464,10 +500,10 @@
     {
       "id": 129,
       "name": "Optativo de Perspectivas en Psicología Clínica I",
-      "code": "",
+      "code": "PSIOPXX",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [124],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -475,10 +511,10 @@
     {
       "id": 130,
       "name": "Introducción al Psicodiagnóstico",
-      "code": "",
+      "code": "PSI4313",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [125],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -486,7 +522,7 @@
     {
       "id": 131,
       "name": "Psicología y Salud",
-      "code": "",
+      "code": "PSI4411",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -497,10 +533,10 @@
     {
       "id": 132,
       "name": "Investigación III",
-      "code": "",
+      "code": "PSI4315",
       "credits": 6,
-      "description": null,
-      "prerequisiteIds": [],
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y aplicar enfoques de investigación y análisis cualitativo para la elaboración y comunicación de un proyecto de investigación, desarrollando habilidades para el trabajo colaborativo y en equipo, orientado a la producción y comunicación de conocimientos de relevancia social y disciplinar en distintas áreas de la psicología, promoviendo la responsabilidad ética de la toma de decisiones basada en la evidencia científica para la praxis de la psicología.",
+      "prerequisiteIds": [127],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -508,10 +544,10 @@
     {
       "id": 133,
       "name": "Psicopatología y Psiquiatría de Adulto",
-      "code": "",
+      "code": "PSI4321",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [123],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -519,10 +555,10 @@
     {
       "id": 134,
       "name": "Optativo de Perspectivas en Psicología Clínica II",
-      "code": "",
+      "code": "PSIOPXX",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [124],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -530,10 +566,10 @@
     {
       "id": 135,
       "name": "Psicodiagnóstico de Niños y Adolescentes",
-      "code": "",
+      "code": "PSI4323",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [130],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -541,7 +577,7 @@
     {
       "id": 136,
       "name": "Psicología y Educación",
-      "code": "",
+      "code": "PSI4324",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -552,10 +588,10 @@
     {
       "id": 137,
       "name": "Investigación IV",
-      "code": "",
+      "code": "PSI4325",
       "credits": 6,
-      "description": null,
-      "prerequisiteIds": [],
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender y aplicar enfoques de investigación y análisis cualitativo para la ejecución de un proyecto de investigación, desarrollando habilidades para el trabajo colaborativo y en equipo, orientado a la producción y comunicación de conocimientos de relevancia social y disciplinar en distintas áreas de la psicología, promoviendo la responsabilidad ética de la toma de decisiones basada en la evidencia científica para la praxis de la psicología.",
+      "prerequisiteIds": [132],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -563,7 +599,7 @@
     {
       "id": 138,
       "name": "Psicología y Justicia",
-      "code": "",
+      "code": "PSI4412",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -574,7 +610,7 @@
     {
       "id": 139,
       "name": "Psicología del Trabajo y las Organizaciones",
-      "code": "",
+      "code": "PSI4314",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -585,10 +621,10 @@
     {
       "id": 140,
       "name": "Psicodiagnóstico de Adultos",
-      "code": "",
+      "code": "PSI4413",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [130],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -596,7 +632,7 @@
     {
       "id": 141,
       "name": "Psicología y Sujetos Sociales",
-      "code": "",
+      "code": "PSI4414",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -607,10 +643,10 @@
     {
       "id": 142,
       "name": "Gestión de Recursos Humanos",
-      "code": "",
-      "credits": 6,
+      "code": "PSI4425",
+      "credits": 5,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [139],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -618,8 +654,8 @@
     {
       "id": 143,
       "name": "Optativo de Intervención Psicosocial",
-      "code": "",
-      "credits": 6,
+      "code": "PSIOPXX",
+      "credits": 8,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -629,10 +665,10 @@
     {
       "id": 144,
       "name": "Optativo de Intervención Clínica",
-      "code": "",
+      "code": "PSIOPXX",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [134],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -640,7 +676,7 @@
     {
       "id": 145,
       "name": "Diseño y Evaluación de Proyectos de Intervención",
-      "code": "",
+      "code": "PSI4423",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],
@@ -650,22 +686,22 @@
     },
     {
       "id": 146,
-      "name": "Taller de Intervención Clínica",
-      "code": "",
+      "name": "Taller de Intervención Psicosocial",
+      "code": "PSITATINTPS",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [143],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
     },
     {
       "id": 147,
-      "name": "Taller de Intervención Psicosocial",
-      "code": "",
+      "name": "Taller de Intervención Clínica",
+      "code": "PSITATINTCL",
       "credits": 6,
       "description": null,
-      "prerequisiteIds": [],
+      "prerequisiteIds": [144],
       "prerequisiteCredits": 0,
       "isElective": false,
       "duration": 1
@@ -673,8 +709,8 @@
     {
       "id": 148,
       "name": "Curso de Profundización",
-      "code": "",
-      "credits": 6,
+      "code": "PSIOPTPR",
+      "credits": 4,
       "description": null,
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
@@ -684,9 +720,9 @@
     {
       "id": 149,
       "name": "Estrategias de Trabajo Grupal",
-      "code": "",
+      "code": "PSI4424",
       "credits": 6,
-      "description": null,
+      "description": "Esta asignatura se propone que el estudiantado sea capaz de comprender los fundamentos de la Psicología de los Grupos y su aplicación en el diseño e implementación de intervenciones grupales para el ejercicio profesional en distintas áreas de la Psicología.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -695,9 +731,9 @@
     {
       "id": 150,
       "name": "Práctica Profesional",
-      "code": "",
-      "credits": 6,
-      "description": null,
+      "code": "PSI4521",
+      "credits": 22,
+      "description": "La Práctica Profesional se realiza durante el noveno semestre. Tiene una duración mínima de 500 horas repartidas en seis meses, y se lleva a cabo de forma continua en una sola institución. Comprende una supervisión de práctica en terreno y en la Escuela de Psicología.De este modo, permite que el estudiantado aplique conocimientos y habilidades en intervenciones profesionales autónomas, contribuyendo al desarrollo del rol profesional.",
       "prerequisiteIds": [],
       "prerequisiteCredits": 0,
       "isElective": false,
@@ -706,7 +742,7 @@
     {
       "id": 151,
       "name": "Supervisión de Práctica",
-      "code": "",
+      "code": "PSI4522",
       "credits": 6,
       "description": null,
       "prerequisiteIds": [],

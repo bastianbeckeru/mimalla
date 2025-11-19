@@ -30,14 +30,10 @@
         "firstYearRetentionRate": 0.946,
         "avgRealDuration": 15.0,
         "avgRealDurationUnit": "SEMESTERS",
-        "totalEnrollment": 1492,
-        "freshmenEnrollment": 267,
-        "graduates": 225,
         "acreditationYears": 6
       },
       "employment": {
         "employmentRate1stYear": 0.794,
-        "employmentRate2ndYear": 0.889,
         "avgIncome4thYear": {
           "min": 1800000,
           "max": 1900000
