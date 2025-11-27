@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import Navbar from '@/components/navbar';
 
 export const dynamicParams = false;

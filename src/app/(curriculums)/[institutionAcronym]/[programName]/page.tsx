@@ -1,7 +1,7 @@
 import type { InstitutionParams } from '../layout';
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import CurriculumView from '@/components/curriculum/curriculum-view';
 import ProgramInfo from '@/components/curriculum/program-info';
