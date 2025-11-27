@@ -1,7 +1,5 @@
-import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-/* import { institutionRouter } from "./routers/institution";
- */
-import { programRouter } from "./routers/program";
+import { programRouter } from '@/server/api/routers/program';
+import { createCallerFactory, createTRPCRouter } from '@/server/api/trpc';
 
 /**
  * This is the primary router for your server.
@@ -9,7 +7,6 @@ import { programRouter } from "./routers/program";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  /*   institution: institutionRouter, */
   program: programRouter,
 });
 
