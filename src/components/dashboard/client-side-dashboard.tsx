@@ -1,34 +1,34 @@
-"use client";
+'use client';
 
 import type {
   CurriculumData,
   History,
   PeriodWithEnrollments,
-} from "@/types/curriculum";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
+} from '@/types/curriculum';
+import { useNewCurriculumStore } from '@/stores/newCurriculum';
 import {
   extractCourseIds,
   getCurriculumStats,
   getPeriodsWithEnrollments,
-} from "@/utils/curriculum";
-import { Loader2, Lock, LockOpen, Save, SquarePen } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getProgramData } from "../../utils/curriculum-data";
-import Sidebar from "./sidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+} from '@/utils/curriculum';
+import { Loader2, Lock, LockOpen, Save, SquarePen } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getProgramData } from '../../utils/curriculum-data';
+import Sidebar from './sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar';
 
-import RBDndCurriculum from "./rbdnd/dnd-curriculum";
-import CurriculumForm from "./curriculum-form";
-import useShortcuts from "@/hooks/use-shortcut";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
-import { Progress } from "../ui/progress";
-import { toast } from "sonner";
-import { StudentEnrollment } from "@/types/store";
-import ScrollAreaWrapper from "../scroll-area-wrapper";
-import { Toggle } from "../ui/toggle";
-import { KbdGroup } from "../ui/kbd";
-import KbdModifier from "../kbd-modifier";
+import RBDndCurriculum from './rbdnd/dnd-curriculum';
+import CurriculumForm from './curriculum-form';
+import useShortcuts from '@/hooks/use-shortcut';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
+import { Progress } from '../ui/progress';
+import { toast } from 'sonner';
+import type { StudentEnrollment } from '@/types/store';
+import ScrollAreaWrapper from '../scroll-area-wrapper';
+import { Toggle } from '../ui/toggle';
+import { KbdGroup } from '../ui/kbd';
+import KbdModifier from '../kbd-modifier';
 
 export default function ClientSideDashboard() {
   const {
@@ -50,11 +50,11 @@ export default function ClientSideDashboard() {
 
   useShortcuts([
     {
-      keys: ["Control", "e"],
+      keys: ['Control', 'e'],
       callback: handleEditMode,
     },
     {
-      keys: ["Control", "s"],
+      keys: ['Control', 's'],
       callback: handleSaveChanges,
     },
     /*     {
@@ -78,7 +78,7 @@ export default function ClientSideDashboard() {
 
     if (isLoading && curriculums.length > 0) {
       const activeCurriculum = curriculums.find(
-        (c) => c.id === activeCurriculumId,
+        (c) => c.id === activeCurriculumId
       );
 
       if (!activeCurriculum) {
@@ -87,7 +87,7 @@ export default function ClientSideDashboard() {
       }
 
       const [institutionAcronym, programSlug] =
-        activeCurriculum.path.split("/");
+        activeCurriculum.path.split('/');
 
       if (!institutionAcronym || !programSlug) {
         setIsLoading(false);
@@ -113,7 +113,7 @@ export default function ClientSideDashboard() {
           setIsLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching data:", error);
+          console.error('Error fetching data:', error);
           setIsLoading(false);
         });
     }
@@ -125,7 +125,7 @@ export default function ClientSideDashboard() {
       data
     ) {
       const activeCurriculum = curriculums.find(
-        (c) => c.id === activeCurriculumId,
+        (c) => c.id === activeCurriculumId
       );
 
       if (!activeCurriculum) return;
@@ -158,7 +158,7 @@ export default function ClientSideDashboard() {
 
   if (isLoading || !data)
     return (
-      <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
+      <Loader2 className='absolute top-[40%] left-[50%] size-8 animate-spin' />
     );
 
   const { institution, program, areas, courses } = data;
@@ -168,14 +168,14 @@ export default function ClientSideDashboard() {
 
   const stats = getCurriculumStats(enrollments, coursesMap);
 
-  const approvedCourseIds = extractCourseIds(enrollments, "APPROVED");
-  const failedCourseIds = extractCourseIds(enrollments, "FAILED");
+  const approvedCourseIds = extractCourseIds(enrollments, 'APPROVED');
+  const failedCourseIds = extractCourseIds(enrollments, 'FAILED');
 
   function handleEditMode() {
     if (history.past.length > 0) {
-      toast("⚠️ Cambios sin guardar", {
+      toast('⚠️ Cambios sin guardar', {
         description:
-          "Guarda los cambios realizados antes de finalizar la edición.",
+          'Guarda los cambios realizados antes de finalizar la edición.',
       });
       return;
     }
@@ -194,41 +194,41 @@ export default function ClientSideDashboard() {
         setHistory={setHistory}
       />
 
-      <SidebarInset className="relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
+      <SidebarInset className='relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden'>
         <div>
-          <header className="bg-card relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-            <SidebarTrigger className="absolute left-2 md:hidden" />
+          <header className='bg-card relative flex h-14 shrink-0 items-center justify-center gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
+            <SidebarTrigger className='absolute left-2 md:hidden' />
 
-            <div className="flex items-center justify-center px-2 font-bold">
+            <div className='flex items-center justify-center px-2 font-bold'>
               <h1>{program.name}</h1>
             </div>
 
-            <div className="absolute right-2 flex flex-row items-center gap-2">
+            <div className='absolute right-2 flex flex-row items-center gap-2'>
               {editMode && (
                 <Button
-                  aria-label="save changes"
-                  variant="outline"
-                  className="disabled:bg-muted bg-accent hidden hover:brightness-110 md:flex"
+                  aria-label='save changes'
+                  variant='outline'
+                  className='disabled:bg-muted bg-accent hidden hover:brightness-110 md:flex'
                   disabled={history.past.length === 0}
                   onClick={handleSaveChanges}
                 >
                   <Save />
-                  <span className="hidden md:inline">Guardar</span>
-                  <KbdGroup className="sr-only">
+                  <span className='hidden md:inline'>Guardar</span>
+                  <KbdGroup className='sr-only'>
                     <KbdModifier>+S</KbdModifier>
                   </KbdGroup>
                 </Button>
               )}
 
               <Toggle
-                aria-label="toggle edit mode"
-                variant="outline"
-                data-state={editMode ? "on" : "off"}
+                aria-label='toggle edit mode'
+                variant='outline'
+                data-state={editMode ? 'on' : 'off'}
                 onClick={handleEditMode}
               >
                 <SquarePen />
-                <span className="hidden md:inline">Editar</span>
-                <KbdGroup className="sr-only">
+                <span className='hidden md:inline'>Editar</span>
+                <KbdGroup className='sr-only'>
                   <KbdModifier>+E</KbdModifier>
                 </KbdGroup>
               </Toggle>
@@ -236,11 +236,11 @@ export default function ClientSideDashboard() {
           </header>
           <Progress
             value={stats.progress}
-            className="h-0.5 rounded-none md:hidden"
+            className='h-0.5 rounded-none md:hidden'
           />
         </div>
 
-        <ScrollAreaWrapper className="h-[calc(100dvh-3.5rem)] w-dvw overflow-hidden lg:w-[calc(100dvw-18rem)]">
+        <ScrollAreaWrapper className='h-[calc(100dvh-3.5rem)] w-dvw overflow-hidden lg:w-[calc(100dvw-18rem)]'>
           <RBDndCurriculum
             editMode={editMode}
             history={history}
@@ -269,7 +269,7 @@ export default function ClientSideDashboard() {
       newPresent.splice(lastWithEnrollmentsIndex + 1);
 
       const updatedPeriods = newPresent.filter((p) => {
-        const term = Number(p.id.split("-")[1]!);
+        const term = Number(p.id.split('-')[1]!);
 
         const hasEnrollments = p.enrollments.length > 0;
         const isSemester = term === 1 || term === 3;

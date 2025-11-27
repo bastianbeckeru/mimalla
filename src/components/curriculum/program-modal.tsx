@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Drawer,
   DrawerContent,
@@ -17,11 +17,11 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
 
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Program, ProgramStats } from "./program-stats";
+import { useIsMobile } from '@/hooks/use-mobile';
+import { type Program, ProgramStats } from './program-stats';
 
 type ProgramModalProps = {
   program: Program | null;
@@ -44,17 +44,17 @@ export default function ProgramModal({ program }: ProgramModalProps) {
         fadeFromIndex={0}
       >
         <DrawerTrigger asChild>
-          <Button variant="outline">Ver estadísticas</Button>
+          <Button variant='outline'>Ver estadísticas</Button>
         </DrawerTrigger>
-        <DrawerContent className="h-full">
-          <DrawerHeader className="">
+        <DrawerContent className='h-full'>
+          <DrawerHeader className=''>
             <DrawerTitle>Estadísticas</DrawerTitle>
-            <DrawerDescription className="sr-only">
-              Visualización de estadísticas del programa académico{" "}
+            <DrawerDescription className='sr-only'>
+              Visualización de estadísticas del programa académico{' '}
               {program.name}.
             </DrawerDescription>
           </DrawerHeader>
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className='flex-1 overflow-y-auto p-4'>
             <ProgramStats program={program} />
           </div>
         </DrawerContent>
@@ -65,12 +65,12 @@ export default function ProgramModal({ program }: ProgramModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Ver estadísticas</Button>
+        <Button variant='outline'>Ver estadísticas</Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80dvh] overflow-y-auto">
+      <DialogContent className='max-h-[80dvh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>Estadísticas</DialogTitle>
-          <DialogDescription className="sr-only">
+          <DialogDescription className='sr-only'>
             Visualización de estadísticas del programa académico {program.name}.
           </DialogDescription>
         </DialogHeader>

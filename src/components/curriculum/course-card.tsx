@@ -1,11 +1,11 @@
-import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { checkContrasts } from "@/utils/colors";
-import useInteractions from "@/hooks/use-interactions";
-import { memo, useRef } from "react";
-import { MotionDiv } from "../motion";
-import { ExtendedSlot } from "@/types/curriculum";
-import { animate, useMotionValue, useTransform } from "motion/react";
+import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
+import { checkContrasts } from '@/utils/colors';
+import useInteractions from '@/hooks/use-interactions';
+import { memo, useRef } from 'react';
+import { MotionDiv } from '../motion';
+import type { ExtendedSlot } from '@/types/curriculum';
+import { animate, useMotionValue, useTransform } from 'motion/react';
 
 type CourseCard = {
   index: number;
@@ -68,12 +68,12 @@ const CourseCard = memo(function CourseCard({
       {...handlers}
       variants={itemVariants}
       className={cn(
-        "bg-card clickeable text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border border-transparent py-6 shadow-sm transition-[filter] select-none",
-        hasLowBackgroundElementContrast && "border-foreground/50",
-        hasLowElementTextContrast && "text-background",
-        isSelected && "ring-2 ring-rose-500",
-        isNotRelated && "brightness-[25%]",
-        className,
+        'bg-card clickeable text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border border-transparent py-6 shadow-sm transition-[filter] select-none',
+        hasLowBackgroundElementContrast && 'border-foreground/50',
+        hasLowElementTextContrast && 'text-background',
+        isSelected && 'ring-2 ring-rose-500',
+        isNotRelated && 'brightness-[25%]',
+        className
       )}
       style={{
         backgroundColor: color,
@@ -92,8 +92,8 @@ const CourseCard = memo(function CourseCard({
       }}
       {...props}
     >
-      <CardContent className="flex h-full items-center justify-center p-2">
-        <h3 className="text-center text-xs font-medium text-balance">
+      <CardContent className='flex h-full items-center justify-center p-2'>
+        <h3 className='text-center text-xs font-medium text-balance'>
           {course?.name ?? `Slot ${index + 1}`}
         </h3>
       </CardContent>
