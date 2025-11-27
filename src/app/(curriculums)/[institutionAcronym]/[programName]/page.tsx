@@ -12,7 +12,13 @@ import { slugify } from '@/utils/strings';
 import ProgramModal from '@/components/curriculum/program-modal';
 
 export const dynamicParams = false;
-export async function generateStaticParams({ params }: InstitutionParams) {
+export async function generateStaticParams({
+  params,
+}: {
+  params: {
+    institutionAcronym: string;
+  };
+}) {
   const institutionPath = path.join(
     process.cwd(),
     'src',
@@ -33,13 +39,14 @@ export async function generateStaticParams({ params }: InstitutionParams) {
 }
 
 type ProgramParams = InstitutionParams & {
-  params: { programName: string };
+  params: Promise<{ programName: string }>;
 };
 
 export default async function ProgramPage({ params }: ProgramParams) {
+  const resolvedParams = await params;
   const data = await getProgramData({
-    institutionAcronym: params.institutionAcronym,
-    programSlug: params.programName,
+    institutionAcronym: resolvedParams.institutionAcronym,
+    programSlug: resolvedParams.programName,
   });
 
   if (!data) return <div>Error al cargar el programa</div>;

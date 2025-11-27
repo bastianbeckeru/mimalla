@@ -25,9 +25,9 @@ export async function generateStaticParams() {
 }
 
 export type InstitutionParams = {
-  params: {
+  params: Promise<{
     institutionAcronym: string;
-  };
+  }>;
 };
 
 export default function InstitutionLayout({
