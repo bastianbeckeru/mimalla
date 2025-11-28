@@ -1,12 +1,12 @@
-import {
+import type {
   CurriculumData,
   PeriodKey,
   Slot,
   Course,
   ExtendedSlot,
-} from "@/types/curriculum";
-import { getCourse, getCourseArea } from "./curriculum";
-import { calculateMedian } from "./numbers";
+} from '@/types/curriculum';
+import { getCourse, getCourseArea } from './curriculum';
+import { calculateMedian } from './numbers';
 
 export const GRID_CELL_WIDTH = 8;
 export const GRID_CELL_HEIGHT = 4;
@@ -49,7 +49,7 @@ export function getCurriculumGridData(data: CurriculumData) {
       y: position.y,
       w: course?.duration ?? 1,
       h: calculateHeight(),
-      color: area?.color ?? "#fafafa",
+      color: area?.color ?? '#fafafa',
       course: course ? { ...course, areaId: area?.id ?? null } : null,
     };
   });
@@ -94,12 +94,12 @@ function getPeriods({ slots }: { slots: Slot[] }): {
   periods: PeriodKey[];
 } {
   const uniquePeriods = new Set<PeriodKey>(
-    slots.map((s) => `${s.year}-${s.term}` as PeriodKey),
+    slots.map((s) => `${s.year}-${s.term}` as PeriodKey)
   );
 
   const sortedPeriods = Array.from(uniquePeriods).sort((a, b) => {
-    const [yearA, termA] = a.split("-").map(Number);
-    const [yearB, termB] = b.split("-").map(Number);
+    const [yearA, termA] = a.split('-').map(Number);
+    const [yearB, termB] = b.split('-').map(Number);
 
     return yearA! - yearB! || termA! - termB!;
   });

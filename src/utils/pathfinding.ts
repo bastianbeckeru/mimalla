@@ -1,10 +1,10 @@
-import { ExtendedSlot } from "@/types/curriculum";
+import type { ExtendedSlot } from '@/types/curriculum';
 import {
   FONTSIZE,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from "./curriculum-grid";
+} from './curriculum-grid';
 
 type Point = { row: number; col: number };
 type Card = {
@@ -36,7 +36,7 @@ const GAP_PX = GRID_GAP * FONTSIZE;
 export function createConnectionPaths(
   rows: number,
   cols: number,
-  cards: ExtendedSlot[],
+  cards: ExtendedSlot[]
 ): Path[] {
   const grid = createNavigationGrid(rows, cols, cards);
   const paths: Path[] = [];
@@ -51,13 +51,13 @@ export function createConnectionPaths(
       const relatedCard = cards.find(
         (slot) =>
           slot.courseId === id &&
-          ((slot.year === year && slot.term < term) || slot.year < year),
+          ((slot.year === year && slot.term < term) || slot.year < year)
       );
 
       if (!relatedCard) return;
 
-      const start = getCardEdgePoint(relatedCard, "right");
-      const end = getCardEdgePoint(card, "left");
+      const start = getCardEdgePoint(relatedCard, 'right');
+      const end = getCardEdgePoint(card, 'left');
       const path = findPath(grid, start, end);
 
       const fixedPath: Path = {
@@ -95,7 +95,7 @@ export function createConnectionPaths(
 function createNavigationGrid(
   rows: number,
   cols: number,
-  cards: Card[],
+  cards: Card[]
 ): NavigationGrid {
   const expandedRows = rows * 2 + 1;
   const expandedCols = cols * 2 + 1;
@@ -105,7 +105,7 @@ function createNavigationGrid(
       row,
       col,
       isOccupied: false,
-    })),
+    }))
   );
 
   // Marcar celdas ocupadas (bloquear todo el área de la card)
@@ -126,7 +126,7 @@ function createNavigationGrid(
 
 function getCardEdgePoint(
   card: Card,
-  side: "left" | "right" | "top" | "bottom",
+  side: 'left' | 'right' | 'top' | 'bottom'
 ): Point {
   const { colStart, colEnd, rowStart, rowEnd } = getCardGridPositions(card);
 
@@ -134,13 +134,13 @@ function getCardEdgePoint(
   const centerRow = rowStart + (rowEnd - rowStart) / 2;
 
   switch (side) {
-    case "left":
+    case 'left':
       return { col: colStart, row: centerRow };
-    case "right":
+    case 'right':
       return { col: colEnd, row: centerRow };
-    case "top":
+    case 'top':
       return { col: centerCol, row: rowStart };
-    case "bottom":
+    case 'bottom':
       return { col: centerCol, row: rowEnd };
   }
 }
@@ -206,7 +206,7 @@ function findPath(grid: NavigationGrid, start: Point, end: Point): Point[] {
       const f = g + h;
 
       const existingIndex = openSet.findIndex(
-        (n) => n.row === neighbor.row && n.col === neighbor.col,
+        (n) => n.row === neighbor.row && n.col === neighbor.col
       );
 
       if (existingIndex === -1) {
@@ -224,13 +224,13 @@ function findPath(grid: NavigationGrid, start: Point, end: Point): Point[] {
 }
 
 function pathToSVGPath(path: Point[]): string {
-  if (path.length === 0) return "";
+  if (path.length === 0) return '';
 
   const pixels = path.map(gridToPixel);
 
   return pixels
     .map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`))
-    .join(" ");
+    .join(' ');
 }
 
 // ============================================
@@ -300,18 +300,18 @@ function debugGrid(grid: NavigationGrid): string {
           const isColGap = cell.col % 2 === 1;
 
           let type;
-          if (!isRowGap && !isColGap) type = "corner";
-          else if (!isRowGap && isColGap) type = "horizontal";
-          else if (isRowGap && !isColGap) type = "vertical";
-          else type = "card";
+          if (!isRowGap && !isColGap) type = 'corner';
+          else if (!isRowGap && isColGap) type = 'horizontal';
+          else if (isRowGap && !isColGap) type = 'vertical';
+          else type = 'card';
 
-          if (cell.isOccupied) return "X";
-          if (type === "card") return "•";
-          if (type === "horizontal") return "─";
-          if (type === "vertical") return "│";
-          return "┼";
+          if (cell.isOccupied) return 'X';
+          if (type === 'card') return '•';
+          if (type === 'horizontal') return '─';
+          if (type === 'vertical') return '│';
+          return '┼';
         })
-        .join(""),
+        .join('')
     )
-    .join("\n");
+    .join('\n');
 }
