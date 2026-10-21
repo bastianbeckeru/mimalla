@@ -2,6 +2,11 @@
   "name": "mimalla",
   "version": "0.4.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bastianbeckeru/mimalla.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "next dev",

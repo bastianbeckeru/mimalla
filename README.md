@@ -1,8 +1,29 @@
 # [Mi Malla](https://mimalla.vercel.app)
 
-Web application for university students. Derived from a past project, UniCore.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/demo-mimalla.vercel.app-black)](https://mimalla.vercel.app)
 
-# Tecnologies and Dependencies
+Mi Malla is a web app that lets university students customize their curriculum ("malla curricular") and track their academic progress.
+
+It is the successor of UniCore, an earlier project by the same author.
+
+## Features
+
+- **See prerequisites:** view the prerequisites of every course in your curriculum.
+- **Set your own pace:** drag and drop courses between terms to fit your time and needs.
+- **Track your progress:** mark courses as passed and follow your overall progress.
+- **Start from an official curriculum:** import an official program curriculum and customize it.
+- **Local first:** your data stays in your browser's local storage. No account is needed.
+
+### Available programs
+
+| Institution | Programs |
+| --- | --- |
+| Universidad Diego Portales (UDP) | Derecho, Ingeniería Civil (Plan Común, Industrial, Informática y Telecomunicaciones, Obras Civiles), Obstetricia y Neonatología, Psicología |
+
+Is your program missing? See [Adding a curriculum](CONTRIBUTING.md#adding-a-curriculum).
+
+## Tech stack
 
 - [Bun](https://bun.sh)
 - [Next.js](https://nextjs.org)
@@ -14,75 +35,54 @@ Web application for university students. Derived from a past project, UniCore.
 - [Vercel Analytics](https://vercel.com/docs/analytics)
 - [Biome](https://biomejs.dev)
 
-# Development
+## Getting started
 
-```
+Prerequisites: [Bun](https://bun.sh) 1.x. Mi Malla needs no environment variables or external services.
+
+```sh
+git clone https://github.com/bastianbeckeru/mimalla.git
+cd mimalla
 bun install
 bun run dev
 ```
 
-`bun run verify` runs `lint` and `typecheck`; `bun run lint:write` applies Biome fixes. See `CODING_STANDARDS.md`.
+Then open [http://localhost:3000](http://localhost:3000).
 
-# Git Commits Messages Style and Versioning
+### Scripts
 
-## [Versioning](https://semver.org/)
+| Command | Description |
+| --- | --- |
+| `bun run dev` | Start the development server |
+| `bun run build` | Build for production |
+| `bun run start` | Serve the production build |
+| `bun run lint` | Check formatting and lint rules with Biome |
+| `bun run lint:write` | Apply Biome fixes |
+| `bun run typecheck` | Type-check the project |
+| `bun run verify` | Run `lint` and `typecheck` |
 
-```
-MAJOR.MINOR.PATCH
-```
-
-- `release:` Publish to production (equivalent to a MAJOR).
-- `feat:` Add a new feature (equivalent to a MINOR).
-- `fix:` Fix a bug (equivalent to a PATCH).
-
-Don't forget to change the version in `package.json`
-
-## [Git Commits Messages Style](https://gist.github.com/rishavpandey43/84665ffe3cea76400d8e5a1ad7133a79)
+## Project structure
 
 ```
-[:<Emoji>: ][<Type>[(<Scope>)]: ]<Subject>
+src/
+├── app/            Next.js routes: (marketing) landing page and (dashboard) app
+├── components/
+│   ├── curriculum/ Curriculum grid, course cards and prerequisite paths
+│   ├── dashboard/  Sidebar, dialogs and forms of the dashboard
+│   └── ui/         shadcn/ui components
+├── hooks/          Shared React hooks
+├── server/db/      Institution list and curriculum JSON files
+├── stores/         Zustand stores persisted to local storage
+├── styles/         Global and curriculum styles
+├── types/          Shared types
+└── utils/          Shared helpers
 ```
 
-### Common Commits
+## Contributing
 
-```
-git commit -m ":confetti_ball: release:"
-```
+Contributions are welcome! Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [coding standards](CODING_STANDARDS.md) before opening a pull request.
 
-```
-git commit -m ":star: feat:"
-```
+Questions or ideas? Join the [Discord](https://discord.gg/wez3cJDzXk) or [open an issue](https://github.com/bastianbeckeru/mimalla/issues).
 
-```
-git commit -m ":bug: fix:"
-```
+## License
 
-```
-git commit -m ":rotating_light: refactor:"
-```
-
-```
-git commit -m ":lipstick: style:"
-```
-
-```
-git commit -m ":chart_with_upwards_trend: perf:"
-```
-
-```
-git commit -m ":wrench: chore:"
-```
-
-```
-git commit -m ":pencil: docs:"
-```
-
-# Proyect Structure
-
-## App
-
-## Components
-
-## Server
-
-## Stores
+Mi Malla is released under the [MIT License](LICENSE).
