@@ -4,17 +4,24 @@ Web application for university students. Derived from a past project, UniCore.
 
 # Tecnologies and Dependencies
 
-- [T3 Stack](https://create.t3.gg/)
+- [Bun](https://bun.sh)
+- [Next.js](https://nextjs.org)
+- [Tailwind CSS](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com/) on [Base UI](https://base-ui.com)
+- [Motion](https://motion.dev)
+- [@hello-pangea/dnd](https://github.com/hello-pangea/dnd)
+- [Zustand](https://zustand.docs.pmnd.rs)
+- [Vercel Analytics](https://vercel.com/docs/analytics)
+- [Biome](https://biomejs.dev)
 
-  - [Next.js](https://nextjs.org)
-  - [NextAuth.js](https://next-auth.js.org)
-  - [Prisma](https://prisma.io)
-  - [tRPC](https://trpc.io)
-  - [Tailwind CSS](https://tailwindcss.com)
+# Development
 
-- [shadcn UI](https://ui.shadcn.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [React Beautiful DnD](https://github.com/atlassian/react-beautiful-dnd)
+```
+bun install
+bun run dev
+```
+
+`bun run verify` runs `lint` and `typecheck`; `bun run lint:write` applies Biome fixes. See `CODING_STANDARDS.md`.
 
 # Git Commits Messages Style and Versioning
 
@@ -28,7 +35,7 @@ MAJOR.MINOR.PATCH
 - `feat:` Add a new feature (equivalent to a MINOR).
 - `fix:` Fix a bug (equivalent to a PATCH).
 
-Don't forget to change the version of `package-lock.json` and `package.json`
+Don't forget to change the version in `package.json`
 
 ## [Git Commits Messages Style](https://gist.github.com/rishavpandey43/84665ffe3cea76400d8e5a1ad7133a79)
 
@@ -71,8 +78,6 @@ git commit -m ":pencil: docs:"
 ```
 
 # Proyect Structure
-
-## Prisma
 
 ## App
 

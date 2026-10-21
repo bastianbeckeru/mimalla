@@ -2,6 +2,7 @@ import type { SVGProps } from "react";
 
 const DiscordIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
+    aria-hidden="true"
     width="24"
     height="24"
     fill="none"

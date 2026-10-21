@@ -1,22 +1,24 @@
-'use client';
+"use client";
 
-import { useCallback, useState } from 'react';
-import { cn } from '@/lib/utils';
-import type { CurriculumData, ExtendedSlot } from '@/types/curriculum';
-import ScrollAreaWrapper from '../scroll-area-wrapper';
-import { arabicToRoman } from '@/utils/numbers';
+import { cn } from "cn";
+import { useCallback, useState } from "react";
+import CourseCard from "@/components/curriculum/course-card";
+import CourseModal from "@/components/curriculum/course-modal";
+import PathsOverlay, {
+  type PathData,
+} from "@/components/curriculum/paths-overlay";
+import { MotionDiv } from "@/components/motion";
+import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
+import type { CurriculumData, ExtendedSlot } from "@/types/curriculum";
 import {
-  getCurriculumGridData,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
+  getCurriculumGridData,
   PADDING,
-} from '@/utils/curriculum-grid';
-import PathsOverlay, { type PathData } from './paths-overlay';
-import CourseModal from './course-modal';
-import CourseCard from './course-card';
-import { MotionDiv } from '../motion';
-import { createConnectionPaths } from '@/utils/pathfinding';
+} from "@/utils/curriculum-grid";
+import { arabicToRoman } from "@/utils/numbers";
+import { createConnectionPaths } from "@/utils/pathfinding";
 
 type CurriculumViewProps = {
   data: CurriculumData;
@@ -50,7 +52,7 @@ export default function CurriculumView({
         return;
       }
 
-      if (!newSlot || !newSlot.course || modal?.isOpen) return;
+      if (!newSlot?.course || modal?.isOpen) return;
 
       setFocusedSlot({
         slot: newSlot,
@@ -58,16 +60,16 @@ export default function CurriculumView({
           .filter(
             (p) =>
               p.originCardId === String(newSlot.id) ||
-              p.destinationCardId === String(newSlot.id)
+              p.destinationCardId === String(newSlot.id),
           )
           .map((p) => ({
             ...p,
             color:
-              p.originCardId === String(newSlot.id) ? '#34d399' : '#f87171',
+              p.originCardId === String(newSlot.id) ? "#34d399" : "#f87171",
           })),
       });
     },
-    [focusedSlot, slots, periods]
+    [paths.filter, modal?.isOpen],
   );
 
   const handleClickCard = useCallback(
@@ -79,8 +81,8 @@ export default function CurriculumView({
       if (focusedSlot) {
         const connectedCourseIds = [
           focusedSlot.slot.courseId,
-          ...focusedSlot.slot.course!.prerequisiteIds,
-          ...focusedSlot.slot.course!.subsequentIds,
+          ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
+          ...(focusedSlot.slot.course?.subsequentIds ?? []),
         ];
 
         if (!connectedCourseIds.includes(course.id)) {
@@ -94,7 +96,7 @@ export default function CurriculumView({
         slot: newSlot,
       });
     },
-    [focusedSlot]
+    [focusedSlot],
   );
 
   const containerVariants = {
@@ -109,27 +111,25 @@ export default function CurriculumView({
   return (
     <>
       <ScrollAreaWrapper className={cn(className)}>
-        <section aria-label='Malla curricular' className='p-2 pb-4'>
+        <section aria-label="Malla curricular" className="p-2 pb-4">
           <div
-            className='flex flex-row gap-2'
+            className="flex flex-row gap-2"
             style={{
               paddingLeft: `${PADDING}rem`,
               paddingRight: `${PADDING}rem`,
             }}
           >
             {periods.map((pKey, pIndex) => {
-              //const [year, term] = pKey.split("-").map(Number);
-
               return (
                 <div
                   key={pKey}
-                  className='relative flex h-7 justify-center rounded-md p-2'
+                  className="relative flex h-7 justify-center rounded-md p-2"
                   style={{
                     width: `${GRID_CELL_WIDTH}rem`,
                   }}
                 >
                   <span
-                    className={`text-muted-foreground w-full text-center text-xs font-bold tracking-wider`}
+                    className={`w-full text-center font-bold text-muted-foreground text-xs tracking-wider`}
                   >
                     SEMESTRE {arabicToRoman(pIndex + 1)}
                   </span>
@@ -140,42 +140,33 @@ export default function CurriculumView({
 
           <MotionDiv
             variants={containerVariants}
-            initial='hidden'
-            animate='visible'
+            initial="hidden"
+            animate="visible"
             style={{
-              display: 'grid',
+              display: "grid",
               gridTemplateColumns: `repeat(${nCols}, ${GRID_CELL_WIDTH}rem)`,
               gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
               gap: `${GRID_GAP}rem`,
               padding: `${PADDING}rem`,
             }}
-            className='relative select-none'
+            className="relative select-none"
             onClick={(e) => {
               if (focusedSlot && e.target === e.currentTarget)
                 setFocusedSlot(null);
             }}
           >
-            <div
-              role='group'
-              aria-labelledby='sem-test'
-              style={{
-                display: 'contents',
-              }}
-            >
-              <h3 id='sem-test' className='sr-only'>
-                test container
-              </h3>
+            <div className="contents">
               {slots.map((slot, sIndex) => {
                 const slotId = `${slot.year}-${slot.term}-${slot.position}`; // TEMPORARY UNTIL DB
                 const focusedSlotId = focusedSlot
                   ? `${focusedSlot.slot.year}-${focusedSlot.slot.term}-${focusedSlot.slot.position}`
-                  : ''; // TEMPORARY UNTIL DB
+                  : ""; // TEMPORARY UNTIL DB
 
                 const connectedCourseIds = focusedSlot
                   ? [
                       focusedSlot.slot.courseId,
-                      ...focusedSlot.slot.course!.prerequisiteIds,
-                      ...focusedSlot.slot.course!.subsequentIds,
+                      ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
+                      ...(focusedSlot.slot.course?.subsequentIds ?? []),
                     ]
                   : [];
 
@@ -207,7 +198,7 @@ export default function CurriculumView({
       <CourseModal
         open={!!modal && modal.isOpen}
         onOpenChange={() => setModal(null)}
-        slot={modal && modal.slot}
+        slot={modal?.slot ?? null}
         courses={courses}
       />
     </>

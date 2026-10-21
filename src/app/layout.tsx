@@ -1,13 +1,18 @@
 import "@/styles/globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
+import { cn } from "cn";
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
-
-import { TRPCReactProvider } from "@/trpc/react";
-
-import { cn } from "@/lib/utils";
+import { Inter, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+
+const montserratHeading = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   creator: "Jnkyns",
@@ -34,20 +39,16 @@ export const metadata: Metadata = {
   },
 };
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700", "800"], // base, medium, semi-bold, bold, extra-bold
-  display: "swap",
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body className={cn("font-sans", montserrat.className)}>
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className={cn("font-sans", inter.variable, montserratHeading.variable)}
+    >
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -55,9 +56,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          {children}
           <Toaster />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

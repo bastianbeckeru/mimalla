@@ -1,35 +1,29 @@
 "use client";
 
-import { type Dispatch, type SetStateAction, useState } from "react";
-import type {
-  CurriculumData,
-  History,
-  ExtendedCourse,
-  PeriodKey,
-  PeriodWithEnrollments,
-  Area,
-  Course,
-} from "@/types/curriculum";
-import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
-
-import { getCourse, getCourseArea } from "@/utils/curriculum";
-import SlotCard from "./slot-card";
-import PeriodContainer from "./period-container";
-
 import {
   DragDropContext,
   Draggable,
   Droppable,
   type DropResult,
 } from "@hello-pangea/dnd";
-
-import { MotionDiv } from "@/components/motion";
-import CourseDialog from "../course-dialog";
-import { toast } from "sonner";
+import { cn } from "cn";
 import { Check, Clock, Plus, Save, Trash, Undo2, X } from "lucide-react";
-import useShortcuts from "@/hooks/use-shortcut";
-import { cn } from "@/lib/utils";
 import { nanoid } from "nanoid";
+import { type Dispatch, type SetStateAction, useState } from "react";
+import { toast } from "sonner";
+import AddPeriodDialog from "@/components/dashboard/add-period-dialog";
+import CourseDialog from "@/components/dashboard/course-dialog";
+import PeriodContainer from "@/components/dashboard/rbdnd/period-container";
+import SlotCard from "@/components/dashboard/rbdnd/slot-card";
+import { MotionDiv } from "@/components/motion";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import {
   Dialog,
   DialogClose,
@@ -38,7 +32,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -46,16 +39,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AddPeriodDialog from "../add-period-dialog";
+import useShortcuts from "@/hooks/use-shortcut";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import { useSettingsStore } from "@/stores/settings";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+import type {
+  Area,
+  Course,
+  ExtendedCourse,
+  History,
+  PeriodKey,
+  PeriodWithEnrollments,
+} from "@/types/curriculum";
+import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import { getCourse, getCourseArea } from "@/utils/curriculum";
+import { comparePeriodKeys, parsePeriodKey } from "@/utils/period-key";
 
 type RBDndCurriculum = {
   editMode: boolean;
@@ -97,7 +94,7 @@ export default function RBDndCurriculum({
   approvedCredits,
   handleSaveChanges,
 }: RBDndCurriculum) {
-  const { showTimeline, autoRescheduleFailed } = useSettingsStore();
+  const { showTimeline } = useSettingsStore();
   const { curriculums, activeCurriculumId } = useNewCurriculumStore();
   const [activeEnrollment, setActiveEnrollment] = useState<
     | (EnrolledCourse & {
@@ -132,7 +129,6 @@ export default function RBDndCurriculum({
       (failedCourseIds.includes(c.id) && !approvedCourseIds.includes(c.id)) ||
       c.isElective,
   );
-  //const coursesAllowedToAdd = Array.from(courses.values());
 
   const years = countYearOccurrences(history.present);
   const enrolledYear =
@@ -154,7 +150,7 @@ export default function RBDndCurriculum({
         onDragEnd={handleOnDragEnd}
       >
         {showTimeline && (
-          <div className="flex flex-row space-x-2 px-4 pt-4 select-none">
+          <div className="flex select-none flex-row space-x-2 px-4 pt-4">
             {years.map(({ year, count }) => (
               <div
                 key={year}
@@ -165,14 +161,14 @@ export default function RBDndCurriculum({
                   count === 4 && "w-[33.5rem]",
                 )}
               >
-                <div className="bg-muted-foreground/50 h-px flex-grow"></div>
+                <div className="h-px flex-grow bg-muted-foreground/50"></div>
                 <span
                   key={year}
-                  className="text-muted-foreground/50 px-2 text-center text-xs font-bold tracking-wider"
+                  className="px-2 text-center font-bold text-muted-foreground/50 text-xs tracking-wider"
                 >
                   {Number(year)}
                 </span>
-                <div className="bg-muted-foreground/50 h-px flex-grow"></div>
+                <div className="h-px flex-grow bg-muted-foreground/50"></div>
               </div>
             ))}
           </div>
@@ -187,7 +183,7 @@ export default function RBDndCurriculum({
             !showTimeline && "pt-4",
           )}
         >
-          {history.present.map((period, pIndex) => (
+          {history.present.map((period) => (
             <Droppable droppableId={period.id} key={period.id}>
               {(provided) => (
                 <PeriodContainer
@@ -224,77 +220,81 @@ export default function RBDndCurriculum({
                             ref={provided.innerRef}
                             className="mb-2 h-16 w-32 overflow-hidden rounded-md"
                           >
-                            <ContextMenu>
-                              <ContextMenuTrigger asChild disabled={!editMode}>
-                                <SlotCard
-                                  className={cn(
-                                    "size-full",
-                                    editMode && "cursor-grab",
-                                    snapshot.isDragging && "shadow-2xl",
-                                  )}
-                                  enrollment={enrollment}
-                                  course={course}
-                                  color={color}
-                                  isAvailable={isAvailable}
-                                  onClick={() => {
-                                    if (snapshot.isDragging) return;
+                            <ContextMenu disabled={!editMode}>
+                              <ContextMenuTrigger
+                                render={
+                                  <SlotCard
+                                    className={cn(
+                                      "size-full",
+                                      editMode && "cursor-grab",
+                                      snapshot.isDragging && "shadow-2xl",
+                                    )}
+                                    enrollment={enrollment}
+                                    course={course}
+                                    color={color}
+                                    isAvailable={isAvailable}
+                                    onClick={() => {
+                                      if (snapshot.isDragging) return;
 
-                                    if (!editMode) {
-                                      setActiveEnrollment({
-                                        ...enrollment,
-                                        course: course,
-                                        color: color,
-                                      });
+                                      if (!editMode) {
+                                        setActiveEnrollment({
+                                          ...enrollment,
+                                          course: course,
+                                          color: color,
+                                        });
 
-                                      setOpenDialogId("course-info");
-                                    } else {
-                                      if (!isAvailable) return;
-
-                                      const newStatus =
-                                        statusTransitions[enrollment.status];
-                                      let updatedPeriods = [...history.present];
-
-                                      // 1. APPROVED: Change the status of the enrollment
-                                      // 2. PENDING: Revert the status of the enrollment and related enrollments
-                                      // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
-                                      if (newStatus === "APPROVED") {
-                                        updatedPeriods =
-                                          updateCourseEnrollmentStatus({
-                                            periods: history.present,
-                                            periodId: period.id,
-                                            enrollmentId: enrollment.id,
-                                            newStatus: "APPROVED",
-                                          });
+                                        setOpenDialogId("course-info");
                                       } else {
-                                        updatedPeriods =
-                                          updateCourseEnrollmentStatusWithRevert(
-                                            {
-                                              periods: history.present,
-                                              courses: courses,
-                                              approvedCourseIds:
-                                                approvedCourseIds,
-                                              enrollmentId: enrollment.id,
-                                              enrollmentCourseId:
-                                                enrollment.courseId,
-                                              newStatus: "PENDING",
-                                            },
-                                          );
-                                      }
+                                        if (!isAvailable) return;
 
-                                      setHistory((prev) => {
-                                        return {
-                                          past: [
-                                            ...prev.past,
-                                            prev.present,
-                                          ].slice(-MAX_HISTORY),
-                                          present: updatedPeriods,
-                                          future: [],
-                                        };
-                                      });
-                                    }
-                                  }}
-                                />
-                              </ContextMenuTrigger>
+                                        const newStatus =
+                                          statusTransitions[enrollment.status];
+                                        let updatedPeriods = [
+                                          ...history.present,
+                                        ];
+
+                                        // 1. APPROVED: Change the status of the enrollment
+                                        // 2. PENDING: Revert the status of the enrollment and related enrollments
+                                        // 3. FAILED: Change the status of the enrollment and related enrollments + LOGIC
+                                        if (newStatus === "APPROVED") {
+                                          updatedPeriods =
+                                            updateCourseEnrollmentStatus({
+                                              periods: history.present,
+                                              periodId: period.id,
+                                              enrollmentId: enrollment.id,
+                                              newStatus: "APPROVED",
+                                            });
+                                        } else {
+                                          updatedPeriods =
+                                            updateCourseEnrollmentStatusWithRevert(
+                                              {
+                                                periods: history.present,
+                                                courses: courses,
+                                                approvedCourseIds:
+                                                  approvedCourseIds,
+                                                enrollmentId: enrollment.id,
+                                                enrollmentCourseId:
+                                                  enrollment.courseId,
+                                                newStatus: "PENDING",
+                                              },
+                                            );
+                                        }
+
+                                        setHistory((prev) => {
+                                          return {
+                                            past: [
+                                              ...prev.past,
+                                              prev.present,
+                                            ].slice(-MAX_HISTORY),
+                                            present: updatedPeriods,
+                                            future: [],
+                                          };
+                                        });
+                                      }
+                                    }}
+                                  />
+                                }
+                              />
                               <ContextMenuContent className="w-52">
                                 <ContextMenuItem
                                   disabled={enrollment.status === "APPROVED"}
@@ -413,9 +413,10 @@ export default function RBDndCurriculum({
                   {provided.placeholder}
 
                   <button
+                    type="button"
                     className={cn(
                       buttonVariants({ variant: "ghost" }),
-                      "text-muted-foreground hidden h-16 w-full rounded-md border",
+                      "hidden h-16 w-full rounded-md border text-muted-foreground",
                       editMode && "flex",
                     )}
                     onClick={() => {
@@ -431,9 +432,10 @@ export default function RBDndCurriculum({
           ))}
 
           <button
+            type="button"
             className={cn(
               buttonVariants({ variant: "ghost" }),
-              "text-muted-foreground hidden h-auto w-32 rounded-md border",
+              "hidden h-auto w-32 rounded-md border text-muted-foreground",
               editMode && "flex",
             )}
             onClick={() => setOpenDialogId("add-period")}
@@ -444,7 +446,7 @@ export default function RBDndCurriculum({
 
         {editMode && (
           <div className="absolute right-0 bottom-0 mb-1 w-full p-2 md:right-3 md:bottom-3 md:mb-0 md:size-fit md:p-0">
-            <div className="bg-muted/75 flex size-full items-center justify-between rounded-md p-2 md:p-0">
+            <div className="flex size-full items-center justify-between rounded-md bg-muted/75 p-2 md:p-0">
               {/* SAVE */}
               <Button
                 aria-label="Save Changes"
@@ -518,28 +520,32 @@ export default function RBDndCurriculum({
             {selectedPeriodId && (
               <dl>
                 <div className="flex flex-row gap-2">
-                  <dt className="text-muted-foreground font-medium">Año:</dt>
-                  <dd className="text-foreground flex-1">
-                    {selectedPeriodId.split("-").map(Number)[0]!}
+                  <dt className="font-medium text-muted-foreground">Año:</dt>
+                  <dd className="flex-1 text-foreground">
+                    {parsePeriodKey(selectedPeriodId).year}
                   </dd>
                 </div>
                 <div className="flex flex-row gap-2">
-                  <dt className="text-muted-foreground font-medium">
+                  <dt className="font-medium text-muted-foreground">
                     Periodo:
                   </dt>
-                  <dd className="text-foreground flex-1">
-                    {periodNames[selectedPeriodId.split("-").map(Number)[1]!]}
+                  <dd className="flex-1 text-foreground">
+                    {periodNames[parsePeriodKey(selectedPeriodId).term]}
                   </dd>
                 </div>
               </dl>
             )}
 
             <div className="flex flex-row items-center gap-2">
-              <h3 className="text-muted-foreground font-medium">Curso:</h3>
+              <h3 className="font-medium text-muted-foreground">Curso:</h3>
               <Select
-                value={selectedCourseId ? String(selectedCourseId) : ""}
-                onValueChange={(value) => {
-                  setSelectedCourseId(Number(value));
+                items={coursesAllowedToAdd.map((c) => ({
+                  value: Number(c.id),
+                  label: c.name,
+                }))}
+                value={selectedCourseId}
+                onValueChange={(value: number | null) => {
+                  setSelectedCourseId(value);
                 }}
               >
                 <SelectTrigger id="courseId" className="w-96">
@@ -547,7 +553,7 @@ export default function RBDndCurriculum({
                 </SelectTrigger>
                 <SelectContent className="w-96">
                   {coursesAllowedToAdd.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
+                    <SelectItem key={c.id} value={Number(c.id)}>
                       {c.name}
                     </SelectItem>
                   ))}
@@ -557,36 +563,36 @@ export default function RBDndCurriculum({
           </div>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="ghost">
-                Cancelar
-              </Button>
+            <DialogClose render={<Button type="button" variant="ghost" />}>
+              Cancelar
             </DialogClose>
-            <DialogClose asChild>
-              <Button
-                onClick={() => {
-                  if (!selectedPeriodId || !selectedCourseId) return;
+            <DialogClose
+              render={
+                <Button
+                  onClick={() => {
+                    if (!selectedPeriodId || !selectedCourseId) return;
 
-                  const [year, term] = selectedPeriodId.split("-").map(Number);
+                    const { year, term } = parsePeriodKey(selectedPeriodId);
 
-                  const newPresent = handleAddEnrollment({
-                    periods: history.present,
-                    courseId: selectedCourseId,
-                    year: year!,
-                    term: term!,
-                  });
+                    const newPresent = handleAddEnrollment({
+                      periods: history.present,
+                      courseId: selectedCourseId,
+                      year,
+                      term,
+                    });
 
-                  setHistory((prev) => {
-                    return {
-                      past: [...prev.past, prev.present].slice(-MAX_HISTORY),
-                      present: newPresent,
-                      future: [],
-                    };
-                  });
-                }}
-              >
-                Añadir
-              </Button>
+                    setHistory((prev) => {
+                      return {
+                        past: [...prev.past, prev.present].slice(-MAX_HISTORY),
+                        present: newPresent,
+                        future: [],
+                      };
+                    });
+                  }}
+                />
+              }
+            >
+              Añadir
             </DialogClose>
           </DialogFooter>
         </DialogContent>
@@ -618,11 +624,9 @@ export default function RBDndCurriculum({
 
           updatedData.push(newPeriod);
 
-          const updatedSortedData = updatedData.sort((a, b) => {
-            const [yearA, termA] = a.id.split("-").map(Number);
-            const [yearB, termB] = b.id.split("-").map(Number);
-            return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
-          });
+          const updatedSortedData = updatedData.sort((a, b) =>
+            comparePeriodKeys(a.id, b.id),
+          );
 
           setHistory((prev) => {
             return {
@@ -661,10 +665,10 @@ export default function RBDndCurriculum({
         return p;
       }
 
-      const course = courses.get(courseId)!;
+      const course = courses.get(courseId);
       if (
         p.enrollments.some((e) => e.courseId === courseId) &&
-        !course.isElective
+        !course?.isElective
       ) {
         toast("❌ Curso duplicado", {
           description: "No puedes añadir un curso que ya está en el periodo.",
@@ -691,9 +695,9 @@ export default function RBDndCurriculum({
   function undo() {
     const { past, present, future } = history;
 
-    if (past.length === 0 || !present) return;
+    const previous = past.at(-1);
+    if (!previous || !present) return;
 
-    const previous = past[past.length - 1]!;
     const newPast = past.slice(0, -1);
 
     setHistory({
@@ -706,9 +710,9 @@ export default function RBDndCurriculum({
   function redo() {
     const { past, present, future } = history;
 
-    if (future.length === 0 || !present) return;
+    const next = future[0];
+    if (!next || !present) return;
 
-    const next = future[0]!;
     const newFuture = future.slice(1);
 
     setHistory({
@@ -768,7 +772,8 @@ export default function RBDndCurriculum({
       return;
     }
     //
-    const sourceEnrollment = sourceContainer.enrollments[source.index]!;
+    const sourceEnrollment = sourceContainer.enrollments[source.index];
+    if (!sourceEnrollment) return;
     const sourceCourse = getCourse({
       id: sourceEnrollment.courseId,
       courses,
@@ -812,66 +817,10 @@ export default function RBDndCurriculum({
       };
     });
   }
-
-  function moveSubsequentCourses(
-    periods: PeriodWithEnrollments[],
-    courseId: number,
-  ) {
-    const newPeriods = [...periods];
-
-    function loop(courseId: number) {
-      const c = getCourse({
-        id: courseId,
-        courses,
-      });
-      if (!c) return;
-
-      // For each subsequent course, move it to the next period
-      // only if the previous course moved was a prerequisite and is in the same period
-      c.subsequentIds.forEach((id) => {
-        const periodIndex = newPeriods.findIndex((p) =>
-          p.enrollments.some((e) => e.courseId === id),
-        );
-
-        if (periodIndex === -1) return;
-
-        const sourcePeriod = newPeriods[periodIndex];
-        const destinationPeriod = newPeriods[periodIndex + 1];
-
-        if (!sourcePeriod || !destinationPeriod) return;
-
-        const hasSourceContainerRelatedCourses = sourcePeriod.enrollments.some(
-          (e) => c.subsequentIds.includes(e.courseId),
-        );
-
-        if (!hasSourceContainerRelatedCourses) return;
-
-        const sourceIndex = sourcePeriod.enrollments.findIndex(
-          (e) => e.courseId === id,
-        );
-        const destinationIndex = destinationPeriod.enrollments.length;
-
-        const { newSourceContainer, newDestinationContainer } = reorder(
-          sourcePeriod,
-          destinationPeriod,
-          sourceIndex,
-          destinationIndex,
-        );
-
-        newPeriods[periodIndex] = newSourceContainer;
-        newPeriods[periodIndex + 1] = newDestinationContainer;
-
-        loop(id);
-      });
-    }
-
-    loop(courseId);
-    return newPeriods;
-  }
 }
 
 function updatePositions(container: PeriodWithEnrollments) {
-  const [newYear, newTerm] = container.id.split("-").map(Number);
+  const { year, term } = parsePeriodKey(container.id);
 
   return {
     ...container,
@@ -879,8 +828,8 @@ function updatePositions(container: PeriodWithEnrollments) {
       return {
         ...slot,
         position: index + 1,
-        year: newYear!,
-        term: newTerm!,
+        year,
+        term,
       };
     }),
   };
@@ -903,10 +852,13 @@ function reorder(
     enrollments: [...destinationContainer.enrollments],
   };
 
-  const movedEnrollment = newSourceContainer.enrollments.splice(
+  const [movedEnrollment] = newSourceContainer.enrollments.splice(
     sourceIndex,
     1,
-  )[0]!;
+  );
+  if (!movedEnrollment) {
+    return { newSourceContainer, newDestinationContainer };
+  }
 
   if (isSameContainer) {
     newSourceContainer.enrollments.splice(destinationIndex, 0, movedEnrollment);
@@ -947,7 +899,8 @@ function isValidMove(
   )
     return { isValid: true };
 
-  const destinationContainer = currentPeriods[destinationContainerIndex]!;
+  const destinationContainer = currentPeriods[destinationContainerIndex];
+  if (!destinationContainer) return { isValid: true };
 
   const hasContainerSameCourse = destinationContainer.enrollments.some(
     (c) => c.courseId === course.id,
@@ -999,7 +952,7 @@ function isValidMove(
 
 function countYearOccurrences(periods: PeriodWithEnrollments[]) {
   // Extract years from ids
-  const years = periods.map((p) => p.id.split("-")[0]!);
+  const years = periods.map((p) => String(parsePeriodKey(p.id).year));
 
   // Count occurrences of each year
   const yearCounts = years.reduce<Record<string, number>>((acc, year) => {

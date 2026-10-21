@@ -1,15 +1,8 @@
 "use client";
 
-import type {
-  CurriculumData,
-  History,
-  PeriodWithEnrollments,
-} from "@/types/curriculum";
-
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { getLuminance, parseHexColor } from "@/utils/colors";
-import Logo from "../Logo";
-
+import { RotateCcw, Trash } from "lucide-react";
+import Logo from "@/components/Logo";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -19,7 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import {
   Sidebar,
   SidebarContent,
@@ -32,10 +26,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-} from "../ui/sidebar";
-import { Button } from "../ui/button";
-import { Progress } from "../ui/progress";
-import { Pencil, PencilOff, RotateCcw, Trash } from "lucide-react";
+} from "@/components/ui/sidebar";
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import type {
+  CurriculumData,
+  History,
+  PeriodWithEnrollments,
+} from "@/types/curriculum";
+import { getLuminance, parseHexColor } from "@/utils/colors";
 
 type DashboardSidebar = {
   editMode: boolean;
@@ -75,11 +73,9 @@ export default function DashboardSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              asChild
+              render={<Logo alwaysShow />}
               className="group-data-[collapsible=icon]:!p-1 [&>svg]:size-6"
-            >
-              <Logo alwaysShow />
-            </SidebarMenuButton>
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -108,9 +104,9 @@ export default function DashboardSidebar({
           <SidebarGroup>
             <SidebarGroupLabel>Áreas de Formación</SidebarGroupLabel>
             <SidebarGroupContent>
-              {fixedAreas.map((area, aIndex) => (
+              {fixedAreas.map((area) => (
                 <li
-                  key={aIndex}
+                  key={area.id}
                   className="flex w-full flex-row items-center space-x-2"
                 >
                   <div
@@ -131,22 +127,23 @@ export default function DashboardSidebar({
         <a
           href="https://forms.gle/Qm43RjotQ38VGhTq7"
           target="_blank"
-          className="text-muted-foreground hover:text-foreground my-4 hidden w-full text-center text-sm underline transition-colors duration-200"
+          className="my-4 hidden w-full text-center text-muted-foreground text-sm underline transition-colors duration-200 hover:text-foreground"
+          rel="noopener"
         >
           ¡Ayudanos a mejorar!
         </a>
 
-        <Button variant="outlineDestructive" className="w-full">
+        <Button variant="destructive" className="w-full">
           <RotateCcw />
           Reiniciar malla
         </Button>
 
         <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outlineDestructive" className="w-full">
-              <Trash />
-              Eliminar malla
-            </Button>
+          <DialogTrigger
+            render={<Button variant="destructive" className="w-full" />}
+          >
+            <Trash />
+            Eliminar malla
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -156,23 +153,23 @@ export default function DashboardSidebar({
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="ghost">
-                  Cancelar
-                </Button>
+              <DialogClose render={<Button type="button" variant="ghost" />}>
+                Cancelar
               </DialogClose>
-              <DialogClose asChild>
-                <Button
-                  variant="destructive"
-                  type="submit"
-                  onClick={() => {
-                    resetStore();
-                    setHistory({ past: [], present: [], future: [] });
-                    setEditMode(false);
-                  }}
-                >
-                  Aceptar
-                </Button>
+              <DialogClose
+                render={
+                  <Button
+                    variant="destructive"
+                    type="submit"
+                    onClick={() => {
+                      resetStore();
+                      setHistory({ past: [], present: [], future: [] });
+                      setEditMode(false);
+                    }}
+                  />
+                }
+              >
+                Aceptar
               </DialogClose>
             </DialogFooter>
           </DialogContent>

@@ -1,23 +1,22 @@
 import type {
   CurriculumData,
+  ExtendedSlot,
   PeriodKey,
   Slot,
-  Course,
-  ExtendedSlot,
-} from '@/types/curriculum';
-import { getCourse, getCourseArea } from './curriculum';
-import { calculateMedian } from './numbers';
+} from "@/types/curriculum";
+import { getCourse, getCourseArea } from "@/utils/curriculum";
+import { calculateMedian } from "@/utils/numbers";
+import { comparePeriodKeys } from "@/utils/period-key";
 
 export const GRID_CELL_WIDTH = 8;
 export const GRID_CELL_HEIGHT = 4;
 export const GRID_GAP = 0.5;
-export const GRID_MARGIN = 0.25;
 export const PADDING = 0.5;
 export const FONTSIZE = 16; // px
 
 // COURSE FUNCTIONS
-export function getPosition(periods: PeriodKey[], slot: Slot) {
-  const x = periods.findIndex((pKey) => pKey === `${slot.year}-${slot.term}`); // Start from 0
+function getPosition(periods: PeriodKey[], slot: Slot) {
+  const x = periods.indexOf(`${slot.year}-${slot.term}`); // Start from 0
   const y = slot.position; // Start from 1
 
   return { x: x + 1, y: y };
@@ -49,7 +48,7 @@ export function getCurriculumGridData(data: CurriculumData) {
       y: position.y,
       w: course?.duration ?? 1,
       h: calculateHeight(),
-      color: area?.color ?? '#fafafa',
+      color: area?.color ?? "#fafafa",
       course: course ? { ...course, areaId: area?.id ?? null } : null,
     };
   });
@@ -65,44 +64,16 @@ export function getCurriculumGridData(data: CurriculumData) {
   };
 }
 
-export function getMostFrequentCredits(courses: Course[]): number {
-  if (courses.length === 0) return 0;
-
-  const frequencyMap = new Map<number, number>();
-
-  courses.forEach((course) => {
-    const count = frequencyMap.get(course.credits) || 0;
-    frequencyMap.set(course.credits, count + 1);
-  });
-
-  let maxFrequency = 0;
-  let mode = 0;
-
-  frequencyMap.forEach((frequency, credit) => {
-    if (frequency > maxFrequency) {
-      maxFrequency = frequency;
-      mode = credit;
-    }
-  });
-
-  return mode;
-}
-
 function getPeriods({ slots }: { slots: Slot[] }): {
   nCols: number;
   nRows: number;
   periods: PeriodKey[];
 } {
   const uniquePeriods = new Set<PeriodKey>(
-    slots.map((s) => `${s.year}-${s.term}` as PeriodKey)
+    slots.map((s) => `${s.year}-${s.term}` as PeriodKey),
   );
 
-  const sortedPeriods = Array.from(uniquePeriods).sort((a, b) => {
-    const [yearA, termA] = a.split('-').map(Number);
-    const [yearB, termB] = b.split('-').map(Number);
-
-    return yearA! - yearB! || termA! - termB!;
-  });
+  const sortedPeriods = Array.from(uniquePeriods).sort(comparePeriodKeys);
 
   const nCols = sortedPeriods.length;
   const nRows = Math.max(1, ...slots.map((s) => s.position));

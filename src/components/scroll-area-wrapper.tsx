@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { cn } from "cn";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type ScrollAreaWrapperProps = {
   className?: string;

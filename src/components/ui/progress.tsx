@@ -1,43 +1,53 @@
 "use client";
 
-import * as React from "react";
-import * as ProgressPrimitive from "@radix-ui/react-progress";
-
-import { cn } from "@/lib/utils";
+import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
+import { cn } from "cn";
 
 function Progress({
   className,
+  children,
   value,
   ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+}: ProgressPrimitive.Root.Props) {
   return (
     <ProgressPrimitive.Root
+      value={value}
       data-slot="progress"
-      className={cn(
-        "bg-input relative h-2 w-full overflow-hidden rounded-full",
-        className,
-      )}
+      className={cn("flex flex-wrap gap-3", className)}
       {...props}
     >
-      <ProgressPrimitive.Indicator
-        data-slot="progress-indicator"
-        className="bg-accent h-full w-full flex-1 transition-all"
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-      />
+      {children}
+      <ProgressTrack>
+        <ProgressIndicator />
+      </ProgressTrack>
     </ProgressPrimitive.Root>
   );
 }
 
-export { Progress };
+function ProgressTrack({ className, ...props }: ProgressPrimitive.Track.Props) {
+  return (
+    <ProgressPrimitive.Track
+      className={cn(
+        "relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted",
+        className,
+      )}
+      data-slot="progress-track"
+      {...props}
+    />
+  );
+}
 
-/*
-        <MotionDiv
-          initial={{ x: "-100%" }}
-          animate={{ x: `-${100 - (value || 0)}%` }}
-          transition={{
-            duration: 1.2,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="bg-accent h-full w-full flex-1"
-        />
-*/
+function ProgressIndicator({
+  className,
+  ...props
+}: ProgressPrimitive.Indicator.Props) {
+  return (
+    <ProgressPrimitive.Indicator
+      data-slot="progress-indicator"
+      className={cn("h-full bg-primary transition-all", className)}
+      {...props}
+    />
+  );
+}
+
+export { Progress };

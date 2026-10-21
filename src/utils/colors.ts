@@ -1,14 +1,7 @@
-export type RGBColor = {
-  r: number; // red
-  g: number; // green
-  b: number; // blue
-  a?: number; // alpha
-};
-
 export type HexColor = `#${string}`;
 export type RGBAColor = `rgba(${number}, ${number}, ${number}, ${number})`;
 
-export function hexToRgb(hexColor: HexColor) {
+function hexToRgb(hexColor: HexColor) {
   const hex = hexColor.replace(/^#/, "");
 
   const bigint = parseInt(hex, 16);
@@ -31,9 +24,7 @@ export function getLuminance(hexColor: HexColor): number {
   // Convert RGB components to linear values
   function linearize(color: number) {
     color /= 255;
-    return color <= 0.03928
-      ? color / 12.92
-      : Math.pow((color + 0.055) / 1.055, 2.4);
+    return color <= 0.03928 ? color / 12.92 : ((color + 0.055) / 1.055) ** 2.4;
   }
 
   const r = linearize(rgbColor.r);
@@ -43,7 +34,7 @@ export function getLuminance(hexColor: HexColor): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-export function getContrastRatio({
+function getContrastRatio({
   backgroundColor,
   foregroundColor,
 }: {
@@ -104,13 +95,13 @@ function hexToHSL(hex: HexColor) {
     b = 0;
 
   if (hex.length === 4) {
-    r = parseInt(hex[1] + hex[1]!, 16);
-    g = parseInt(hex[2] + hex[2]!, 16);
-    b = parseInt(hex[3] + hex[3]!, 16);
+    r = parseInt(hex.slice(1, 2).repeat(2), 16);
+    g = parseInt(hex.slice(2, 3).repeat(2), 16);
+    b = parseInt(hex.slice(3, 4).repeat(2), 16);
   } else if (hex.length === 7) {
-    r = parseInt(hex[1] + hex[2]!, 16);
-    g = parseInt(hex[3] + hex[4]!, 16);
-    b = parseInt(hex[5] + hex[6]!, 16);
+    r = parseInt(hex.slice(1, 3), 16);
+    g = parseInt(hex.slice(3, 5), 16);
+    b = parseInt(hex.slice(5, 7), 16);
   }
 
   r /= 255;
@@ -183,27 +174,10 @@ function hslToHex(h: number, s: number, l: number): HexColor {
 
   const toHex = (n: number) => {
     const hex = Math.round((n + m) * 255).toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
+    return hex.length === 1 ? `0${hex}` : hex;
   };
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-// Obtener versión complementaria del color (clara si es oscura, oscura si es clara)
-function getComplementaryShade(hexColor: HexColor): HexColor {
-  const hsl = hexToHSL(hexColor);
-
-  // Si es oscuro (l < 50), hacer claro
-  // Si es claro (l >= 50), hacer oscuro
-  const newLightness =
-    hsl.l < 50
-      ? 85 // Color claro (pero no blanco puro)
-      : 25; // Color oscuro (pero no negro puro)
-
-  // Opcionalmente aumentar saturación para colores más vivos
-  const newSaturation = Math.min(100, hsl.s * 1.2);
-
-  return hslToHex(hsl.h, newSaturation, newLightness);
 }
 
 export function getContrastingShade(

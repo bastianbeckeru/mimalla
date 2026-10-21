@@ -1,7 +1,10 @@
 "use client";
 
 import { ArrowRight, Import } from "lucide-react";
-import { Button } from "../ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,13 +21,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { useState } from "react";
+} from "@/components/ui/select";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { CurriculumData } from "@/types/curriculum";
-import { useRouter } from "next/navigation";
 import { slugify } from "@/utils/strings";
-import Link from "next/link";
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
 const periods = [
@@ -52,21 +52,25 @@ export default function ImportCurriculumButton({
 
   if (curriculums.some((c) => c.path === path)) {
     return (
-      <Button className="w-full" asChild>
-        <Link href="/dashboard">
-          Ir a mi malla
-          <ArrowRight />
-        </Link>
+      <Button
+        className="w-full"
+        nativeButton={false}
+        render={<Link href="/dashboard" />}
+      >
+        Ir a mi malla
+        <ArrowRight />
       </Button>
     );
   }
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="accent" className="w-full">
-          <Import /> Importar malla
-        </Button>
+      <DialogTrigger
+        render={
+          <Button className="w-full bg-accent text-foreground hover:bg-accent/90" />
+        }
+      >
+        <Import /> Importar malla
       </DialogTrigger>
       <DialogContent className="min-h-48">
         <DialogHeader>
@@ -76,27 +80,29 @@ export default function ImportCurriculumButton({
         <div className="space-y-4 pb-4">
           <dl>
             <div className="flex flex-row gap-2">
-              <dt className="text-muted-foreground font-medium">
+              <dt className="font-medium text-muted-foreground">
                 Universidad:
               </dt>
-              <dd className="text-foreground flex-1">{institution.name}</dd>
+              <dd className="flex-1 text-foreground">{institution.name}</dd>
             </div>
             <div className="flex flex-row gap-2">
-              <dt className="text-muted-foreground font-medium">Programa:</dt>
-              <dd className="text-foreground flex-1">{program.name}</dd>
+              <dt className="font-medium text-muted-foreground">Programa:</dt>
+              <dd className="flex-1 text-foreground">{program.name}</dd>
             </div>
             <div className="flex flex-row gap-2">
-              <dt className="text-muted-foreground font-medium">Versión:</dt>
-              <dd className="text-foreground flex-1">{2020}</dd>
+              <dt className="font-medium text-muted-foreground">Versión:</dt>
+              <dd className="flex-1 text-foreground">{2020}</dd>
             </div>
           </dl>
 
           <div className="flex flex-col gap-2">
-            <h3 className="text-muted-foreground font-medium">Ingreso</h3>
+            <h3 className="font-medium text-muted-foreground">Ingreso</h3>
             <div className="flex flex-row gap-2 md:flex-row">
               <Select
-                onValueChange={(value) => setYear(parseInt(value))}
-                value={year?.toString()}
+                onValueChange={(value: number | null) =>
+                  setYear(value ?? undefined)
+                }
+                value={year ?? null}
               >
                 <SelectTrigger id="year" className="w-1/3">
                   <SelectValue placeholder="Año" />
@@ -104,7 +110,7 @@ export default function ImportCurriculumButton({
                 <SelectContent>
                   <SelectGroup>
                     {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
+                      <SelectItem key={year} value={year}>
                         {year}
                       </SelectItem>
                     ))}
@@ -112,8 +118,11 @@ export default function ImportCurriculumButton({
                 </SelectContent>
               </Select>
               <Select
-                onValueChange={(value) => setPeriod(parseInt(value))}
-                value={period?.toString()}
+                items={periods}
+                onValueChange={(value: number | null) =>
+                  setPeriod(value ?? undefined)
+                }
+                value={period ?? null}
               >
                 <SelectTrigger id=" semester" className="w-2/3">
                   <SelectValue placeholder="Semestre" />
@@ -121,10 +130,7 @@ export default function ImportCurriculumButton({
                 <SelectContent>
                   <SelectGroup>
                     {periods.map((period) => (
-                      <SelectItem
-                        key={period.value}
-                        value={period.value.toString()}
-                      >
+                      <SelectItem key={period.value} value={period.value}>
                         {period.label}
                       </SelectItem>
                     ))}
@@ -136,10 +142,8 @@ export default function ImportCurriculumButton({
         </div>
 
         <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="ghost">
-              Cancelar
-            </Button>
+          <DialogClose render={<Button type="button" variant="ghost" />}>
+            Cancelar
           </DialogClose>
           <Button
             type="submit"
@@ -154,7 +158,6 @@ export default function ImportCurriculumButton({
                 path: path,
                 slots: curriculum.structure,
               });
-              //setEditMode(true)
               router.push("/dashboard");
             }}
           >

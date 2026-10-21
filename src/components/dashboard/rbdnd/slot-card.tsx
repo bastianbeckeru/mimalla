@@ -1,10 +1,10 @@
 import "@/styles/curriculum.css";
-import { cn } from "@/lib/utils";
-import type { CurriculumData } from "@/types/curriculum";
+import { cn } from "cn";
 import type { ComponentProps, PropsWithChildren } from "react";
+import { MotionLi } from "@/components/motion";
+import type { CurriculumData } from "@/types/curriculum";
 import type { EnrolledCourse } from "@/types/store";
 import { checkContrasts } from "@/utils/colors";
-import { MotionLi } from "@/components/motion";
 
 type SlotProps = {
   color?: string;
@@ -52,15 +52,15 @@ export default function SlotCard({
       variants={itemVariants}
       style={style}
       className={cn(
-        "bg-card text-card-foreground relative mb-2 flex h-16 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-md p-2 shadow-sm transition-[filter] select-none hover:brightness-110",
-        hasLowBackgroundElementContrast && "border-foreground/50 border",
+        "relative mb-2 flex h-16 w-32 cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-[filter] hover:brightness-110",
+        hasLowBackgroundElementContrast && "border border-foreground/50",
         hasLowElementTextContrast && "text-background",
         !isAvailable && "brightness-[25%] hover:brightness-[35%]",
         className,
       )}
       onClick={props.onClick}
     >
-      <span className="text-center text-xs font-medium">
+      <span className="text-center font-medium text-xs">
         {course ? course.name : "Vacío"}
       </span>
 

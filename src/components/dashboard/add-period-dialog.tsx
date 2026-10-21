@@ -1,7 +1,7 @@
 "use client";
 
-import type { PeriodWithEnrollments } from "@/types/curriculum";
-import { Button } from "../ui/button";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,16 +9,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { useState } from "react";
+} from "@/components/ui/select";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import type { PeriodWithEnrollments } from "@/types/curriculum";
+import { parsePeriodKey } from "@/utils/period-key";
 
 type AddPeriodDialogProps = {
   open: boolean;
@@ -48,8 +49,12 @@ export default function AddPeriodDialog({
     curriculums.find((c) => c.id === activeCurriculumId)?.year ?? 2020;
 
   const years = [
-    ...new Set(periods.map((period) => period.id.split("-")[0]!)),
-  ].map(Number);
+    ...new Set(periods.map((period) => parsePeriodKey(period.id).year)),
+  ];
+  const yearOptions = [...years, years.length + 1].map((year) => ({
+    value: year,
+    label: year + enrolledYear - 1,
+  }));
 
   return (
     <Dialog
@@ -66,30 +71,29 @@ export default function AddPeriodDialog({
         </DialogHeader>
         <div className="flex flex-row space-x-2 py-2">
           <Select
-            onValueChange={(value) => {
+            items={yearOptions}
+            onValueChange={(value: number | null) => {
               setSelectedTerm(null);
-              setSelectedYear(Number(value));
+              setSelectedYear(value);
             }}
-            value={selectedYear ? String(selectedYear) : ""}
+            value={selectedYear}
           >
             <SelectTrigger id="year" className="w-32">
               <SelectValue placeholder="Año" />
             </SelectTrigger>
             <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={String(year)}>
-                  {year + enrolledYear - 1}
+              {yearOptions.map((year) => (
+                <SelectItem key={year.value} value={year.value}>
+                  {year.label}
                 </SelectItem>
               ))}
-              <SelectItem value={String(years.length + 1)}>
-                {years.length + enrolledYear}
-              </SelectItem>
             </SelectContent>
           </Select>
 
           <Select
-            onValueChange={(value) => setSelectedTerm(Number(value))}
-            value={selectedTerm ? String(selectedTerm) : ""}
+            items={terms}
+            onValueChange={(value: number | null) => setSelectedTerm(value)}
+            value={selectedTerm}
             disabled={!selectedYear}
           >
             <SelectTrigger id="term">
@@ -99,7 +103,7 @@ export default function AddPeriodDialog({
               {terms.map((term) => (
                 <SelectItem
                   key={term.value}
-                  value={String(term.value)}
+                  value={term.value}
                   disabled={periods.some(
                     (p) => p.id === `${selectedYear}-${term.value}`,
                   )}
@@ -112,21 +116,21 @@ export default function AddPeriodDialog({
         </div>
 
         <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="ghost">
-              Cancelar
-            </Button>
+          <DialogClose render={<Button type="button" variant="ghost" />}>
+            Cancelar
           </DialogClose>
-          <DialogClose asChild>
-            <Button
-              onClick={() => {
-                if (!selectedYear || !selectedTerm) return;
+          <DialogClose
+            render={
+              <Button
+                onClick={() => {
+                  if (!selectedYear || !selectedTerm) return;
 
-                handleAddPeriod(selectedYear, selectedTerm);
-              }}
-            >
-              Añadir
-            </Button>
+                  handleAddPeriod(selectedYear, selectedTerm);
+                }}
+              />
+            }
+          >
+            Añadir
           </DialogClose>
         </DialogFooter>
       </DialogContent>

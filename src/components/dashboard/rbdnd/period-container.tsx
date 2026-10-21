@@ -1,7 +1,7 @@
+import { forwardRef, type PropsWithChildren } from "react";
 import { MotionOl, MotionUl } from "@/components/motion";
 import type { PeriodKey } from "@/types/curriculum";
 import { getPeriodInfo } from "@/utils/curriculum";
-import { forwardRef, type PropsWithChildren } from "react";
 
 type PeriodContainerProps = {
   id: PeriodKey;
@@ -28,10 +28,10 @@ const PeriodContainer = forwardRef<HTMLUListElement, PeriodContainerProps>(
     return (
       <MotionOl
         variants={columnVariants}
-        className="flex min-w-32 flex-col gap-2 select-none"
+        className="flex min-w-32 select-none flex-col gap-2"
       >
         <h3
-          className={`text-muted-foreground text-center text-xs font-bold tracking-wider uppercase ${isCurrent && "text-primary"}`}
+          className={`text-center font-bold text-muted-foreground text-xs uppercase tracking-wider ${isCurrent && "text-primary"}`}
         >
           {label}
         </h3>

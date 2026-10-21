@@ -1,12 +1,13 @@
 import type {
-  CurriculumData,
   Area,
-  PeriodKey,
   Course,
+  CurriculumData,
   ExtendedCourse,
+  PeriodKey,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
-import { arabicToRoman } from "./numbers";
+import { arabicToRoman } from "@/utils/numbers";
+import { comparePeriodKeys, parsePeriodKey } from "@/utils/period-key";
 
 export function getCourse({
   id,
@@ -67,11 +68,7 @@ export function getPeriods({
     maxRows = Math.max(maxRows, s.position);
   });
 
-  const sortedPeriods = Array.from(periodSet).sort((a, b) => {
-    const [yearA, termA] = a.split("-").map(Number);
-    const [yearB, termB] = b.split("-").map(Number);
-    return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
-  });
+  const sortedPeriods = Array.from(periodSet).sort(comparePeriodKeys);
 
   return { nCols: periodSet.size, nRows: maxRows, periods: sortedPeriods };
 }
@@ -109,7 +106,7 @@ export function getPeriodsWithEnrollments({
       periodMap.set(periodKey, []);
     }
 
-    periodMap.get(periodKey)!.push(e);
+    periodMap.get(periodKey)?.push(e);
 
     maxRows = Math.max(maxRows, e.position);
     minYear = Math.min(minYear, e.year);
@@ -125,11 +122,7 @@ export function getPeriodsWithEnrollments({
   }
 
   const sortedPeriods = Array.from(periodMap.entries())
-    .sort(([a], [b]) => {
-      const [yearA, termA] = a.split("-").map(Number);
-      const [yearB, termB] = b.split("-").map(Number);
-      return yearA !== yearB ? yearA! - yearB! : termA! - termB!;
-    })
+    .sort(([a], [b]) => comparePeriodKeys(a, b))
     .map(([id, enrollments]) => {
       return { id, enrollments };
     });
@@ -176,10 +169,10 @@ export function getCurriculumStats(
     if (enrollment.status === "APPROVED") {
       approvedCourses++;
       approvedCredits += course.credits;
-    } else if (enrollment.status == "PENDING") {
+    } else if (enrollment.status === "PENDING") {
       pendingCourses++;
       pendingCredits += course.credits;
-    } else if (enrollment.status == "FAILED") {
+    } else if (enrollment.status === "FAILED") {
       failedCourses++;
     }
   }
@@ -197,9 +190,9 @@ export function getCurriculumStats(
 }
 
 export function getPeriodInfo(id: PeriodKey, startYear = 2020) {
-  const [year, term] = id.split("-").map(Number);
+  const { year, term } = parsePeriodKey(id);
 
-  const number = 2 * (year! - startYear + 1) - (term === 1 ? 1 : 0);
+  const number = 2 * (year - startYear + 1) - (term === 1 ? 1 : 0);
   const currentDate = new Date();
   let label = "SEMESTRE";
   let isCurrent = false;

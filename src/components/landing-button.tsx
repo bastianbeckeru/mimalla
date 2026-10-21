@@ -1,6 +1,12 @@
 "use client";
 
+import { track } from "@vercel/analytics";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -8,28 +14,22 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Button, buttonVariants } from "./ui/button";
-import Link from "next/link";
-import { useState } from "react";
-import { usePostHog } from "posthog-js/react";
-import { ArrowRight } from "lucide-react";
 import { institutions } from "@/server/db/data";
-import { slugify } from "@/utils/strings";
-import { cn } from "@/lib/utils";
 import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import { slugify } from "@/utils/strings";
 
 export function LandingButton() {
-  const posthog = usePostHog();
   const { curriculums } = useNewCurriculumStore();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   if (curriculums.length > 0) {
     return (
       <Link
         href="/dashboard"
-        className="glow glow-active bg-foreground text-background inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md p-2 px-4 py-2 text-sm font-medium whitespace-nowrap has-[>svg]:px-3 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
+        className="glow glow-active inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md bg-foreground p-2 px-4 py-2 font-medium text-background text-sm has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none"
         onClick={() => {
-          posthog.capture("redirect_dashboard", { source: "cta_button" });
+          track("redirect_dashboard", { source: "cta_button" });
         }}
       >
         Ir a mi malla
@@ -41,35 +41,39 @@ export function LandingButton() {
   return (
     <>
       <button
-        className="glow glow-active bg-foreground text-background inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md p-2 px-4 py-2 text-sm font-medium whitespace-nowrap has-[>svg]:px-3 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
+        type="button"
+        className="glow glow-active inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md bg-foreground p-2 px-4 py-2 font-medium text-background text-sm has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none"
         onClick={() => {
           setOpen((open) => !open);
 
-          posthog.capture("searchbar_opened", { source: "cta_button" });
+          track("searchbar_opened", { source: "cta_button" });
         }}
       >
         Explorar carreras
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Escribe una carrera..." />
-        <CommandList>
-          <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-          {institutions[0]?.departments.map((department) => (
-            <CommandGroup heading={department.name} key={department.name}>
-              {department.programs.map((program) => (
-                <CommandItem asChild key={program.siesCode}>
-                  <Link
-                    href={`/udp/${slugify(program.name)}`}
-                    onClick={() => setOpen(false)}
+        <Command>
+          <CommandInput placeholder="Escribe una carrera..." />
+          <CommandList>
+            <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
+            {institutions[0]?.departments.map((department) => (
+              <CommandGroup heading={department.name} key={department.name}>
+                {department.programs.map((program) => (
+                  <CommandItem
+                    key={program.siesCode}
+                    onSelect={() => {
+                      setOpen(false);
+                      router.push(`/udp/${slugify(program.name)}`);
+                    }}
                   >
                     {program.name}
-                  </Link>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          ))}
-        </CommandList>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
       </CommandDialog>
     </>
   );

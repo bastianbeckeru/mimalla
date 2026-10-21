@@ -1,5 +1,5 @@
+import { useCallback, useEffect, useRef } from "react";
 import type { Coordinates } from "@/utils/pathfinding";
-import { useRef, useCallback, useEffect } from "react";
 
 type UseInteractionsOptions = {
   onLongPress?: (event: PointerEvent) => void;
@@ -12,6 +12,10 @@ type UseInteractionsOptions = {
   moveTolerance?: number;
   clickThreshold?: number; // NUEVO
 };
+
+function getCoordinates(event: PointerEvent): Coordinates {
+  return { x: event.clientX, y: event.clientY };
+}
 
 const useInteractions = (options: UseInteractionsOptions = {}) => {
   const {
@@ -51,17 +55,16 @@ const useInteractions = (options: UseInteractionsOptions = {}) => {
     };
   }, [onLongPress, onClick, onHoverStart, onHoverEnd, onScroll]);
 
-  const getCoordinates = (event: PointerEvent): Coordinates => {
-    return { x: event.clientX, y: event.clientY };
-  };
-
-  const isScrolling = (event: PointerEvent): boolean => {
-    const current = getCoordinates(event);
-    return (
-      Math.abs(current.x - startCoords.current.x) > moveTolerance ||
-      Math.abs(current.y - startCoords.current.y) > moveTolerance
-    );
-  };
+  const isScrolling = useCallback(
+    (event: PointerEvent): boolean => {
+      const current = getCoordinates(event);
+      return (
+        Math.abs(current.x - startCoords.current.x) > moveTolerance ||
+        Math.abs(current.y - startCoords.current.y) > moveTolerance
+      );
+    },
+    [moveTolerance],
+  );
 
   const start = useCallback(
     (event: React.PointerEvent) => {
@@ -115,7 +118,7 @@ const useInteractions = (options: UseInteractionsOptions = {}) => {
         callbacksRef.current.onScroll?.(event);
       }
     },
-    [clear],
+    [clear, isScrolling],
   );
 
   const handlePointerEnter = useCallback(

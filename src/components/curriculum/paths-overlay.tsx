@@ -1,8 +1,8 @@
 "use client";
 
+import { cn } from "cn";
 import { memo } from "react";
-import { cn } from "@/lib/utils";
-import Path from "./path";
+import Path from "@/components/curriculum/path";
 
 export type PathData = {
   data: string;
@@ -22,8 +22,8 @@ const PathsOverlay = memo(({ paths, className }: PathsOverlayProps) => {
       className={cn("absolute top-0 left-0 -z-50 size-full", className)}
       aria-hidden="true"
     >
-      {paths.map((item, idx) => (
-        <Path key={idx} path={item.data} color={item.color ?? "white"} />
+      {paths.map((item) => (
+        <Path key={item.data} path={item.data} color={item.color ?? "white"} />
       ))}
     </svg>
   );

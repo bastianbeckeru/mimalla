@@ -1,14 +1,13 @@
+import { nanoid } from "nanoid";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type {
   EnrolledCourse,
   newCurriculumStoreInitialStateProps,
   useNewCurriculumStoreProps,
 } from "@/types/store";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { nanoid } from "nanoid";
 
 const initialState: newCurriculumStoreInitialStateProps = {
-  //version: "0.1.4",
   curriculums: [],
   activeCurriculumId: null,
 };
@@ -61,7 +60,7 @@ export const useNewCurriculumStore = create(
             return {
               ...state,
               curriculums: newCurriculums,
-              activeCurriculumId: newCurriculums[0]!.id,
+              activeCurriculumId: newCurriculums[0]?.id,
             };
           }
 
@@ -73,7 +72,7 @@ export const useNewCurriculumStore = create(
       selectCurriculum: (id) => set({ activeCurriculumId: id }),
       updateCurriculumEnrollments: (newEnrollments) =>
         set((state) => {
-          if (!state || !state.activeCurriculumId) return state;
+          if (!state?.activeCurriculumId) return state;
           console.log("Updating enrollments...");
           const newCurriculums = state.curriculums.map((c) => {
             if (c.id !== state.activeCurriculumId) return c;

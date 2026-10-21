@@ -1,11 +1,11 @@
-import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
-import { checkContrasts } from '@/utils/colors';
-import useInteractions from '@/hooks/use-interactions';
-import { memo, useRef } from 'react';
-import { MotionDiv } from '../motion';
-import type { ExtendedSlot } from '@/types/curriculum';
-import { animate, useMotionValue, useTransform } from 'motion/react';
+import { cn } from "cn";
+import { animate, useMotionValue, useTransform } from "motion/react";
+import { memo, useRef } from "react";
+import { MotionDiv } from "@/components/motion";
+import { CardContent } from "@/components/ui/card";
+import useInteractions from "@/hooks/use-interactions";
+import type { ExtendedSlot } from "@/types/curriculum";
+import { checkContrasts } from "@/utils/colors";
 
 type CourseCard = {
   index: number;
@@ -29,7 +29,7 @@ const CourseCard = memo(function CourseCard({
 }: CourseCard) {
   const progress = useMotionValue(0);
   const scale = useTransform(progress, [0, 1], [1, 0.97]);
-  const animation = useRef<any>(null);
+  const animation = useRef<ReturnType<typeof animate> | null>(null);
 
   const { course, color, x, y, w, h } = slot;
 
@@ -68,12 +68,12 @@ const CourseCard = memo(function CourseCard({
       {...handlers}
       variants={itemVariants}
       className={cn(
-        'bg-card clickeable text-card-foreground flex cursor-pointer flex-col gap-6 rounded-md border border-transparent py-6 shadow-sm transition-[filter] select-none',
-        hasLowBackgroundElementContrast && 'border-foreground/50',
-        hasLowElementTextContrast && 'text-background',
-        isSelected && 'ring-2 ring-rose-500',
-        isNotRelated && 'brightness-[25%]',
-        className
+        "clickeable flex cursor-pointer select-none flex-col gap-6 rounded-md border border-transparent bg-card py-6 text-card-foreground shadow-sm transition-[filter]",
+        hasLowBackgroundElementContrast && "border-foreground/50",
+        hasLowElementTextContrast && "text-background",
+        isSelected && "ring-2 ring-rose-500",
+        isNotRelated && "brightness-[25%]",
+        className,
       )}
       style={{
         backgroundColor: color,
@@ -92,8 +92,8 @@ const CourseCard = memo(function CourseCard({
       }}
       {...props}
     >
-      <CardContent className='flex h-full items-center justify-center p-2'>
-        <h3 className='text-center text-xs font-medium text-balance'>
+      <CardContent className="flex h-full items-center justify-center p-2">
+        <h3 className="text-balance text-center font-medium text-xs">
           {course?.name ?? `Slot ${index + 1}`}
         </h3>
       </CardContent>

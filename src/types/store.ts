@@ -1,6 +1,6 @@
-import type { CurriculumData } from "./curriculum";
+import type { CurriculumData } from "@/types/curriculum";
 
-export type StudentEnrollment = {
+type StudentEnrollment = {
   id: string;
   path: string;
   year: number;

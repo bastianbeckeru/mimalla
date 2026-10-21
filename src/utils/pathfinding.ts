@@ -1,10 +1,10 @@
-import type { ExtendedSlot } from '@/types/curriculum';
+import type { ExtendedSlot } from "@/types/curriculum";
 import {
   FONTSIZE,
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from './curriculum-grid';
+} from "@/utils/curriculum-grid";
 
 type Point = { row: number; col: number };
 type Card = {
@@ -27,8 +27,6 @@ type Path = {
   data: string;
 };
 export type Coordinates = { x: number; y: number };
-export type Dimensions = { w: number; h: number };
-
 const CELL_WIDTH_PX = GRID_CELL_WIDTH * FONTSIZE;
 const CELL_HEIGHT_PX = GRID_CELL_HEIGHT * FONTSIZE;
 const GAP_PX = GRID_GAP * FONTSIZE;
@@ -36,7 +34,7 @@ const GAP_PX = GRID_GAP * FONTSIZE;
 export function createConnectionPaths(
   rows: number,
   cols: number,
-  cards: ExtendedSlot[]
+  cards: ExtendedSlot[],
 ): Path[] {
   const grid = createNavigationGrid(rows, cols, cards);
   const paths: Path[] = [];
@@ -51,13 +49,13 @@ export function createConnectionPaths(
       const relatedCard = cards.find(
         (slot) =>
           slot.courseId === id &&
-          ((slot.year === year && slot.term < term) || slot.year < year)
+          ((slot.year === year && slot.term < term) || slot.year < year),
       );
 
       if (!relatedCard) return;
 
-      const start = getCardEdgePoint(relatedCard, 'right');
-      const end = getCardEdgePoint(card, 'left');
+      const start = getCardEdgePoint(relatedCard, "right");
+      const end = getCardEdgePoint(card, "left");
       const path = findPath(grid, start, end);
 
       const fixedPath: Path = {
@@ -95,7 +93,7 @@ export function createConnectionPaths(
 function createNavigationGrid(
   rows: number,
   cols: number,
-  cards: Card[]
+  cards: Card[],
 ): NavigationGrid {
   const expandedRows = rows * 2 + 1;
   const expandedCols = cols * 2 + 1;
@@ -105,7 +103,7 @@ function createNavigationGrid(
       row,
       col,
       isOccupied: false,
-    }))
+    })),
   );
 
   // Marcar celdas ocupadas (bloquear todo el área de la card)
@@ -114,8 +112,9 @@ function createNavigationGrid(
 
     for (let r = rowStart; r <= rowEnd; r++) {
       for (let c = colStart; c <= colEnd; c++) {
-        if (grid[r]![c]!) {
-          grid[r]![c]!.isOccupied = true;
+        const cell = grid[r]?.[c];
+        if (cell) {
+          cell.isOccupied = true;
         }
       }
     }
@@ -126,7 +125,7 @@ function createNavigationGrid(
 
 function getCardEdgePoint(
   card: Card,
-  side: 'left' | 'right' | 'top' | 'bottom'
+  side: "left" | "right" | "top" | "bottom",
 ): Point {
   const { colStart, colEnd, rowStart, rowEnd } = getCardGridPositions(card);
 
@@ -134,13 +133,13 @@ function getCardEdgePoint(
   const centerRow = rowStart + (rowEnd - rowStart) / 2;
 
   switch (side) {
-    case 'left':
+    case "left":
       return { col: colStart, row: centerRow };
-    case 'right':
+    case "right":
       return { col: colEnd, row: centerRow };
-    case 'top':
+    case "top":
       return { col: centerCol, row: rowStart };
-    case 'bottom':
+    case "bottom":
       return { col: centerCol, row: rowEnd };
   }
 }
@@ -164,7 +163,8 @@ function findPath(grid: NavigationGrid, start: Point, end: Point): Point[] {
 
   while (openSet.length > 0) {
     openSet.sort((a, b) => a.f - b.f);
-    const current = openSet.shift()!;
+    const current = openSet.shift();
+    if (!current) break;
 
     // ¿Llegamos al destino?
     if (current.row === end.row && current.col === end.col) {
@@ -206,31 +206,29 @@ function findPath(grid: NavigationGrid, start: Point, end: Point): Point[] {
       const f = g + h;
 
       const existingIndex = openSet.findIndex(
-        (n) => n.row === neighbor.row && n.col === neighbor.col
+        (n) => n.row === neighbor.row && n.col === neighbor.col,
       );
 
       if (existingIndex === -1) {
         // Agregar nuevo nodo
         openSet.push({ ...neighbor, g, h, f, parent: current });
-      } else if (g < openSet[existingIndex]!.g) {
+      } else if (g < (openSet[existingIndex]?.g ?? Infinity)) {
         // Actualizar nodo existente con mejor camino
         openSet[existingIndex] = { ...neighbor, g, h, f, parent: current };
       }
     }
   }
-
-  //console.warn("No path found between", start, "and", end);
   return [];
 }
 
 function pathToSVGPath(path: Point[]): string {
-  if (path.length === 0) return '';
+  if (path.length === 0) return "";
 
   const pixels = path.map(gridToPixel);
 
   return pixels
     .map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`))
-    .join(' ');
+    .join(" ");
 }
 
 // ============================================
@@ -267,12 +265,12 @@ function isNavigable(grid: NavigationGrid, point: Point): boolean {
     point.row < 0 ||
     point.row >= grid.length ||
     point.col < 0 ||
-    point.col >= grid[0]!.length
+    point.col >= (grid[0]?.length ?? 0)
   ) {
     return false;
   }
 
-  return !grid[point.row]![point.col]!.isOccupied;
+  return !grid[point.row]?.[point.col]?.isOccupied;
 }
 
 function manhattanDistance(a: Point, b: Point): number {
@@ -289,29 +287,4 @@ function reconstructPath(node: Node | undefined): Point[] {
   }
 
   return path;
-}
-
-function debugGrid(grid: NavigationGrid): string {
-  return grid
-    .map((row) =>
-      row
-        .map((cell) => {
-          const isRowGap = cell.row % 2 === 1;
-          const isColGap = cell.col % 2 === 1;
-
-          let type;
-          if (!isRowGap && !isColGap) type = 'corner';
-          else if (!isRowGap && isColGap) type = 'horizontal';
-          else if (isRowGap && !isColGap) type = 'vertical';
-          else type = 'card';
-
-          if (cell.isOccupied) return 'X';
-          if (type === 'card') return '•';
-          if (type === 'horizontal') return '─';
-          if (type === 'vertical') return '│';
-          return '┼';
-        })
-        .join('')
-    )
-    .join('\n');
 }

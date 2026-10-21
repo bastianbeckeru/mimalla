@@ -3,17 +3,13 @@
  */
 
 import { useEffect } from "react";
-//import { useIsMac } from "./use-mac";
 
 type Shortcut = {
-  //keys: string | string[];
   keys: string[];
   callback: (event: KeyboardEvent) => void;
 };
 
 const useShortcuts = (shortcuts: Shortcut[]) => {
-  //const isMac = useIsMac();
-
   useEffect(() => {
     const pressedKeys = new Set<string>();
 

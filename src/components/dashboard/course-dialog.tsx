@@ -1,9 +1,14 @@
 "use client";
 
+import { Check, Ghost, Minus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { Course, ExtendedCourse } from "@/types/curriculum";
 import { hexToRgba, parseHexColor } from "@/utils/colors";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Check, Ghost, Minus } from "lucide-react";
 
 type CourseDialogProps = {
   isOpen: boolean;
@@ -37,7 +42,7 @@ export default function CourseDialog({
       <DialogContent tabIndex={-1} className="min-h-64 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-left text-xl">{course.name}</DialogTitle>
-          <div className="text-muted-foreground mt-1 flex flex-row items-center space-x-2 text-sm">
+          <div className="mt-1 flex flex-row items-center space-x-2 text-muted-foreground text-sm">
             {course.code && (
               <p className="min-w-fit rounded-md px-2 py-px" style={style}>
                 {course.code}
@@ -51,7 +56,7 @@ export default function CourseDialog({
 
         <div className="flex size-full min-h-48 flex-col gap-2 md:flex-row">
           <div className="rounded-md border md:w-1/2">
-            <h2 className="text-muted-foreground border-b px-2 py-1 font-semibold">
+            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
               Prerequisitos
             </h2>
             <ul className="flex min-h-32 flex-col space-y-1 p-2">
@@ -60,7 +65,7 @@ export default function CourseDialog({
                 <>
                   {course.prerequisiteCredits > 0 && (
                     <RelatedElement
-                      name={`${course.prerequisiteCredits}` + " créditos"}
+                      name={`${course.prerequisiteCredits} créditos`}
                       code={null}
                       isChecked={course.prerequisiteCredits <= approvedCredits}
                     />
@@ -83,37 +88,35 @@ export default function CourseDialog({
                 </>
               ) : (
                 <div className="flex h-28 items-center justify-center">
-                  <Ghost className="text-muted size-8" />
+                  <Ghost className="size-8 text-muted" />
                 </div>
               )}
             </ul>
           </div>
           <div className="rounded-md border md:w-1/2">
-            <h2 className="text-muted-foreground border-b px-2 py-1 font-semibold">
+            <h2 className="border-b px-2 py-1 font-semibold text-muted-foreground">
               Desbloquea
             </h2>
             <ul className="flex min-h-32 flex-col space-y-1 p-2">
               {course.subsequentIds.length > 0 ? (
-                <>
-                  {course.subsequentIds.map((id) => {
-                    const isApproved = approvedCourseIds.includes(id);
-                    const c = courses.get(id);
+                course.subsequentIds.map((id) => {
+                  const isApproved = approvedCourseIds.includes(id);
+                  const c = courses.get(id);
 
-                    if (!c) return null;
+                  if (!c) return null;
 
-                    return (
-                      <RelatedElement
-                        key={id}
-                        name={c.name}
-                        code={c.code}
-                        isChecked={isApproved}
-                      />
-                    );
-                  })}
-                </>
+                  return (
+                    <RelatedElement
+                      key={id}
+                      name={c.name}
+                      code={c.code}
+                      isChecked={isApproved}
+                    />
+                  );
+                })
               ) : (
                 <div className="flex h-28 items-center justify-center">
-                  <Ghost className="text-muted size-8" />
+                  <Ghost className="size-8 text-muted" />
                 </div>
               )}
             </ul>
@@ -141,7 +144,7 @@ const RelatedElement = ({
       {isChecked ? (
         <Check className="size-4 text-green-500" />
       ) : (
-        <Minus className="text-muted-foreground size-4" />
+        <Minus className="size-4 text-muted-foreground" />
       )}
     </div>
   </li>

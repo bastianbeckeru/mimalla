@@ -20,10 +20,10 @@ export default function InfoItem({
 
   return (
     <div>
-      <dt className="text-muted-foreground text-sm font-medium text-balance">
+      <dt className="text-balance font-medium text-muted-foreground text-sm">
         {label}
       </dt>
-      <dd className="text-foreground text-base font-normal">{renderValue()}</dd>
+      <dd className="font-normal text-base text-foreground">{renderValue()}</dd>
     </div>
   );
 }

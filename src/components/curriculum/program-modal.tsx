@@ -1,7 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-
+import { useState } from "react";
+import {
+  type Program,
+  ProgramStats,
+} from "@/components/curriculum/program-stats";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
@@ -17,44 +21,41 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
-
-import { useIsMobile } from '@/hooks/use-mobile';
-import { type Program, ProgramStats } from './program-stats';
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ProgramModalProps = {
   program: Program | null;
 };
 
-const snapPoints = [0.6, 1];
+const initialSnapPoint = 0.6;
+const snapPoints = [initialSnapPoint, 1];
 
 export default function ProgramModal({ program }: ProgramModalProps) {
-  if (!program || !program.stats || program.stats.length === 0) return null;
-
   const isMobile = useIsMobile();
-  const [snap, setSnap] = useState<string | number | null>(snapPoints[0]!);
+  const [snap, setSnap] = useState<string | number | null>(initialSnapPoint);
+
+  if (!program?.stats || program.stats.length === 0) return null;
 
   if (isMobile) {
     return (
       <Drawer
         snapPoints={snapPoints}
-        activeSnapPoint={snap}
-        setActiveSnapPoint={setSnap}
-        fadeFromIndex={0}
+        snapPoint={snap}
+        onSnapPointChange={setSnap}
       >
-        <DrawerTrigger asChild>
-          <Button variant='outline'>Ver estadísticas</Button>
+        <DrawerTrigger render={<Button variant="outline" />}>
+          Ver estadísticas
         </DrawerTrigger>
-        <DrawerContent className='h-full'>
-          <DrawerHeader className=''>
+        <DrawerContent>
+          <DrawerHeader className="">
             <DrawerTitle>Estadísticas</DrawerTitle>
-            <DrawerDescription className='sr-only'>
-              Visualización de estadísticas del programa académico{' '}
+            <DrawerDescription className="sr-only">
+              Visualización de estadísticas del programa académico{" "}
               {program.name}.
             </DrawerDescription>
           </DrawerHeader>
-          <div className='flex-1 overflow-y-auto p-4'>
+          <div className="flex-1 overflow-y-auto p-4">
             <ProgramStats program={program} />
           </div>
         </DrawerContent>
@@ -64,13 +65,13 @@ export default function ProgramModal({ program }: ProgramModalProps) {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant='outline'>Ver estadísticas</Button>
+      <DialogTrigger render={<Button variant="outline" />}>
+        Ver estadísticas
       </DialogTrigger>
-      <DialogContent className='max-h-[80dvh] overflow-y-auto'>
+      <DialogContent className="max-h-[80dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Estadísticas</DialogTitle>
-          <DialogDescription className='sr-only'>
+          <DialogDescription className="sr-only">
             Visualización de estadísticas del programa académico {program.name}.
           </DialogDescription>
         </DialogHeader>

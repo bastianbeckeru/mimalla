@@ -1,7 +1,9 @@
 "use client";
 
-import type { Course, ExtendedCourse, ExtendedSlot } from "@/types/curriculum";
-
+import { cn } from "cn";
+import { GitFork } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -16,45 +18,21 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-
-import { getContrastingShade, parseHexColor } from "@/utils/colors";
+import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useEffect, useRef, useState } from "react";
-import { Badge } from "../ui/badge";
-import {
-  ArrowDownCircle,
-  ArrowLeft,
-  ArrowRight,
-  CornerDownRight,
-  CornerLeftDown,
-  GitFork,
-  Lock,
-  Unlock,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Separator } from "../ui/separator";
+import type { Course, ExtendedSlot } from "@/types/curriculum";
+import { getContrastingShade, parseHexColor } from "@/utils/colors";
 
 type CourseDialogProps = {
   open: boolean;
   onOpenChange: () => void;
   slot: ExtendedSlot | null;
-  //course: ExtendedCourse;
   courses: Map<string | number, Course>;
-  //areas:  Map<string | number, Area>;
 };
 
-/* POSSIBLE NEW FEATURE AND CONTRIBUTION TO OPEN SOURCE
- *
- * Actualmente el Drawer (Vaul) no soporta un modal dinámico, para permitir o no la interacción
- * con el background del drawer. Se podría hacer un fork de Vault y apoyar con esta feature.
- * ¿Es necesaria y/o útil esta feature?
- *
- * const snapPoints = [0.2, 0.5, 1];
- * <Drawer ... snapPoints={snapPoints} fadeFromIndex={1} modal={snap !== snapPoints[0]} />
- *
- */
-
-const snapPoints = [0.6, 1];
+const collapsedSnapPoint = 0.6;
+const expandedSnapPoint = 1;
+const snapPoints = [collapsedSnapPoint, expandedSnapPoint];
 
 export default function CourseModal({
   open,
@@ -65,17 +43,17 @@ export default function CourseModal({
 }: CourseDialogProps) {
   const isMobile = useIsMobile();
   const lastValidSlot = useRef<ExtendedSlot | null>(null);
-  const [snap, setSnap] = useState<string | number | null>(snapPoints[1]!);
+  const [snap, setSnap] = useState<string | number | null>(expandedSnapPoint);
 
   useEffect(() => {
-    if (slot && slot.course) {
-      setSnap(snapPoints[0]!);
+    if (slot?.course) {
+      setSnap(collapsedSnapPoint);
       lastValidSlot.current = slot;
     }
   }, [slot]);
 
   const displaySlot = slot?.course ? slot : lastValidSlot.current;
-  if (!displaySlot || !displaySlot.course) return null;
+  if (!displaySlot?.course) return null;
 
   // Probablemente lo más lógico es recibir únicamente el curso, no el slot completo.
   // De esta manera si por alguna razón se abre el mismo curso, no se reabre el modal, sino que se mantiene.
@@ -96,15 +74,14 @@ export default function CourseModal({
         open={open}
         onOpenChange={onOpenChange}
         snapPoints={snapPoints}
-        activeSnapPoint={snap}
-        setActiveSnapPoint={setSnap}
-        fadeFromIndex={0}
+        snapPoint={snap}
+        onSnapPointChange={setSnap}
         {...props}
       >
-        <DrawerContent className="h-full px-4">
+        <DrawerContent className="px-4">
           <DrawerHeader className="">
             <DrawerTitle className="pb-1.5">{course.name}</DrawerTitle>
-            <div className="text-muted-foreground space-y-3 text-sm">
+            <div className="space-y-3 text-muted-foreground text-sm">
               <div className="flex items-center gap-2">
                 {course.code && (
                   <Badge
@@ -140,7 +117,7 @@ export default function CourseModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{course.name}</DialogTitle>
-          <div className="text-muted-foreground space-y-3 text-sm">
+          <div className="space-y-3 text-muted-foreground text-sm">
             <div className="flex items-center gap-2">
               {course.code && (
                 <Badge
@@ -185,7 +162,7 @@ function RelatedCourses({
   return (
     <div className={cn("space-y-4 py-2", className)}>
       <div className="space-y-2">
-        <h4 className="text-muted-foreground inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
+        <h4 className="inline-flex items-center gap-2 font-bold text-muted-foreground text-xs uppercase tracking-wide [&_svg]:size-4 [&_svg]:shrink-0">
           <GitFork className="-rotate-90" />
           Requiere
         </h4>
@@ -205,7 +182,7 @@ function RelatedCourses({
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-muted-foreground inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase [&_svg]:size-4 [&_svg]:shrink-0">
+        <h4 className="inline-flex items-center gap-2 font-bold text-muted-foreground text-xs uppercase tracking-wide [&_svg]:size-4 [&_svg]:shrink-0">
           <GitFork className="rotate-90" />
           Habilita
         </h4>

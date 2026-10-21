@@ -1,9 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { cn } from "cn";
+import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -12,25 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { slugify } from "@/utils/strings";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronLeftIcon, Loader2 } from "lucide-react";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { getProgramData } from "@/utils/curriculum-data";
-import type { CurriculumData } from "@/types/curriculum";
 import { institutions } from "@/server/db/data";
+import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import type { CurriculumData } from "@/types/curriculum";
+import { getProgramData } from "@/utils/curriculum-data";
+import { slugify } from "@/utils/strings";
 
 type Institution = {
   acronym: string;
@@ -49,6 +51,11 @@ type Program = {
 };
 
 const years = [2020, 2021, 2022, 2023, 2024, 2025];
+
+const institutionOptions = institutions.map((institution) => ({
+  value: institution.acronym,
+  label: institution.name,
+}));
 
 const periods = [
   { value: 1, label: "Primer semestre" },
@@ -121,7 +128,7 @@ export default function CurriculumForm({
 
       <div className="mx-10 flex w-full flex-col justify-center gap-6 md:w-80">
         <div className="flex flex-col gap-2 text-left">
-          <h1 className="text-2xl font-semibold tracking-tight text-balance md:text-center">
+          <h1 className="text-balance font-semibold text-2xl tracking-tight md:text-center">
             Crea tu malla de estudios
           </h1>
           <p className="text-muted-foreground">
@@ -131,14 +138,15 @@ export default function CurriculumForm({
 
         <div className="gap-3">
           <div className="flex flex-col gap-1">
-            <h3 className="text-muted-foreground hidden font-semibold">
+            <h3 className="hidden font-semibold text-muted-foreground">
               Carrera
             </h3>
 
             <div className="flex flex-col gap-2">
               <Select
-                value={selectedInstitution?.acronym}
-                onValueChange={(value) => {
+                items={institutionOptions}
+                value={selectedInstitution?.acronym ?? null}
+                onValueChange={(value: string | null) => {
                   const selected = institutions.find(
                     (inst) => inst.acronym === value,
                   );
@@ -163,18 +171,18 @@ export default function CurriculumForm({
 
               <div className="flex h-14 w-full flex-col items-end justify-start gap-1">
                 <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      disabled={!selectedInstitution}
-                    >
-                      {selectedProgram ? (
-                        <>{selectedProgram.name}</>
-                      ) : (
-                        <>Selecciona una carrera</>
-                      )}
-                    </Button>
+                  <PopoverTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        disabled={!selectedInstitution}
+                      />
+                    }
+                  >
+                    {selectedProgram
+                      ? selectedProgram.name
+                      : "Selecciona una carrera"}
                   </PopoverTrigger>
                   <PopoverContent className="w-96 p-0" align="start">
                     <ProgramList
@@ -185,13 +193,13 @@ export default function CurriculumForm({
                   </PopoverContent>
                 </Popover>
 
-                {selectedProgram && (
+                {selectedInstitution && selectedProgram && (
                   <Link
                     href={slugify(
-                      selectedInstitution!.acronym,
-                      selectedProgram!.name,
+                      selectedInstitution.acronym,
+                      selectedProgram.name,
                     )}
-                    className="text-muted-foreground hover:text-foreground text-xs underline underline-offset-4"
+                    className="text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground"
                   >
                     Ver malla
                   </Link>
@@ -201,12 +209,14 @@ export default function CurriculumForm({
           </div>
 
           <div className="flex flex-col gap-1">
-            <h3 className="text-muted-foreground font-semibold">Ingreso</h3>
+            <h3 className="font-semibold text-muted-foreground">Ingreso</h3>
 
             <div className="flex flex-row gap-2">
               <Select
-                value={year?.toString()}
-                onValueChange={(value) => setYear(parseInt(value))}
+                value={year ?? null}
+                onValueChange={(value: number | null) =>
+                  setYear(value ?? undefined)
+                }
                 disabled={!selectedProgram}
               >
                 <SelectTrigger id="year" className="min-w-24">
@@ -215,7 +225,7 @@ export default function CurriculumForm({
                 <SelectContent>
                   <SelectGroup>
                     {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
+                      <SelectItem key={year} value={year}>
                         {year}
                       </SelectItem>
                     ))}
@@ -223,8 +233,11 @@ export default function CurriculumForm({
                 </SelectContent>
               </Select>
               <Select
-                value={period?.toString()}
-                onValueChange={(value) => setPeriod(parseInt(value))}
+                items={periods}
+                value={period ?? null}
+                onValueChange={(value: number | null) =>
+                  setPeriod(value ?? undefined)
+                }
                 disabled={!selectedProgram}
               >
                 <SelectTrigger id="semester" className="flex-1">
@@ -233,10 +246,7 @@ export default function CurriculumForm({
                 <SelectContent>
                   <SelectGroup>
                     {periods.map((period) => (
-                      <SelectItem
-                        key={period.value}
-                        value={period.value.toString()}
-                      >
+                      <SelectItem key={period.value} value={period.value}>
                         {period.label}
                       </SelectItem>
                     ))}
@@ -260,14 +270,14 @@ export default function CurriculumForm({
             )}
           </Button>
 
-          <p className="text-muted-foreground text-left text-xs">
+          <p className="text-left text-muted-foreground text-xs">
             ¿No encuentras tu carrera?{" "}
             <a
               aria-label="No encontraste tu carrera? Rellena este formulario para solicitarla!"
               target="_blank"
               rel="noreferrer"
               href="https://forms.gle/P6JjrCPn1y4fZyUNA"
-              className="hover:text-foreground underline underline-offset-4"
+              className="underline underline-offset-4 hover:text-foreground"
             >
               Haz clic aquí
             </a>

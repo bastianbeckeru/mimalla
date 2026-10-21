@@ -1,6 +1,13 @@
 "use client";
 
+import { track } from "@vercel/analytics";
+import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import KbdModifier from "@/components/kbd-modifier";
+import { Button } from "@/components/ui/button";
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -8,26 +15,20 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Button } from "./ui/button";
-import Link from "next/link";
-import { useState } from "react";
-import { usePostHog } from "posthog-js/react";
+import { KbdGroup } from "@/components/ui/kbd";
 import useShortcuts from "@/hooks/use-shortcut";
-import { Search } from "lucide-react";
 import { institutions } from "@/server/db/data";
 import { slugify } from "@/utils/strings";
-import { KbdGroup } from "./ui/kbd";
-import KbdModifier from "./kbd-modifier";
 
 export function Searchbar() {
-  const posthog = usePostHog();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   function handleOpen(source?: string) {
     setOpen((open) => !open);
 
     if (source) {
-      posthog.capture("searchbar_opened", { source: source });
+      track("searchbar_opened", { source: source });
     }
   }
 
@@ -42,7 +43,7 @@ export function Searchbar() {
     <>
       <Button
         variant="outline"
-        className="text-muted-foreground h-8 w-40 items-center justify-center gap-2 p-1.5 lg:w-48"
+        className="h-8 w-40 items-center justify-center gap-2 p-1.5 text-muted-foreground lg:w-48"
         onClick={() => handleOpen("button")}
       >
         <p className="ml-0.5 flex-1 text-left text-sm">Buscar carrera...</p>
@@ -56,24 +57,27 @@ export function Searchbar() {
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Escribe una carrera..." />
-        <CommandList>
-          <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-          {institutions[0]?.departments.map((department) => (
-            <CommandGroup heading={department.name} key={department.name}>
-              {department.programs.map((program) => (
-                <CommandItem asChild key={program.siesCode}>
-                  <Link
-                    href={`/udp/${slugify(program.name)}`}
-                    onClick={() => setOpen(false)}
+        <Command>
+          <CommandInput placeholder="Escribe una carrera..." />
+          <CommandList>
+            <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
+            {institutions[0]?.departments.map((department) => (
+              <CommandGroup heading={department.name} key={department.name}>
+                {department.programs.map((program) => (
+                  <CommandItem
+                    key={program.siesCode}
+                    onSelect={() => {
+                      setOpen(false);
+                      router.push(`/udp/${slugify(program.name)}`);
+                    }}
                   >
                     {program.name}
-                  </Link>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          ))}
-        </CommandList>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
       </CommandDialog>
     </>
   );
