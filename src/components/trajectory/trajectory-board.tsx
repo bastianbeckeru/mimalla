@@ -19,7 +19,11 @@ import PeriodContainer from "@/components/trajectory/period-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { HistoryControls } from "@/hooks/use-history";
 import type { Area, ExtendedCourse, PeriodKey } from "@/types/curriculum";
-import type { Entry, PeriodWithEnrollments } from "@/types/trajectory";
+import type {
+  Entry,
+  PeriodWithEnrollments,
+  TrajectoryProgress,
+} from "@/types/trajectory";
 import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
 import { getCourseArea } from "@/utils/curriculum";
 import {
@@ -64,10 +68,7 @@ type TrajectoryBoardProps = {
   entry: Entry;
   areas: Area[];
   courses: Map<number, ExtendedCourse>;
-  progress: {
-    approvedCourseIds: number[];
-    approvedCredits: number;
-  };
+  progress: TrajectoryProgress;
   onSave: () => void;
 };
 

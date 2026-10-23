@@ -5,6 +5,7 @@ import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Course, ExtendedCourse } from "@/types/curriculum";
+import type { TrajectoryProgress } from "@/types/trajectory";
 import { getContrastingShade, parseHexColor } from "@/utils/colors";
 
 type CourseModalProps = {
@@ -13,10 +14,7 @@ type CourseModalProps = {
   course: ExtendedCourse | null;
   color: string;
   courses: Map<number, Course>;
-  progress?: {
-    approvedCourseIds: number[];
-    approvedCredits: number;
-  };
+  progress?: TrajectoryProgress;
 };
 
 type RelatedItem = {
@@ -44,7 +42,7 @@ export default function CourseModal({
         {
           key: id,
           name: related.name,
-          isApproved: progress?.approvedCourseIds.includes(id),
+          isApproved: progress?.approvedCourseIds.has(id),
         },
       ];
     });

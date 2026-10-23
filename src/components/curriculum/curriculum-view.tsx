@@ -41,13 +41,15 @@ export default function CurriculumView({
   const [modalSlot, setModalSlot] = useState<ExtendedSlot | null>(null);
   const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
 
-  const connectedCourseIds = focusedSlot
-    ? [
-        focusedSlot.slot.courseId,
-        ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
-        ...(focusedSlot.slot.course?.successorIds ?? []),
-      ]
-    : [];
+  const connectedCourseIds = new Set(
+    focusedSlot
+      ? [
+          focusedSlot.slot.courseId,
+          ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
+          ...(focusedSlot.slot.course?.successorIds ?? []),
+        ]
+      : [],
+  );
 
   function handleSelectCard(newSlot: ExtendedSlot | null) {
     if (newSlot === null) {
@@ -76,7 +78,7 @@ export default function CurriculumView({
     const { course } = newSlot;
     if (!course) return;
 
-    if (focusedSlot && !connectedCourseIds.includes(course.id)) {
+    if (focusedSlot && !connectedCourseIds.has(course.id)) {
       setFocusedSlot(null);
       return;
     }
@@ -139,7 +141,7 @@ export default function CurriculumView({
                   isNotRelated={
                     !!focusedSlot &&
                     !(
-                      slot.course && connectedCourseIds.includes(slot.course.id)
+                      slot.course && connectedCourseIds.has(slot.course.id)
                     )
                   }
                   handleClick={handleClickCard}

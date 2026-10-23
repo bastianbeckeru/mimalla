@@ -23,6 +23,11 @@ export type Trajectory = {
   enrollments: Enrollment[];
 };
 
+export type TrajectoryProgress = {
+  approvedCourseIds: Set<number>;
+  approvedCredits: number;
+};
+
 export type PeriodWithEnrollments = {
   id: PeriodKey;
   enrollments: Enrollment[];

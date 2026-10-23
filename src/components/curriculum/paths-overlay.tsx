@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "cn";
 import { memo } from "react";
 import Path from "@/components/curriculum/path";
 
@@ -11,15 +10,14 @@ export type PathData = {
 
 type PathsOverlayProps = {
   paths: PathData[];
-  className?: string;
 };
 
-const PathsOverlay = memo(({ paths, className }: PathsOverlayProps) => {
+const PathsOverlay = memo(({ paths }: PathsOverlayProps) => {
   if (paths.length === 0) return null;
 
   return (
     <svg
-      className={cn("absolute top-0 left-0 -z-50 size-full", className)}
+      className="absolute top-0 left-0 -z-50 size-full"
       aria-hidden="true"
     >
       {paths.map((item) => (

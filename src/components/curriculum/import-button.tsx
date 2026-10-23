@@ -32,12 +32,15 @@ export default function ImportCurriculumButton({
   program,
 }: Props) {
   const hasHydrated = useHasHydrated();
-  const { addTrajectory, trajectories } = useTrajectoryStore();
+  const addTrajectory = useTrajectoryStore((state) => state.addTrajectory);
+  const isImported = useTrajectoryStore((state) =>
+    state.trajectories.some((t) => t.curriculumPath === path),
+  );
   const [year, setYear] = useState<number | null>(null);
   const [term, setTerm] = useState<number | null>(null);
   const router = useRouter();
 
-  if (hasHydrated && trajectories.some((t) => t.curriculumPath === path)) {
+  if (hasHydrated && isImported) {
     return (
       <Button
         className="w-full"

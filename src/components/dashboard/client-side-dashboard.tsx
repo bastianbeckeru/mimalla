@@ -52,7 +52,9 @@ export default function ClientSideDashboard({
 }) {
   const hasHydrated = useHasHydrated();
   const activeTrajectory = useActiveTrajectory();
-  const { removeActiveTrajectory } = useTrajectoryStore();
+  const removeActiveTrajectory = useTrajectoryStore(
+    (state) => state.removeActiveTrajectory,
+  );
   const [program, setProgram] = useState<LoadedProgram | null>(null);
 
   const activePath = activeTrajectory?.curriculumPath;
@@ -116,7 +118,9 @@ function TrajectoryDashboard({
   trajectory: Trajectory;
   data: CurriculumData;
 }) {
-  const { updateActiveEnrollments } = useTrajectoryStore();
+  const updateActiveEnrollments = useTrajectoryStore(
+    (state) => state.updateActiveEnrollments,
+  );
   const history = useHistory(() =>
     groupEnrollmentsByPeriod(trajectory.enrollments),
   );

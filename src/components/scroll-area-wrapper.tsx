@@ -1,4 +1,3 @@
-import { cn } from "cn";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type ScrollAreaWrapperProps = {
@@ -11,7 +10,7 @@ export default function ScrollAreaWrapper({
   children,
 }: ScrollAreaWrapperProps) {
   return (
-    <ScrollArea className={cn(className)}>
+    <ScrollArea className={className}>
       {children}
       <ScrollBar orientation="horizontal" />
     </ScrollArea>

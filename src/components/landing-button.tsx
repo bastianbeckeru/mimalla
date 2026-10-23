@@ -21,9 +21,11 @@ export function LandingButton({
   className,
 }: LandingButtonProps) {
   const hasHydrated = useHasHydrated();
-  const { trajectories } = useTrajectoryStore();
+  const hasTrajectories = useTrajectoryStore(
+    (state) => state.trajectories.length > 0,
+  );
 
-  if (hasHydrated && trajectories.length > 0) {
+  if (hasHydrated && hasTrajectories) {
     return (
       <Link
         href="/dashboard"

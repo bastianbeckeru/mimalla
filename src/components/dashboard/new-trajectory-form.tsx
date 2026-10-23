@@ -43,7 +43,7 @@ export default function NewTrajectoryForm({
   catalog: CatalogInstitution[];
   onImport: (path: string, data: CurriculumData) => void;
 }) {
-  const { addTrajectory } = useTrajectoryStore();
+  const addTrajectory = useTrajectoryStore((state) => state.addTrajectory);
 
   const [selectedInstitution, setSelectedInstitution] = useState(
     catalog.length === 1 ? catalog[0] : undefined,

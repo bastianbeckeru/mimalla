@@ -36,11 +36,13 @@ export default function DashboardSidebar({
   stats,
   onReset,
 }: DashboardSidebarProps) {
-  const { removeActiveTrajectory } = useTrajectoryStore();
+  const removeActiveTrajectory = useTrajectoryStore(
+    (state) => state.removeActiveTrajectory,
+  );
   const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
-  const subareaIds = areas.flatMap((area) => area.subareaIds);
+  const subareaIds = new Set(areas.flatMap((area) => area.subareaIds));
   const mainAreas = areas
-    .filter((area) => !subareaIds.includes(area.id))
+    .filter((area) => !subareaIds.has(area.id))
     .sort(
       (a, b) =>
         getLuminance(parseHexColor(a.color)) -

@@ -3,30 +3,32 @@ import { animate, useMotionValue, useTransform } from "motion/react";
 import { memo, useRef } from "react";
 import { MotionDiv } from "@/components/motion";
 import { CardContent } from "@/components/ui/card";
-import useInteractions from "@/hooks/use-interactions";
+import { useInteractions } from "@/hooks/use-interactions";
 import type { ExtendedSlot } from "@/types/curriculum";
 import { checkContrasts } from "@/utils/colors";
 
-type CourseCard = {
+const ITEM_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+type CourseCardProps = {
   index: number;
   slot: ExtendedSlot;
   isSelected: boolean;
   isNotRelated: boolean;
   handleClick: (newSlot: ExtendedSlot) => void;
   handleSelect: (newSlot: ExtendedSlot | null) => void;
-  className?: string;
 };
 
 const CourseCard = memo(function CourseCard({
   index,
   slot,
-  isSelected = false,
-  isNotRelated = true,
+  isSelected,
+  isNotRelated,
   handleClick,
   handleSelect,
-  className,
-  ...props
-}: CourseCard) {
+}: CourseCardProps) {
   const progress = useMotionValue(0);
   const scale = useTransform(progress, [0, 1], [1, 0.97]);
   const animation = useRef<ReturnType<typeof animate> | null>(null);
@@ -42,11 +44,6 @@ const CourseCard = memo(function CourseCard({
     onHoverEnd: () => handleSelect(null),
     onClick: () => handleClick(slot),
   });
-
-  const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
 
   const startPress = () => {
     if (isSelected) return;
@@ -66,14 +63,13 @@ const CourseCard = memo(function CourseCard({
   return (
     <MotionDiv
       {...handlers}
-      variants={itemVariants}
+      variants={ITEM_VARIANTS}
       className={cn(
         "clickeable flex cursor-pointer select-none flex-col gap-6 rounded-md border border-transparent bg-card py-6 text-card-foreground shadow-sm transition-[filter]",
         hasLowBackgroundElementContrast && "border-foreground/50",
         hasLowElementTextContrast && "text-background",
         isSelected && "ring-2 ring-rose-500",
         isNotRelated && "brightness-[25%]",
-        className,
       )}
       style={{
         backgroundColor: color,
@@ -90,7 +86,6 @@ const CourseCard = memo(function CourseCard({
         endPress();
         handlers.onPointerLeave(e);
       }}
-      {...props}
     >
       <CardContent className="flex h-full items-center justify-center p-2">
         <h3 className="text-balance text-center font-medium text-xs">

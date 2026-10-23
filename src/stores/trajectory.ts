@@ -32,7 +32,7 @@ type PersistedStateV2 = {
   activeCurriculumId: string | null;
 };
 
-export function migrateTrajectoryState(
+function migrateTrajectoryState(
   persistedState: unknown,
   version: number,
 ): TrajectoryState {

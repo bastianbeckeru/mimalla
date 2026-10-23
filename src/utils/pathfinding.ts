@@ -26,7 +26,6 @@ type Path = {
   destinationCardId: string;
   data: string;
 };
-export type Coordinates = { x: number; y: number };
 const CELL_WIDTH_PX = GRID_CELL_WIDTH * FONTSIZE;
 const CELL_HEIGHT_PX = GRID_CELL_HEIGHT * FONTSIZE;
 const GAP_PX = GRID_GAP * FONTSIZE;
