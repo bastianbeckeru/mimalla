@@ -13,7 +13,7 @@ The faculty or school of an institution that a program belongs to.
 _Avoid_: Faculty
 
 **Program**:
-A degree course of study offered by an institution, such as Derecho at UDP. A program has one or more curriculums over time.
+A degree course of study that an institution offers for admission, such as Derecho at UDP. A program has one or more curriculums over time. A common first cycle, such as Ingeniería Civil Plan Común, is a program when students are admitted to it directly.
 _Avoid_: Career, carrera, degree
 
 **Catalog**:
@@ -22,12 +22,15 @@ Every program available in Mi Malla, grouped by institution and department.
 ## Official curriculum
 
 **Curriculum**:
-One official version of the course layout of a program, with its slots, areas, courses and tracks. Shown in the UI as "malla oficial".
+One official version of the course layout of a program, with its slots, areas, courses and tracks. It applies to the students who enter the program from its year on, until a newer curriculum replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
 _Avoid_: Malla, structure, program data
 
 **Course**:
-A subject with its own code, credits and prerequisites. Shown in the UI as "curso".
+A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
 _Avoid_: Ramo, subject, asignatura
+
+**Curriculum course**:
+A course as it appears in one curriculum, with the rules that curriculum sets for it: its prerequisites, the minimum approved credits it requires, its duration and whether it is an elective.
 
 **Slot**:
 The place of a course in a curriculum: the program year, the term and the position within that term.
@@ -46,7 +49,7 @@ A course that has a given course as a prerequisite.
 _Avoid_: Subsequent, dependent
 
 **Elective**:
-A course that stands for a choice among several options, so it can appear more than once in a period.
+A course that stands for a choice among several options, such as "Curso de Formación General", so it can appear more than once in a period. The student can write down which course they actually chose for each of its enrollments.
 _Avoid_: Optional, OFG
 
 **Area**:
@@ -54,8 +57,8 @@ A group of related courses in a curriculum, shown with one color. An area can co
 _Avoid_: Category, line
 
 **Track**:
-A path to a degree or title within a curriculum: the courses and credits it requires and the credential it grants.
-_Avoid_: Plan, mención, degree path
+A path to a degree or title within a curriculum: the courses and credits it requires and the credential it grants. A track can contain other tracks. Shown in the UI as "plan".
+_Avoid_: Plan (in code: it clashes with "plan de estudios" and with planning a trajectory), mención, degree path
 
 **Credential**:
 The degree, title or certificate a track grants.
