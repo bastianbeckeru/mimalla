@@ -1,19 +1,7 @@
 "use client";
 
-import { RotateCcw, Trash } from "lucide-react";
-import type { ReactNode } from "react";
+import SettingsDialog from "@/components/dashboard/settings-dialog";
 import Logo from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import {
   Sidebar,
@@ -113,68 +101,16 @@ export default function DashboardSidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-4 text-sm">
-        <ConfirmDialog
-          trigger={
-            <>
-              <RotateCcw />
-              Reiniciar malla
-            </>
-          }
-          title="¿Deseas reiniciar esta malla curricular?"
-          description="Volverá a la malla oficial y perderás tu progreso y cambios."
-          onConfirm={onReset}
-        />
-        <ConfirmDialog
-          trigger={
-            <>
-              <Trash />
-              Eliminar malla
-            </>
-          }
-          title="¿Deseas eliminar esta malla curricular?"
-          description="Esta acción es irreversible, todos los datos se perderán."
-          onConfirm={removeActiveTrajectory}
-        />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SettingsDialog
+              onReset={onReset}
+              onRemove={removeActiveTrajectory}
+            />
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  );
-}
-
-function ConfirmDialog({
-  trigger,
-  title,
-  description,
-  onConfirm,
-}: {
-  trigger: ReactNode;
-  title: string;
-  description: string;
-  onConfirm: () => void;
-}) {
-  return (
-    <Dialog>
-      <DialogTrigger
-        render={<Button variant="destructive" className="w-full" />}
-      >
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose render={<Button type="button" variant="ghost" />}>
-            Cancelar
-          </DialogClose>
-          <DialogClose
-            render={<Button variant="destructive" onClick={onConfirm} />}
-          >
-            Aceptar
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
