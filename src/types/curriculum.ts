@@ -5,7 +5,7 @@ export type CurriculumData = {
   department: Department;
   program: Program;
   curriculum: {
-    version: string;
+    version?: string;
     year: number;
     isCurrent: boolean;
     slots: Slot[];
@@ -41,8 +41,8 @@ type Department = {
 
 export type Program = {
   name: string;
-  siesCode: string;
-  demreCode: number;
+  siesCode?: string;
+  demreCode?: number;
   schedule: "DAYTIME" | "EVENING";
 };
 
