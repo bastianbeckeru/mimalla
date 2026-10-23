@@ -93,7 +93,7 @@ export default function CourseModal({
         <RelatedCourses
           title="Habilita"
           iconClassName="rotate-90"
-          items={toRelatedItems(course.subsequentIds)}
+          items={toRelatedItems(course.successorIds)}
         />
       </div>
     </ResponsiveDialog>

@@ -45,7 +45,7 @@ export default function CurriculumView({
     ? [
         focusedSlot.slot.courseId,
         ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
-        ...(focusedSlot.slot.course?.subsequentIds ?? []),
+        ...(focusedSlot.slot.course?.successorIds ?? []),
       ]
     : [];
 

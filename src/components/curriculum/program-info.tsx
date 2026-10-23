@@ -12,8 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import type {
   CredentialType,
   Institution,
-  Plan,
   Program,
+  Track,
 } from "@/types/curriculum";
 
 const CredentialTypeLabels: Record<CredentialType, string> = {
@@ -26,19 +26,19 @@ const CredentialTypeLabels: Record<CredentialType, string> = {
 export default function ProgramInfo({
   institution,
   program,
-  plans,
+  tracks,
   duration,
   children,
 }: {
   institution: Institution;
   program: Program;
-  plans: Plan[];
+  tracks: Track[];
   duration: number;
   children?: ReactNode;
 }) {
   const { schedule, siesCode, demreCode } = program;
 
-  const credentials = plans
+  const credentials = tracks
     .map((p) => p.credential)
     .filter((c) => c !== null)
     .sort((a, b) => {

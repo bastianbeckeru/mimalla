@@ -3,11 +3,12 @@ import { cn } from "cn";
 import type { ReactNode, Ref } from "react";
 import { MotionDiv, MotionUl } from "@/components/motion";
 import type { PeriodKey } from "@/types/curriculum";
+import type { Entry } from "@/types/trajectory";
 import { getPeriodInfo } from "@/utils/curriculum";
 
 type PeriodContainerProps = DroppableProvidedProps & {
   id: PeriodKey;
-  entry: { year: number; term: number };
+  entry: Entry;
   ref: Ref<HTMLUListElement>;
   children: ReactNode;
 };

@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { PeriodWithEnrollments } from "@/types/curriculum";
+import type { PeriodWithEnrollments } from "@/types/trajectory";
 import { parsePeriodKey, TERM_LABELS } from "@/utils/period-key";
 
 type AddPeriodDialogProps = {

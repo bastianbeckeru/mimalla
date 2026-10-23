@@ -4,10 +4,14 @@ import type {
   Course,
   ExtendedCourse,
   PeriodKey,
-  PeriodWithEnrollments,
   Slot,
 } from "@/types/curriculum";
-import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import type {
+  Enrollment,
+  EnrollmentStatus,
+  Entry,
+  PeriodWithEnrollments,
+} from "@/types/trajectory";
 import { arabicToRoman } from "@/utils/numbers";
 import {
   comparePeriodKeys,
@@ -18,12 +22,12 @@ import {
 } from "@/utils/period-key";
 
 export function extendCourses(courses: Course[]) {
-  const subsequentIds = new Map<number, number[]>();
+  const successorIds = new Map<number, number[]>();
 
   for (const course of courses) {
     for (const prerequisiteId of course.prerequisiteIds) {
-      subsequentIds.set(prerequisiteId, [
-        ...(subsequentIds.get(prerequisiteId) ?? []),
+      successorIds.set(prerequisiteId, [
+        ...(successorIds.get(prerequisiteId) ?? []),
         course.id,
       ]);
     }
@@ -32,7 +36,7 @@ export function extendCourses(courses: Course[]) {
   return new Map<number, ExtendedCourse>(
     courses.map((course) => [
       course.id,
-      { ...course, subsequentIds: subsequentIds.get(course.id) ?? [] },
+      { ...course, successorIds: successorIds.get(course.id) ?? [] },
     ]),
   );
 }
@@ -57,7 +61,7 @@ export function getCourseArea(areas: Area[], course: Course) {
 
 export function getPeriods(slots: Slot[]) {
   const periods = [
-    ...new Set(slots.map((s): PeriodKey => `${s.year}-${s.term}`)),
+    ...new Set(slots.map((s): PeriodKey => `${s.programYear}-${s.term}`)),
   ].sort(comparePeriodKeys);
 
   return {
@@ -68,20 +72,20 @@ export function getPeriods(slots: Slot[]) {
 }
 
 export function createEnrollments({
-  year,
-  term,
+  entry,
   slots,
 }: {
-  year: number;
-  term: number;
+  entry: Entry;
   slots: Slot[];
-}): EnrolledCourse[] {
-  const entryOffset = term >= 3 ? 1 : 0;
+}): Enrollment[] {
+  const entryOffset = entry.term >= 3 ? 1 : 0;
 
   return slots.map((slot) => {
     const semesterIndex =
-      getSemesterIndex({ year: year + slot.year - 1, term: slot.term }) +
-      entryOffset;
+      getSemesterIndex({
+        year: entry.year + slot.programYear - 1,
+        term: slot.term,
+      }) + entryOffset;
 
     return {
       id: nanoid(),
@@ -95,9 +99,9 @@ export function createEnrollments({
 }
 
 export function groupEnrollmentsByPeriod(
-  enrollments: EnrolledCourse[],
+  enrollments: Enrollment[],
 ): PeriodWithEnrollments[] {
-  const periods = new Map<PeriodKey, EnrolledCourse[]>();
+  const periods = new Map<PeriodKey, Enrollment[]>();
 
   for (const enrollment of enrollments) {
     const key: PeriodKey = `${enrollment.year}-${enrollment.term}`;
@@ -130,14 +134,14 @@ export function groupEnrollmentsByPeriod(
 }
 
 export function extractCourseIds(
-  enrollments: EnrolledCourse[],
-  status: EnrolledCourseStatus,
+  enrollments: Enrollment[],
+  status: EnrollmentStatus,
 ) {
   return enrollments.filter((e) => e.status === status).map((e) => e.courseId);
 }
 
 export function getCurriculumStats(
-  enrollments: EnrolledCourse[],
+  enrollments: Enrollment[],
   courses: Map<number, Course>,
 ) {
   let approvedCredits = 0;
@@ -166,10 +170,7 @@ export function getCurriculumStats(
   };
 }
 
-export function getPeriodInfo(
-  id: PeriodKey,
-  entry: { year: number; term: number },
-) {
+export function getPeriodInfo(id: PeriodKey, entry: Entry) {
   const { year, term } = parsePeriodKey(id);
   const currentDate = new Date();
 

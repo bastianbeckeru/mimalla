@@ -29,8 +29,8 @@ export default async function ProgramPage({
       <ProgramInfo
         institution={institution}
         program={program}
-        plans={curriculum.plans}
-        duration={getPeriods(curriculum.structure).nCols}
+        tracks={curriculum.tracks}
+        duration={getPeriods(curriculum.slots).nCols}
       >
         <ProgramModal program={{ ...program, stats }} />
         <ImportCurriculumButton

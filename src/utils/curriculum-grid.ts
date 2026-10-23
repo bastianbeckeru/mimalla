@@ -16,18 +16,18 @@ export const FONTSIZE = 16;
 
 function getPosition(periods: PeriodKey[], slot: Slot) {
   return {
-    x: periods.indexOf(`${slot.year}-${slot.term}`) + 1,
+    x: periods.indexOf(`${slot.programYear}-${slot.term}`) + 1,
     y: slot.position,
   };
 }
 
 export function getCurriculumGridData(data: CurriculumData) {
-  const { periods, nCols, nRows } = getPeriods(data.curriculum.structure);
+  const { periods, nCols, nRows } = getPeriods(data.curriculum.slots);
 
   const creditsMedian = calculateMedian(data.courses.map((c) => c.credits));
   const courses = extendCourses(data.courses);
 
-  const serializedSlots = data.curriculum.structure.map((slot) => {
+  const serializedSlots = data.curriculum.slots.map((slot) => {
     const position = getPosition(periods, slot);
     const course = courses.get(slot.courseId) ?? null;
     const area = course ? getCourseArea(data.areas, course) : null;

@@ -3,103 +3,123 @@ import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Slot } from "@/types/curriculum";
-import type { EnrolledCourse, StudentCurriculum } from "@/types/store";
+import type { Enrollment, Entry, Trajectory } from "@/types/trajectory";
 import { createEnrollments } from "@/utils/curriculum";
 
-type CurriculumState = {
-  curriculums: StudentCurriculum[];
-  activeCurriculumId: string | null;
+type TrajectoryState = {
+  trajectories: Trajectory[];
+  activeTrajectoryId: string | null;
 };
 
-type CurriculumActions = {
-  addCurriculum: (curriculum: {
+type TrajectoryActions = {
+  addTrajectory: (trajectory: {
+    curriculumPath: string;
+    entry: Entry;
+    slots: Slot[];
+  }) => void;
+  removeActiveTrajectory: () => void;
+  updateActiveEnrollments: (enrollments: Enrollment[]) => void;
+};
+
+type PersistedStateV2 = {
+  curriculums: {
+    id: string;
     path: string;
     year: number;
     term: number;
-    slots: Slot[];
-  }) => void;
-  removeActiveCurriculum: () => void;
-  updateActiveEnrollments: (enrollments: EnrolledCourse[]) => void;
+    enrolledCourses: Enrollment[];
+  }[];
+  activeCurriculumId: string | null;
 };
 
-export const useCurriculumStore = create<CurriculumState & CurriculumActions>()(
+export function migrateTrajectoryState(
+  persistedState: unknown,
+  version: number,
+): TrajectoryState {
+  const state = persistedState as PersistedStateV2;
+
+  if (version < 2) {
+    state.activeCurriculumId ??= state.curriculums[0]?.id ?? null;
+    state.curriculums = state.curriculums.map((curriculum) => ({
+      ...curriculum,
+      term: curriculum.term === 2 ? 3 : curriculum.term,
+      enrolledCourses: curriculum.enrolledCourses.map((enrollment) =>
+        enrollment.year < curriculum.year
+          ? { ...enrollment, year: curriculum.year + enrollment.year - 1 }
+          : enrollment,
+      ),
+    }));
+  }
+
+  return {
+    trajectories: state.curriculums.map((curriculum) => ({
+      id: curriculum.id,
+      curriculumPath: curriculum.path,
+      entry: { year: curriculum.year, term: curriculum.term },
+      enrollments: curriculum.enrolledCourses,
+    })),
+    activeTrajectoryId: state.activeCurriculumId,
+  };
+}
+
+export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
   persist(
     (set) => ({
-      curriculums: [],
-      activeCurriculumId: null,
+      trajectories: [],
+      activeTrajectoryId: null,
 
-      addCurriculum: ({ path, year, term, slots }) =>
+      addTrajectory: ({ curriculumPath, entry, slots }) =>
         set((state) => {
-          const curriculum = {
+          const trajectory = {
             id: nanoid(),
-            path,
-            year,
-            term,
-            enrolledCourses: createEnrollments({ year, term, slots }),
+            curriculumPath,
+            entry,
+            enrollments: createEnrollments({ entry, slots }),
           };
 
           return {
-            curriculums: [...state.curriculums, curriculum],
-            activeCurriculumId: curriculum.id,
+            trajectories: [...state.trajectories, trajectory],
+            activeTrajectoryId: trajectory.id,
           };
         }),
 
-      removeActiveCurriculum: () =>
+      removeActiveTrajectory: () =>
         set((state) => {
-          const curriculums = state.curriculums.filter(
-            (c) => c.id !== state.activeCurriculumId,
+          const trajectories = state.trajectories.filter(
+            (t) => t.id !== state.activeTrajectoryId,
           );
 
           return {
-            curriculums,
-            activeCurriculumId: curriculums[0]?.id ?? null,
+            trajectories,
+            activeTrajectoryId: trajectories[0]?.id ?? null,
           };
         }),
 
       updateActiveEnrollments: (enrollments) =>
         set((state) => ({
-          curriculums: state.curriculums.map((c) =>
-            c.id === state.activeCurriculumId
-              ? { ...c, enrolledCourses: enrollments }
-              : c,
+          trajectories: state.trajectories.map((t) =>
+            t.id === state.activeTrajectoryId ? { ...t, enrollments } : t,
           ),
         })),
     }),
     {
       name: "curriculum-storage",
-      version: 2,
-      migrate: (persistedState, version) => {
-        const state = persistedState as CurriculumState;
-
-        if (version < 2) {
-          state.activeCurriculumId ??= state.curriculums[0]?.id ?? null;
-          state.curriculums = state.curriculums.map((curriculum) => ({
-            ...curriculum,
-            term: curriculum.term === 2 ? 3 : curriculum.term,
-            enrolledCourses: curriculum.enrolledCourses.map((enrollment) =>
-              enrollment.year < curriculum.year
-                ? { ...enrollment, year: curriculum.year + enrollment.year - 1 }
-                : enrollment,
-            ),
-          }));
-        }
-
-        return state;
-      },
+      version: 3,
+      migrate: migrateTrajectoryState,
     },
   ),
 );
 
-export function useActiveCurriculum() {
-  return useCurriculumStore((state) =>
-    state.curriculums.find((c) => c.id === state.activeCurriculumId),
+export function useActiveTrajectory() {
+  return useTrajectoryStore((state) =>
+    state.trajectories.find((t) => t.id === state.activeTrajectoryId),
   );
 }
 
 export function useHasHydrated() {
   return useSyncExternalStore(
-    (onChange) => useCurriculumStore.persist.onFinishHydration(onChange),
-    () => useCurriculumStore.persist.hasHydrated(),
+    (onChange) => useTrajectoryStore.persist.onFinishHydration(onChange),
+    () => useTrajectoryStore.persist.hasHydrated(),
     () => false,
   );
 }

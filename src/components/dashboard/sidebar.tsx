@@ -2,7 +2,7 @@
 
 import { RotateCcw, Trash } from "lucide-react";
 import type { ReactNode } from "react";
-import Logo from "@/components/Logo";
+import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +28,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { useCurriculumStore } from "@/stores/curriculum";
+import { useTrajectoryStore } from "@/stores/trajectory";
 import type { Area } from "@/types/curriculum";
 import { getLuminance, parseHexColor } from "@/utils/colors";
 
@@ -48,7 +48,7 @@ export default function DashboardSidebar({
   stats,
   onReset,
 }: DashboardSidebarProps) {
-  const { removeActiveCurriculum } = useCurriculumStore();
+  const { removeActiveTrajectory } = useTrajectoryStore();
   const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
   const subareaIds = areas.flatMap((area) => area.subareaIds);
   const mainAreas = areas
@@ -134,7 +134,7 @@ export default function DashboardSidebar({
           }
           title="¿Deseas eliminar esta malla curricular?"
           description="Esta acción es irreversible, todos los datos se perderán."
-          onConfirm={removeActiveCurriculum}
+          onConfirm={removeActiveTrajectory}
         />
       </SidebarFooter>
     </Sidebar>

@@ -1,5 +1,5 @@
 import { cn } from "cn";
-import Logo from "@/components/Logo";
+import Logo from "@/components/logo";
 import { Searchbar } from "@/components/search-bar";
 import { getCatalog } from "@/server/db/curriculums";
 

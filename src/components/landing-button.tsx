@@ -4,7 +4,7 @@ import { track } from "@vercel/analytics";
 import { cn } from "cn";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useCurriculumStore, useHasHydrated } from "@/stores/curriculum";
+import { useHasHydrated, useTrajectoryStore } from "@/stores/trajectory";
 
 type LandingButtonProps = {
   label: string;
@@ -21,9 +21,9 @@ export function LandingButton({
   className,
 }: LandingButtonProps) {
   const hasHydrated = useHasHydrated();
-  const { curriculums } = useCurriculumStore();
+  const { trajectories } = useTrajectoryStore();
 
-  if (hasHydrated && curriculums.length > 0) {
+  if (hasHydrated && trajectories.length > 0) {
     return (
       <Link
         href="/dashboard"

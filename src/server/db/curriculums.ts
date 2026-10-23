@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
+import type {
+  CatalogInstitution,
+  CurriculumData,
+  Slot,
+  Track,
+} from "@/types/curriculum";
 
 const CURRICULUMS_DIR = path.join(
   process.cwd(),
@@ -9,6 +14,13 @@ const CURRICULUMS_DIR = path.join(
   "db",
   "curriculums",
 );
+
+type CurriculumFile = Omit<CurriculumData, "curriculum"> & {
+  curriculum: Omit<CurriculumData["curriculum"], "slots" | "tracks"> & {
+    structure: (Omit<Slot, "programYear"> & { year: number })[];
+    plans: Track[];
+  };
+};
 
 type CurriculumParams = {
   institutionAcronym: string;
@@ -40,7 +52,22 @@ export function getProgramData({
     `${programSlug}.json`,
   );
 
-  return JSON.parse(fs.readFileSync(file, "utf-8"));
+  const { curriculum, ...data }: CurriculumFile = JSON.parse(
+    fs.readFileSync(file, "utf-8"),
+  );
+  const { structure, plans, ...version } = curriculum;
+
+  return {
+    ...data,
+    curriculum: {
+      ...version,
+      slots: structure.map(({ year, ...slot }) => ({
+        ...slot,
+        programYear: year,
+      })),
+      tracks: plans,
+    },
+  };
 }
 
 export function getCatalog(): CatalogInstitution[] {

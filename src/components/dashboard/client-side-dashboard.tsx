@@ -4,11 +4,11 @@ import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Save, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import CurriculumForm from "@/components/dashboard/curriculum-form";
-import RBDndCurriculum from "@/components/dashboard/rbdnd/dnd-curriculum";
+import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
 import Sidebar from "@/components/dashboard/sidebar";
 import KbdHotkey from "@/components/kbd-hotkey";
 import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
+import TrajectoryBoard from "@/components/trajectory/trajectory-board";
 import { Button } from "@/components/ui/button";
 import { KbdGroup } from "@/components/ui/kbd";
 import { Progress } from "@/components/ui/progress";
@@ -20,16 +20,12 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { useHistory } from "@/hooks/use-history";
 import {
-  useActiveCurriculum,
-  useCurriculumStore,
+  useActiveTrajectory,
   useHasHydrated,
-} from "@/stores/curriculum";
-import type {
-  CatalogInstitution,
-  CurriculumData,
-  PeriodWithEnrollments,
-} from "@/types/curriculum";
-import type { StudentCurriculum } from "@/types/store";
+  useTrajectoryStore,
+} from "@/stores/trajectory";
+import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
+import type { PeriodWithEnrollments, Trajectory } from "@/types/trajectory";
 import {
   createEnrollments,
   extendCourses,
@@ -55,11 +51,11 @@ export default function ClientSideDashboard({
   catalog: CatalogInstitution[];
 }) {
   const hasHydrated = useHasHydrated();
-  const activeCurriculum = useActiveCurriculum();
-  const { removeActiveCurriculum } = useCurriculumStore();
+  const activeTrajectory = useActiveTrajectory();
+  const { removeActiveTrajectory } = useTrajectoryStore();
   const [program, setProgram] = useState<LoadedProgram | null>(null);
 
-  const activePath = activeCurriculum?.path;
+  const activePath = activeTrajectory?.curriculumPath;
   const loadedPath = program?.path;
 
   useEffect(() => {
@@ -82,22 +78,22 @@ export default function ClientSideDashboard({
 
   if (!hasHydrated) return loader;
 
-  if (!activeCurriculum) {
+  if (!activeTrajectory) {
     return (
-      <CurriculumForm
+      <NewTrajectoryForm
         catalog={catalog}
         onImport={(path, data) => setProgram({ path, data })}
       />
     );
   }
 
-  if (program?.path !== activeCurriculum.path) return loader;
+  if (program?.path !== activeTrajectory.curriculumPath) return loader;
 
   if (!program.data) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <p className="text-muted-foreground">No se pudo cargar tu malla.</p>
-        <Button variant="destructive" onClick={removeActiveCurriculum}>
+        <Button variant="destructive" onClick={removeActiveTrajectory}>
           Eliminar malla
         </Button>
       </div>
@@ -105,24 +101,24 @@ export default function ClientSideDashboard({
   }
 
   return (
-    <CurriculumDashboard
-      key={activeCurriculum.id}
-      curriculum={activeCurriculum}
+    <TrajectoryDashboard
+      key={activeTrajectory.id}
+      trajectory={activeTrajectory}
       data={program.data}
     />
   );
 }
 
-function CurriculumDashboard({
-  curriculum,
+function TrajectoryDashboard({
+  trajectory,
   data,
 }: {
-  curriculum: StudentCurriculum;
+  trajectory: Trajectory;
   data: CurriculumData;
 }) {
-  const { updateActiveEnrollments } = useCurriculumStore();
+  const { updateActiveEnrollments } = useTrajectoryStore();
   const history = useHistory(() =>
-    groupEnrollmentsByPeriod(curriculum.enrolledCourses),
+    groupEnrollmentsByPeriod(trajectory.enrollments),
   );
   const [editMode, setEditMode] = useState(false);
 
@@ -164,9 +160,8 @@ function CurriculumDashboard({
 
   function resetCurriculum() {
     const officialEnrollments = createEnrollments({
-      year: curriculum.year,
-      term: curriculum.term,
-      slots: data.curriculum.structure,
+      entry: trajectory.entry,
+      slots: data.curriculum.slots,
     });
 
     updateActiveEnrollments(officialEnrollments);
@@ -225,10 +220,10 @@ function CurriculumDashboard({
         </div>
 
         <ScrollAreaWrapper className="h-[calc(100dvh-3.5rem)] w-dvw overflow-hidden lg:w-[calc(100dvw-18rem)]">
-          <RBDndCurriculum
+          <TrajectoryBoard
             editMode={editMode}
             history={history}
-            entry={curriculum}
+            entry={trajectory.entry}
             areas={data.areas}
             courses={courses}
             approvedCourseIds={extractCourseIds(enrollments, "APPROVED")}

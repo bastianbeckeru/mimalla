@@ -1,10 +1,3 @@
-import type { EnrolledCourse } from "@/types/store";
-
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: EnrolledCourse[];
-};
-
 export type PeriodKey = `${number}-${number}`;
 
 export type CurriculumData = {
@@ -16,8 +9,8 @@ export type CurriculumData = {
     version: string;
     year: number;
     isCurrent: boolean;
-    structure: Slot[];
-    plans: Plan[];
+    slots: Slot[];
+    tracks: Track[];
   };
   areas: Area[];
   courses: Course[];
@@ -54,7 +47,7 @@ export type Program = {
   schedule: "DAYTIME" | "EVENING";
 };
 
-export type Plan = {
+export type Track = {
   id: number;
   name: string;
   description?: string;
@@ -132,12 +125,12 @@ export type Course = {
   isElective: boolean;
 };
 export type ExtendedCourse = Course & {
-  subsequentIds: number[];
+  successorIds: number[];
 };
 
 export type Slot = {
   id: number;
-  year: number;
+  programYear: number;
   term: number;
   position: number;
   courseId: number;

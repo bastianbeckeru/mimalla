@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCurriculumStore, useHasHydrated } from "@/stores/curriculum";
+import { useHasHydrated, useTrajectoryStore } from "@/stores/trajectory";
 import type { CurriculumData } from "@/types/curriculum";
 
 type Props = {
@@ -32,12 +32,12 @@ export default function ImportCurriculumButton({
   program,
 }: Props) {
   const hasHydrated = useHasHydrated();
-  const { addCurriculum, curriculums } = useCurriculumStore();
+  const { addTrajectory, trajectories } = useTrajectoryStore();
   const [year, setYear] = useState<number | null>(null);
   const [term, setTerm] = useState<number | null>(null);
   const router = useRouter();
 
-  if (hasHydrated && curriculums.some((c) => c.path === path)) {
+  if (hasHydrated && trajectories.some((t) => t.curriculumPath === path)) {
     return (
       <Button
         className="w-full"
@@ -103,7 +103,11 @@ export default function ImportCurriculumButton({
             onClick={() => {
               if (!year || !term) return;
 
-              addCurriculum({ path, year, term, slots: curriculum.structure });
+              addTrajectory({
+                curriculumPath: path,
+                entry: { year, term },
+                slots: curriculum.slots,
+              });
               router.push("/dashboard");
             }}
           >

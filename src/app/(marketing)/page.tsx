@@ -127,7 +127,7 @@ function SemesterCard({ className }: { className?: string }) {
 const features = [
   {
     title: "Prerrequisitos a la vista",
-    description: "Toca un ramo y ve qué necesita y qué desbloquea.",
+    description: "Toca un curso y ve qué necesita y qué desbloquea.",
     preview: (
       <div className="flex items-center gap-2.5">
         <FloatingCard className="rounded-xl px-3.5 py-2.5 font-semibold text-[13px]">
@@ -143,7 +143,7 @@ const features = [
   {
     title: "A tu propio ritmo",
     description:
-      "Arrastra ramos entre semestres y arma el plan que te acomode.",
+      "Arrastra cursos entre semestres y arma el plan que te acomode.",
     preview: (
       <div className="flex gap-3">
         <div className="flex w-24 flex-col gap-1.5">
@@ -180,7 +180,7 @@ const features = [
           <div className="h-full w-[38%] rounded-full bg-blue-600" />
         </div>
         <span className="text-muted-foreground text-xs">
-          30 ramos por delante
+          30 cursos por delante
         </span>
       </FloatingCard>
     ),
@@ -230,7 +230,7 @@ export default function IndexPage() {
               <br />y respira
             </h1>
             <p className="max-w-75 text-base text-muted-foreground leading-relaxed sm:max-w-110 sm:text-[17px]">
-              Ve qué ramos llevas, cuáles te bloquean y cuánto te falta.
+              Ve qué cursos llevas, cuáles te bloquean y cuánto te falta.
             </p>
             <LandingButton
               label="Elegir mi carrera"
@@ -284,7 +284,7 @@ export default function IndexPage() {
                     18 de 48
                   </span>
                   <span className="text-[13px] text-muted-foreground">
-                    ramos aprobados
+                    cursos aprobados
                   </span>
                 </div>
               </div>

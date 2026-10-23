@@ -13,30 +13,30 @@ import { nanoid } from "nanoid";
 import { useState } from "react";
 import { toast } from "sonner";
 import CourseModal from "@/components/curriculum/course-modal";
-import AddEnrollmentDialog from "@/components/dashboard/add-enrollment-dialog";
-import AddPeriodDialog from "@/components/dashboard/add-period-dialog";
-import EnrollmentCard from "@/components/dashboard/rbdnd/enrollment-card";
-import PeriodContainer from "@/components/dashboard/rbdnd/period-container";
 import { MotionDiv } from "@/components/motion";
+import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
+import AddPeriodDialog from "@/components/trajectory/add-period-dialog";
+import EnrollmentCard from "@/components/trajectory/enrollment-card";
+import PeriodContainer from "@/components/trajectory/period-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { HistoryControls } from "@/hooks/use-history";
+import type { Area, ExtendedCourse, PeriodKey } from "@/types/curriculum";
 import type {
-  Area,
-  ExtendedCourse,
-  PeriodKey,
+  Enrollment,
+  EnrollmentStatus,
+  Entry,
   PeriodWithEnrollments,
-} from "@/types/curriculum";
-import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+} from "@/types/trajectory";
 import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
 import { getCourseArea } from "@/utils/curriculum";
 import { comparePeriodKeys, parsePeriodKey } from "@/utils/period-key";
 
 const MAX_ENROLLMENTS_PER_PERIOD = 10;
 
-type RBDndCurriculumProps = {
+type TrajectoryBoardProps = {
   editMode: boolean;
   history: HistoryControls<PeriodWithEnrollments[]>;
-  entry: { year: number; term: number };
+  entry: Entry;
   areas: Area[];
   courses: Map<number, ExtendedCourse>;
   approvedCourseIds: number[];
@@ -50,7 +50,7 @@ type OpenedCourse = {
   color: string;
 };
 
-export default function RBDndCurriculum({
+export default function TrajectoryBoard({
   editMode,
   history,
   entry,
@@ -60,7 +60,7 @@ export default function RBDndCurriculum({
   failedCourseIds,
   approvedCredits,
   onSave,
-}: RBDndCurriculumProps) {
+}: TrajectoryBoardProps) {
   const periods = history.present;
   const [openedCourse, setOpenedCourse] = useState<OpenedCourse | null>(null);
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
@@ -103,7 +103,7 @@ export default function RBDndCurriculum({
     }
 
     const { year, term } = parsePeriodKey(periodId);
-    const enrollment: EnrolledCourse = {
+    const enrollment: Enrollment = {
       id: nanoid(),
       courseId,
       status: "PENDING",
@@ -411,7 +411,7 @@ function getMoveError(
 
   const isMovingForward = sourceIndex < destinationIndex;
   const relatedIds = isMovingForward
-    ? course.subsequentIds
+    ? course.successorIds
     : course.prerequisiteIds;
 
   const hasRelatedCourse = (period: PeriodWithEnrollments) =>
@@ -438,8 +438,8 @@ function getMoveError(
 
 function setEnrollmentStatus(
   periods: PeriodWithEnrollments[],
-  target: EnrolledCourse,
-  status: EnrolledCourseStatus,
+  target: Enrollment,
+  status: EnrollmentStatus,
   courses: Map<number, ExtendedCourse>,
 ) {
   const revertedCourseIds =
@@ -474,13 +474,13 @@ function getApprovedSuccessorIds(
   const pendingIds = [courseId];
 
   for (let id = pendingIds.pop(); id !== undefined; id = pendingIds.pop()) {
-    for (const subsequentId of courses.get(id)?.subsequentIds ?? []) {
+    for (const successorId of courses.get(id)?.successorIds ?? []) {
       if (
-        approvedCourseIds.has(subsequentId) &&
-        !successorIds.has(subsequentId)
+        approvedCourseIds.has(successorId) &&
+        !successorIds.has(successorId)
       ) {
-        successorIds.add(subsequentId);
-        pendingIds.push(subsequentId);
+        successorIds.add(successorId);
+        pendingIds.push(successorId);
       }
     }
   }

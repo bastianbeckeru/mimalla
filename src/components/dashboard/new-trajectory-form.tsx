@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCurriculumStore } from "@/stores/curriculum";
+import { useTrajectoryStore } from "@/stores/trajectory";
 import type {
   CatalogDepartment,
   CatalogInstitution,
@@ -36,14 +36,14 @@ import type {
 } from "@/types/curriculum";
 import { fetchProgramData } from "@/utils/curriculum-data";
 
-export default function CurriculumForm({
+export default function NewTrajectoryForm({
   catalog,
   onImport,
 }: {
   catalog: CatalogInstitution[];
   onImport: (path: string, data: CurriculumData) => void;
 }) {
-  const { addCurriculum } = useCurriculumStore();
+  const { addTrajectory } = useTrajectoryStore();
 
   const [selectedInstitution, setSelectedInstitution] = useState(
     catalog.length === 1 ? catalog[0] : undefined,
@@ -69,11 +69,10 @@ export default function CurriculumForm({
       const data = await fetchProgramData(selectedProgram.path);
 
       onImport(selectedProgram.path, data);
-      addCurriculum({
-        path: selectedProgram.path,
-        year,
-        term,
-        slots: data.curriculum.structure,
+      addTrajectory({
+        curriculumPath: selectedProgram.path,
+        entry: { year, term },
+        slots: data.curriculum.slots,
       });
 
       toast("✅ Malla importada", {

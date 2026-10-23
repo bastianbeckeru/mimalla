@@ -9,10 +9,10 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import type { Course } from "@/types/curriculum";
-import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
+import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
 import { checkContrasts } from "@/utils/colors";
 
-const STATUS_TRANSITIONS: Record<EnrolledCourseStatus, EnrolledCourseStatus> = {
+const STATUS_TRANSITIONS: Record<EnrollmentStatus, EnrollmentStatus> = {
   PENDING: "APPROVED",
   APPROVED: "FAILED",
   FAILED: "PENDING",
@@ -25,14 +25,14 @@ const STATUS_ACTIONS = [
 ] as const;
 
 type EnrollmentCardProps = {
-  enrollment: EnrolledCourse;
+  enrollment: Enrollment;
   course: Course | undefined;
   color: string;
   isAvailable: boolean;
   editMode: boolean;
   isDragging: boolean;
   onOpen: () => void;
-  onStatusChange: (status: EnrolledCourseStatus) => void;
+  onStatusChange: (status: EnrollmentStatus) => void;
   onDelete: () => void;
 };
 

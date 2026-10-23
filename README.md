@@ -67,12 +67,13 @@ Then open [http://localhost:3000](http://localhost:3000).
 src/
 ├── app/            Next.js routes: landing, program pages, dashboard and curriculum JSON API
 ├── components/
-│   ├── curriculum/ Curriculum grid, course cards and prerequisite paths
-│   ├── dashboard/  Sidebar, dialogs and forms of the dashboard
+│   ├── curriculum/ Official curriculum grid, course cards and prerequisite paths
+│   ├── dashboard/  Dashboard shell: sidebar and new trajectory form
+│   ├── trajectory/ Trajectory board: periods, enrollments and their dialogs
 │   └── ui/         shadcn/ui components
 ├── hooks/          Shared React hooks
 ├── server/db/      Curriculum JSON files and the build-time reader
-├── stores/         Zustand stores persisted to local storage
+├── stores/         Trajectory store persisted to local storage
 ├── styles/         Global and curriculum styles
 ├── types/          Shared types
 └── utils/          Shared helpers

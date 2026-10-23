@@ -1,18 +1,29 @@
-export type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
+import type { PeriodKey } from "@/types/curriculum";
 
-export type EnrolledCourse = {
+export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
+
+export type Enrollment = {
   id: string;
   year: number;
   term: number;
   position: number;
-  status: EnrolledCourseStatus;
+  status: EnrollmentStatus;
   courseId: number;
 };
 
-export type StudentCurriculum = {
-  id: string;
-  path: string;
+export type Entry = {
   year: number;
   term: number;
-  enrolledCourses: EnrolledCourse[];
+};
+
+export type Trajectory = {
+  id: string;
+  curriculumPath: string;
+  entry: Entry;
+  enrollments: Enrollment[];
+};
+
+export type PeriodWithEnrollments = {
+  id: PeriodKey;
+  enrollments: Enrollment[];
 };
