@@ -3,9 +3,9 @@
 import { cn } from "cn";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EntryDateFields } from "@/components/entry-date-fields";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Command,
@@ -23,93 +23,67 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { institutions } from "@/server/db/data";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import type { CurriculumData } from "@/types/curriculum";
-import { getProgramData } from "@/utils/curriculum-data";
-import { slugify } from "@/utils/strings";
-
-type Institution = {
-  acronym: string;
-  name: string;
-  departments: Department[];
-};
-
-type Department = {
-  name: string;
-  programs: Program[];
-};
-
-type Program = {
-  name: string;
-  siesCode: string;
-};
-
-const years = [2020, 2021, 2022, 2023, 2024, 2025];
-
-const institutionOptions = institutions.map((institution) => ({
-  value: institution.acronym,
-  label: institution.name,
-}));
-
-const periods = [
-  { value: 1, label: "Primer semestre" },
-  { value: 2, label: "Segundo semestre" },
-];
+import { useCurriculumStore } from "@/stores/curriculum";
+import type {
+  CatalogDepartment,
+  CatalogInstitution,
+  CatalogProgram,
+  CurriculumData,
+} from "@/types/curriculum";
+import { fetchProgramData } from "@/utils/curriculum-data";
 
 export default function CurriculumForm({
-  setData,
+  catalog,
+  onImport,
 }: {
-  setData: (data: CurriculumData) => void;
+  catalog: CatalogInstitution[];
+  onImport: (path: string, data: CurriculumData) => void;
 }) {
-  const router = useRouter();
-  const { addCurriculum } = useNewCurriculumStore();
+  const { addCurriculum } = useCurriculumStore();
 
-  const [selectedInstitution, setSelectedInstitution] = useState<
-    Institution | undefined
-  >(institutions.length === 1 ? institutions[0] : undefined);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-  const [year, setYear] = useState<number>();
-  const [period, setPeriod] = useState<number>();
+  const [selectedInstitution, setSelectedInstitution] = useState(
+    catalog.length === 1 ? catalog[0] : undefined,
+  );
+  const [selectedProgram, setSelectedProgram] = useState<CatalogProgram>();
+  const [year, setYear] = useState<number | null>(null);
+  const [term, setTerm] = useState<number | null>(null);
 
   const [open, setOpen] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
+  const institutionOptions = catalog.map((institution) => ({
+    value: institution.acronym,
+    label: institution.name,
+  }));
+
   async function onSubmit() {
-    console.log("Importing curriculum...");
-    if (!selectedInstitution || !selectedProgram || !year || !period) return;
+    if (!selectedProgram || !year || !term) return;
 
     setIsCreating(true);
 
-    const institutionAcronym = selectedInstitution.acronym.toLowerCase();
-    const programSlug = slugify(selectedProgram.name);
-
     try {
-      const data = await getProgramData({
-        institutionAcronym: institutionAcronym,
-        programSlug: programSlug,
-      });
+      const data = await fetchProgramData(selectedProgram.path);
 
+      onImport(selectedProgram.path, data);
       addCurriculum({
-        year: year,
-        term: period,
-        path: `${institutionAcronym}/${programSlug}`,
+        path: selectedProgram.path,
+        year,
+        term,
         slots: data.curriculum.structure,
       });
-
-      setData(data);
 
       toast("✅ Malla importada", {
         description: `${data.program.name} ${data.curriculum.year}`,
       });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      router.push("/");
+    } catch {
+      toast("❌ No se pudo importar la malla", {
+        description: "Inténtalo nuevamente en unos segundos.",
+      });
+      setIsCreating(false);
     }
   }
 
@@ -138,27 +112,23 @@ export default function CurriculumForm({
 
         <div className="gap-3">
           <div className="flex flex-col gap-1">
-            <h3 className="hidden font-semibold text-muted-foreground">
-              Carrera
-            </h3>
-
             <div className="flex flex-col gap-2">
               <Select
                 items={institutionOptions}
                 value={selectedInstitution?.acronym ?? null}
                 onValueChange={(value: string | null) => {
-                  const selected = institutions.find(
-                    (inst) => inst.acronym === value,
+                  setSelectedInstitution(
+                    catalog.find((inst) => inst.acronym === value),
                   );
-                  setSelectedInstitution(selected);
+                  setSelectedProgram(undefined);
                 }}
-                disabled={institutions.length === 1}
+                disabled={catalog.length === 1}
               >
                 <SelectTrigger id="institution" className="w-full">
                   <SelectValue placeholder="Selecciona una universidad" />
                 </SelectTrigger>
                 <SelectContent>
-                  {institutions.map((institution) => (
+                  {catalog.map((institution) => (
                     <SelectItem
                       key={institution.acronym}
                       value={institution.acronym}
@@ -193,12 +163,9 @@ export default function CurriculumForm({
                   </PopoverContent>
                 </Popover>
 
-                {selectedInstitution && selectedProgram && (
+                {selectedProgram && (
                   <Link
-                    href={slugify(
-                      selectedInstitution.acronym,
-                      selectedProgram.name,
-                    )}
+                    href={`/${selectedProgram.path}`}
                     className="text-muted-foreground text-xs underline underline-offset-4 hover:text-foreground"
                   >
                     Ver malla
@@ -211,56 +178,20 @@ export default function CurriculumForm({
           <div className="flex flex-col gap-1">
             <h3 className="font-semibold text-muted-foreground">Ingreso</h3>
 
-            <div className="flex flex-row gap-2">
-              <Select
-                value={year ?? null}
-                onValueChange={(value: number | null) =>
-                  setYear(value ?? undefined)
-                }
-                disabled={!selectedProgram}
-              >
-                <SelectTrigger id="year" className="min-w-24">
-                  <SelectValue placeholder="Año" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Select
-                items={periods}
-                value={period ?? null}
-                onValueChange={(value: number | null) =>
-                  setPeriod(value ?? undefined)
-                }
-                disabled={!selectedProgram}
-              >
-                <SelectTrigger id="semester" className="flex-1">
-                  <SelectValue placeholder="Semestre" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {periods.map((period) => (
-                      <SelectItem key={period.value} value={period.value}>
-                        {period.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+            <EntryDateFields
+              year={year}
+              term={term}
+              onYearChange={setYear}
+              onTermChange={setTerm}
+              disabled={!selectedProgram}
+            />
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <Button
             className="w-full"
-            disabled={!selectedProgram || !year || !period || isCreating}
+            disabled={!selectedProgram || !year || !term || isCreating}
             onClick={onSubmit}
           >
             {isCreating ? (
@@ -293,9 +224,9 @@ function ProgramList({
   setSelectedProgram,
   departments,
 }: {
-  departments: Department[];
+  departments: CatalogDepartment[];
   setOpen: (open: boolean) => void;
-  setSelectedProgram: (program: Program) => void;
+  setSelectedProgram: (program: CatalogProgram) => void;
 }) {
   return (
     <Command>
@@ -306,7 +237,7 @@ function ProgramList({
           <CommandGroup key={department.name} heading={department.name}>
             {department.programs.map((program) => (
               <CommandItem
-                key={program.siesCode}
+                key={program.path}
                 value={program.name}
                 onSelect={() => {
                   setSelectedProgram(program);

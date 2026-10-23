@@ -1,42 +1,46 @@
+import { nanoid } from "nanoid";
 import type {
   Area,
   Course,
-  CurriculumData,
   ExtendedCourse,
   PeriodKey,
+  PeriodWithEnrollments,
+  Slot,
 } from "@/types/curriculum";
 import type { EnrolledCourse, EnrolledCourseStatus } from "@/types/store";
 import { arabicToRoman } from "@/utils/numbers";
-import { comparePeriodKeys, parsePeriodKey } from "@/utils/period-key";
+import {
+  comparePeriodKeys,
+  getSemesterIndex,
+  isSemester,
+  parsePeriodKey,
+  TERM_LABELS,
+} from "@/utils/period-key";
 
-export function getCourse({
-  id,
-  courses,
-}: {
-  id: number;
-  courses: Map<number, Course>;
-}) {
-  const course = courses.get(id);
+export function extendCourses(courses: Course[]) {
+  const subsequentIds = new Map<number, number[]>();
 
-  if (!course) return null;
+  for (const course of courses) {
+    for (const prerequisiteId of course.prerequisiteIds) {
+      subsequentIds.set(prerequisiteId, [
+        ...(subsequentIds.get(prerequisiteId) ?? []),
+        course.id,
+      ]);
+    }
+  }
 
-  const subsequentIds = course
-    ? Array.from(courses.values())
-        .filter((c) => c.prerequisiteIds.includes(course.id))
-        .map((c) => c.id)
-    : [];
-
-  return { ...course, subsequentIds: subsequentIds };
+  return new Map<number, ExtendedCourse>(
+    courses.map((course) => [
+      course.id,
+      { ...course, subsequentIds: subsequentIds.get(course.id) ?? [] },
+    ]),
+  );
 }
 
-export function getCourseArea(
-  areas: Area[],
-  course: ExtendedCourse & { isElective: boolean },
-) {
+export function getCourseArea(areas: Area[], course: Course) {
   const { id, isElective } = course;
 
   if (isElective) {
-    // Qué pasa en el caso de que el electivo pertenezca a un main area indicando que todos los cursos de esa main area son opciones para este electivo?
     const electiveAreas = areas.filter((area) => area.courseIds.includes(id));
 
     const mainArea = areas.find((area) =>
@@ -51,119 +55,97 @@ export function getCourseArea(
   return areas.find((area) => area.courseIds.includes(id));
 }
 
-export function getPeriods({
-  slots,
-}: {
-  slots: CurriculumData["curriculum"]["structure"];
-}): {
-  nCols: number;
-  nRows: number;
-  periods: PeriodKey[];
-} {
-  const periodSet = new Set<PeriodKey>();
-  let maxRows = 1;
-
-  slots.forEach((s) => {
-    periodSet.add(`${s.year}-${s.term}`);
-    maxRows = Math.max(maxRows, s.position);
-  });
-
-  const sortedPeriods = Array.from(periodSet).sort(comparePeriodKeys);
-
-  return { nCols: periodSet.size, nRows: maxRows, periods: sortedPeriods };
-}
-
-export function getPeriodsWithEnrollments({
-  year,
-  enrollments,
-}: {
-  year: number;
-  enrollments: EnrolledCourse[];
-}): {
-  nCols: number;
-  nRows: number;
-  periods: {
-    id: PeriodKey;
-    enrollments: EnrolledCourse[];
-  }[];
-  hasToSave: boolean;
-} {
-  const periodMap = new Map<PeriodKey, EnrolledCourse[]>();
-  let maxRows = 1;
-  let minYear = Infinity;
-  let maxYear = -Infinity;
-  let hasToSave = false;
-
-  enrollments.forEach((e) => {
-    if (hasToSave === false && e.year < 1800) {
-      hasToSave = true; // ⚠️ Temp: Fix outdated year format
-    }
-    e.year = !hasToSave ? e.year : year + e.year - 1; // ⚠️ Temp: Fix outdated year format
-
-    const periodKey: PeriodKey = `${e.year}-${e.term}`;
-
-    if (!periodMap.has(periodKey)) {
-      periodMap.set(periodKey, []);
-    }
-
-    periodMap.get(periodKey)?.push(e);
-
-    maxRows = Math.max(maxRows, e.position);
-    minYear = Math.min(minYear, e.year);
-    maxYear = Math.max(maxYear, e.year);
-  });
-
-  for (let pYear = minYear; pYear <= maxYear; pYear++) {
-    const firstSemesterKey: PeriodKey = `${pYear}-1`;
-    const secondSemesterKey: PeriodKey = `${pYear}-3`;
-
-    if (!periodMap.has(firstSemesterKey)) periodMap.set(firstSemesterKey, []);
-    if (!periodMap.has(secondSemesterKey)) periodMap.set(secondSemesterKey, []);
-  }
-
-  const sortedPeriods = Array.from(periodMap.entries())
-    .sort(([a], [b]) => comparePeriodKeys(a, b))
-    .map(([id, enrollments]) => {
-      return { id, enrollments };
-    });
-
-  if (sortedPeriods.at(-1)?.enrollments.length === 0) {
-    sortedPeriods.splice(-1, 1);
-  }
+export function getPeriods(slots: Slot[]) {
+  const periods = [
+    ...new Set(slots.map((s): PeriodKey => `${s.year}-${s.term}`)),
+  ].sort(comparePeriodKeys);
 
   return {
-    nCols: sortedPeriods.length,
-    nRows: maxRows,
-    periods: sortedPeriods,
-    hasToSave,
+    periods,
+    nCols: periods.length,
+    nRows: Math.max(1, ...slots.map((s) => s.position)),
   };
+}
+
+export function createEnrollments({
+  year,
+  term,
+  slots,
+}: {
+  year: number;
+  term: number;
+  slots: Slot[];
+}): EnrolledCourse[] {
+  const entryOffset = term >= 3 ? 1 : 0;
+
+  return slots.map((slot) => {
+    const semesterIndex =
+      getSemesterIndex({ year: year + slot.year - 1, term: slot.term }) +
+      entryOffset;
+
+    return {
+      id: nanoid(),
+      courseId: slot.courseId,
+      position: slot.position,
+      status: "PENDING",
+      year: Math.floor(semesterIndex / 2),
+      term: semesterIndex % 2 === 0 ? 1 : 3,
+    };
+  });
+}
+
+export function groupEnrollmentsByPeriod(
+  enrollments: EnrolledCourse[],
+): PeriodWithEnrollments[] {
+  const periods = new Map<PeriodKey, EnrolledCourse[]>();
+
+  for (const enrollment of enrollments) {
+    const key: PeriodKey = `${enrollment.year}-${enrollment.term}`;
+    periods.set(key, [...(periods.get(key) ?? []), enrollment]);
+  }
+
+  const keys = [...periods.keys()].sort(comparePeriodKeys);
+  const first = keys[0];
+  const last = keys.at(-1);
+
+  if (first && last) {
+    const fromYear = parsePeriodKey(first).year;
+    const toYear = parsePeriodKey(last).year;
+
+    for (let year = fromYear; year <= toYear; year++) {
+      for (const term of [1, 3]) {
+        const key: PeriodKey = `${year}-${term}`;
+        const isInRange =
+          comparePeriodKeys(key, first) >= 0 &&
+          comparePeriodKeys(key, last) <= 0;
+
+        if (isInRange && !periods.has(key)) periods.set(key, []);
+      }
+    }
+  }
+
+  return [...periods.entries()]
+    .sort(([a], [b]) => comparePeriodKeys(a, b))
+    .map(([id, enrollments]) => ({ id, enrollments }));
 }
 
 export function extractCourseIds(
   enrollments: EnrolledCourse[],
-  status?: EnrolledCourseStatus,
+  status: EnrolledCourseStatus,
 ) {
-  const filtered = status
-    ? enrollments.filter((e) => e.status === status)
-    : enrollments;
-
-  return filtered
-    .map((e) => e.courseId)
-    .filter((id) => id !== null && id !== undefined);
+  return enrollments.filter((e) => e.status === status).map((e) => e.courseId);
 }
 
 export function getCurriculumStats(
   enrollments: EnrolledCourse[],
-  curriculumCourses: Map<number, CurriculumData["courses"][0]>,
+  courses: Map<number, Course>,
 ) {
   let approvedCredits = 0;
-  let pendingCredits = 0;
   let approvedCourses = 0;
   let pendingCourses = 0;
-  let failedCourses = 0;
 
   for (const enrollment of enrollments) {
-    const course = curriculumCourses.get(enrollment.courseId);
+    const course = courses.get(enrollment.courseId);
     if (!course) continue;
 
     if (enrollment.status === "APPROVED") {
@@ -171,61 +153,36 @@ export function getCurriculumStats(
       approvedCredits += course.credits;
     } else if (enrollment.status === "PENDING") {
       pendingCourses++;
-      pendingCredits += course.credits;
-    } else if (enrollment.status === "FAILED") {
-      failedCourses++;
     }
   }
 
+  const totalCourses = approvedCourses + pendingCourses;
+
   return {
-    progress: (approvedCourses / (approvedCourses + pendingCourses)) * 100,
+    progress: totalCourses > 0 ? (approvedCourses / totalCourses) * 100 : 0,
     approvedCredits,
-    pendingCredits,
-    totalCredits: approvedCredits + pendingCredits,
     approvedCourses,
-    pendingCourses,
-    failedCourses,
-    totalCourses: approvedCourses + pendingCourses,
+    totalCourses,
   };
 }
 
-export function getPeriodInfo(id: PeriodKey, startYear = 2020) {
+export function getPeriodInfo(
+  id: PeriodKey,
+  entry: { year: number; term: number },
+) {
   const { year, term } = parsePeriodKey(id);
-
-  const number = 2 * (year - startYear + 1) - (term === 1 ? 1 : 0);
   const currentDate = new Date();
-  let label = "SEMESTRE";
-  let isCurrent = false;
 
-  if (
+  const isCurrent =
     year === currentDate.getFullYear() &&
-    term === (currentDate.getMonth() < 7 ? 1 : 3)
-  ) {
-    isCurrent = true;
-  }
+    term === (currentDate.getMonth() < 7 ? 1 : 3);
 
-  if (term === 1 || term === 3) {
-    label = `SEMESTRE ${arabicToRoman(number)}`;
-  } else if (term === 2) {
-    label = `INVIERNO`;
-  } else if (term === 4) {
-    label = `VERANO`;
-  }
+  if (!isSemester(term)) return { label: TERM_LABELS[term], isCurrent };
+
+  const number = getSemesterIndex({ year, term }) - getSemesterIndex(entry) + 1;
 
   return {
-    year,
-    term,
-    label,
+    label: number > 0 ? `Semestre ${arabicToRoman(number)}` : "Semestre",
     isCurrent,
-    number,
   };
 }
-
-/*
-
-areas
-periods array
-courses map
-slots with x,y and course data 
-
-*/

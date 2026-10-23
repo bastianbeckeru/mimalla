@@ -17,10 +17,9 @@ import {
 } from "@/components/ui/command";
 import { KbdGroup } from "@/components/ui/kbd";
 import useShortcuts from "@/hooks/use-shortcut";
-import { institutions } from "@/server/db/data";
-import { slugify } from "@/utils/strings";
+import type { CatalogInstitution } from "@/types/curriculum";
 
-export function Searchbar() {
+export function Searchbar({ catalog }: { catalog: CatalogInstitution[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -43,13 +42,16 @@ export function Searchbar() {
     <>
       <Button
         variant="outline"
-        className="h-8 w-40 items-center justify-center gap-2 p-1.5 text-muted-foreground lg:w-48"
+        aria-label="Buscar carrera"
+        className="size-11 items-center justify-center gap-2 rounded-xl bg-muted/50 text-foreground sm:h-10 sm:w-56 sm:bg-transparent sm:px-3 sm:text-muted-foreground"
         onClick={() => handleOpen("button")}
       >
-        <p className="ml-0.5 flex-1 text-left text-sm">Buscar carrera...</p>
+        <p className="ml-0.5 hidden flex-1 text-left text-sm sm:block">
+          Buscar carrera...
+        </p>
 
         <div>
-          <Search className="mr-0.5 lg:hidden" />
+          <Search className="sm:mr-0.5 lg:hidden" />
           <KbdGroup className="hidden lg:inline-flex">
             <KbdModifier>+K</KbdModifier>
           </KbdGroup>
@@ -61,21 +63,26 @@ export function Searchbar() {
           <CommandInput placeholder="Escribe una carrera..." />
           <CommandList>
             <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-            {institutions[0]?.departments.map((department) => (
-              <CommandGroup heading={department.name} key={department.name}>
-                {department.programs.map((program) => (
-                  <CommandItem
-                    key={program.siesCode}
-                    onSelect={() => {
-                      setOpen(false);
-                      router.push(`/udp/${slugify(program.name)}`);
-                    }}
-                  >
-                    {program.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
+            {catalog.flatMap((institution) =>
+              institution.departments.map((department) => (
+                <CommandGroup
+                  heading={`${department.name} · ${institution.acronym}`}
+                  key={`${institution.acronym}-${department.name}`}
+                >
+                  {department.programs.map((program) => (
+                    <CommandItem
+                      key={program.path}
+                      onSelect={() => {
+                        setOpen(false);
+                        router.push(`/${program.path}`);
+                      }}
+                    >
+                      {program.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )),
+            )}
           </CommandList>
         </Command>
       </CommandDialog>

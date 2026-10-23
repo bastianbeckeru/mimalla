@@ -14,19 +14,16 @@ export type Program = CurriculumData["program"] & {
 
 export function ProgramStats({ program }: { program: Program }) {
   const [selectedYearIndex, setSelectedYearIndex] = useState(0);
-
-  if (!program.stats?.length) return null;
-
-  const currentStats = program.stats[selectedYearIndex];
+  const stats = program.stats ?? [];
+  const currentStats = stats[selectedYearIndex];
 
   if (currentStats === undefined) return null;
 
   return (
     <div className="space-y-4">
-      {/* Year selector if multiple years */}
-      {program.stats.length > 1 && (
+      {stats.length > 1 && (
         <div className="flex gap-2 border-b pb-2">
-          {program.stats.map((stat, index) => (
+          {stats.map((stat, index) => (
             <button
               type="button"
               key={stat.year}
@@ -146,7 +143,6 @@ export function ProgramStats({ program }: { program: Program }) {
         </div>
       </div>
 
-      {/* Footer note */}
       <p className="pt-4 text-left text-muted-foreground text-xs italic">
         Datos oficiales Servicio de Información de Educación Superior (SIES){" "}
         {currentStats.year}.

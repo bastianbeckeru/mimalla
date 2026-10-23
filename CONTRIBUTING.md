@@ -73,13 +73,12 @@ Maintainers update `version` in `package.json` when they publish a release.
 
 ## Adding a curriculum
 
-Curricula are stored as JSON files in `src/server/db/curriculums/<institution-acronym>/<program-slug>.json`, and the institution list is in `src/server/db/data.ts`.
+Curricula are stored as JSON files in `src/server/db/curriculums/<institution-acronym>/<program-slug>.json`. The program list, routes and search are derived from these files, so adding a file is enough.
 
 1. Copy an existing curriculum file from the same institution, or from another one, as a template.
 2. Fill in the institution, department, program and course data. The shape is defined by `CurriculumData` in `src/types/curriculum.ts`.
-3. Add the program to its institution and department in `src/server/db/data.ts`.
-4. Check in the app that the curriculum imports and that prerequisites render correctly.
-5. In the pull request, link the official source of the curriculum.
+3. Check in the app that the curriculum imports and that prerequisites render correctly.
+4. In the pull request, link the official source of the curriculum.
 
 ## License
 

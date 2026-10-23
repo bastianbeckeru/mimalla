@@ -1,4 +1,5 @@
 "use client";
+
 import { Loader2, Save, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,182 +17,174 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Toggle } from "@/components/ui/toggle";
+import { useHistory } from "@/hooks/use-history";
 import useShortcuts from "@/hooks/use-shortcut";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
+import {
+  useActiveCurriculum,
+  useCurriculumStore,
+  useHasHydrated,
+} from "@/stores/curriculum";
 import type {
+  CatalogInstitution,
   CurriculumData,
-  History,
   PeriodWithEnrollments,
 } from "@/types/curriculum";
+import type { StudentCurriculum } from "@/types/store";
 import {
+  createEnrollments,
+  extendCourses,
   extractCourseIds,
   getCurriculumStats,
-  getPeriodsWithEnrollments,
+  groupEnrollmentsByPeriod,
 } from "@/utils/curriculum";
-import { getProgramData } from "@/utils/curriculum-data";
-import { parsePeriodKey } from "@/utils/period-key";
+import { fetchProgramData } from "@/utils/curriculum-data";
+import { isSemester, parsePeriodKey } from "@/utils/period-key";
 
-export default function ClientSideDashboard() {
-  const {
-    activeCurriculumId,
-    curriculums,
-    selectCurriculum,
-    updateCurriculumEnrollments,
-  } = useNewCurriculumStore();
+type LoadedProgram = {
+  path: string;
+  data: CurriculumData | null;
+};
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
-  const [data, setData] = useState<CurriculumData | null>(null);
-  const [history, setHistory] = useState<History<PeriodWithEnrollments[]>>({
-    past: [],
-    present: [],
-    future: [],
-  });
+const loader = (
+  <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
+);
 
-  useShortcuts([
-    {
-      keys: ["Control", "e"],
-      callback: handleEditMode,
-    },
-    {
-      keys: ["Control", "s"],
-      callback: handleSaveChanges,
-    },
-    /*     {
-      keys: ["Control", "escape"],
-      handler: handleCancelEditMode(),
-    }, */
-  ]);
+export default function ClientSideDashboard({
+  catalog,
+}: {
+  catalog: CatalogInstitution[];
+}) {
+  const hasHydrated = useHasHydrated();
+  const activeCurriculum = useActiveCurriculum();
+  const { removeActiveCurriculum } = useCurriculumStore();
+  const [program, setProgram] = useState<LoadedProgram | null>(null);
 
-  // Wait for the store to be hydrated
+  const activePath = activeCurriculum?.path;
+  const loadedPath = program?.path;
+
   useEffect(() => {
-    const delay = setTimeout(() => {
-      if (curriculums.length === 0) {
-        setIsLoading(false);
-      }
-    }, 500);
+    if (!activePath || loadedPath === activePath) return;
 
-    const firstCurriculum = curriculums[0];
-    if (firstCurriculum && !activeCurriculumId) {
-      selectCurriculum(firstCurriculum.id);
-      return;
-    }
+    let isCurrent = true;
 
-    if (isLoading && curriculums.length > 0) {
-      const activeCurriculum = curriculums.find(
-        (c) => c.id === activeCurriculumId,
-      );
-
-      if (!activeCurriculum) {
-        setIsLoading(false);
-        return;
-      }
-
-      const [institutionAcronym, programSlug] =
-        activeCurriculum.path.split("/");
-
-      if (!institutionAcronym || !programSlug) {
-        setIsLoading(false);
-        return;
-      }
-
-      getProgramData({
-        institutionAcronym: institutionAcronym,
-        programSlug: programSlug,
+    fetchProgramData(activePath)
+      .then((data) => {
+        if (isCurrent) setProgram({ path: activePath, data });
       })
-        .then((data) => {
-          const { periods, hasToSave } = getPeriodsWithEnrollments({
-            year: activeCurriculum.year,
-            enrollments: activeCurriculum.enrolledCourses,
-          });
-
-          if (hasToSave)
-            updateCurriculumEnrollments(periods.flatMap((p) => p.enrollments));
-
-          setHistory({ ...history, present: periods });
-          setData(data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          setIsLoading(false);
-        });
-    }
-
-    if (
-      !isLoading &&
-      history.present.length === 0 &&
-      curriculums.length > 0 &&
-      data
-    ) {
-      const activeCurriculum = curriculums.find(
-        (c) => c.id === activeCurriculumId,
-      );
-
-      if (!activeCurriculum) return;
-
-      const { periods, hasToSave } = getPeriodsWithEnrollments({
-        year: activeCurriculum.year,
-        enrollments: activeCurriculum.enrolledCourses,
+      .catch(() => {
+        if (isCurrent) setProgram({ path: activePath, data: null });
       });
 
-      if (hasToSave)
-        updateCurriculumEnrollments(periods.flatMap((p) => p.enrollments));
+    return () => {
+      isCurrent = false;
+    };
+  }, [activePath, loadedPath]);
 
-      setHistory({ ...history, present: periods });
-    }
+  if (!hasHydrated) return loader;
 
-    return () => clearTimeout(delay);
-  }, [
-    isLoading,
-    data,
-    curriculums,
-    activeCurriculumId,
-    selectCurriculum,
-    history,
-    updateCurriculumEnrollments,
+  if (!activeCurriculum) {
+    return (
+      <CurriculumForm
+        catalog={catalog}
+        onImport={(path, data) => setProgram({ path, data })}
+      />
+    );
+  }
+
+  if (program?.path !== activeCurriculum.path) return loader;
+
+  if (!program.data) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+        <p className="text-muted-foreground">No se pudo cargar tu malla.</p>
+        <Button variant="destructive" onClick={removeActiveCurriculum}>
+          Eliminar malla
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <CurriculumDashboard
+      key={activeCurriculum.id}
+      curriculum={activeCurriculum}
+      data={program.data}
+    />
+  );
+}
+
+function CurriculumDashboard({
+  curriculum,
+  data,
+}: {
+  curriculum: StudentCurriculum;
+  data: CurriculumData;
+}) {
+  const { updateActiveEnrollments } = useCurriculumStore();
+  const history = useHistory(() =>
+    groupEnrollmentsByPeriod(curriculum.enrolledCourses),
+  );
+  const [editMode, setEditMode] = useState(false);
+
+  const courses = extendCourses(data.courses);
+  const enrollments = history.present.flatMap((p) => p.enrollments);
+  const stats = getCurriculumStats(enrollments, courses);
+
+  useShortcuts([
+    { keys: ["Control", "e"], callback: toggleEditMode },
+    { keys: ["Control", "s"], callback: saveChanges },
+    {
+      keys: ["Control", "z"],
+      callback: () => {
+        if (editMode) history.undo();
+      },
+    },
+    {
+      keys: ["Control", "Shift", "z"],
+      callback: () => {
+        if (editMode) history.redo();
+      },
+    },
   ]);
 
-  if (!isLoading && curriculums.length === 0)
-    return <CurriculumForm setData={setData} />;
-
-  if (isLoading || !data)
-    return (
-      <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
-    );
-
-  const { program, areas, courses } = data;
-
-  const enrollments = history.present.flatMap((p) => p.enrollments);
-  const coursesMap = new Map(courses.map((c) => [c.id, c]));
-
-  const stats = getCurriculumStats(enrollments, coursesMap);
-
-  const approvedCourseIds = extractCourseIds(enrollments, "APPROVED");
-  const failedCourseIds = extractCourseIds(enrollments, "FAILED");
-
-  function handleEditMode() {
-    if (history.past.length > 0) {
+  function toggleEditMode() {
+    if (history.canUndo) {
       toast("⚠️ Cambios sin guardar", {
         description:
           "Guarda los cambios realizados antes de finalizar la edición.",
       });
       return;
     }
-    if (history.future.length > 0)
-      setHistory({ ...history, past: [], future: [] });
+
+    history.reset(history.present);
     setEditMode(!editMode);
+  }
+
+  function saveChanges() {
+    if (!editMode) return;
+
+    const periods = trimEmptyPeriods(history.present);
+
+    updateActiveEnrollments(periods.flatMap((p) => p.enrollments));
+    history.reset(periods);
+    setEditMode(false);
+  }
+
+  function resetCurriculum() {
+    const officialEnrollments = createEnrollments({
+      year: curriculum.year,
+      term: curriculum.term,
+      slots: data.curriculum.structure,
+    });
+
+    updateActiveEnrollments(officialEnrollments);
+    history.reset(groupEnrollmentsByPeriod(officialEnrollments));
+    setEditMode(false);
   }
 
   return (
     <SidebarProvider>
-      <Sidebar
-        editMode={editMode}
-        setEditMode={handleEditMode}
-        areas={areas}
-        stats={stats}
-        setHistory={setHistory}
-      />
+      <Sidebar areas={data.areas} stats={stats} onReset={resetCurriculum} />
 
       <SidebarInset className="relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
         <div>
@@ -199,7 +192,7 @@ export default function ClientSideDashboard() {
             <SidebarTrigger className="absolute left-2 md:hidden" />
 
             <div className="flex items-center justify-center px-2 font-bold">
-              <h1>{program.name}</h1>
+              <h1>{data.program.name}</h1>
             </div>
 
             <div className="absolute right-2 flex flex-row items-center gap-2">
@@ -208,8 +201,8 @@ export default function ClientSideDashboard() {
                   aria-label="save changes"
                   variant="outline"
                   className="hidden bg-accent hover:brightness-110 disabled:bg-muted md:flex"
-                  disabled={history.past.length === 0}
-                  onClick={handleSaveChanges}
+                  disabled={!history.canUndo}
+                  onClick={saveChanges}
                 >
                   <Save />
                   <span className="hidden md:inline">Guardar</span>
@@ -223,7 +216,7 @@ export default function ClientSideDashboard() {
                 aria-label="toggle edit mode"
                 variant="outline"
                 pressed={editMode}
-                onPressedChange={() => handleEditMode()}
+                onPressedChange={toggleEditMode}
               >
                 <SquarePen />
                 <span className="hidden md:inline">Editar</span>
@@ -243,41 +236,26 @@ export default function ClientSideDashboard() {
           <RBDndCurriculum
             editMode={editMode}
             history={history}
-            setHistory={setHistory}
-            areas={areas}
-            courses={new Map(courses.map((c) => [c.id, c]))}
-            approvedCourseIds={approvedCourseIds}
-            failedCourseIds={failedCourseIds}
+            entry={curriculum}
+            areas={data.areas}
+            courses={courses}
+            approvedCourseIds={extractCourseIds(enrollments, "APPROVED")}
+            failedCourseIds={extractCourseIds(enrollments, "FAILED")}
             approvedCredits={stats.approvedCredits}
-            handleSaveChanges={handleSaveChanges}
+            onSave={saveChanges}
           />
         </ScrollAreaWrapper>
       </SidebarInset>
     </SidebarProvider>
   );
+}
 
-  function handleSaveChanges() {
-    setEditMode(!editMode);
-    setHistory((prev) => {
-      const newPresent = [...prev.present];
+function trimEmptyPeriods(periods: PeriodWithEnrollments[]) {
+  const lastIndex = periods.findLastIndex((p) => p.enrollments.length > 0);
 
-      const lastWithEnrollmentsIndex = newPresent
-        .map((p) => p.enrollments.length > 0)
-        .lastIndexOf(true);
-
-      newPresent.splice(lastWithEnrollmentsIndex + 1);
-
-      const updatedPeriods = newPresent.filter((p) => {
-        const { term } = parsePeriodKey(p.id);
-
-        const hasEnrollments = p.enrollments.length > 0;
-        const isSemester = term === 1 || term === 3;
-
-        return hasEnrollments || isSemester;
-      });
-
-      return { ...history, past: [], present: updatedPeriods, future: [] };
-    });
-    updateCurriculumEnrollments(history.present.flatMap((p) => p.enrollments));
-  }
+  return periods
+    .slice(0, lastIndex + 1)
+    .filter(
+      (p) => p.enrollments.length > 0 || isSemester(parsePeriodKey(p.id).term),
+    );
 }

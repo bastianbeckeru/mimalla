@@ -1,5 +1,6 @@
-export type HexColor = `#${string}`;
-export type RGBAColor = `rgba(${number}, ${number}, ${number}, ${number})`;
+type HexColor = `#${string}`;
+
+export const DEFAULT_COURSE_COLOR = "#fafafa";
 
 function hexToRgb(hexColor: HexColor) {
   const hex = hexColor.replace(/^#/, "");
@@ -10,12 +11,6 @@ function hexToRgb(hexColor: HexColor) {
   const b = bigint & 255;
 
   return { r, g, b };
-}
-
-export function hexToRgba(hexColor: HexColor, a = 1.0): RGBAColor {
-  const { r, g, b } = hexToRgb(hexColor);
-
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
 
 export function getLuminance(hexColor: HexColor): number {

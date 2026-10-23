@@ -17,50 +17,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
 import type { PeriodWithEnrollments } from "@/types/curriculum";
-import { parsePeriodKey } from "@/utils/period-key";
+import { parsePeriodKey, TERM_LABELS } from "@/utils/period-key";
 
 type AddPeriodDialogProps = {
   open: boolean;
-  onOpenChange: () => void;
-  handleAddPeriod: (year: number, term: number) => void;
+  onOpenChange: (open: boolean) => void;
+  onAdd: (year: number, term: number) => void;
   periods: PeriodWithEnrollments[];
 };
 
-const terms = [
-  { value: 1, label: "Primer Semestre" },
-  { value: 2, label: "Invierno" },
-  { value: 3, label: "Segundo Semestre" },
-  { value: 4, label: "Verano" },
-];
+const terms = Object.entries(TERM_LABELS).map(([value, label]) => ({
+  value: Number(value),
+  label,
+}));
 
 export default function AddPeriodDialog({
   open,
   onOpenChange,
-  handleAddPeriod,
+  onAdd,
   periods,
 }: AddPeriodDialogProps) {
-  const { curriculums, activeCurriculumId } = useNewCurriculumStore();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedTerm, setSelectedTerm] = useState<number | null>(null);
 
-  const enrolledYear =
-    curriculums.find((c) => c.id === activeCurriculumId)?.year ?? 2020;
-
-  const years = [
-    ...new Set(periods.map((period) => parsePeriodKey(period.id).year)),
-  ];
-  const yearOptions = [...years, years.length + 1].map((year) => ({
-    value: year,
-    label: year + enrolledYear - 1,
-  }));
+  const years = [...new Set(periods.map((p) => parsePeriodKey(p.id).year))];
+  const lastYear = years.at(-1);
+  const yearOptions = (lastYear ? [...years, lastYear + 1] : years).map(
+    (year) => ({ value: year, label: String(year) }),
+  );
 
   return (
     <Dialog
       open={open}
-      onOpenChange={() => {
-        onOpenChange();
+      onOpenChange={(isOpen) => {
+        onOpenChange(isOpen);
         setSelectedYear(null);
         setSelectedTerm(null);
       }}
@@ -122,10 +113,11 @@ export default function AddPeriodDialog({
           <DialogClose
             render={
               <Button
+                disabled={!selectedYear || !selectedTerm}
                 onClick={() => {
                   if (!selectedYear || !selectedTerm) return;
 
-                  handleAddPeriod(selectedYear, selectedTerm);
+                  onAdd(selectedYear, selectedTerm);
                 }}
               />
             }

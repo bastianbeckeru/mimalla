@@ -1,18 +1,3 @@
-import type { CurriculumData } from "@/types/curriculum";
-
-type StudentEnrollment = {
-  id: string;
-  path: string;
-  year: number;
-  term: number;
-  enrolledCourses: EnrolledCourse[];
-};
-
-export type newCurriculumStoreInitialStateProps = {
-  curriculums: StudentEnrollment[];
-  activeCurriculumId: string | null;
-};
-
 export type EnrolledCourseStatus = "APPROVED" | "PENDING" | "FAILED";
 
 export type EnrolledCourse = {
@@ -24,16 +9,10 @@ export type EnrolledCourse = {
   courseId: number;
 };
 
-export type useNewCurriculumStoreProps = {
-  resetStore: () => void;
-  /* CURRICULUM */
-  addCurriculum: (newCurriculum: {
-    year: number;
-    term: number;
-    path: string;
-    slots: CurriculumData["curriculum"]["structure"];
-  }) => void;
-  removeCurriculum: (curriculumId: string) => void;
-  updateCurriculumEnrollments: (newEnrollments: EnrolledCourse[]) => void;
-  selectCurriculum: (id: string) => void;
-} & newCurriculumStoreInitialStateProps;
+export type StudentCurriculum = {
+  id: string;
+  path: string;
+  year: number;
+  term: number;
+  enrolledCourses: EnrolledCourse[];
+};

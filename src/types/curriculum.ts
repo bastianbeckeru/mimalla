@@ -7,21 +7,11 @@ export type PeriodWithEnrollments = {
 
 export type PeriodKey = `${number}-${number}`;
 
-export type History<T> = {
-  past: T[];
-  present: T;
-  future: T[];
-};
-
-//////////////////////////////////////////
-// NEW MIMALLA v0.3.0
-//////////////////////////////////////////
-
 export type CurriculumData = {
   institution: Institution;
   department: Department;
   program: Program;
-  stats: Stat[];
+  stats?: Stat[];
   curriculum: {
     version: string;
     year: number;
@@ -36,6 +26,20 @@ export type CurriculumData = {
 export type Institution = {
   name: string;
   acronym: string;
+};
+
+export type CatalogProgram = {
+  name: string;
+  path: string;
+};
+
+export type CatalogDepartment = {
+  name: string;
+  programs: CatalogProgram[];
+};
+
+export type CatalogInstitution = Institution & {
+  departments: CatalogDepartment[];
 };
 
 type Department = {
@@ -56,7 +60,7 @@ export type Plan = {
   description?: string;
   courseIds: number[];
   subplanIds: number[];
-  requiredCredits: number; // (-1) All courses and subplans. (>0) X courses until reach that amount.
+  requiredCredits: number;
   credential: Credential | null;
 };
 
@@ -76,7 +80,6 @@ export type Area = {
   color: string;
   courseIds: number[];
   subareaIds: number[];
-  electiveIds: number[];
 };
 
 type Stat = {
@@ -132,12 +135,6 @@ export type ExtendedCourse = Course & {
   subsequentIds: number[];
 };
 
-/* type Category = {
-  id: number;
-  name: string;
-};
- */
-
 export type Slot = {
   id: number;
   year: number;
@@ -145,7 +142,6 @@ export type Slot = {
   position: number;
   courseId: number;
   isElective?: boolean;
-  //forceElection?: boolean;
 };
 
 export type ExtendedSlot = Slot & {
