@@ -22,6 +22,7 @@ import { useHistory } from "@/hooks/use-history";
 import {
   useActiveTrajectory,
   useHasHydrated,
+  useHasHydrationFailed,
   useTrajectoryStore,
 } from "@/stores/trajectory";
 import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
@@ -51,6 +52,7 @@ export default function ClientSideDashboard({
   catalog: CatalogInstitution[];
 }) {
   const hasHydrated = useHasHydrated();
+  const hasHydrationFailed = useHasHydrationFailed();
   const activeTrajectory = useActiveTrajectory();
   const { removeActiveTrajectory } = useTrajectoryStore();
   const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
@@ -78,6 +80,20 @@ export default function ClientSideDashboard({
       isCurrent = false;
     };
   }, [activeCurriculumId, loadedCurriculumId]);
+
+  if (hasHydrationFailed) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+        <p className="text-muted-foreground">
+          No se pudieron cargar tus mallas. Revisa tu conexión e inténtalo de
+          nuevo.
+        </p>
+        <Button onClick={() => useTrajectoryStore.persist.rehydrate()}>
+          Reintentar
+        </Button>
+      </div>
+    );
+  }
 
   if (!hasHydrated) return loader;
 
