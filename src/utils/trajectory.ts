@@ -10,6 +10,7 @@ import type {
   EnrollmentStatus,
   Entry,
   PeriodWithEnrollments,
+  TrajectoryProgress,
 } from "@/types/trajectory";
 import { arabicToRoman } from "@/utils/numbers";
 import {
@@ -37,11 +38,6 @@ type EditResult =
 type EnrollmentLocation = {
   periodId: string;
   index: number;
-};
-
-type Progress = {
-  approvedCourseIds: number[];
-  approvedCredits: number;
 };
 
 export function createEnrollments({
@@ -171,11 +167,10 @@ export function getPeriodInfo(id: PeriodKey, entry: Entry) {
   };
 }
 
-export function isAvailable(course: Course, progress: Progress) {
+export function isAvailable(course: Course, progress: TrajectoryProgress) {
   return (
-    course.prerequisiteIds.every((id) =>
-      progress.approvedCourseIds.includes(id),
-    ) && course.prerequisiteCredits <= progress.approvedCredits
+    course.prerequisiteIds.every((id) => progress.approvedCourseIds.has(id)) &&
+    course.prerequisiteCredits <= progress.approvedCredits
   );
 }
 

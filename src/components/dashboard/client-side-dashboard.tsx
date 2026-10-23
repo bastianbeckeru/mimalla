@@ -231,7 +231,9 @@ function TrajectoryDashboard({
             areas={data.areas}
             courses={courses}
             progress={{
-              approvedCourseIds: extractCourseIds(enrollments, "APPROVED"),
+              approvedCourseIds: new Set(
+                extractCourseIds(enrollments, "APPROVED"),
+              ),
               approvedCredits: stats.approvedCredits,
             }}
             onSave={saveChanges}

@@ -140,9 +140,7 @@ export default function CurriculumView({
                   isSelected={focusedSlot?.slot.id === slot.id}
                   isNotRelated={
                     !!focusedSlot &&
-                    !(
-                      slot.course && connectedCourseIds.has(slot.course.id)
-                    )
+                    !(slot.course && connectedCourseIds.has(slot.course.id))
                   }
                   handleClick={handleClickCard}
                   handleSelect={handleSelectCard}
