@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { listJsonFiles } from "@/server/json-files";
 
 const curriculumsDirectory = path.join(
   process.cwd(),
@@ -12,10 +13,7 @@ const outputPath = path.join(
 
 type LegacyCurriculumFile = { courses: { id: number; code: string }[] };
 
-const files = fs
-  .readdirSync(curriculumsDirectory, { recursive: true, encoding: "utf-8" })
-  .filter((file) => file.endsWith(".json"))
-  .sort();
+const files = listJsonFiles(curriculumsDirectory);
 
 const codesByPath = Object.fromEntries(
   files.map((file) => {

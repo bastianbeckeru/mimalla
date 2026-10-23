@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { validateCurriculumFiles } from "@/server/catalog/validate-curriculum";
+import { listJsonFiles } from "@/server/json-files";
 
 const target = process.argv[2];
 if (!target) {
@@ -11,11 +12,7 @@ if (!target) {
 const isDirectory = fs.statSync(target).isDirectory();
 const baseDirectory = isDirectory ? target : path.dirname(target);
 const filePaths = isDirectory
-  ? fs
-      .readdirSync(target, { recursive: true, encoding: "utf-8" })
-      .filter((file) => file.endsWith(".json"))
-      .sort()
-      .map((file) => path.join(target, file))
+  ? listJsonFiles(target).map((file) => path.join(target, file))
   : [target];
 
 const unreadable: { path: string; message: string }[] = [];

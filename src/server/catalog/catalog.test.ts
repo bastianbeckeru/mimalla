@@ -136,10 +136,10 @@ function byCode(data: CurriculumData) {
             a.position - b.position,
         ),
       tracks: data.curriculum.tracks
-        .map(({ id: _, courseIds, subplanIds, ...track }) => ({
+        .map(({ id: _, courseIds, subtrackIds, ...track }) => ({
           ...track,
           courses: codes(courseIds),
-          subtracks: subplanIds.map((id) => trackName.get(id)),
+          subtracks: subtrackIds.map((id) => trackName.get(id)),
         }))
         .sort((a, b) => a.name.localeCompare(b.name)),
     },

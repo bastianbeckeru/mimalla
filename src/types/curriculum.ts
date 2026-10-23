@@ -58,7 +58,7 @@ export type Track = {
   name: string;
   description?: string;
   courseIds: number[];
-  subplanIds: number[];
+  subtrackIds: number[];
   requiredCredits: number;
   credential: Credential | null;
 };

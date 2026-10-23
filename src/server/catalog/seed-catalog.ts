@@ -3,6 +3,7 @@ import path from "node:path";
 import { and, eq } from "drizzle-orm";
 import { importCurriculum } from "@/server/catalog/import-curriculum";
 import { curriculum, institution, program } from "@/server/db/schema";
+import { listJsonFiles } from "@/server/json-files";
 import type { Database } from "@/types/database";
 
 type SeedFile = { path: string; programSlug: string; content: unknown };
@@ -15,17 +16,13 @@ type SeedHeader = {
 const seedDirectory = path.join(process.cwd(), "seed");
 
 export function readSeedFiles(): SeedFile[] {
-  return fs
-    .readdirSync(seedDirectory, { recursive: true, encoding: "utf-8" })
-    .filter((file) => file.endsWith(".json"))
-    .sort()
-    .map((file) => ({
-      path: file,
-      programSlug: path.basename(file, ".json"),
-      content: JSON.parse(
-        fs.readFileSync(path.join(seedDirectory, file), "utf-8"),
-      ) as unknown,
-    }));
+  return listJsonFiles(seedDirectory).map((file) => ({
+    path: file,
+    programSlug: path.basename(file, ".json"),
+    content: JSON.parse(
+      fs.readFileSync(path.join(seedDirectory, file), "utf-8"),
+    ) as unknown,
+  }));
 }
 
 async function findSeededCurriculum(db: Database, file: SeedFile) {

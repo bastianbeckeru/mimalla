@@ -1,8 +1,7 @@
 import path from "node:path";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { readSeedFiles, seedCatalog } from "@/server/catalog/seed-catalog";
-import * as schema from "@/server/db/schema";
+import { connectNodePostgres } from "@/server/db/client";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -10,7 +9,7 @@ if (!databaseUrl) {
   process.exit(2);
 }
 
-const db = drizzle(databaseUrl, { schema, casing: "snake_case" });
+const db = connectNodePostgres(databaseUrl);
 
 try {
   await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });

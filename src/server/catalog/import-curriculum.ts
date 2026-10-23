@@ -1,8 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
-import {
-  type Problem,
-  validateCurriculum,
-} from "@/server/catalog/validate-curriculum";
+import { validateCurriculum } from "@/server/catalog/validate-curriculum";
 import {
   area,
   areaCourse,
@@ -19,6 +16,7 @@ import {
 } from "@/server/db/schema";
 import type { CredentialType, Program } from "@/types/curriculum";
 import type { Database } from "@/types/database";
+import type { Problem } from "@/types/validation";
 
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 

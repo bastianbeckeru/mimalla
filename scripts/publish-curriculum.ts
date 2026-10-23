@@ -1,7 +1,6 @@
-import { drizzle } from "drizzle-orm/node-postgres";
 import { publishCurriculum } from "@/server/catalog/publish-curriculum";
 import { revalidateApp } from "@/server/catalog/revalidate-app";
-import * as schema from "@/server/db/schema";
+import { connectNodePostgres } from "@/server/db/client";
 
 const [target] = process.argv.slice(2);
 const curriculumId = Number(target);
@@ -13,7 +12,7 @@ if (!target || !Number.isInteger(curriculumId) || !databaseUrl) {
   process.exit(2);
 }
 
-const db = drizzle(databaseUrl, { schema, casing: "snake_case" });
+const db = connectNodePostgres(databaseUrl);
 
 try {
   if (await publishCurriculum(db, curriculumId)) {

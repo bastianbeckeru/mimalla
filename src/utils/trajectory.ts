@@ -117,15 +117,34 @@ export function trimEmptyPeriods(periods: PeriodWithEnrollments[]) {
     );
 }
 
+const coursesByCode = new WeakMap<Map<number, Course>, Map<string, Course>>();
+
+function indexByCode<C extends Course>(courses: Map<number, C>) {
+  let index = coursesByCode.get(courses);
+  if (!index) {
+    index = new Map([...courses.values()].map((c) => [c.code, c]));
+    coursesByCode.set(courses, index);
+  }
+  return index as Map<string, C>;
+}
+
 export function findEnrollmentCourse<C extends Course>(
   courses: Map<number, C>,
   enrollment: Enrollment,
 ) {
-  if (enrollment.courseCode === null) return undefined;
-  for (const course of courses.values()) {
-    if (course.code === enrollment.courseCode) return course;
-  }
-  return undefined;
+  return enrollment.courseCode === null
+    ? undefined
+    : indexByCode(courses).get(enrollment.courseCode);
+}
+
+function codesOf(courseIds: Iterable<number>, courses: Map<number, Course>) {
+  return new Set([...courseIds].flatMap((id) => courses.get(id)?.code ?? []));
+}
+
+function isEnrollmentOf(enrollment: Enrollment, courseCodes: Set<string>) {
+  return (
+    enrollment.courseCode !== null && courseCodes.has(enrollment.courseCode)
+  );
 }
 
 export function extractCourseIds(
@@ -349,14 +368,13 @@ function getMoveError(
   }
 
   const isMovingForward = sourceIndex < destinationIndex;
-  const relatedCodes = (
-    isMovingForward ? course.successorIds : course.prerequisiteIds
-  ).flatMap((id) => courses.get(id)?.code ?? []);
+  const relatedCodes = codesOf(
+    isMovingForward ? course.successorIds : course.prerequisiteIds,
+    courses,
+  );
 
   const hasRelatedCourse = (period: PeriodWithEnrollments) =>
-    period.enrollments.some(
-      (e) => e.courseCode !== null && relatedCodes.includes(e.courseCode),
-    );
+    period.enrollments.some((e) => isEnrollmentOf(e, relatedCodes));
 
   if (hasRelatedCourse(destinationPeriod)) {
     return isMovingForward ? "SUCCESSOR_IN_PERIOD" : "PREREQUISITE_IN_PERIOD";
@@ -385,19 +403,18 @@ export function setEnrollmentStatus(
   if (!target) return periods;
 
   const targetCourse = findEnrollmentCourse(courses, target);
-  const revertedCourseCodes = new Set(
+  const revertedCourseCodes = codesOf(
     status === "APPROVED" || !targetCourse
       ? []
-      : [...getApprovedSuccessorIds(periods, targetCourse.id, courses)].flatMap(
-          (id) => courses.get(id)?.code ?? [],
-        ),
+      : getApprovedSuccessorIds(periods, targetCourse.id, courses),
+    courses,
   );
 
   return periods.map((p) => ({
     ...p,
     enrollments: p.enrollments.map((e) => {
       if (e.id === enrollmentId) return { ...e, status };
-      if (e.courseCode !== null && revertedCourseCodes.has(e.courseCode)) {
+      if (isEnrollmentOf(e, revertedCourseCodes)) {
         return { ...e, status: "PENDING" as const };
       }
       return e;
