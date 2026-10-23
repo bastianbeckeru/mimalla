@@ -4,7 +4,13 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { importCurriculum } from "@/server/catalog/import-curriculum";
-import { getCurriculum } from "@/server/catalog/read-catalog";
+import { publishCurriculum } from "@/server/catalog/publish-curriculum";
+import {
+  getCatalog,
+  getCurrentCurriculum,
+  getCurriculum,
+  getCurriculumParams,
+} from "@/server/catalog/read-catalog";
 import * as schema from "@/server/db/schema";
 import type { CurriculumData } from "@/types/curriculum";
 
@@ -155,9 +161,10 @@ async function importValid(
   db: Awaited<ReturnType<typeof freshDatabase>>,
   file: unknown,
   programSlug = "derecho",
+  options: { publish?: boolean; replace?: boolean } = {},
 ) {
-  const result = await importCurriculum(db, file, { programSlug });
-  if (!result.ok) throw new Error(JSON.stringify(result.problems));
+  const result = await importCurriculum(db, file, { programSlug, ...options });
+  if (!result.ok) throw new Error(JSON.stringify(result));
   return result.curriculumId;
 }
 
@@ -449,6 +456,241 @@ describe("import, then read by id", () => {
 
       await insert(own, 1);
       await expect(insert(foreign, 2)).rejects.toEqual(foreignKeyViolation);
+    });
+  });
+});
+
+describe("import, then read the catalog", () => {
+  const derecho = { institutionAcronym: "udp", programSlug: "derecho" };
+
+  test("a draft curriculum is not in the catalog nor the static parameters, and its program does not resolve", async () => {
+    const db = await freshDatabase();
+
+    const curriculumId = await importValid(db, curriculumFile());
+
+    expect(await getCatalog(db)).toEqual([]);
+    expect(await getCurriculumParams(db)).toEqual([]);
+    expect(await getCurrentCurriculum(db, derecho)).toBeNull();
+    expect(await getCurriculum(db, curriculumId)).not.toBeNull();
+  });
+
+  test("once published, it is in the catalog and the static parameters, and its program resolves to it", async () => {
+    const db = await freshDatabase();
+    const curriculumId = await importValid(db, curriculumFile());
+
+    expect(await publishCurriculum(db, curriculumId)).toBe(true);
+
+    expect(await getCatalog(db)).toEqual([
+      {
+        name: "Universidad Diego Portales",
+        acronym: "UDP",
+        departments: [
+          {
+            name: "Facultad de Derecho",
+            programs: [{ name: "Derecho", path: "udp/derecho" }],
+          },
+        ],
+      },
+    ]);
+    expect(await getCurriculumParams(db)).toEqual([derecho]);
+    const current = await getCurrentCurriculum(db, derecho);
+    expect(current).toEqual(await getCurriculum(db, curriculumId));
+    expect(current?.curriculum.isCurrent).toBe(true);
+  });
+
+  test("publishing an unknown curriculum reports that nothing was published", async () => {
+    const db = await freshDatabase();
+
+    expect(await publishCurriculum(db, 1)).toBe(false);
+  });
+
+  test("an import can publish right away, and the catalog groups published programs by institution and department, sorted by name", async () => {
+    const db = await freshDatabase();
+    const published = { publish: true };
+    const psicologiaDepartment = {
+      name: "Facultad de Psicología",
+      acronym: "FP",
+    };
+    await importValid(
+      db,
+      curriculumFile({
+        department: psicologiaDepartment,
+        program: { name: "Psicología", schedule: "DAYTIME" },
+      }),
+      "psicologia",
+      published,
+    );
+    await importValid(db, curriculumFile(), "derecho", published);
+    await importValid(
+      db,
+      curriculumFile({
+        department: psicologiaDepartment,
+        program: { name: "Diseño", schedule: "DAYTIME" },
+      }),
+      "diseno",
+      published,
+    );
+    await importValid(
+      db,
+      curriculumFile({
+        program: { name: "Obstetricia", schedule: "DAYTIME" },
+      }),
+      "obstetricia",
+    );
+    await importValid(
+      db,
+      curriculumFile({
+        institution: { name: "Universidad de Chile", acronym: "UCH" },
+        department: { name: "Facultad de Química", acronym: "FQ" },
+        program: { name: "Química y Farmacia", schedule: "DAYTIME" },
+      }),
+      "quimica-y-farmacia",
+      published,
+    );
+
+    expect(await getCatalog(db)).toEqual([
+      {
+        name: "Universidad de Chile",
+        acronym: "UCH",
+        departments: [
+          {
+            name: "Facultad de Química",
+            programs: [
+              { name: "Química y Farmacia", path: "uch/quimica-y-farmacia" },
+            ],
+          },
+        ],
+      },
+      {
+        name: "Universidad Diego Portales",
+        acronym: "UDP",
+        departments: [
+          {
+            name: "Facultad de Derecho",
+            programs: [{ name: "Derecho", path: "udp/derecho" }],
+          },
+          {
+            name: "Facultad de Psicología",
+            programs: [
+              { name: "Diseño", path: "udp/diseno" },
+              { name: "Psicología", path: "udp/psicologia" },
+            ],
+          },
+        ],
+      },
+    ]);
+    const params = await getCurriculumParams(db);
+    expect(
+      params.map((p) => `${p.institutionAcronym}/${p.programSlug}`).sort(),
+    ).toEqual([
+      "uch/quimica-y-farmacia",
+      "udp/derecho",
+      "udp/diseno",
+      "udp/psicologia",
+    ]);
+  });
+
+  test("with two published curriculums, the program resolves to the latest year and the other stays reachable by id", async () => {
+    const db = await freshDatabase();
+    const yearOf = (year: number, version: string) =>
+      curriculumFile({
+        curriculum: { ...curriculumFile().curriculum, year, version },
+      });
+    const latestId = await importValid(db, yearOf(2023, "v6.0"), "derecho", {
+      publish: true,
+    });
+    const olderId = await importValid(db, yearOf(2018, "v5.0"), "derecho", {
+      publish: true,
+    });
+    await importValid(db, yearOf(2026, "v7.0"));
+
+    const current = await getCurrentCurriculum(db, derecho);
+    const older = await getCurriculum(db, olderId);
+
+    expect(current).toEqual(await getCurriculum(db, latestId));
+    expect(current?.curriculum).toMatchObject({
+      year: 2023,
+      version: "v6.0",
+      isCurrent: true,
+    });
+    expect(older?.curriculum).toMatchObject({
+      year: 2018,
+      version: "v5.0",
+      isCurrent: false,
+    });
+    expect(await getCurriculumParams(db)).toEqual([derecho]);
+  });
+
+  describe("an import for a program and year that already have a curriculum", () => {
+    const revised = () =>
+      curriculumFile({
+        curriculum: { ...curriculumFile().curriculum, version: "v6.1" },
+        courses: [
+          course(1, { description: "Introducción" }),
+          course(2, { prerequisiteIds: [1], prerequisiteCredits: 18 }),
+          course(3, {
+            code: "CFG",
+            name: "Curso de Formación General",
+            isElective: true,
+          }),
+        ],
+      });
+
+    test("is refused by default and leaves the existing curriculum as it was", async () => {
+      const db = await freshDatabase();
+      const existingId = await importValid(db, curriculumFile(), "derecho", {
+        publish: true,
+      });
+      const before = await getCurriculum(db, existingId);
+
+      const result = await importCurriculum(db, revised(), {
+        programSlug: "derecho",
+      });
+
+      expect(result).toEqual({ ok: false, existingCurriculumId: existingId });
+      expect(await getCurrentCurriculum(db, derecho)).toEqual(before);
+    });
+
+    test("replaces the existing curriculum, under the same id, when replacement is requested", async () => {
+      const db = await freshDatabase();
+      const existingId = await importValid(db, curriculumFile(), "derecho", {
+        publish: true,
+      });
+
+      const replacedId = await importValid(db, revised(), "derecho", {
+        replace: true,
+        publish: true,
+      });
+
+      const current = await getCurrentCurriculum(db, derecho);
+      expect(replacedId).toBe(existingId);
+      expect(current).toEqual(await getCurriculum(db, existingId));
+      const { curriculum: replaced, courses } = byCode(
+        current as CurriculumData,
+      );
+      expect(replaced.version).toBe("v6.1");
+      expect(replaced.slots).toHaveLength(4);
+      expect(replaced.tracks).toHaveLength(2);
+      expect(courses.map((c) => [c.code, c.prerequisiteCredits])).toEqual([
+        ["CFG", 0],
+        ["CRS1", 0],
+        ["CRS2", 18],
+      ]);
+      expect(byCode(current as CurriculumData).areas).toHaveLength(2);
+    });
+
+    test("a replacement is a draft unless it is published", async () => {
+      const db = await freshDatabase();
+      const existingId = await importValid(db, curriculumFile(), "derecho", {
+        publish: true,
+      });
+
+      await importValid(db, revised(), "derecho", { replace: true });
+
+      expect(await getCurrentCurriculum(db, derecho)).toBeNull();
+      expect((await getCurriculum(db, existingId))?.curriculum.version).toBe(
+        "v6.1",
+      );
     });
   });
 });

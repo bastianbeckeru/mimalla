@@ -67,15 +67,26 @@ type CurriculumFile = {
   }[];
 };
 
-type ImportOptions = { programSlug: string };
+type ImportOptions = {
+  programSlug: string;
+  publish?: boolean;
+  replace?: boolean;
+};
 
 type ImportResult =
   | { ok: true; curriculumId: number }
-  | { ok: false; problems: Problem[] };
+  | { ok: false; problems: Problem[] }
+  | { ok: false; existingCurriculumId: number };
 
 class RejectedFile extends Error {
   constructor(readonly problems: Problem[]) {
     super("curriculum file rejected");
+  }
+}
+
+class ExistingCurriculum extends Error {
+  constructor(readonly curriculumId: number) {
+    super("curriculum already exists");
   }
 }
 
@@ -202,10 +213,47 @@ function parentsOf(groups: { id: number; children: number[] }[]) {
   );
 }
 
+async function upsertCurriculum(
+  tx: Transaction,
+  programId: number,
+  file: CurriculumFile,
+  { publish, replace }: { publish: boolean; replace: boolean },
+) {
+  const values = {
+    version: file.curriculum.version ?? null,
+    status: publish ? ("published" as const) : ("draft" as const),
+  };
+  const [existing] = await tx
+    .select({ id: curriculum.id })
+    .from(curriculum)
+    .where(
+      and(
+        eq(curriculum.programId, programId),
+        eq(curriculum.year, file.curriculum.year),
+      ),
+    );
+  if (!existing) {
+    const [created] = await tx
+      .insert(curriculum)
+      .values({ programId, year: file.curriculum.year, ...values })
+      .returning({ id: curriculum.id });
+    return (created as { id: number }).id;
+  }
+  if (!replace) throw new ExistingCurriculum(existing.id);
+
+  await tx.update(curriculum).set(values).where(eq(curriculum.id, existing.id));
+  await tx.delete(area).where(eq(area.curriculumId, existing.id));
+  await tx.delete(track).where(eq(track.curriculumId, existing.id));
+  await tx
+    .delete(curriculumCourse)
+    .where(eq(curriculumCourse.curriculumId, existing.id));
+  return existing.id;
+}
+
 async function insertCurriculum(
   tx: Transaction,
   file: CurriculumFile,
-  { programSlug }: ImportOptions,
+  { programSlug, publish = false, replace = false }: ImportOptions,
 ) {
   const institutionId = await ensureInstitution(tx, file);
   const departmentId = await ensureDepartment(tx, institutionId, file);
@@ -217,15 +265,10 @@ async function insertCurriculum(
     file,
   );
 
-  const [created] = await tx
-    .insert(curriculum)
-    .values({
-      programId,
-      year: file.curriculum.year,
-      version: file.curriculum.version ?? null,
-    })
-    .returning({ id: curriculum.id });
-  const curriculumId = (created as { id: number }).id;
+  const curriculumId = await upsertCurriculum(tx, programId, file, {
+    publish,
+    replace,
+  });
 
   const courseIds = await ensureCourses(tx, institutionId, file);
   const curriculumCourses = await tx
@@ -362,6 +405,9 @@ export async function importCurriculum(
   } catch (error) {
     if (error instanceof RejectedFile) {
       return { ok: false, problems: error.problems };
+    }
+    if (error instanceof ExistingCurriculum) {
+      return { ok: false, existingCurriculumId: error.curriculumId };
     }
     throw error;
   }

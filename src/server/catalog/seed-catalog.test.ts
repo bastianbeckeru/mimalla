@@ -39,7 +39,7 @@ describe("sample seed", () => {
 });
 
 describe("seeding the catalog", () => {
-  test("running it again keeps the seeded curriculums and adds nothing", async () => {
+  test("publishes the seeded curriculums, and running it again adds nothing", async () => {
     const client = new PGlite();
     const db = drizzle({ client, schema, casing: "snake_case" });
     await migrate(db, {
@@ -51,7 +51,11 @@ describe("seeding the catalog", () => {
     const programs = await Promise.all(
       second.map(async ({ curriculumId }) => {
         const data = await getCurriculum(db, curriculumId);
-        return { program: data?.program.name, courses: data?.courses.length };
+        return {
+          program: data?.program.name,
+          courses: data?.courses.length,
+          isCurrent: data?.curriculum.isCurrent,
+        };
       }),
     );
 
@@ -61,8 +65,16 @@ describe("seeding the catalog", () => {
       first.map(({ curriculumId }) => curriculumId),
     );
     expect(programs).toEqual([
-      { program: "Ingeniería Civil Industrial", courses: 11 },
-      { program: "Ingeniería Civil en Informática", courses: 11 },
+      {
+        program: "Ingeniería Civil Industrial",
+        courses: 11,
+        isCurrent: true,
+      },
+      {
+        program: "Ingeniería Civil en Informática",
+        courses: 11,
+        isCurrent: true,
+      },
     ]);
     await client.close();
   });

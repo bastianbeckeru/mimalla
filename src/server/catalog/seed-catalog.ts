@@ -58,7 +58,16 @@ export async function seedCatalog(db: Database, files: SeedFile[]) {
     }
     const result = await importCurriculum(db, file.content, {
       programSlug: file.programSlug,
+      publish: true,
     });
+    if (!result.ok && "existingCurriculumId" in result) {
+      results.push({
+        path: file.path,
+        curriculumId: result.existingCurriculumId,
+        seeded: false,
+      });
+      continue;
+    }
     if (!result.ok) {
       const messages = result.problems.map(({ message }) => message);
       throw new Error(
