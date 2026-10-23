@@ -194,7 +194,7 @@ function Doodle({ name, className }: { name: string; className?: string }) {
       alt=""
       width={1024}
       height={768}
-      className={cn("h-auto dark:hue-rotate-180 dark:invert", className)}
+      className={cn("h-auto", className)}
     />
   );
 }
