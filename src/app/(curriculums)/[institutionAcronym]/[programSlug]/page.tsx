@@ -1,7 +1,6 @@
 import CurriculumView from "@/components/curriculum/curriculum-view";
 import ImportCurriculumButton from "@/components/curriculum/import-button";
 import ProgramInfo from "@/components/curriculum/program-info";
-import ProgramModal from "@/components/curriculum/program-modal";
 import { getCurriculumParams, getProgramData } from "@/server/db/curriculums";
 import { getPeriods } from "@/utils/curriculum";
 
@@ -18,7 +17,7 @@ export default async function ProgramPage({
 }) {
   const { institutionAcronym, programSlug } = await params;
   const data = getProgramData({ institutionAcronym, programSlug });
-  const { institution, program, curriculum, stats } = data;
+  const { institution, program, curriculum } = data;
 
   return (
     <div className="lg:max-y-full flex h-auto w-full max-w-full flex-col overflow-hidden border-t lg:max-h-[35.5rem] lg:flex-row lg:rounded-md lg:border">
@@ -32,7 +31,6 @@ export default async function ProgramPage({
         tracks={curriculum.tracks}
         duration={getPeriods(curriculum.slots).nCols}
       >
-        <ProgramModal program={{ ...program, stats }} />
         <ImportCurriculumButton
           path={`${institutionAcronym}/${programSlug}`}
           institution={institution}

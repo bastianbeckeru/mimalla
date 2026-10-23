@@ -44,8 +44,8 @@ Many areas list ids in `courseIds` that are not in the file's `courses`, mostly 
 
 **Fix:** set `isElective` explicitly on every course.
 
-## Programs without statistics
+## Program without plans
 
-`udp/diseno.json`, `udp/ingenieria-civil-plan-comun.json` and `udp/obstetricia-y-neonatologia.json` have no `stats`, so their pages hide the "Ver estadísticas" button. `udp/ingenieria-civil-plan-comun.json` also has no `plans`, so its page lists no degree or title.
+`udp/ingenieria-civil-plan-comun.json` has no `plans`, so its page lists no degree or title.
 
-**Fix:** add the SIES statistics and the plans from the official sources.
+**Fix:** add the plans from the official sources.
