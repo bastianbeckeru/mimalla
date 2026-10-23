@@ -114,7 +114,7 @@ export default function ImportCurriculumButton({
               router.push("/dashboard");
             }}
           >
-            Importar 🚀
+            Importar
           </Button>
         </DialogFooter>
       </DialogContent>

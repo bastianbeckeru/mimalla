@@ -39,7 +39,7 @@ import {
 } from "@/utils/trajectory";
 
 const PERIOD_FULL_TOAST = {
-  title: "❌ Límite de cursos",
+  title: "Límite de cursos",
   description: `No puedes añadir más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos por periodo.`,
 };
 
@@ -48,7 +48,7 @@ const ADD_ERROR_TOASTS: Partial<
 > = {
   PERIOD_FULL: PERIOD_FULL_TOAST,
   DUPLICATE_COURSE: {
-    title: "❌ Curso duplicado",
+    title: "Curso duplicado",
     description: "No puedes añadir un curso que ya está en el periodo.",
   },
 };
@@ -101,7 +101,7 @@ export default function TrajectoryBoard({
     if (result.error) {
       const errorToast = ADD_ERROR_TOASTS[result.error];
       if (errorToast) {
-        toast(errorToast.title, { description: errorToast.description });
+        toast.error(errorToast.title, { description: errorToast.description });
       }
       return;
     }
@@ -127,8 +127,10 @@ export default function TrajectoryBoard({
       const title =
         result.error === "PERIOD_FULL"
           ? PERIOD_FULL_TOAST.title
-          : "❌ Movimiento inválido";
-      toast(title, { description: MOVE_ERROR_DESCRIPTIONS[result.error] });
+          : "Movimiento inválido";
+      toast.error(title, {
+        description: MOVE_ERROR_DESCRIPTIONS[result.error],
+      });
       return;
     }
 

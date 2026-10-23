@@ -75,11 +75,11 @@ export default function NewTrajectoryForm({
         slots: data.curriculum.slots,
       });
 
-      toast("✅ Malla importada", {
+      toast.success("Malla importada", {
         description: `${data.program.name} ${data.curriculum.year}`,
       });
     } catch {
-      toast("❌ No se pudo importar la malla", {
+      toast.error("No se pudo importar la malla", {
         description: "Inténtalo nuevamente en unos segundos.",
       });
       setIsCreating(false);
@@ -196,7 +196,7 @@ export default function NewTrajectoryForm({
             {isCreating ? (
               <Loader2 className="animate-spin" />
             ) : (
-              "Importar malla ✨"
+              "Importar malla"
             )}
           </Button>
 

@@ -143,7 +143,7 @@ function TrajectoryDashboard({
 
   function toggleEditMode() {
     if (history.canUndo) {
-      toast("⚠️ Cambios sin guardar", {
+      toast.warning("Cambios sin guardar", {
         description:
           "Guarda los cambios realizados antes de finalizar la edición.",
       });
