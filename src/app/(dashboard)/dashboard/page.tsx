@@ -1,5 +1,6 @@
 import ClientSideDashboard from "@/components/dashboard/client-side-dashboard";
+import { getCachedCatalog } from "@/server/catalog/cached-catalog";
 
-export default function DashboardPage() {
-  return <ClientSideDashboard />;
+export default async function DashboardPage() {
+  return <ClientSideDashboard catalog={await getCachedCatalog()} />;
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "cn";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import CourseCard from "@/components/curriculum/course-card";
 import CourseModal from "@/components/curriculum/course-modal";
 import PathsOverlay, {
@@ -10,6 +9,7 @@ import PathsOverlay, {
 import { MotionDiv } from "@/components/motion";
 import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
 import type { CurriculumData, ExtendedSlot } from "@/types/curriculum";
+import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -30,11 +30,6 @@ type FocusedSlot = {
   relatedPaths: PathData[];
 };
 
-type Modal = {
-  isOpen: boolean;
-  slot: ExtendedSlot;
-};
-
 export default function CurriculumView({
   data,
   className,
@@ -42,75 +37,57 @@ export default function CurriculumView({
   const { courses, periods, nCols, nRows, slots } = getCurriculumGridData(data);
   const paths = createConnectionPaths(nRows, nCols, slots);
 
-  const [modal, setModal] = useState<Modal | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalSlot, setModalSlot] = useState<ExtendedSlot | null>(null);
   const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
 
-  const handleSelectCard = useCallback(
-    (newSlot: ExtendedSlot | null) => {
-      if (newSlot === null) {
-        setFocusedSlot(null);
-        return;
-      }
+  const connectedCourseIds = focusedSlot
+    ? [
+        focusedSlot.slot.courseId,
+        ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
+        ...(focusedSlot.slot.course?.successorIds ?? []),
+      ]
+    : [];
 
-      if (!newSlot?.course || modal?.isOpen) return;
+  function handleSelectCard(newSlot: ExtendedSlot | null) {
+    if (newSlot === null) {
+      setFocusedSlot(null);
+      return;
+    }
 
-      setFocusedSlot({
-        slot: newSlot,
-        relatedPaths: paths
-          .filter(
-            (p) =>
-              p.originCardId === String(newSlot.id) ||
-              p.destinationCardId === String(newSlot.id),
-          )
-          .map((p) => ({
-            ...p,
-            color:
-              p.originCardId === String(newSlot.id) ? "#34d399" : "#f87171",
-          })),
-      });
-    },
-    [paths.filter, modal?.isOpen],
-  );
+    if (!newSlot.course || isModalOpen) return;
 
-  const handleClickCard = useCallback(
-    (newSlot: ExtendedSlot) => {
-      const course = newSlot.course;
+    const slotId = String(newSlot.id);
 
-      if (!course) return;
+    setFocusedSlot({
+      slot: newSlot,
+      relatedPaths: paths
+        .filter(
+          (p) => p.originCardId === slotId || p.destinationCardId === slotId,
+        )
+        .map((p) => ({
+          ...p,
+          color: p.originCardId === slotId ? "#34d399" : "#f87171",
+        })),
+    });
+  }
 
-      if (focusedSlot) {
-        const connectedCourseIds = [
-          focusedSlot.slot.courseId,
-          ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
-          ...(focusedSlot.slot.course?.subsequentIds ?? []),
-        ];
+  function handleClickCard(newSlot: ExtendedSlot) {
+    const { course } = newSlot;
+    if (!course) return;
 
-        if (!connectedCourseIds.includes(course.id)) {
-          setFocusedSlot(null);
-          return;
-        }
-      }
+    if (focusedSlot && !connectedCourseIds.includes(course.id)) {
+      setFocusedSlot(null);
+      return;
+    }
 
-      setModal({
-        isOpen: true,
-        slot: newSlot,
-      });
-    },
-    [focusedSlot],
-  );
-
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.025, // 0.05 con periods
-      },
-    },
-  };
+    setModalSlot(newSlot);
+    setIsModalOpen(true);
+  }
 
   return (
     <>
-      <ScrollAreaWrapper className={cn(className)}>
+      <ScrollAreaWrapper className={className}>
         <section aria-label="Malla curricular" className="p-2 pb-4">
           <div
             className="flex flex-row gap-2"
@@ -119,27 +96,24 @@ export default function CurriculumView({
               paddingRight: `${PADDING}rem`,
             }}
           >
-            {periods.map((pKey, pIndex) => {
-              return (
-                <div
-                  key={pKey}
-                  className="relative flex h-7 justify-center rounded-md p-2"
-                  style={{
-                    width: `${GRID_CELL_WIDTH}rem`,
-                  }}
-                >
-                  <span
-                    className={`w-full text-center font-bold text-muted-foreground text-xs tracking-wider`}
-                  >
-                    SEMESTRE {arabicToRoman(pIndex + 1)}
-                  </span>
-                </div>
-              );
-            })}
+            {periods.map((pKey, pIndex) => (
+              <div
+                key={pKey}
+                className="relative flex h-7 justify-center rounded-md p-2"
+                style={{ width: `${GRID_CELL_WIDTH}rem` }}
+              >
+                <span className="w-full text-center font-bold text-muted-foreground text-xs tracking-wider">
+                  SEMESTRE {arabicToRoman(pIndex + 1)}
+                </span>
+              </div>
+            ))}
           </div>
 
           <MotionDiv
-            variants={containerVariants}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.025 } },
+            }}
             initial="hidden"
             animate="visible"
             style={{
@@ -156,38 +130,22 @@ export default function CurriculumView({
             }}
           >
             <div className="contents">
-              {slots.map((slot, sIndex) => {
-                const slotId = `${slot.year}-${slot.term}-${slot.position}`; // TEMPORARY UNTIL DB
-                const focusedSlotId = focusedSlot
-                  ? `${focusedSlot.slot.year}-${focusedSlot.slot.term}-${focusedSlot.slot.position}`
-                  : ""; // TEMPORARY UNTIL DB
-
-                const connectedCourseIds = focusedSlot
-                  ? [
-                      focusedSlot.slot.courseId,
-                      ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
-                      ...(focusedSlot.slot.course?.subsequentIds ?? []),
-                    ]
-                  : [];
-
-                return (
-                  <CourseCard
-                    key={slotId}
-                    index={sIndex}
-                    slot={slot}
-                    isSelected={focusedSlotId === slotId}
-                    isNotRelated={
-                      !!focusedSlotId &&
-                      !(
-                        slot.course &&
-                        connectedCourseIds.includes(slot.course.id)
-                      )
-                    }
-                    handleClick={handleClickCard}
-                    handleSelect={handleSelectCard}
-                  />
-                );
-              })}
+              {slots.map((slot, sIndex) => (
+                <CourseCard
+                  key={slot.id}
+                  index={sIndex}
+                  slot={slot}
+                  isSelected={focusedSlot?.slot.id === slot.id}
+                  isNotRelated={
+                    !!focusedSlot &&
+                    !(
+                      slot.course && connectedCourseIds.includes(slot.course.id)
+                    )
+                  }
+                  handleClick={handleClickCard}
+                  handleSelect={handleSelectCard}
+                />
+              ))}
             </div>
 
             <PathsOverlay paths={focusedSlot ? focusedSlot.relatedPaths : []} />
@@ -196,9 +154,10 @@ export default function CurriculumView({
       </ScrollAreaWrapper>
 
       <CourseModal
-        open={!!modal && modal.isOpen}
-        onOpenChange={() => setModal(null)}
-        slot={modal?.slot ?? null}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        course={modalSlot?.course ?? null}
+        color={modalSlot?.color ?? DEFAULT_COURSE_COLOR}
         courses={courses}
       />
     </>

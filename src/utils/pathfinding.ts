@@ -42,14 +42,15 @@ export function createConnectionPaths(
   cards.forEach((card) => {
     if (!card.course) return;
 
-    const { year, term, course } = card;
+    const { programYear, term, course } = card;
     const { prerequisiteIds } = course;
 
     prerequisiteIds.forEach((id) => {
       const relatedCard = cards.find(
         (slot) =>
           slot.courseId === id &&
-          ((slot.year === year && slot.term < term) || slot.year < year),
+          ((slot.programYear === programYear && slot.term < term) ||
+            slot.programYear < programYear),
       );
 
       if (!relatedCard) return;

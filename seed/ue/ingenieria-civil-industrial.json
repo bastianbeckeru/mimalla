@@ -1,0 +1,197 @@
+{
+  "institution": { "name": "Universidad de Ejemplo", "acronym": "UE" },
+  "department": { "name": "Facultad de Ingeniería", "acronym": "FI" },
+  "program": {
+    "name": "Ingeniería Civil Industrial",
+    "siesCode": null,
+    "demreCode": null,
+    "schedule": "EVENING"
+  },
+  "curriculum": {
+    "version": "v1",
+    "year": 2024,
+    "structure": [
+      { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 1 },
+      { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 2 },
+      { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 20 },
+      { "id": 4, "year": 1, "term": 3, "position": 1, "courseId": 4 },
+      { "id": 5, "year": 1, "term": 3, "position": 2, "courseId": 3 },
+      { "id": 6, "year": 1, "term": 3, "position": 3, "courseId": 21 },
+      { "id": 7, "year": 2, "term": 1, "position": 1, "courseId": 22 },
+      { "id": 8, "year": 2, "term": 1, "position": 2, "courseId": 23 },
+      { "id": 9, "year": 2, "term": 1, "position": 3, "courseId": 5 },
+      { "id": 10, "year": 2, "term": 3, "position": 1, "courseId": 24 },
+      { "id": 11, "year": 2, "term": 3, "position": 2, "courseId": 25 },
+      { "id": 12, "year": 2, "term": 3, "position": 3, "courseId": 5 }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "Licenciatura",
+        "description": "Grado de licenciado en ciencias de la ingeniería",
+        "requiredCredits": 60,
+        "courseIds": [1, 2, 3, 4, 20, 21, 22, 23, 24],
+        "subplanIds": [2],
+        "credential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Ciencias de la Ingeniería"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Electivos de Gestión",
+        "description": null,
+        "requiredCredits": 6,
+        "courseIds": [25],
+        "subplanIds": [],
+        "credential": null
+      }
+    ]
+  },
+  "areas": [
+    {
+      "id": 1,
+      "name": "Ciencias Básicas",
+      "color": "#34C1CD",
+      "courseIds": [1, 2, 3, 4],
+      "subareaIds": []
+    },
+    {
+      "id": 2,
+      "name": "Gestión",
+      "color": "#81B29A",
+      "courseIds": [20, 21, 22, 23, 24, 25],
+      "subareaIds": []
+    },
+    {
+      "id": 3,
+      "name": "Formación General",
+      "color": "#9B7BD4",
+      "courseIds": [5],
+      "subareaIds": []
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "code": "MAT101",
+      "name": "Cálculo I",
+      "description": "Límites, derivadas y sus aplicaciones.",
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 2,
+      "code": "MAT102",
+      "name": "Álgebra Lineal",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 3,
+      "code": "FIS101",
+      "name": "Física I",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [1],
+      "isElective": false
+    },
+    {
+      "id": 4,
+      "code": "MAT201",
+      "name": "Cálculo II",
+      "description": "Integrales y series.",
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [1],
+      "isElective": false
+    },
+    {
+      "id": 5,
+      "code": "CFG",
+      "name": "Curso de Formación General",
+      "description": null,
+      "credits": 4,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": true
+    },
+    {
+      "id": 20,
+      "code": "IND101",
+      "name": "Introducción a la Ingeniería Industrial",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 21,
+      "code": "IND102",
+      "name": "Microeconomía",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [20],
+      "isElective": false
+    },
+    {
+      "id": 22,
+      "code": "IND201",
+      "name": "Investigación de Operaciones",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [2, 4],
+      "isElective": false
+    },
+    {
+      "id": 23,
+      "code": "IND202",
+      "name": "Contabilidad y Finanzas",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [21],
+      "isElective": false
+    },
+    {
+      "id": 24,
+      "code": "IND301",
+      "name": "Gestión de Operaciones",
+      "description": "Proyecto anual con una empresa.",
+      "credits": 12,
+      "duration": 2,
+      "prerequisiteCredits": 48,
+      "prerequisiteIds": [22],
+      "isElective": false
+    },
+    {
+      "id": 25,
+      "code": "IND390",
+      "name": "Electivo de Gestión",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [21],
+      "isElective": true
+    }
+  ]
+}

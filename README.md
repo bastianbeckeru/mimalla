@@ -19,7 +19,8 @@ It is the successor of UniCore, an earlier project by the same author.
 
 | Institution | Programs |
 | --- | --- |
-| Universidad Diego Portales (UDP) | Derecho, Ingeniería Civil (Plan Común, Industrial, Informática y Telecomunicaciones, Obras Civiles), Obstetricia y Neonatología, Psicología |
+| Universidad de Chile (UCH) | Química y Farmacia |
+| Universidad Diego Portales (UDP) | Derecho, Diseño, Ingeniería Civil (Plan Común, Industrial, Informática y Telecomunicaciones, Obras Civiles), Obstetricia y Neonatología, Psicología |
 
 Is your program missing? See [Adding a curriculum](CONTRIBUTING.md#adding-a-curriculum).
 
@@ -64,14 +65,15 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ```
 src/
-├── app/            Next.js routes: (marketing) landing page and (dashboard) app
+├── app/            Next.js routes: landing, program pages, dashboard and curriculum JSON API
 ├── components/
-│   ├── curriculum/ Curriculum grid, course cards and prerequisite paths
-│   ├── dashboard/  Sidebar, dialogs and forms of the dashboard
+│   ├── curriculum/ Official curriculum grid, course cards and prerequisite paths
+│   ├── dashboard/  Dashboard shell: sidebar and new trajectory form
+│   ├── trajectory/ Trajectory board: periods, enrollments and their dialogs
 │   └── ui/         shadcn/ui components
 ├── hooks/          Shared React hooks
-├── server/db/      Institution list and curriculum JSON files
-├── stores/         Zustand stores persisted to local storage
+├── server/db/      Curriculum JSON files and the build-time reader
+├── stores/         Trajectory store persisted to local storage
 ├── styles/         Global and curriculum styles
 ├── types/          Shared types
 └── utils/          Shared helpers

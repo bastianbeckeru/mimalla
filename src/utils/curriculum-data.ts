@@ -1,26 +1,30 @@
-"use server";
+import type { CurriculumData, ProgramCurriculum } from "@/types/curriculum";
 
-import fs from "node:fs";
-import path from "node:path";
-import type { CurriculumData } from "@/types/curriculum";
+export async function fetchCurriculum(
+  curriculumId: number,
+): Promise<CurriculumData> {
+  const response = await fetch(`/api/curriculums/by-id/${curriculumId}`);
 
-export async function getProgramData({
-  institutionAcronym,
-  programSlug,
-}: {
-  institutionAcronym: string;
-  programSlug: string;
-}) {
-  const curriculumPath = path.join(
-    process.cwd(),
-    "src",
-    "server",
-    "db",
-    "curriculums",
-    institutionAcronym,
-    `${programSlug}.json`,
-  );
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load curriculum ${curriculumId}: ${response.status}`,
+    );
+  }
 
-  const fileContent = fs.readFileSync(curriculumPath, "utf-8");
-  return JSON.parse(fileContent) as CurriculumData;
+  return response.json();
+}
+
+export async function fetchProgramCurriculums(
+  path: string,
+): Promise<ProgramCurriculum[]> {
+  const response = await fetch(`/api/curriculums/${path}/curriculums`);
+
+  if (response.status === 404) return [];
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load the curriculums of "${path}": ${response.status}`,
+    );
+  }
+
+  return response.json();
 }

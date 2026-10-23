@@ -10,42 +10,6 @@
     "demreCode": 38004,
     "schedule": "DAYTIME"
   },
-  "stats": [
-    {
-      "year": 2024,
-      "admissions": {
-        "paesRequirements": {
-          "nem": 10,
-          "ranking": 20,
-          "language": 40,
-          "science": 10,
-          "history": 10,
-          "math1": 20,
-          "math2": 0
-        },
-        "averageScore": 769.2,
-        "vacancies": 261
-      },
-      "academics": {
-        "firstYearRetentionRate": 0.946,
-        "avgRealDuration": 15.0,
-        "avgRealDurationUnit": "SEMESTERS",
-        "acreditationYears": 6
-      },
-      "employment": {
-        "employmentRate1stYear": 0.794,
-        "avgIncome4thYear": {
-          "min": 1800000,
-          "max": 1900000
-        }
-      },
-      "costs": {
-        "annualTuition": 7238000,
-        "annualEnrollment": 721000,
-        "currency": "CLP"
-      }
-    }
-  ],
   "curriculum": {
     "version": "v6.0",
     "year": 2023,
@@ -103,7 +67,7 @@
       { "id": 50, "year": 5, "term": 3, "position": 1, "courseId": 213 },
       { "id": 51, "year": 5, "term": 3, "position": 2, "courseId": 214 },
       { "id": 52, "year": 5, "term": 3, "position": 3, "courseId": 215 },
-      { "id": 52, "year": 5, "term": 3, "position": 4, "courseId": 210 }
+      { "id": 53, "year": 5, "term": 3, "position": 4, "courseId": 210 }
     ],
     "plans": [
       {

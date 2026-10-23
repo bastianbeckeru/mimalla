@@ -1,35 +1,35 @@
 "use client";
 
 import { track } from "@vercel/analytics";
+import { cn } from "cn";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { institutions } from "@/server/db/data";
-import { useNewCurriculumStore } from "@/stores/newCurriculum";
-import { slugify } from "@/utils/strings";
+import { useHasHydrated, useTrajectoryStore } from "@/stores/trajectory";
 
-export function LandingButton() {
-  const { curriculums } = useNewCurriculumStore();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
+type LandingButtonProps = {
+  label: string;
+  source: string;
+  className?: string;
+};
 
-  if (curriculums.length > 0) {
+const baseClassName =
+  "inline-flex min-h-13 items-center gap-2 rounded-2xl bg-blue-600 px-7 font-semibold text-base text-white transition-colors hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:outline-offset-2 [&_svg]:size-4";
+
+export function LandingButton({
+  label,
+  source,
+  className,
+}: LandingButtonProps) {
+  const hasHydrated = useHasHydrated();
+  const { trajectories } = useTrajectoryStore();
+
+  if (hasHydrated && trajectories.length > 0) {
     return (
       <Link
         href="/dashboard"
-        className="glow glow-active inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md bg-foreground p-2 px-4 py-2 font-medium text-background text-sm has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none"
+        className={cn(baseClassName, className)}
         onClick={() => {
-          track("redirect_dashboard", { source: "cta_button" });
+          track("redirect_dashboard", { source });
         }}
       >
         Ir a mi malla
@@ -39,42 +39,8 @@ export function LandingButton() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="glow glow-active inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md bg-foreground p-2 px-4 py-2 font-medium text-background text-sm has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none"
-        onClick={() => {
-          setOpen((open) => !open);
-
-          track("searchbar_opened", { source: "cta_button" });
-        }}
-      >
-        Explorar carreras
-      </button>
-
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <Command>
-          <CommandInput placeholder="Escribe una carrera..." />
-          <CommandList>
-            <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
-            {institutions[0]?.departments.map((department) => (
-              <CommandGroup heading={department.name} key={department.name}>
-                {department.programs.map((program) => (
-                  <CommandItem
-                    key={program.siesCode}
-                    onSelect={() => {
-                      setOpen(false);
-                      router.push(`/udp/${slugify(program.name)}`);
-                    }}
-                  >
-                    {program.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
-          </CommandList>
-        </Command>
-      </CommandDialog>
-    </>
+    <a href="#carreras" className={cn(baseClassName, className)}>
+      {label}
+    </a>
   );
 }

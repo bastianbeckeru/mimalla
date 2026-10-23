@@ -1,41 +1,44 @@
-import type { EnrolledCourse } from "@/types/store";
-
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: EnrolledCourse[];
-};
-
 export type PeriodKey = `${number}-${number}`;
-
-export type History<T> = {
-  past: T[];
-  present: T;
-  future: T[];
-};
-
-//////////////////////////////////////////
-// NEW MIMALLA v0.3.0
-//////////////////////////////////////////
 
 export type CurriculumData = {
   institution: Institution;
   department: Department;
   program: Program;
-  stats: Stat[];
   curriculum: {
-    version: string;
+    id: number;
+    version?: string;
     year: number;
     isCurrent: boolean;
-    structure: Slot[];
-    plans: Plan[];
+    slots: Slot[];
+    tracks: Track[];
   };
   areas: Area[];
   courses: Course[];
 };
 
+export type ProgramCurriculum = {
+  id: number;
+  year: number;
+  version?: string;
+};
+
 export type Institution = {
   name: string;
   acronym: string;
+};
+
+export type CatalogProgram = {
+  name: string;
+  path: string;
+};
+
+export type CatalogDepartment = {
+  name: string;
+  programs: CatalogProgram[];
+};
+
+export type CatalogInstitution = Institution & {
+  departments: CatalogDepartment[];
 };
 
 type Department = {
@@ -45,18 +48,18 @@ type Department = {
 
 export type Program = {
   name: string;
-  siesCode: string;
-  demreCode: number;
+  siesCode?: string;
+  demreCode?: number;
   schedule: "DAYTIME" | "EVENING";
 };
 
-export type Plan = {
+export type Track = {
   id: number;
   name: string;
   description?: string;
   courseIds: number[];
-  subplanIds: number[];
-  requiredCredits: number; // (-1) All courses and subplans. (>0) X courses until reach that amount.
+  subtrackIds: number[];
+  requiredCredits: number;
   credential: Credential | null;
 };
 
@@ -76,45 +79,6 @@ export type Area = {
   color: string;
   courseIds: number[];
   subareaIds: number[];
-  electiveIds: number[];
-};
-
-type Stat = {
-  year: number;
-  admissions: {
-    paesRequirements: {
-      nem: number;
-      ranking: number;
-      language: number;
-      science: number;
-      history: number;
-      math1: number;
-      math2: number;
-    };
-    averageScore: number;
-    vacancies: number;
-  };
-  academics: {
-    firstYearRetentionRate: number;
-    avgRealDuration: number;
-    avgRealDurationUnit: string;
-    totalEnrollment: number;
-    freshmenEnrollment: number;
-    graduates: number;
-    acreditationYears: number;
-  };
-  employment: {
-    employmentRate1stYear: number;
-    employmentRate2ndYear: number;
-    avgIncome4thYear: {
-      min: number;
-      max: number;
-    };
-  };
-  costs: {
-    annualTuition: number;
-    annualEnrollment: number;
-  };
 };
 
 export type Course = {
@@ -129,23 +93,16 @@ export type Course = {
   isElective: boolean;
 };
 export type ExtendedCourse = Course & {
-  subsequentIds: number[];
+  successorIds: number[];
 };
-
-/* type Category = {
-  id: number;
-  name: string;
-};
- */
 
 export type Slot = {
   id: number;
-  year: number;
+  programYear: number;
   term: number;
   position: number;
   courseId: number;
   isElective?: boolean;
-  //forceElection?: boolean;
 };
 
 export type ExtendedSlot = Slot & {

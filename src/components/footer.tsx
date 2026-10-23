@@ -1,32 +1,18 @@
 import { cn } from "cn";
-import DiscordIcon from "@/components/icons/DiscordIcon";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { version } from "../../package.json";
 
 export default function Footer({
   className,
 }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <footer className={cn("px-4 lg:px-0", className)}>
-      <div className="flex flex-col items-center justify-between gap-4 py-8 text-muted-foreground md:h-20 md:flex-row md:py-0">
-        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <p className="text-center text-sm leading-relaxed md:text-left">
-            Desarrollado con ❤️, por{" "}
-            <span className="font-medium underline underline-offset-4">
-              estudiantes
-            </span>{" "}
-            para estudiantes.
-          </p>
-        </div>
+    <footer className={cn("border-t", className)}>
+      <div className="mx-auto flex max-w-300 flex-col items-center justify-between gap-x-6 gap-y-1.5 px-4 pt-6 pb-8 text-center text-muted-foreground text-sm sm:flex-row sm:flex-wrap sm:gap-y-3 sm:px-6 sm:py-7 sm:text-left">
+        <p>Desarrollado con ❤️, por estudiantes para estudiantes.</p>
 
-        <div className="flex flex-row items-center gap-4">
-          <a
-            aria-label="Discord"
-            target="_blank"
-            rel="noreferrer"
-            href="https://discord.gg/wez3cJDzXk"
-            className="flex items-center justify-center [&>svg]:size-5 [&>svg]:transition-colors [&>svg]:hover:text-foreground"
-          >
-            <DiscordIcon />
-          </a>
+        <div className="flex items-center gap-4">
+          <ThemeToggle variant="icon" className="size-10 rounded-xl" />
+          <span>v{version}</span>
         </div>
       </div>
     </footer>

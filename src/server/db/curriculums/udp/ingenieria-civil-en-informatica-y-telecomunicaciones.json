@@ -10,42 +10,6 @@
     "demreCode": 38175,
     "schedule": "DAYTIME"
   },
-  "stats": [
-    {
-      "year": 2024,
-      "admissions": {
-        "paesRequirements": {
-          "nem": 10,
-          "ranking": 30,
-          "language": 10,
-          "science": 10,
-          "history": 10,
-          "math1": 35,
-          "math2": 5
-        },
-        "averageScore": 741.2,
-        "vacancies": 170
-      },
-      "academics": {
-        "firstYearRetentionRate": 0.874,
-        "avgRealDuration": 14.5,
-        "avgRealDurationUnit": "SEMESTERS",
-        "acreditationYears": 6
-      },
-      "employment": {
-        "employmentRate1stYear": 0.938,
-        "avgIncome4thYear": {
-          "min": 2500000,
-          "max": 3000000
-        }
-      },
-      "costs": {
-        "annualTuition": 6969000,
-        "annualEnrollment": 696000,
-        "currency": "CLP"
-      }
-    }
-  ],
   "curriculum": {
     "version": "v4",
     "year": 2020,
@@ -212,8 +176,8 @@
       "id": 8,
       "name": "Formación en Ingeniería Aplicada: Informática",
       "color": "#AFCEC3",
-      "courseIds": "47, 50, 51, 55, 58, 60, 62, 68, 71",
-      "subareaIds": ""
+      "courseIds": [47, 50, 51, 55, 58, 60, 62, 68, 71],
+      "subareaIds": []
     },
     {
       "id": 9,
