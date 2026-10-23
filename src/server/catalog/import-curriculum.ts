@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   type Problem,
   validateCurriculum,
@@ -90,12 +90,23 @@ class ExistingCurriculum extends Error {
   }
 }
 
-function acronymOf(file: unknown) {
-  if (typeof file !== "object" || file === null) return undefined;
-  const { institution } = file as { institution?: { acronym?: unknown } };
-  return typeof institution?.acronym === "string"
-    ? institution.acronym
-    : undefined;
+type FileHeader = {
+  institution?: { acronym?: unknown };
+  curriculum?: { year?: unknown };
+};
+
+function headerOf(file: unknown) {
+  if (typeof file !== "object" || file === null) return {};
+  const { institution, curriculum } = file as FileHeader;
+  return {
+    acronym:
+      typeof institution?.acronym === "string"
+        ? institution.acronym
+        : undefined,
+    year: Number.isInteger(curriculum?.year)
+      ? (curriculum?.year as number)
+      : undefined,
+  };
 }
 
 async function findInstitution(tx: Transaction, acronym: string) {
@@ -106,14 +117,51 @@ async function findInstitution(tx: Transaction, acronym: string) {
   return found?.id;
 }
 
-async function knownCoursesOf(tx: Transaction, acronym: string | undefined) {
+async function coursesOfReplacedCurriculum(
+  tx: Transaction,
+  institutionId: number,
+  programSlug: string,
+  year: number | undefined,
+) {
+  if (year === undefined) return new Set<number>();
+  const rows = await tx
+    .select({ courseId: curriculumCourse.courseId })
+    .from(curriculumCourse)
+    .innerJoin(curriculum, eq(curriculum.id, curriculumCourse.curriculumId))
+    .innerJoin(program, eq(program.id, curriculum.programId))
+    .where(
+      and(
+        eq(program.institutionId, institutionId),
+        eq(program.slug, programSlug),
+        eq(curriculum.year, year),
+      ),
+    );
+  return new Set(rows.map(({ courseId }) => courseId));
+}
+
+async function knownCoursesOf(
+  tx: Transaction,
+  file: unknown,
+  { programSlug, replace = false }: ImportOptions,
+) {
+  const { acronym, year } = headerOf(file);
   const institutionId = acronym && (await findInstitution(tx, acronym));
   if (!institutionId) return [];
   const courses = await tx
-    .select({ code: course.code, name: course.name, credits: course.credits })
+    .select({
+      id: course.id,
+      code: course.code,
+      name: course.name,
+      credits: course.credits,
+    })
     .from(course)
     .where(eq(course.institutionId, institutionId));
-  return courses.map((known) => ({ ...known, source: `${acronym} catalog` }));
+  const replaced = replace
+    ? await coursesOfReplacedCurriculum(tx, institutionId, programSlug, year)
+    : new Set<number>();
+  return courses
+    .filter(({ id }) => !replaced.has(id))
+    .map(({ id: _, ...known }) => ({ ...known, source: `${acronym} catalog` }));
 }
 
 async function ensureInstitution(tx: Transaction, file: CurriculumFile) {
@@ -181,19 +229,26 @@ async function ensureCourses(
   tx: Transaction,
   institutionId: number,
   file: CurriculumFile,
+  replace: boolean,
 ) {
-  await tx
-    .insert(course)
-    .values(
-      file.courses.map((fileCourse) => ({
-        institutionId,
-        code: fileCourse.code.trim(),
-        name: fileCourse.name,
-        description: fileCourse.description || null,
-        credits: fileCourse.credits,
-      })),
-    )
-    .onConflictDoNothing();
+  const insert = tx.insert(course).values(
+    file.courses.map((fileCourse) => ({
+      institutionId,
+      code: fileCourse.code.trim(),
+      name: fileCourse.name,
+      description: fileCourse.description || null,
+      credits: fileCourse.credits,
+    })),
+  );
+  await (replace
+    ? insert.onConflictDoUpdate({
+        target: [course.institutionId, course.code],
+        set: {
+          name: sql.raw("excluded.name"),
+          credits: sql.raw("excluded.credits"),
+        },
+      })
+    : insert.onConflictDoNothing());
   const stored = await tx
     .select({ id: course.id, code: course.code })
     .from(course)
@@ -221,7 +276,6 @@ async function upsertCurriculum(
 ) {
   const values = {
     version: file.curriculum.version ?? null,
-    status: publish ? ("published" as const) : ("draft" as const),
   };
   const [existing] = await tx
     .select({ id: curriculum.id })
@@ -235,13 +289,21 @@ async function upsertCurriculum(
   if (!existing) {
     const [created] = await tx
       .insert(curriculum)
-      .values({ programId, year: file.curriculum.year, ...values })
+      .values({
+        programId,
+        year: file.curriculum.year,
+        status: publish ? "published" : "draft",
+        ...values,
+      })
       .returning({ id: curriculum.id });
     return (created as { id: number }).id;
   }
   if (!replace) throw new ExistingCurriculum(existing.id);
 
-  await tx.update(curriculum).set(values).where(eq(curriculum.id, existing.id));
+  await tx
+    .update(curriculum)
+    .set(publish ? { ...values, status: "published" } : values)
+    .where(eq(curriculum.id, existing.id));
   await tx.delete(area).where(eq(area.curriculumId, existing.id));
   await tx.delete(track).where(eq(track.curriculumId, existing.id));
   await tx
@@ -270,7 +332,7 @@ async function insertCurriculum(
     replace,
   });
 
-  const courseIds = await ensureCourses(tx, institutionId, file);
+  const courseIds = await ensureCourses(tx, institutionId, file, replace);
   const curriculumCourses = await tx
     .insert(curriculumCourse)
     .values(
@@ -396,7 +458,7 @@ export async function importCurriculum(
     const curriculumId = await db.transaction(async (tx) => {
       const problems = validateCurriculum(
         file,
-        await knownCoursesOf(tx, acronymOf(file)),
+        await knownCoursesOf(tx, file, options),
       );
       if (problems.length > 0) throw new RejectedFile(problems);
       return insertCurriculum(tx, file as CurriculumFile, options);

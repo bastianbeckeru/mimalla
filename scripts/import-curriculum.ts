@@ -33,9 +33,9 @@ try {
     { programSlug, publish: values.publish, replace: values.replace },
   );
   if (result.ok) {
-    const status = values.publish ? "published" : "draft";
+    const published = values.publish ? ", published" : "";
     console.log(
-      `Imported ${target} as ${status} curriculum ${result.curriculumId}`,
+      `Imported ${target} as curriculum ${result.curriculumId}${published}`,
     );
     await revalidateApp();
   } else if ("existingCurriculumId" in result) {
