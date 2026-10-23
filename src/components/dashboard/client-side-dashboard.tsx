@@ -1,12 +1,13 @@
 "use client";
 
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Save, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import CurriculumForm from "@/components/dashboard/curriculum-form";
 import RBDndCurriculum from "@/components/dashboard/rbdnd/dnd-curriculum";
 import Sidebar from "@/components/dashboard/sidebar";
-import KbdModifier from "@/components/kbd-modifier";
+import KbdHotkey from "@/components/kbd-hotkey";
 import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
 import { Button } from "@/components/ui/button";
 import { KbdGroup } from "@/components/ui/kbd";
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Toggle } from "@/components/ui/toggle";
 import { useHistory } from "@/hooks/use-history";
-import useShortcuts from "@/hooks/use-shortcut";
 import {
   useActiveCurriculum,
   useCurriculumStore,
@@ -130,22 +130,16 @@ function CurriculumDashboard({
   const enrollments = history.present.flatMap((p) => p.enrollments);
   const stats = getCurriculumStats(enrollments, courses);
 
-  useShortcuts([
-    { keys: ["Control", "e"], callback: toggleEditMode },
-    { keys: ["Control", "s"], callback: saveChanges },
-    {
-      keys: ["Control", "z"],
-      callback: () => {
-        if (editMode) history.undo();
-      },
-    },
-    {
-      keys: ["Control", "Shift", "z"],
-      callback: () => {
-        if (editMode) history.redo();
-      },
-    },
-  ]);
+  useHotkey("Mod+E", toggleEditMode);
+  useHotkey("Mod+S", saveChanges, { enabled: editMode });
+  useHotkey("Mod+Z", history.undo, {
+    enabled: editMode,
+    ignoreInputs: true,
+  });
+  useHotkey("Mod+Shift+Z", history.redo, {
+    enabled: editMode,
+    ignoreInputs: true,
+  });
 
   function toggleEditMode() {
     if (history.canUndo) {
@@ -161,8 +155,6 @@ function CurriculumDashboard({
   }
 
   function saveChanges() {
-    if (!editMode) return;
-
     const periods = trimEmptyPeriods(history.present);
 
     updateActiveEnrollments(periods.flatMap((p) => p.enrollments));
@@ -207,7 +199,7 @@ function CurriculumDashboard({
                   <Save />
                   <span className="hidden md:inline">Guardar</span>
                   <KbdGroup className="sr-only">
-                    <KbdModifier>+S</KbdModifier>
+                    <KbdHotkey hotkey="Mod+S" />
                   </KbdGroup>
                 </Button>
               )}
@@ -221,7 +213,7 @@ function CurriculumDashboard({
                 <SquarePen />
                 <span className="hidden md:inline">Editar</span>
                 <KbdGroup className="sr-only">
-                  <KbdModifier>+E</KbdModifier>
+                  <KbdHotkey hotkey="Mod+E" />
                 </KbdGroup>
               </Toggle>
             </div>

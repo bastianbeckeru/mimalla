@@ -1,10 +1,11 @@
 "use client";
 
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { track } from "@vercel/analytics";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import KbdModifier from "@/components/kbd-modifier";
+import KbdHotkey from "@/components/kbd-hotkey";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -16,7 +17,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { KbdGroup } from "@/components/ui/kbd";
-import useShortcuts from "@/hooks/use-shortcut";
 import type { CatalogInstitution } from "@/types/curriculum";
 
 export function Searchbar({ catalog }: { catalog: CatalogInstitution[] }) {
@@ -31,12 +31,7 @@ export function Searchbar({ catalog }: { catalog: CatalogInstitution[] }) {
     }
   }
 
-  useShortcuts([
-    {
-      keys: ["Control", "k"],
-      callback: () => handleOpen("keyboard_shortcut"),
-    },
-  ]);
+  useHotkey("Mod+K", () => handleOpen("keyboard_shortcut"));
 
   return (
     <>
@@ -53,7 +48,7 @@ export function Searchbar({ catalog }: { catalog: CatalogInstitution[] }) {
         <div>
           <Search className="sm:mr-0.5 lg:hidden" />
           <KbdGroup className="hidden lg:inline-flex">
-            <KbdModifier>+K</KbdModifier>
+            <KbdHotkey hotkey="Mod+K" />
           </KbdGroup>
         </div>
       </Button>
