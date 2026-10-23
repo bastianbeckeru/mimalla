@@ -1,0 +1,204 @@
+{
+  "institution": { "name": "Universidad de Ejemplo", "acronym": "UE" },
+  "department": { "name": "Facultad de Ingeniería", "acronym": "FI" },
+  "program": {
+    "name": "Ingeniería Civil en Informática",
+    "siesCode": null,
+    "demreCode": null,
+    "schedule": "DAYTIME"
+  },
+  "curriculum": {
+    "version": "v1",
+    "year": 2024,
+    "structure": [
+      { "id": 1, "year": 1, "term": 1, "position": 1, "courseId": 1 },
+      { "id": 2, "year": 1, "term": 1, "position": 2, "courseId": 2 },
+      { "id": 3, "year": 1, "term": 1, "position": 3, "courseId": 10 },
+      { "id": 4, "year": 1, "term": 3, "position": 1, "courseId": 4 },
+      { "id": 5, "year": 1, "term": 3, "position": 2, "courseId": 3 },
+      { "id": 6, "year": 1, "term": 3, "position": 3, "courseId": 11 },
+      { "id": 7, "year": 2, "term": 1, "position": 1, "courseId": 12 },
+      { "id": 8, "year": 2, "term": 1, "position": 2, "courseId": 13 },
+      { "id": 9, "year": 2, "term": 1, "position": 3, "courseId": 5 },
+      { "id": 10, "year": 2, "term": 3, "position": 1, "courseId": 14 },
+      { "id": 11, "year": 2, "term": 3, "position": 2, "courseId": 15 },
+      { "id": 12, "year": 2, "term": 3, "position": 3, "courseId": 5 }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "Licenciatura",
+        "description": "Grado de licenciado en ciencias de la ingeniería",
+        "requiredCredits": 66,
+        "courseIds": [1, 2, 3, 4, 10, 11, 12, 13, 14],
+        "subplanIds": [2],
+        "credential": {
+          "type": "ACADEMIC",
+          "name": "Licenciado/a en Ciencias de la Ingeniería"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Electivos de Especialidad",
+        "description": null,
+        "requiredCredits": 6,
+        "courseIds": [15],
+        "subplanIds": [],
+        "credential": null
+      }
+    ]
+  },
+  "areas": [
+    {
+      "id": 1,
+      "name": "Ciencias Básicas",
+      "color": "#34C1CD",
+      "courseIds": [1, 2, 3, 4],
+      "subareaIds": []
+    },
+    {
+      "id": 2,
+      "name": "Computación",
+      "color": "#F2A93B",
+      "courseIds": [10, 11, 12, 13, 14],
+      "subareaIds": [3]
+    },
+    {
+      "id": 3,
+      "name": "Electivos de Computación",
+      "color": "#E07A5F",
+      "courseIds": [15],
+      "subareaIds": []
+    },
+    {
+      "id": 4,
+      "name": "Formación General",
+      "color": "#9B7BD4",
+      "courseIds": [5],
+      "subareaIds": []
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "code": "MAT101",
+      "name": "Cálculo I",
+      "description": "Límites, derivadas y sus aplicaciones.",
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 2,
+      "code": "MAT102",
+      "name": "Álgebra Lineal",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 3,
+      "code": "FIS101",
+      "name": "Física I",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [1],
+      "isElective": false
+    },
+    {
+      "id": 4,
+      "code": "MAT201",
+      "name": "Cálculo II",
+      "description": "Integrales y series.",
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [1],
+      "isElective": false
+    },
+    {
+      "id": 5,
+      "code": "CFG",
+      "name": "Curso de Formación General",
+      "description": null,
+      "credits": 4,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": true
+    },
+    {
+      "id": 10,
+      "code": "INF101",
+      "name": "Introducción a la Programación",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [],
+      "isElective": false
+    },
+    {
+      "id": 11,
+      "code": "INF102",
+      "name": "Estructuras de Datos",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [10],
+      "isElective": false
+    },
+    {
+      "id": 12,
+      "code": "INF201",
+      "name": "Bases de Datos",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [11],
+      "isElective": false
+    },
+    {
+      "id": 13,
+      "code": "INF202",
+      "name": "Sistemas Operativos",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [11, 2],
+      "isElective": false
+    },
+    {
+      "id": 14,
+      "code": "INF301",
+      "name": "Proyecto de Software",
+      "description": "Proyecto anual en equipo.",
+      "credits": 12,
+      "duration": 2,
+      "prerequisiteCredits": 48,
+      "prerequisiteIds": [12],
+      "isElective": false
+    },
+    {
+      "id": 15,
+      "code": "INF390",
+      "name": "Electivo de Computación",
+      "description": null,
+      "credits": 6,
+      "duration": 1,
+      "prerequisiteCredits": 0,
+      "prerequisiteIds": [11],
+      "isElective": true
+    }
+  ]
+}

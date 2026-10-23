@@ -22,7 +22,25 @@ For questions, join the [Discord](https://discord.gg/wez3cJDzXk).
    bun run dev
    ```
 
-No environment variables are needed.
+The app still reads curricula from JSON files, so it needs no environment variables.
+
+### Local database
+
+The catalog is moving to Postgres. To run Mi Malla against a local database, install [Docker](https://docs.docker.com/get-docker/) and run, from the repository root:
+
+```sh
+cp .env.example .env
+docker compose up -d
+bun run db:seed
+```
+
+- `docker compose up -d` starts Postgres 17 on `localhost:5432`, as defined in `compose.yaml`. Data persists in the `pgdata` volume.
+- `bun run db:seed` applies the migrations in `drizzle/` and imports the sample seed in `seed/`. Running it again is safe: curriculums already in the database are skipped.
+- The connection string comes from `DATABASE_URL`. Bun and Next load it from `.env`.
+
+The sample seed holds two programs of a fictional institution, Universidad de Ejemplo (`UE`), that share their basic science and general education courses. It is not real data. Check it with `bun run validate seed`.
+
+To stop Postgres, run `docker compose down`. Add `-v` to also delete the data and start from scratch.
 
 ## Pull requests
 
