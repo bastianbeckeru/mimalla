@@ -251,4 +251,204 @@ describe("import, then read by id", () => {
       ],
     });
   });
+
+  test("an invalid file is rejected with the validator's problems and nothing is stored", async () => {
+    const db = await freshDatabase();
+
+    const result = await importCurriculum(
+      db,
+      curriculumFile({
+        courses: [
+          course(1),
+          course(2, { code: "" }),
+          course(3, { prerequisiteIds: [9] }),
+        ],
+      }),
+      { programSlug: "derecho" },
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      problems: [
+        {
+          rule: "missing-course",
+          message: "course 3 (CRS3 Course 3) lists missing prerequisites: 9",
+        },
+        {
+          rule: "empty-code",
+          message: "course 2 (Course 2) has an empty code",
+        },
+      ],
+    });
+    expect(await getCurriculum(db, 1)).toBeNull();
+  });
+
+  test("a course that disagrees with the one the institution already has is rejected", async () => {
+    const db = await freshDatabase();
+    const firstId = await importValid(db, curriculumFile());
+
+    const result = await importCurriculum(
+      db,
+      curriculumFile({
+        program: { name: "Psicología", schedule: "DAYTIME" },
+        courses: [
+          course(1, { credits: 5 }),
+          course(2, { prerequisiteIds: [1] }),
+          course(3, {
+            code: "CFG",
+            name: "Curso de Formación General",
+            isElective: true,
+          }),
+        ],
+      }),
+      { programSlug: "psicologia" },
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      problems: [
+        {
+          rule: "shared-course-conflict",
+          message:
+            "course 1 (CRS1 Course 1) disagrees with UDP catalog on credits (5 vs 6)",
+        },
+      ],
+    });
+    expect(await getCurriculum(db, firstId + 1)).toBeNull();
+  });
+
+  describe("two curriculums of one institution that share a course", () => {
+    const psicologia = () =>
+      curriculumFile({
+        department: { name: "Facultad de Psicología", acronym: "FP" },
+        program: { name: "Psicología", schedule: "DAYTIME" },
+        curriculum: {
+          year: 2020,
+          structure: [
+            { id: 1, year: 1, term: 1, position: 1, courseId: 10 },
+            { id: 2, year: 1, term: 3, position: 1, courseId: 20 },
+          ],
+          plans: [],
+        },
+        areas: [
+          {
+            id: 1,
+            name: "Formación General",
+            color: "#0000FF",
+            courseIds: [20],
+            subareaIds: [],
+          },
+        ],
+        courses: [
+          course(10, { code: "PSI1", name: "Psicología General" }),
+          course(20, {
+            code: "CRS2",
+            name: "Course 2",
+            prerequisiteIds: [10],
+            isElective: true,
+            duration: 1,
+          }),
+        ],
+      });
+
+    test("each keeps its own prerequisites, elective flag and duration", async () => {
+      const db = await freshDatabase();
+      const derechoId = await importValid(db, curriculumFile());
+      const psicologiaId = await importValid(db, psicologia(), "psicologia");
+
+      const shared = async (curriculumId: number) => {
+        const data = (await getCurriculum(db, curriculumId)) as CurriculumData;
+        const { prerequisites, isElective, duration } = byCode(
+          data,
+        ).courses.find((c) => c.code === "CRS2") as ReturnType<
+          typeof byCode
+        >["courses"][number];
+        return { prerequisites, isElective, duration };
+      };
+
+      expect(await shared(derechoId)).toEqual({
+        prerequisites: ["CRS1"],
+        isElective: false,
+        duration: 2,
+      });
+      expect(await shared(psicologiaId)).toEqual({
+        prerequisites: ["PSI1"],
+        isElective: true,
+        duration: 1,
+      });
+    });
+
+    test("the course can belong to a different area in each", async () => {
+      const db = await freshDatabase();
+      const derechoId = await importValid(db, curriculumFile());
+      const psicologiaId = await importValid(db, psicologia(), "psicologia");
+
+      const areasOf = async (curriculumId: number) =>
+        byCode((await getCurriculum(db, curriculumId)) as CurriculumData)
+          .areas.filter((a) => a.courses.includes("CRS2"))
+          .map((a) => a.name);
+
+      expect(await areasOf(derechoId)).toEqual(["Derecho Privado"]);
+      expect(await areasOf(psicologiaId)).toEqual(["Formación General"]);
+    });
+  });
+
+  describe("the database rejects a reference to a course of another curriculum", () => {
+    async function twoCurriculums() {
+      const db = await freshDatabase();
+      const curriculumId = await importValid(db, curriculumFile());
+      const otherId = await importValid(
+        db,
+        curriculumFile({ program: { name: "Diseño", schedule: "DAYTIME" } }),
+        "diseno",
+      );
+      const idOf = async (id: number, code: string) =>
+        (
+          ((await getCurriculum(db, id)) as CurriculumData).courses.find(
+            (c) => c.code === code,
+          ) as { id: number }
+        ).id;
+      return {
+        db,
+        curriculumId,
+        own: await idOf(curriculumId, "CFG"),
+        foreign: await idOf(otherId, "CRS1"),
+      };
+    }
+
+    const foreignKeyViolation = expect.objectContaining({
+      cause: expect.objectContaining({ code: "23503" }),
+    });
+
+    test("a prerequisite", async () => {
+      const { db, curriculumId, own, foreign } = await twoCurriculums();
+
+      const insert = async (requiredCurriculumCourseId: number) => {
+        await db.insert(schema.prerequisite).values({
+          curriculumId,
+          curriculumCourseId: own,
+          requiredCurriculumCourseId,
+        });
+      };
+
+      await expect(insert(foreign)).rejects.toEqual(foreignKeyViolation);
+    });
+
+    test("a slot", async () => {
+      const { db, curriculumId, own, foreign } = await twoCurriculums();
+
+      const insert = async (curriculumCourseId: number, position: number) => {
+        await db.insert(schema.slot).values({
+          curriculumId,
+          curriculumCourseId,
+          programYear: 5,
+          term: 1,
+          position,
+        });
+      };
+
+      await insert(own, 1);
+      await expect(insert(foreign, 2)).rejects.toEqual(foreignKeyViolation);
+    });
+  });
 });

@@ -17,7 +17,10 @@
     "typecheck": "bun --check",
     "verify": "bun run lint && bun run typecheck",
     "test": "bun test",
-    "validate": "bun scripts/validate-curriculums.ts"
+    "validate": "bun scripts/validate-curriculums.ts",
+    "import": "bun scripts/import-curriculum.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
