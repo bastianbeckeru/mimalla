@@ -3,9 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/demo-mimalla.vercel.app-black)](https://mimalla.vercel.app)
 
-Mi Malla is a web app that lets university students customize their curriculum ("malla curricular") and track their academic progress.
+Mi Malla is a web app that lets university students customize their curriculum and track their academic progress.
 
-It is the successor of UniCore, an earlier project by the same author.
 
 ## Features
 
