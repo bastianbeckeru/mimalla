@@ -25,6 +25,12 @@ Every program available in Mi Malla, grouped by institution and department.
 One official version of the course layout of a program, with its slots, areas, courses and tracks. It applies to the students who enter the program from its year on, until a newer curriculum replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
 _Avoid_: Malla, structure, program data
 
+**Draft** / **Published**:
+The status of a curriculum. An imported curriculum is a draft until it is published; only published curriculums appear in the catalog.
+
+**Current curriculum**:
+The published curriculum of a program with the latest year. A program resolves to it; its other curriculums stay reachable by id.
+
 **Course**:
 A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
 _Avoid_: Ramo, subject, asignatura

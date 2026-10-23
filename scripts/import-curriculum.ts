@@ -7,13 +7,17 @@ import * as schema from "@/server/db/schema";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { slug: { type: "string" } },
+  options: {
+    slug: { type: "string" },
+    publish: { type: "boolean", default: false },
+    replace: { type: "boolean", default: false },
+  },
 });
 const [target] = positionals;
 const databaseUrl = process.env.DATABASE_URL;
 if (!target || !databaseUrl) {
   console.error(
-    "Usage: DATABASE_URL=<url> bun run import <file> [--slug <program-slug>]",
+    "Usage: DATABASE_URL=<url> bun run import <file> [--slug <program-slug>] [--publish] [--replace]",
   );
   process.exit(2);
 }
@@ -25,10 +29,18 @@ try {
   const result = await importCurriculum(
     db,
     JSON.parse(fs.readFileSync(target, "utf-8")),
-    { programSlug },
+    { programSlug, publish: values.publish, replace: values.replace },
   );
   if (result.ok) {
-    console.log(`Imported ${target} as curriculum ${result.curriculumId}`);
+    const status = values.publish ? "published" : "draft";
+    console.log(
+      `Imported ${target} as ${status} curriculum ${result.curriculumId}`,
+    );
+  } else if ("existingCurriculumId" in result) {
+    console.error(
+      `${target} was refused: curriculum ${result.existingCurriculumId} already exists for this program and year (pass --replace to replace it)`,
+    );
+    process.exitCode = 1;
   } else {
     console.error(`${target} was rejected (${result.problems.length})`);
     for (const problem of result.problems) {

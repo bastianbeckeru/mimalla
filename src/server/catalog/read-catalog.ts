@@ -1,4 +1,4 @@
-import { and, asc, eq, max } from "drizzle-orm";
+import { and, asc, desc, eq, max, sql } from "drizzle-orm";
 import type { PgColumn } from "drizzle-orm/pg-core";
 import {
   area,
@@ -14,7 +14,7 @@ import {
   track,
   trackCourse,
 } from "@/server/db/schema";
-import type { CurriculumData } from "@/types/curriculum";
+import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
 import type { Database } from "@/types/database";
 
 function groupBy<T>(
@@ -190,4 +190,92 @@ export async function getCurriculum(
       prerequisiteIds: prerequisitesOf(row.id),
     })),
   };
+}
+
+type ProgramParams = { institutionAcronym: string; programSlug: string };
+
+const publishedPrograms = (db: Database) =>
+  db
+    .selectDistinct({
+      institution: { name: institution.name, acronym: institution.acronym },
+      department: department.name,
+      program: program.name,
+      params: {
+        institutionAcronym: sql<string>`lower(${institution.acronym})`,
+        programSlug: program.slug,
+      },
+    })
+    .from(curriculum)
+    .innerJoin(program, eq(program.id, curriculum.programId))
+    .innerJoin(department, eq(department.id, program.departmentId))
+    .innerJoin(institution, eq(institution.id, program.institutionId))
+    .where(eq(curriculum.status, "published"));
+
+export async function getCurriculumParams(
+  db: Database,
+): Promise<ProgramParams[]> {
+  const rows = await publishedPrograms(db);
+  return rows.map(({ params }) => params);
+}
+
+export async function getCatalog(db: Database): Promise<CatalogInstitution[]> {
+  const institutions = new Map<string, CatalogInstitution>();
+
+  for (const row of await publishedPrograms(db)) {
+    const catalogInstitution = institutions.get(row.institution.acronym) ?? {
+      ...row.institution,
+      departments: [],
+    };
+    institutions.set(row.institution.acronym, catalogInstitution);
+
+    let catalogDepartment = catalogInstitution.departments.find(
+      (d) => d.name === row.department,
+    );
+    if (!catalogDepartment) {
+      catalogDepartment = { name: row.department, programs: [] };
+      catalogInstitution.departments.push(catalogDepartment);
+    }
+
+    catalogDepartment.programs.push({
+      name: row.program,
+      path: `${row.params.institutionAcronym}/${row.params.programSlug}`,
+    });
+  }
+
+  const byName = (a: { name: string }, b: { name: string }) =>
+    a.name.localeCompare(b.name, "es");
+
+  return [...institutions.values()].sort(byName).map((catalogInstitution) => ({
+    ...catalogInstitution,
+    departments: catalogInstitution.departments
+      .sort(byName)
+      .map((catalogDepartment) => ({
+        ...catalogDepartment,
+        programs: catalogDepartment.programs.sort(byName),
+      })),
+  }));
+}
+
+export async function getCurrentCurriculum(
+  db: Database,
+  { institutionAcronym, programSlug }: ProgramParams,
+): Promise<CurriculumData | null> {
+  const [current] = await db
+    .select({ id: curriculum.id })
+    .from(curriculum)
+    .innerJoin(program, eq(program.id, curriculum.programId))
+    .innerJoin(institution, eq(institution.id, program.institutionId))
+    .where(
+      and(
+        eq(curriculum.status, "published"),
+        eq(program.slug, programSlug),
+        eq(
+          sql`lower(${institution.acronym})`,
+          institutionAcronym.toLowerCase(),
+        ),
+      ),
+    )
+    .orderBy(desc(curriculum.year))
+    .limit(1);
+  return current ? getCurriculum(db, current.id) : null;
 }
