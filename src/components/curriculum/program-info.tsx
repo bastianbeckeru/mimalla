@@ -89,8 +89,12 @@ export default function ProgramInfo({
           <Separator />
 
           <div className="grid grid-cols-2 gap-8">
-            <InfoItem label="Código SIES" value={siesCode} type="code" />
-            <InfoItem label="Código DEMRE" value={demreCode} type="code" />
+            {siesCode !== undefined && (
+              <InfoItem label="Código SIES" value={siesCode} type="code" />
+            )}
+            {demreCode !== undefined && (
+              <InfoItem label="Código DEMRE" value={demreCode} type="code" />
+            )}
           </div>
         </dl>
       </CardContent>
