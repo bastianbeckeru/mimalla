@@ -59,7 +59,8 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `bun run lint` | Check formatting and lint rules with Biome |
 | `bun run lint:write` | Apply Biome fixes |
 | `bun run typecheck` | Type-check the project |
-| `bun run verify` | Run `lint` and `typecheck` |
+| `bun run test` | Run the tests |
+| `bun run verify` | Run `lint`, `typecheck` and `test` |
 
 ## Project structure
 
