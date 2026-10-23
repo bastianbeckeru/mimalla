@@ -6,6 +6,7 @@ import {
   course,
   curriculum,
   curriculumCourse,
+  type curriculumStatus,
   department,
   institution,
   prerequisite,
@@ -33,14 +34,14 @@ function groupBy<T>(
   return (id: number) => groups.get(id) ?? [];
 }
 
-function optional<K extends string>(key: K, value: string | null) {
-  return value === null ? {} : ({ [key]: value } as Record<K, string>);
+function optional<K extends string, V>(key: K, value: V | null) {
+  return value === null ? {} : ({ [key]: value } as Record<K, V>);
 }
 
 async function isCurrent(
   db: Database,
   programId: number,
-  status: string,
+  status: (typeof curriculumStatus.enumValues)[number],
   year: number,
 ) {
   if (status !== "published") return false;
@@ -147,9 +148,7 @@ export async function getCurriculum(
     program: {
       name: programRow.name,
       ...optional("siesCode", programRow.siesCode),
-      ...(programRow.demreCode === null
-        ? {}
-        : { demreCode: programRow.demreCode }),
+      ...optional("demreCode", programRow.demreCode),
       schedule: programRow.schedule,
     },
     curriculum: {
@@ -174,7 +173,7 @@ export async function getCurriculum(
         name: row.name,
         ...optional("description", row.description),
         courseIds: coursesOfTrack(row.id),
-        subplanIds: subtracksOf(row.id),
+        subtrackIds: subtracksOf(row.id),
         requiredCredits: row.requiredCredits ?? -1,
         credential:
           row.credentialType === null || row.credentialName === null

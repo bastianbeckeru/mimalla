@@ -342,4 +342,37 @@ describe("migrateTrajectoryState", () => {
       activeTrajectoryId: "c1",
     });
   });
+
+  test("a failed curriculum lookup rejects the migration and leaves the persisted state as it was", async () => {
+    const persisted = {
+      curriculums: [
+        {
+          id: "c1",
+          path: "udp/derecho",
+          year: 2021,
+          term: 2,
+          enrolledCourses: [
+            {
+              id: "e1",
+              year: 1,
+              term: 2,
+              position: 1,
+              status: "APPROVED",
+              courseId: 177,
+            },
+          ],
+        },
+      ],
+      activeCurriculumId: null,
+    };
+    const before = structuredClone(persisted);
+    const failingLookup = async () => {
+      throw new Error("Failed to fetch");
+    };
+
+    await expect(
+      migrateTrajectoryState(persisted, 1, failingLookup),
+    ).rejects.toThrow("Failed to fetch");
+    expect(persisted).toEqual(before);
+  });
 });

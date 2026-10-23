@@ -136,10 +136,10 @@ function byCode(data: CurriculumData) {
             a.position - b.position,
         ),
       tracks: data.curriculum.tracks
-        .map(({ id: _, courseIds, subplanIds, ...track }) => ({
+        .map(({ id: _, courseIds, subtrackIds, ...track }) => ({
           ...track,
           courses: codes(courseIds),
-          subtracks: subplanIds.map((id) => trackName.get(id)),
+          subtracks: subtrackIds.map((id) => trackName.get(id)),
         }))
         .sort((a, b) => a.name.localeCompare(b.name)),
     },
@@ -727,18 +727,118 @@ describe("import, then read the catalog", () => {
       expect(byCode(current as CurriculumData).areas).toHaveLength(2);
     });
 
-    test("a replacement is a draft unless it is published", async () => {
+    test("a replacement keeps the existing curriculum's status unless it is published", async () => {
       const db = await freshDatabase();
-      const existingId = await importValid(db, curriculumFile(), "derecho", {
+      const publishedId = await importValid(db, curriculumFile(), "derecho", {
         publish: true,
       });
+      const draftId = await importValid(db, curriculumFile(), "psicologia");
 
       await importValid(db, revised(), "derecho", { replace: true });
+      await importValid(db, revised(), "psicologia", { replace: true });
 
-      expect(await getCurrentCurriculum(db, derecho)).toBeNull();
-      expect((await getCurriculum(db, existingId))?.curriculum.version).toBe(
+      expect((await getCurrentCurriculum(db, derecho))?.curriculum).toEqual(
+        expect.objectContaining({ id: publishedId, version: "v6.1" }),
+      );
+      expect(await getPublishedCurriculum(db, draftId)).toBeNull();
+      expect((await getCurriculum(db, draftId))?.curriculum.version).toBe(
         "v6.1",
       );
+
+      await importValid(db, revised(), "psicologia", {
+        replace: true,
+        publish: true,
+      });
+      expect((await getPublishedCurriculum(db, draftId))?.curriculum.id).toBe(
+        draftId,
+      );
+    });
+
+    test("a replacement fixes the name and credits of the curriculum's courses for the institution", async () => {
+      const db = await freshDatabase();
+      const derechoId = await importValid(db, curriculumFile(), "derecho", {
+        publish: true,
+      });
+      const psicologiaId = await importValid(
+        db,
+        curriculumFile(),
+        "psicologia",
+        {
+          publish: true,
+        },
+      );
+
+      const fixedId = await importValid(
+        db,
+        curriculumFile({
+          courses: [
+            course(1, { description: "Introducción", credits: 5 }),
+            course(2, {
+              name: "Course Two",
+              prerequisiteIds: [1],
+              prerequisiteCredits: 12,
+              duration: 2,
+            }),
+            course(3, {
+              code: "CFG",
+              name: "Curso de Formación General",
+              isElective: true,
+            }),
+          ],
+        }),
+        "derecho",
+        { replace: true },
+      );
+
+      const namesAndCredits = (data: CurriculumData | null) =>
+        byCode(data as CurriculumData).courses.map((c) => [
+          c.code,
+          c.name,
+          c.credits,
+        ]);
+      const expected = [
+        ["CFG", "Curso de Formación General", 6],
+        ["CRS1", "Course 1", 5],
+        ["CRS2", "Course Two", 6],
+      ];
+      expect(fixedId).toBe(derechoId);
+      expect(namesAndCredits(await getCurriculum(db, derechoId))).toEqual(
+        expected,
+      );
+      expect(namesAndCredits(await getCurriculum(db, psicologiaId))).toEqual(
+        expected,
+      );
+    });
+
+    test("a replacement fixes a course's code", async () => {
+      const db = await freshDatabase();
+      const existingId = await importValid(db, curriculumFile(), "derecho");
+
+      await importValid(
+        db,
+        curriculumFile({
+          courses: [
+            course(1, { code: "CRS1-A", description: "Introducción" }),
+            course(2, { prerequisiteIds: [1] }),
+            course(3, {
+              code: "CFG",
+              name: "Curso de Formación General",
+              isElective: true,
+            }),
+          ],
+        }),
+        "derecho",
+        { replace: true },
+      );
+
+      const { courses } = byCode(
+        (await getCurriculum(db, existingId)) as CurriculumData,
+      );
+      expect(courses.map((c) => [c.code, c.prerequisites])).toEqual([
+        ["CFG", []],
+        ["CRS1-A", []],
+        ["CRS2", ["CRS1-A"]],
+      ]);
     });
   });
 });

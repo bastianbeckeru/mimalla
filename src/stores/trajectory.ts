@@ -53,10 +53,11 @@ const legacyCourseCodes: Record<
   Record<string, string>
 > = legacyCourseCodesByPath;
 
-function migrateToV3(state: PersistedStateV2, version: number) {
-  if (version < 2) {
-    state.activeCurriculumId ??= state.curriculums[0]?.id ?? null;
-    state.curriculums = state.curriculums.map((curriculum) => ({
+function migrateToV2(state: PersistedStateV2): PersistedStateV2 {
+  return {
+    activeCurriculumId:
+      state.activeCurriculumId ?? state.curriculums[0]?.id ?? null,
+    curriculums: state.curriculums.map((curriculum) => ({
       ...curriculum,
       term: curriculum.term === 2 ? 3 : curriculum.term,
       enrolledCourses: curriculum.enrolledCourses.map((enrollment) =>
@@ -64,8 +65,12 @@ function migrateToV3(state: PersistedStateV2, version: number) {
           ? { ...enrollment, year: curriculum.year + enrollment.year - 1 }
           : enrollment,
       ),
-    }));
-  }
+    })),
+  };
+}
+
+function migrateToV3(persisted: PersistedStateV2, version: number) {
+  const state = version < 2 ? migrateToV2(persisted) : persisted;
 
   return {
     trajectories: state.curriculums.map((curriculum) => ({
@@ -113,6 +118,14 @@ export function migrateTrajectoryState(
       : (persistedState as PersistedStateV3);
 
   return migrateToV4(state, findCurrentCurriculumId);
+}
+
+let hasHydrationFailed = false;
+const hydrationFailureListeners = new Set<() => void>();
+
+function setHydrationFailed(failed: boolean) {
+  hasHydrationFailed = failed;
+  for (const listener of hydrationFailureListeners) listener();
 }
 
 async function findCurrentCurriculumIdOf(path: string) {
@@ -165,6 +178,10 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
       version: 4,
       migrate: (persistedState, version) =>
         migrateTrajectoryState(persistedState, version),
+      onRehydrateStorage: () => {
+        setHydrationFailed(false);
+        return (_state, error) => setHydrationFailed(error !== undefined);
+      },
     },
   ),
 );
@@ -179,6 +196,17 @@ export function useHasHydrated() {
   return useSyncExternalStore(
     (onChange) => useTrajectoryStore.persist.onFinishHydration(onChange),
     () => useTrajectoryStore.persist.hasHydrated(),
+    () => false,
+  );
+}
+
+export function useHasHydrationFailed() {
+  return useSyncExternalStore(
+    (onChange) => {
+      hydrationFailureListeners.add(onChange);
+      return () => hydrationFailureListeners.delete(onChange);
+    },
+    () => hasHydrationFailed,
     () => false,
   );
 }

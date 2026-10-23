@@ -1,6 +1,6 @@
 import {
+  getCachedCurrentCurriculum,
   getCachedCurriculumParams,
-  getCachedProgramCurriculums,
 } from "@/server/catalog/cached-catalog";
 
 export function generateStaticParams() {
@@ -14,11 +14,9 @@ export async function GET(
   }: { params: Promise<{ institutionAcronym: string; programSlug: string }> },
 ) {
   const { institutionAcronym, programSlug } = await params;
-  const curriculums = await getCachedProgramCurriculums(
+  const data = await getCachedCurrentCurriculum(
     institutionAcronym,
     programSlug,
   );
-  return curriculums.length > 0
-    ? Response.json(curriculums)
-    : new Response(null, { status: 404 });
+  return data ? Response.json(data) : new Response(null, { status: 404 });
 }

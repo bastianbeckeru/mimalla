@@ -1,10 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { importCurriculum } from "@/server/catalog/import-curriculum";
 import { revalidateApp } from "@/server/catalog/revalidate-app";
-import * as schema from "@/server/db/schema";
+import { connectNodePostgres } from "@/server/db/client";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -23,7 +22,7 @@ if (!target || !databaseUrl) {
   process.exit(2);
 }
 
-const db = drizzle(databaseUrl, { schema, casing: "snake_case" });
+const db = connectNodePostgres(databaseUrl);
 const programSlug = values.slug ?? path.basename(target, ".json");
 
 try {
@@ -33,9 +32,9 @@ try {
     { programSlug, publish: values.publish, replace: values.replace },
   );
   if (result.ok) {
-    const status = values.publish ? "published" : "draft";
+    const published = values.publish ? ", published" : "";
     console.log(
-      `Imported ${target} as ${status} curriculum ${result.curriculumId}`,
+      `Imported ${target} as curriculum ${result.curriculumId}${published}`,
     );
     await revalidateApp();
   } else if ("existingCurriculumId" in result) {
