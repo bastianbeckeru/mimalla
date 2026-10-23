@@ -1,13 +1,17 @@
+import { notFound } from "next/navigation";
 import CurriculumView from "@/components/curriculum/curriculum-view";
 import ImportCurriculumButton from "@/components/curriculum/import-button";
 import ProgramInfo from "@/components/curriculum/program-info";
-import { getCurriculumParams, getProgramData } from "@/server/db/curriculums";
+import {
+  getCachedCurrentCurriculum,
+  getCachedCurriculumParams,
+} from "@/server/catalog/cached-catalog";
 import { getPeriods } from "@/utils/curriculum";
 
-export const dynamicParams = false;
+export const ensureStatic = "navigation";
 
 export function generateStaticParams() {
-  return getCurriculumParams();
+  return getCachedCurriculumParams();
 }
 
 export default async function ProgramPage({
@@ -16,7 +20,11 @@ export default async function ProgramPage({
   params: Promise<{ institutionAcronym: string; programSlug: string }>;
 }) {
   const { institutionAcronym, programSlug } = await params;
-  const data = getProgramData({ institutionAcronym, programSlug });
+  const data = await getCachedCurrentCurriculum(
+    institutionAcronym,
+    programSlug,
+  );
+  if (!data) notFound();
   const { institution, program, curriculum } = data;
 
   return (

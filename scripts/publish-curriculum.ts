@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { publishCurriculum } from "@/server/catalog/publish-curriculum";
+import { revalidateApp } from "@/server/catalog/revalidate-app";
 import * as schema from "@/server/db/schema";
 
 const [target] = process.argv.slice(2);
@@ -17,6 +18,7 @@ const db = drizzle(databaseUrl, { schema, casing: "snake_case" });
 try {
   if (await publishCurriculum(db, curriculumId)) {
     console.log(`Published curriculum ${curriculumId}`);
+    await revalidateApp();
   } else {
     console.error(`Curriculum ${curriculumId} does not exist`);
     process.exitCode = 1;

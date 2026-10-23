@@ -3,6 +3,7 @@ import path from "node:path";
 import { parseArgs } from "node:util";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { importCurriculum } from "@/server/catalog/import-curriculum";
+import { revalidateApp } from "@/server/catalog/revalidate-app";
 import * as schema from "@/server/db/schema";
 
 const { values, positionals } = parseArgs({
@@ -36,6 +37,7 @@ try {
     console.log(
       `Imported ${target} as ${status} curriculum ${result.curriculumId}`,
     );
+    await revalidateApp();
   } else if ("existingCurriculumId" in result) {
     console.error(
       `${target} was refused: curriculum ${result.existingCurriculumId} already exists for this program and year (pass --replace to replace it)`,

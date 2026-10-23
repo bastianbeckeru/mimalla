@@ -3,7 +3,7 @@ import { ArrowDown, ArrowRight, Check, Lock } from "lucide-react";
 import Image from "next/image";
 import { LandingButton } from "@/components/landing-button";
 import { ProgramPicker } from "@/components/program-picker";
-import { getCatalog } from "@/server/db/curriculums";
+import { getCachedCatalog } from "@/server/catalog/cached-catalog";
 
 function FloatingCard({
   className,
@@ -215,7 +215,7 @@ function MissingProgramNote({ className }: { className?: string }) {
   );
 }
 
-export default function IndexPage() {
+export default async function IndexPage() {
   return (
     <main>
       <section className="px-2.5 sm:px-3">
@@ -370,7 +370,7 @@ export default function IndexPage() {
             className="mt-3 hidden w-70 max-w-full sm:block"
           />
         </div>
-        <ProgramPicker catalog={getCatalog()} />
+        <ProgramPicker catalog={await getCachedCatalog()} />
         <MissingProgramNote className="w-full text-center sm:hidden" />
         <Doodle name="reading" className="mx-auto w-57.5 sm:hidden" />
       </section>
