@@ -39,12 +39,7 @@ export default async function ProgramPage({
         tracks={curriculum.tracks}
         duration={getPeriods(curriculum.slots).nCols}
       >
-        <ImportCurriculumButton
-          path={`${institutionAcronym}/${programSlug}`}
-          institution={institution}
-          program={program}
-          curriculum={curriculum}
-        />
+        <ImportCurriculumButton data={data} />
       </ProgramInfo>
     </div>
   );

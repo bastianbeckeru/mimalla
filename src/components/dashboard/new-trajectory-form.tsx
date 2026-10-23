@@ -33,15 +33,36 @@ import type {
   CatalogInstitution,
   CatalogProgram,
   CurriculumData,
+  ProgramCurriculum,
 } from "@/types/curriculum";
-import { fetchProgramData } from "@/utils/curriculum-data";
+import {
+  fetchCurriculum,
+  fetchProgramCurriculums,
+} from "@/utils/curriculum-data";
+
+type LoadedCurriculums = {
+  path: string;
+  curriculums: ProgramCurriculum[];
+};
+
+function findApplicableCurriculum(
+  curriculums: ProgramCurriculum[],
+  entryYear: number | null,
+) {
+  if (entryYear === null) return curriculums[0];
+  return curriculums.find((c) => c.year <= entryYear) ?? curriculums.at(-1);
+}
+
+function curriculumLabel({ year, version }: ProgramCurriculum) {
+  return version ? `${year} (${version})` : `${year}`;
+}
 
 export default function NewTrajectoryForm({
   catalog,
   onImport,
 }: {
   catalog: CatalogInstitution[];
-  onImport: (path: string, data: CurriculumData) => void;
+  onImport: (data: CurriculumData) => void;
 }) {
   const { addTrajectory } = useTrajectoryStore();
 
@@ -49,6 +70,11 @@ export default function NewTrajectoryForm({
     catalog.length === 1 ? catalog[0] : undefined,
   );
   const [selectedProgram, setSelectedProgram] = useState<CatalogProgram>();
+  const [loadedCurriculums, setLoadedCurriculums] =
+    useState<LoadedCurriculums | null>(null);
+  const [chosenCurriculumId, setChosenCurriculumId] = useState<number | null>(
+    null,
+  );
   const [year, setYear] = useState<number | null>(null);
   const [term, setTerm] = useState<number | null>(null);
 
@@ -60,19 +86,50 @@ export default function NewTrajectoryForm({
     label: institution.name,
   }));
 
+  const curriculums =
+    loadedCurriculums && loadedCurriculums.path === selectedProgram?.path
+      ? loadedCurriculums.curriculums
+      : [];
+  const applicableCurriculum = findApplicableCurriculum(curriculums, year);
+  const selectedCurriculumId = curriculums.some(
+    (c) => c.id === chosenCurriculumId,
+  )
+    ? chosenCurriculumId
+    : (applicableCurriculum?.id ?? null);
+  const curriculumOptions = curriculums.map((curriculum) => ({
+    value: curriculum.id,
+    label: curriculumLabel(curriculum),
+  }));
+
+  async function selectProgram(program: CatalogProgram) {
+    setSelectedProgram(program);
+    setChosenCurriculumId(null);
+
+    try {
+      setLoadedCurriculums({
+        path: program.path,
+        curriculums: await fetchProgramCurriculums(program.path),
+      });
+    } catch {
+      toast("❌ No se pudieron cargar las versiones de la malla", {
+        description: "Inténtalo nuevamente en unos segundos.",
+      });
+    }
+  }
+
   async function onSubmit() {
-    if (!selectedProgram || !year || !term) return;
+    if (!selectedCurriculumId || !year || !term) return;
 
     setIsCreating(true);
 
     try {
-      const data = await fetchProgramData(selectedProgram.path);
+      const data = await fetchCurriculum(selectedCurriculumId);
 
-      onImport(selectedProgram.path, data);
+      onImport(data);
       addTrajectory({
-        curriculumPath: selectedProgram.path,
+        curriculumId: selectedCurriculumId,
         entry: { year, term },
-        slots: data.curriculum.slots,
+        curriculum: data,
       });
 
       toast("✅ Malla importada", {
@@ -120,6 +177,7 @@ export default function NewTrajectoryForm({
                     catalog.find((inst) => inst.acronym === value),
                   );
                   setSelectedProgram(undefined);
+                  setChosenCurriculumId(null);
                 }}
                 disabled={catalog.length === 1}
               >
@@ -157,7 +215,7 @@ export default function NewTrajectoryForm({
                     <ProgramList
                       departments={selectedInstitution?.departments ?? []}
                       setOpen={setOpen}
-                      setSelectedProgram={setSelectedProgram}
+                      setSelectedProgram={selectProgram}
                     />
                   </PopoverContent>
                 </Popover>
@@ -185,12 +243,39 @@ export default function NewTrajectoryForm({
               disabled={!selectedProgram}
             />
           </div>
+
+          <div className="flex flex-col gap-1">
+            <h3 className="font-semibold text-muted-foreground">Versión</h3>
+
+            <Select
+              items={curriculumOptions}
+              value={selectedCurriculumId}
+              onValueChange={(value: number | null) =>
+                setChosenCurriculumId(value)
+              }
+              disabled={curriculums.length === 0}
+            >
+              <SelectTrigger id="curriculum" className="w-full">
+                <SelectValue placeholder="Selecciona una versión" />
+              </SelectTrigger>
+              <SelectContent>
+                {curriculums.map((curriculum) => (
+                  <SelectItem key={curriculum.id} value={curriculum.id}>
+                    {curriculumLabel(curriculum)}
+                    {curriculum.id === applicableCurriculum?.id &&
+                      year !== null &&
+                      " · sugerida"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <Button
             className="w-full"
-            disabled={!selectedProgram || !year || !term || isCreating}
+            disabled={!selectedCurriculumId || !year || !term || isCreating}
             onClick={onSubmit}
           >
             {isCreating ? (

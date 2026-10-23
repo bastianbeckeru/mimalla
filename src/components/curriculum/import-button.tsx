@@ -18,26 +18,22 @@ import {
 import { useHasHydrated, useTrajectoryStore } from "@/stores/trajectory";
 import type { CurriculumData } from "@/types/curriculum";
 
-type Props = {
-  path: string;
-  curriculum: CurriculumData["curriculum"];
-  institution: CurriculumData["institution"];
-  program: CurriculumData["program"];
-};
-
 export default function ImportCurriculumButton({
-  path,
-  curriculum,
-  institution,
-  program,
-}: Props) {
+  data,
+}: {
+  data: CurriculumData;
+}) {
+  const { institution, program, curriculum } = data;
   const hasHydrated = useHasHydrated();
   const { addTrajectory, trajectories } = useTrajectoryStore();
   const [year, setYear] = useState<number | null>(null);
   const [term, setTerm] = useState<number | null>(null);
   const router = useRouter();
 
-  if (hasHydrated && trajectories.some((t) => t.curriculumPath === path)) {
+  if (
+    hasHydrated &&
+    trajectories.some((t) => t.curriculumId === curriculum.id)
+  ) {
     return (
       <Button
         className="w-full"
@@ -104,9 +100,9 @@ export default function ImportCurriculumButton({
               if (!year || !term) return;
 
               addTrajectory({
-                curriculumPath: path,
+                curriculumId: curriculum.id,
                 entry: { year, term },
-                slots: curriculum.slots,
+                curriculum: data,
               });
               router.push("/dashboard");
             }}

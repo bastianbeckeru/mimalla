@@ -3,6 +3,8 @@ import {
   getCatalog,
   getCurrentCurriculum,
   getCurriculumParams,
+  getProgramCurriculums,
+  getPublishedCurriculum,
 } from "@/server/catalog/read-catalog";
 import { getDatabase } from "@/server/db/client";
 
@@ -35,4 +37,22 @@ export async function getCachedCurrentCurriculum(
     institutionAcronym,
     programSlug,
   });
+}
+
+export async function getCachedProgramCurriculums(
+  institutionAcronym: string,
+  programSlug: string,
+) {
+  "use cache";
+  cacheCatalogRead();
+  return getProgramCurriculums(getDatabase(), {
+    institutionAcronym,
+    programSlug,
+  });
+}
+
+export async function getCachedPublishedCurriculum(curriculumId: number) {
+  "use cache";
+  cacheCatalogRead();
+  return getPublishedCurriculum(getDatabase(), curriculumId);
 }

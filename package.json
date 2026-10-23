@@ -21,7 +21,8 @@
     "import": "bun scripts/import-curriculum.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "bun scripts/seed.ts"
+    "db:seed": "bun scripts/seed.ts",
+    "generate:legacy-course-codes": "bun scripts/generate-legacy-course-codes.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
