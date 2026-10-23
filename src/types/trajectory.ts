@@ -8,7 +8,7 @@ export type Enrollment = {
   term: number;
   position: number;
   status: EnrollmentStatus;
-  courseId: number;
+  courseCode: string | null;
 };
 
 export type Entry = {
@@ -18,7 +18,7 @@ export type Entry = {
 
 export type Trajectory = {
   id: string;
-  curriculumPath: string;
+  curriculumId: number | null;
   entry: Entry;
   enrollments: Enrollment[];
 };

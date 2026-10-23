@@ -27,7 +27,7 @@ import {
 import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
 import type { Trajectory } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
-import { fetchProgramData } from "@/utils/curriculum-data";
+import { fetchCurriculum } from "@/utils/curriculum-data";
 import {
   createEnrollments,
   extractCourseIds,
@@ -36,8 +36,8 @@ import {
   trimEmptyPeriods,
 } from "@/utils/trajectory";
 
-type LoadedProgram = {
-  path: string;
+type LoadedCurriculum = {
+  curriculumId: number;
   data: CurriculumData | null;
 };
 
@@ -53,28 +53,31 @@ export default function ClientSideDashboard({
   const hasHydrated = useHasHydrated();
   const activeTrajectory = useActiveTrajectory();
   const { removeActiveTrajectory } = useTrajectoryStore();
-  const [program, setProgram] = useState<LoadedProgram | null>(null);
+  const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
 
-  const activePath = activeTrajectory?.curriculumPath;
-  const loadedPath = program?.path;
+  const activeCurriculumId = activeTrajectory?.curriculumId;
+  const loadedCurriculumId = loaded?.curriculumId;
 
   useEffect(() => {
-    if (!activePath || loadedPath === activePath) return;
+    if (activeCurriculumId == null) return;
+    if (loadedCurriculumId === activeCurriculumId) return;
 
     let isCurrent = true;
 
-    fetchProgramData(activePath)
+    fetchCurriculum(activeCurriculumId)
       .then((data) => {
-        if (isCurrent) setProgram({ path: activePath, data });
+        if (isCurrent) setLoaded({ curriculumId: activeCurriculumId, data });
       })
       .catch(() => {
-        if (isCurrent) setProgram({ path: activePath, data: null });
+        if (isCurrent) {
+          setLoaded({ curriculumId: activeCurriculumId, data: null });
+        }
       });
 
     return () => {
       isCurrent = false;
     };
-  }, [activePath, loadedPath]);
+  }, [activeCurriculumId, loadedCurriculumId]);
 
   if (!hasHydrated) return loader;
 
@@ -82,14 +85,23 @@ export default function ClientSideDashboard({
     return (
       <NewTrajectoryForm
         catalog={catalog}
-        onImport={(path, data) => setProgram({ path, data })}
+        onImport={(data) =>
+          setLoaded({ curriculumId: data.curriculum.id, data })
+        }
       />
     );
   }
 
-  if (program?.path !== activeTrajectory.curriculumPath) return loader;
+  const isMissing = activeTrajectory.curriculumId === null;
 
-  if (!program.data) {
+  if (
+    !isMissing &&
+    (!loaded || loaded.curriculumId !== activeTrajectory.curriculumId)
+  ) {
+    return loader;
+  }
+
+  if (isMissing || !loaded?.data) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <p className="text-muted-foreground">No se pudo cargar tu malla.</p>
@@ -104,7 +116,7 @@ export default function ClientSideDashboard({
     <TrajectoryDashboard
       key={activeTrajectory.id}
       trajectory={activeTrajectory}
-      data={program.data}
+      data={loaded.data}
     />
   );
 }
@@ -161,7 +173,7 @@ function TrajectoryDashboard({
   function resetCurriculum() {
     const officialEnrollments = createEnrollments({
       entry: trajectory.entry,
-      slots: data.curriculum.slots,
+      curriculum: data,
     });
 
     updateActiveEnrollments(officialEnrollments);
@@ -227,7 +239,11 @@ function TrajectoryDashboard({
             areas={data.areas}
             courses={courses}
             progress={{
-              approvedCourseIds: extractCourseIds(enrollments, "APPROVED"),
+              approvedCourseIds: extractCourseIds(
+                enrollments,
+                "APPROVED",
+                courses,
+              ),
               approvedCredits: stats.approvedCredits,
             }}
             onSave={saveChanges}

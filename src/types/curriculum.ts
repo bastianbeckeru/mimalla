@@ -5,6 +5,7 @@ export type CurriculumData = {
   department: Department;
   program: Program;
   curriculum: {
+    id: number;
     version?: string;
     year: number;
     isCurrent: boolean;
@@ -13,6 +14,12 @@ export type CurriculumData = {
   };
   areas: Area[];
   courses: Course[];
+};
+
+export type ProgramCurriculum = {
+  id: number;
+  year: number;
+  version?: string;
 };
 
 export type Institution = {

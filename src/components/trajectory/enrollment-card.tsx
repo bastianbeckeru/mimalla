@@ -72,6 +72,7 @@ export default function EnrollmentCard({
               "relative flex size-full cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-[filter] hover:brightness-110",
               hasLowBackgroundElementContrast && "border border-foreground/50",
               hasLowElementTextContrast && "text-background",
+              !course && "border-2 border-destructive border-dashed",
               !isAvailable && "brightness-[25%] hover:brightness-[35%]",
               editMode && "cursor-grab",
               isDragging && "shadow-2xl",
@@ -80,9 +81,19 @@ export default function EnrollmentCard({
           />
         }
       >
-        <span className="text-center font-medium text-xs">
-          {course?.name ?? "Vacío"}
-        </span>
+        {course ? (
+          <span className="text-center font-medium text-xs">{course.name}</span>
+        ) : (
+          <span
+            title="Este curso no está en la malla"
+            className="flex flex-col items-center text-center text-xs"
+          >
+            <span className="font-medium">
+              {enrollment.courseCode ?? "Curso"}
+            </span>
+            <span className="opacity-75">No encontrado</span>
+          </span>
+        )}
 
         {enrollment.status !== "PENDING" && (
           <div

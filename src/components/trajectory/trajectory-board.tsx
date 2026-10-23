@@ -26,6 +26,7 @@ import {
   addEnrollment,
   addPeriod,
   type EditError,
+  findEnrollmentCourse,
   getAddableCourses,
   isAvailable,
   MAX_ENROLLMENTS_PER_PERIOD,
@@ -156,7 +157,7 @@ export default function TrajectoryBoard({
                   entry={entry}
                 >
                   {period.enrollments.map((enrollment, index) => {
-                    const course = courses.get(enrollment.courseId);
+                    const course = findEnrollmentCourse(courses, enrollment);
                     const color =
                       (course && getCourseArea(areas, course)?.color) ??
                       DEFAULT_COURSE_COLOR;

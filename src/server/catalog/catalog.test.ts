@@ -10,6 +10,8 @@ import {
   getCurrentCurriculum,
   getCurriculum,
   getCurriculumParams,
+  getProgramCurriculums,
+  getPublishedCurriculum,
 } from "@/server/catalog/read-catalog";
 import * as schema from "@/server/db/schema";
 import type { CurriculumData } from "@/types/curriculum";
@@ -619,6 +621,52 @@ describe("import, then read the catalog", () => {
       isCurrent: false,
     });
     expect(await getCurriculumParams(db)).toEqual([derecho]);
+  });
+
+  test("a program lists its published curriculums with their ids and years, latest first", async () => {
+    const db = await freshDatabase();
+    const yearOf = (year: number, version: string) =>
+      curriculumFile({
+        curriculum: { ...curriculumFile().curriculum, year, version },
+      });
+    const olderId = await importValid(db, yearOf(2018, "v5.0"), "derecho", {
+      publish: true,
+    });
+    const latestId = await importValid(db, yearOf(2023, "v6.0"), "derecho", {
+      publish: true,
+    });
+    await importValid(db, yearOf(2026, "v7.0"));
+
+    expect(await getProgramCurriculums(db, derecho)).toEqual([
+      { id: latestId, year: 2023, version: "v6.0" },
+      { id: olderId, year: 2018, version: "v5.0" },
+    ]);
+    expect(
+      await getProgramCurriculums(db, {
+        institutionAcronym: "udp",
+        programSlug: "psicologia",
+      }),
+    ).toEqual([]);
+    expect((await getCurrentCurriculum(db, derecho))?.curriculum.id).toBe(
+      latestId,
+    );
+  });
+
+  test("a published curriculum is reachable by id, a draft is not", async () => {
+    const db = await freshDatabase();
+    const publishedId = await importValid(db, curriculumFile(), "derecho", {
+      publish: true,
+    });
+    const draftId = await importValid(db, curriculumFile(), "psicologia");
+
+    expect(await getPublishedCurriculum(db, publishedId)).toEqual(
+      await getCurriculum(db, publishedId),
+    );
+    expect((await getPublishedCurriculum(db, publishedId))?.curriculum.id).toBe(
+      publishedId,
+    );
+    expect(await getPublishedCurriculum(db, draftId)).toBeNull();
+    expect(await getPublishedCurriculum(db, draftId + 100)).toBeNull();
   });
 
   describe("an import for a program and year that already have a curriculum", () => {

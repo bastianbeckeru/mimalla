@@ -14,7 +14,11 @@ import {
   track,
   trackCourse,
 } from "@/server/db/schema";
-import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
+import type {
+  CatalogInstitution,
+  CurriculumData,
+  ProgramCurriculum,
+} from "@/types/curriculum";
 import type { Database } from "@/types/database";
 
 function groupBy<T>(
@@ -149,6 +153,7 @@ export async function getCurriculum(
       schedule: programRow.schedule,
     },
     curriculum: {
+      id: version.id,
       ...optional("version", version.version),
       year: version.year,
       isCurrent: await isCurrent(
@@ -190,6 +195,19 @@ export async function getCurriculum(
       prerequisiteIds: prerequisitesOf(row.id),
     })),
   };
+}
+
+export async function getPublishedCurriculum(
+  db: Database,
+  curriculumId: number,
+): Promise<CurriculumData | null> {
+  const [published] = await db
+    .select({ id: curriculum.id })
+    .from(curriculum)
+    .where(
+      and(eq(curriculum.id, curriculumId), eq(curriculum.status, "published")),
+    );
+  return published ? getCurriculum(db, published.id) : null;
 }
 
 type ProgramParams = { institutionAcronym: string; programSlug: string };
@@ -256,12 +274,16 @@ export async function getCatalog(db: Database): Promise<CatalogInstitution[]> {
   }));
 }
 
-export async function getCurrentCurriculum(
+const publishedCurriculumsOf = (
   db: Database,
   { institutionAcronym, programSlug }: ProgramParams,
-): Promise<CurriculumData | null> {
-  const [current] = await db
-    .select({ id: curriculum.id })
+) =>
+  db
+    .select({
+      id: curriculum.id,
+      year: curriculum.year,
+      version: curriculum.version,
+    })
     .from(curriculum)
     .innerJoin(program, eq(program.id, curriculum.programId))
     .innerJoin(institution, eq(institution.id, program.institutionId))
@@ -275,7 +297,23 @@ export async function getCurrentCurriculum(
         ),
       ),
     )
-    .orderBy(desc(curriculum.year))
-    .limit(1);
+    .orderBy(desc(curriculum.year));
+
+export async function getProgramCurriculums(
+  db: Database,
+  params: ProgramParams,
+): Promise<ProgramCurriculum[]> {
+  const rows = await publishedCurriculumsOf(db, params);
+  return rows.map(({ version, ...row }) => ({
+    ...row,
+    ...optional("version", version),
+  }));
+}
+
+export async function getCurrentCurriculum(
+  db: Database,
+  params: ProgramParams,
+): Promise<CurriculumData | null> {
+  const [current] = await publishedCurriculumsOf(db, params).limit(1);
   return current ? getCurriculum(db, current.id) : null;
 }

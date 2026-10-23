@@ -1,9 +1,9 @@
 import { nanoid } from "nanoid";
 import type {
   Course,
+  CurriculumData,
   ExtendedCourse,
   PeriodKey,
-  Slot,
 } from "@/types/curriculum";
 import type {
   Enrollment,
@@ -46,14 +46,15 @@ type Progress = {
 
 export function createEnrollments({
   entry,
-  slots,
+  curriculum: { curriculum, courses },
 }: {
   entry: Entry;
-  slots: Slot[];
+  curriculum: Pick<CurriculumData, "curriculum" | "courses">;
 }): Enrollment[] {
   const entryOffset = entry.term >= 3 ? 1 : 0;
+  const codeOf = new Map(courses.map((course) => [course.id, course.code]));
 
-  return slots.map((slot) => {
+  return curriculum.slots.map((slot) => {
     const semesterIndex =
       getSemesterIndex({
         year: entry.year + slot.programYear - 1,
@@ -62,7 +63,7 @@ export function createEnrollments({
 
     return {
       id: nanoid(),
-      courseId: slot.courseId,
+      courseCode: codeOf.get(slot.courseId) ?? null,
       position: slot.position,
       status: "PENDING",
       year: Math.floor(semesterIndex / 2),
@@ -116,11 +117,25 @@ export function trimEmptyPeriods(periods: PeriodWithEnrollments[]) {
     );
 }
 
+export function findEnrollmentCourse<C extends Course>(
+  courses: Map<number, C>,
+  enrollment: Enrollment,
+) {
+  if (enrollment.courseCode === null) return undefined;
+  for (const course of courses.values()) {
+    if (course.code === enrollment.courseCode) return course;
+  }
+  return undefined;
+}
+
 export function extractCourseIds(
   enrollments: Enrollment[],
   status: EnrollmentStatus,
+  courses: Map<number, Course>,
 ) {
-  return enrollments.filter((e) => e.status === status).map((e) => e.courseId);
+  return enrollments
+    .filter((e) => e.status === status)
+    .flatMap((e) => findEnrollmentCourse(courses, e)?.id ?? []);
 }
 
 export function getTrajectoryStats(
@@ -132,7 +147,7 @@ export function getTrajectoryStats(
   let pendingCourses = 0;
 
   for (const enrollment of enrollments) {
-    const course = courses.get(enrollment.courseId);
+    const course = findEnrollmentCourse(courses, enrollment);
     if (!course) continue;
 
     if (enrollment.status === "APPROVED") {
@@ -183,8 +198,8 @@ export function getAddableCourses(
   courses: Map<number, Course>,
   enrollments: Enrollment[],
 ) {
-  const approvedCourseIds = extractCourseIds(enrollments, "APPROVED");
-  const failedCourseIds = extractCourseIds(enrollments, "FAILED");
+  const approvedCourseIds = extractCourseIds(enrollments, "APPROVED", courses);
+  const failedCourseIds = extractCourseIds(enrollments, "FAILED", courses);
 
   return [...courses.values()].filter(
     (c) =>
@@ -220,7 +235,9 @@ export function addEnrollment(
     return { error: "PERIOD_FULL" };
   }
 
-  const isDuplicate = period.enrollments.some((e) => e.courseId === course.id);
+  const isDuplicate = period.enrollments.some(
+    (e) => e.courseCode === course.code,
+  );
   if (isDuplicate && !course.isElective) {
     return { error: "DUPLICATE_COURSE" };
   }
@@ -228,7 +245,7 @@ export function addEnrollment(
   const { year, term } = parsePeriodKey(periodId);
   const enrollment: Enrollment = {
     id: nanoid(),
-    courseId: course.id,
+    courseCode: course.code,
     status: "PENDING",
     position: period.enrollments.length + 1,
     year,
@@ -279,7 +296,8 @@ export function moveEnrollment(
     periods,
     sourceIndex,
     destinationIndex,
-    courses.get(enrollment.courseId),
+    findEnrollmentCourse(courses, enrollment),
+    courses,
   );
   if (error) return { error };
 
@@ -317,6 +335,7 @@ function getMoveError(
   sourceIndex: number,
   destinationIndex: number,
   course: ExtendedCourse | undefined,
+  courses: Map<number, ExtendedCourse>,
 ): EditError | null {
   if (!course || course.isElective || sourceIndex === destinationIndex) {
     return null;
@@ -325,17 +344,19 @@ function getMoveError(
   const destinationPeriod = periods[destinationIndex];
   if (!destinationPeriod) return null;
 
-  if (destinationPeriod.enrollments.some((e) => e.courseId === course.id)) {
+  if (destinationPeriod.enrollments.some((e) => e.courseCode === course.code)) {
     return "DUPLICATE_COURSE";
   }
 
   const isMovingForward = sourceIndex < destinationIndex;
-  const relatedIds = isMovingForward
-    ? course.successorIds
-    : course.prerequisiteIds;
+  const relatedCodes = (
+    isMovingForward ? course.successorIds : course.prerequisiteIds
+  ).flatMap((id) => courses.get(id)?.code ?? []);
 
   const hasRelatedCourse = (period: PeriodWithEnrollments) =>
-    period.enrollments.some((e) => relatedIds.includes(e.courseId));
+    period.enrollments.some(
+      (e) => e.courseCode !== null && relatedCodes.includes(e.courseCode),
+    );
 
   if (hasRelatedCourse(destinationPeriod)) {
     return isMovingForward ? "SUCCESSOR_IN_PERIOD" : "PREREQUISITE_IN_PERIOD";
@@ -363,16 +384,20 @@ export function setEnrollmentStatus(
     .find((e) => e.id === enrollmentId);
   if (!target) return periods;
 
-  const revertedCourseIds =
-    status === "APPROVED"
-      ? new Set<number>()
-      : getApprovedSuccessorIds(periods, target.courseId, courses);
+  const targetCourse = findEnrollmentCourse(courses, target);
+  const revertedCourseCodes = new Set(
+    status === "APPROVED" || !targetCourse
+      ? []
+      : [...getApprovedSuccessorIds(periods, targetCourse.id, courses)].flatMap(
+          (id) => courses.get(id)?.code ?? [],
+        ),
+  );
 
   return periods.map((p) => ({
     ...p,
     enrollments: p.enrollments.map((e) => {
       if (e.id === enrollmentId) return { ...e, status };
-      if (revertedCourseIds.has(e.courseId)) {
+      if (e.courseCode !== null && revertedCourseCodes.has(e.courseCode)) {
         return { ...e, status: "PENDING" as const };
       }
       return e;
@@ -389,6 +414,7 @@ function getApprovedSuccessorIds(
     extractCourseIds(
       periods.flatMap((p) => p.enrollments),
       "APPROVED",
+      courses,
     ),
   );
   const successorIds = new Set<number>();
