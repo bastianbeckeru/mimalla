@@ -21,6 +21,9 @@ try {
         : `Skipped ${result.path}, already seeded as curriculum ${result.curriculumId}`,
     );
   }
+  console.log(
+    "Skipped revalidating the app on purpose: db:seed is for local development",
+  );
 } finally {
   await db.$client.end();
 }

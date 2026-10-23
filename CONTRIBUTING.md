@@ -94,11 +94,11 @@ Maintainers update `version` in `package.json` when they publish a release.
 The catalog lives in Postgres. A curriculum enters it through a curriculum file that is validated and imported, and only published curriculums are shown.
 
 1. Copy a file from `seed/` as a template and fill in the institution, department, program and course data. Check it with `bun run validate <file>`.
-2. Import it as a draft with `bun run import <file> [--slug <program-slug>]`. Pass `--replace` to fix a curriculum that already exists for the program and year, and `--publish` to publish it right away.
+2. Import it as a draft with `bun run import <file> [--slug <program-slug>]`. Pass `--replace` to fix a curriculum that already exists for the program and year (it keeps its status, and the names and credits of its courses are updated for the institution), and `--publish` to publish it right away.
 3. Publish a draft with `bun scripts/publish-curriculum.ts <curriculum-id>`.
 4. Check in the app that the curriculum renders and that prerequisites are right.
 
-The app caches the catalog and the curriculum pages. After an import or a publish, the scripts ask the app at `APP_URL` to refresh them by calling `POST /api/revalidate` with `REVALIDATE_SECRET`, which must match the app's. Without `APP_URL` and `REVALIDATE_SECRET` they print a warning and the pages keep the old data until the next build.
+The app caches the catalog and the curriculum pages. After an import or a publish, the scripts ask the app at `APP_URL` to refresh them by calling `POST /api/revalidate` with `REVALIDATE_SECRET`, which must match the app's. If `APP_URL` or `REVALIDATE_SECRET` is unset, or the request fails, they report that the data was written but the pages were not refreshed and exit with a non-zero status; the pages keep the old data until the app is revalidated or rebuilt. `bun run db:seed` is for local development and does not revalidate.
 
 ## License
 
