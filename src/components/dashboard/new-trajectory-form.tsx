@@ -4,7 +4,6 @@ import { cn } from "cn";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { toast } from "sonner";
 import { EntryDateFields } from "@/components/entry-date-fields";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -27,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/components/ui/toast";
 import { useTrajectoryStore } from "@/stores/trajectory";
 import type {
   CatalogDepartment,
@@ -75,11 +75,15 @@ export default function NewTrajectoryForm({
         slots: data.curriculum.slots,
       });
 
-      toast.success("Malla importada", {
+      toast.add({
+        type: "success",
+        title: "Malla importada",
         description: `${data.program.name} ${data.curriculum.year}`,
       });
     } catch {
-      toast.error("No se pudo importar la malla", {
+      toast.add({
+        type: "error",
+        title: "No se pudo importar la malla",
         description: "Inténtalo nuevamente en unos segundos.",
       });
       setIsCreating(false);

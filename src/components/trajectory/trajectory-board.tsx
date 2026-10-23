@@ -9,7 +9,6 @@ import {
 import { cn } from "cn";
 import { Plus, Save, Undo2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import CourseModal from "@/components/curriculum/course-modal";
 import { MotionDiv } from "@/components/motion";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
@@ -17,6 +16,7 @@ import AddPeriodDialog from "@/components/trajectory/add-period-dialog";
 import EnrollmentCard from "@/components/trajectory/enrollment-card";
 import PeriodContainer from "@/components/trajectory/period-container";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import type { HistoryControls } from "@/hooks/use-history";
 import type { Area, ExtendedCourse, PeriodKey } from "@/types/curriculum";
 import type {
@@ -101,7 +101,7 @@ export default function TrajectoryBoard({
     if (result.error) {
       const errorToast = ADD_ERROR_TOASTS[result.error];
       if (errorToast) {
-        toast.error(errorToast.title, { description: errorToast.description });
+        toast.add({ type: "error", ...errorToast });
       }
       return;
     }
@@ -128,7 +128,9 @@ export default function TrajectoryBoard({
         result.error === "PERIOD_FULL"
           ? PERIOD_FULL_TOAST.title
           : "Movimiento inválido";
-      toast.error(title, {
+      toast.add({
+        type: "error",
+        title,
         description: MOVE_ERROR_DESCRIPTIONS[result.error],
       });
       return;

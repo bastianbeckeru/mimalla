@@ -5,7 +5,7 @@ import { cn } from "cn";
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toast";
 
 const montserratHeading = Montserrat({
   subsets: ["latin"],

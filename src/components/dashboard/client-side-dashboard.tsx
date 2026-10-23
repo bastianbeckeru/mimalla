@@ -3,7 +3,6 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Save, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
 import Sidebar from "@/components/dashboard/sidebar";
 import KbdHotkey from "@/components/kbd-hotkey";
@@ -17,6 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { toast } from "@/components/ui/toast";
 import { Toggle } from "@/components/ui/toggle";
 import { useHistory } from "@/hooks/use-history";
 import {
@@ -143,7 +143,9 @@ function TrajectoryDashboard({
 
   function toggleEditMode() {
     if (history.canUndo) {
-      toast.warning("Cambios sin guardar", {
+      toast.add({
+        type: "warning",
+        title: "Cambios sin guardar",
         description:
           "Guarda los cambios realizados antes de finalizar la edición.",
       });
