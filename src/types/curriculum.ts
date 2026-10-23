@@ -4,7 +4,6 @@ export type CurriculumData = {
   institution: Institution;
   department: Department;
   program: Program;
-  stats?: Stat[];
   curriculum: {
     version: string;
     year: number;
@@ -73,44 +72,6 @@ export type Area = {
   color: string;
   courseIds: number[];
   subareaIds: number[];
-};
-
-type Stat = {
-  year: number;
-  admissions: {
-    paesRequirements: {
-      nem: number;
-      ranking: number;
-      language: number;
-      science: number;
-      history: number;
-      math1: number;
-      math2: number;
-    };
-    averageScore: number;
-    vacancies: number;
-  };
-  academics: {
-    firstYearRetentionRate: number;
-    avgRealDuration: number;
-    avgRealDurationUnit: string;
-    totalEnrollment: number;
-    freshmenEnrollment: number;
-    graduates: number;
-    acreditationYears: number;
-  };
-  employment: {
-    employmentRate1stYear: number;
-    employmentRate2ndYear: number;
-    avgIncome4thYear: {
-      min: number;
-      max: number;
-    };
-  };
-  costs: {
-    annualTuition: number;
-    annualEnrollment: number;
-  };
 };
 
 export type Course = {
