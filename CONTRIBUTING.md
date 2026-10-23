@@ -15,18 +15,18 @@ For questions, join the [Discord](https://discord.gg/wez3cJDzXk).
 
 1. Fork the repository and clone your fork.
 2. Install [Bun](https://bun.sh) 1.x.
-3. Install dependencies and start the development server:
+3. Install dependencies, start a [local database](#local-database) and start the development server:
 
    ```sh
    bun install
    bun run dev
    ```
 
-The app still reads curricula from JSON files, so it needs no environment variables.
+The app reads the catalog from Postgres, so `bun run dev`, `bun run build` and `bun run start` need `DATABASE_URL`. The build prerenders every published program, so the database must hold at least one published curriculum.
 
 ### Local database
 
-The catalog is moving to Postgres. To run Mi Malla against a local database, install [Docker](https://docs.docker.com/get-docker/) and run, from the repository root:
+To run Mi Malla against a local database, install [Docker](https://docs.docker.com/get-docker/) and run, from the repository root:
 
 ```sh
 cp .env.example .env
@@ -36,7 +36,7 @@ bun run db:seed
 
 - `docker compose up -d` starts Postgres 17 on `localhost:5432`, as defined in `compose.yaml`. Data persists in the `pgdata` volume.
 - `bun run db:seed` applies the migrations in `drizzle/` and imports the sample seed in `seed/`. Running it again is safe: curriculums already in the database are skipped.
-- The connection string comes from `DATABASE_URL`. Bun and Next load it from `.env`.
+- The connection string comes from `DATABASE_URL`. Bun and Next load it from `.env`. A Neon connection string (`*.neon.tech`) makes the app use the Neon HTTP driver; any other uses `pg`.
 
 The sample seed holds two programs of a fictional institution, Universidad de Ejemplo (`UE`), that share their basic science and general education courses. It is not real data. Check it with `bun run validate seed`.
 
@@ -91,12 +91,14 @@ Maintainers update `version` in `package.json` when they publish a release.
 
 ## Adding a curriculum
 
-Curricula are stored as JSON files in `src/server/db/curriculums/<institution-acronym>/<program-slug>.json`. The program list, routes and search are derived from these files, so adding a file is enough.
+The catalog lives in Postgres. A curriculum enters it through a curriculum file that is validated and imported, and only published curriculums are shown.
 
-1. Copy an existing curriculum file from the same institution, or from another one, as a template.
-2. Fill in the institution, department, program and course data. The shape is defined by `CurriculumData` in `src/types/curriculum.ts`.
-3. Check in the app that the curriculum imports and that prerequisites render correctly.
-4. In the pull request, link the official source of the curriculum.
+1. Copy a file from `seed/` as a template and fill in the institution, department, program and course data. Check it with `bun run validate <file>`.
+2. Import it as a draft with `bun run import <file> [--slug <program-slug>]`. Pass `--replace` to fix a curriculum that already exists for the program and year, and `--publish` to publish it right away.
+3. Publish a draft with `bun scripts/publish-curriculum.ts <curriculum-id>`.
+4. Check in the app that the curriculum renders and that prerequisites are right.
+
+The app caches the catalog and the curriculum pages. After an import or a publish, the scripts ask the app at `APP_URL` to refresh them by calling `POST /api/revalidate` with `REVALIDATE_SECRET`, which must match the app's. Without `APP_URL` and `REVALIDATE_SECRET` they print a warning and the pages keep the old data until the next build.
 
 ## License
 

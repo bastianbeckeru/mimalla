@@ -1,10 +1,10 @@
-import { getCurriculumParams, getProgramData } from "@/server/db/curriculums";
-
-export const dynamic = "force-static";
-export const dynamicParams = false;
+import {
+  getCachedCurrentCurriculum,
+  getCachedCurriculumParams,
+} from "@/server/catalog/cached-catalog";
 
 export function generateStaticParams() {
-  return getCurriculumParams();
+  return getCachedCurriculumParams();
 }
 
 export async function GET(
@@ -13,5 +13,10 @@ export async function GET(
     params,
   }: { params: Promise<{ institutionAcronym: string; programSlug: string }> },
 ) {
-  return Response.json(getProgramData(await params));
+  const { institutionAcronym, programSlug } = await params;
+  const data = await getCachedCurrentCurriculum(
+    institutionAcronym,
+    programSlug,
+  );
+  return data ? Response.json(data) : new Response(null, { status: 404 });
 }
