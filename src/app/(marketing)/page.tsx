@@ -392,14 +392,6 @@ export default function IndexPage() {
               source="bottom_cta"
               className="justify-center"
             />
-            <a
-              href="https://github.com/bastianbeckeru/mimalla"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl border bg-card px-6 font-semibold transition-colors hover:bg-muted"
-            >
-              Ver el código
-            </a>
           </div>
         </div>
       </section>
