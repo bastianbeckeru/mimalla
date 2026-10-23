@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Slot } from "@/types/curriculum";
 import type { Enrollment, Entry, Trajectory } from "@/types/trajectory";
-import { createEnrollments } from "@/utils/curriculum";
+import { createEnrollments } from "@/utils/trajectory";
 
 type TrajectoryState = {
   trajectories: Trajectory[];

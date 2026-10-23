@@ -25,16 +25,16 @@ import {
   useTrajectoryStore,
 } from "@/stores/trajectory";
 import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
-import type { PeriodWithEnrollments, Trajectory } from "@/types/trajectory";
+import type { Trajectory } from "@/types/trajectory";
+import { extendCourses } from "@/utils/curriculum";
+import { fetchProgramData } from "@/utils/curriculum-data";
 import {
   createEnrollments,
-  extendCourses,
   extractCourseIds,
-  getCurriculumStats,
+  getTrajectoryStats,
   groupEnrollmentsByPeriod,
-} from "@/utils/curriculum";
-import { fetchProgramData } from "@/utils/curriculum-data";
-import { isSemester, parsePeriodKey } from "@/utils/period-key";
+  trimEmptyPeriods,
+} from "@/utils/trajectory";
 
 type LoadedProgram = {
   path: string;
@@ -124,7 +124,7 @@ function TrajectoryDashboard({
 
   const courses = extendCourses(data.courses);
   const enrollments = history.present.flatMap((p) => p.enrollments);
-  const stats = getCurriculumStats(enrollments, courses);
+  const stats = getTrajectoryStats(enrollments, courses);
 
   useHotkey("Mod+E", toggleEditMode);
   useHotkey("Mod+S", saveChanges, { enabled: editMode });
@@ -226,23 +226,14 @@ function TrajectoryDashboard({
             entry={trajectory.entry}
             areas={data.areas}
             courses={courses}
-            approvedCourseIds={extractCourseIds(enrollments, "APPROVED")}
-            failedCourseIds={extractCourseIds(enrollments, "FAILED")}
-            approvedCredits={stats.approvedCredits}
+            progress={{
+              approvedCourseIds: extractCourseIds(enrollments, "APPROVED"),
+              approvedCredits: stats.approvedCredits,
+            }}
             onSave={saveChanges}
           />
         </ScrollAreaWrapper>
       </SidebarInset>
     </SidebarProvider>
   );
-}
-
-function trimEmptyPeriods(periods: PeriodWithEnrollments[]) {
-  const lastIndex = periods.findLastIndex((p) => p.enrollments.length > 0);
-
-  return periods
-    .slice(0, lastIndex + 1)
-    .filter(
-      (p) => p.enrollments.length > 0 || isSemester(parsePeriodKey(p.id).term),
-    );
 }

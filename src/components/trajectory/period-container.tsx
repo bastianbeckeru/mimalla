@@ -4,7 +4,7 @@ import type { ReactNode, Ref } from "react";
 import { MotionDiv, MotionUl } from "@/components/motion";
 import type { PeriodKey } from "@/types/curriculum";
 import type { Entry } from "@/types/trajectory";
-import { getPeriodInfo } from "@/utils/curriculum";
+import { getPeriodInfo } from "@/utils/trajectory";
 
 type PeriodContainerProps = DroppableProvidedProps & {
   id: PeriodKey;

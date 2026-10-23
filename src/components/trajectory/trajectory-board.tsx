@@ -3,13 +3,11 @@
 import {
   DragDropContext,
   Draggable,
-  type DraggableLocation,
   Droppable,
   type DropResult,
 } from "@hello-pangea/dnd";
 import { cn } from "cn";
 import { Plus, Save, Undo2 } from "lucide-react";
-import { nanoid } from "nanoid";
 import { useState } from "react";
 import { toast } from "sonner";
 import CourseModal from "@/components/curriculum/course-modal";
@@ -21,17 +19,44 @@ import PeriodContainer from "@/components/trajectory/period-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { HistoryControls } from "@/hooks/use-history";
 import type { Area, ExtendedCourse, PeriodKey } from "@/types/curriculum";
-import type {
-  Enrollment,
-  EnrollmentStatus,
-  Entry,
-  PeriodWithEnrollments,
-} from "@/types/trajectory";
+import type { Entry, PeriodWithEnrollments } from "@/types/trajectory";
 import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
 import { getCourseArea } from "@/utils/curriculum";
-import { comparePeriodKeys, parsePeriodKey } from "@/utils/period-key";
+import {
+  addEnrollment,
+  addPeriod,
+  type EditError,
+  getAddableCourses,
+  isAvailable,
+  MAX_ENROLLMENTS_PER_PERIOD,
+  moveEnrollment,
+  removeEnrollment,
+  setEnrollmentStatus,
+} from "@/utils/trajectory";
 
-const MAX_ENROLLMENTS_PER_PERIOD = 10;
+const PERIOD_FULL_TOAST = {
+  title: "❌ Límite de cursos",
+  description: `No puedes añadir más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos por periodo.`,
+};
+
+const ADD_ERROR_TOASTS: Partial<
+  Record<EditError, { title: string; description: string }>
+> = {
+  PERIOD_FULL: PERIOD_FULL_TOAST,
+  DUPLICATE_COURSE: {
+    title: "❌ Curso duplicado",
+    description: "No puedes añadir un curso que ya está en el periodo.",
+  },
+};
+
+const MOVE_ERROR_DESCRIPTIONS: Record<EditError, string> = {
+  PERIOD_FULL: `No puedes mover un curso a un periodo con ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
+  DUPLICATE_COURSE: "Este periodo ya tiene este curso.",
+  SUCCESSOR_IN_PERIOD: "Este periodo tiene un curso sucesor.",
+  PREREQUISITE_IN_PERIOD: "Este periodo tiene un curso prerequisito.",
+  SUCCESSOR_ON_THE_WAY: "Hay un curso sucesor en el camino.",
+  PREREQUISITE_ON_THE_WAY: "Hay un curso prerequisito en el camino.",
+};
 
 type TrajectoryBoardProps = {
   editMode: boolean;
@@ -39,9 +64,10 @@ type TrajectoryBoardProps = {
   entry: Entry;
   areas: Area[];
   courses: Map<number, ExtendedCourse>;
-  approvedCourseIds: number[];
-  failedCourseIds: number[];
-  approvedCredits: number;
+  progress: {
+    approvedCourseIds: number[];
+    approvedCredits: number;
+  };
   onSave: () => void;
 };
 
@@ -56,9 +82,7 @@ export default function TrajectoryBoard({
   entry,
   areas,
   courses,
-  approvedCourseIds,
-  failedCourseIds,
-  approvedCredits,
+  progress,
   onSave,
 }: TrajectoryBoardProps) {
   const periods = history.present;
@@ -68,70 +92,20 @@ export default function TrajectoryBoard({
   const [addEnrollmentPeriodId, setAddEnrollmentPeriodId] =
     useState<PeriodKey | null>(null);
 
-  const coursesAllowedToAdd = [...courses.values()].filter(
-    (c) =>
-      (failedCourseIds.includes(c.id) && !approvedCourseIds.includes(c.id)) ||
-      c.isElective,
-  );
+  function handleAddEnrollment(periodId: PeriodKey, courseId: number) {
+    const course = courses.get(courseId);
+    if (!course) return;
 
-  function isAvailable(course: ExtendedCourse | undefined) {
-    if (!course) return true;
-
-    return (
-      course.prerequisiteIds.every((id) => approvedCourseIds.includes(id)) &&
-      course.prerequisiteCredits <= approvedCredits
-    );
-  }
-
-  function addEnrollment(periodId: PeriodKey, courseId: number) {
-    const period = periods.find((p) => p.id === periodId);
-    if (!period) return;
-
-    if (period.enrollments.length >= MAX_ENROLLMENTS_PER_PERIOD) {
-      toast("❌ Límite de cursos", {
-        description: `No puedes añadir más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos por periodo.`,
-      });
+    const result = addEnrollment(periods, periodId, course);
+    if (result.error) {
+      const errorToast = ADD_ERROR_TOASTS[result.error];
+      if (errorToast) {
+        toast(errorToast.title, { description: errorToast.description });
+      }
       return;
     }
 
-    const isDuplicate = period.enrollments.some((e) => e.courseId === courseId);
-    if (isDuplicate && !courses.get(courseId)?.isElective) {
-      toast("❌ Curso duplicado", {
-        description: "No puedes añadir un curso que ya está en el periodo.",
-      });
-      return;
-    }
-
-    const { year, term } = parsePeriodKey(periodId);
-    const enrollment: Enrollment = {
-      id: nanoid(),
-      courseId,
-      status: "PENDING",
-      position: period.enrollments.length + 1,
-      year,
-      term,
-    };
-
-    history.commit(
-      periods.map((p) =>
-        p.id === periodId
-          ? { ...p, enrollments: [...p.enrollments, enrollment] }
-          : p,
-      ),
-    );
-  }
-
-  function addPeriod(year: number, term: number) {
-    const newPeriodIds: PeriodKey[] = [`${year}-${term}`];
-    if (term === 3 && !periods.some((p) => p.id === `${year}-1`)) {
-      newPeriodIds.push(`${year}-1`);
-    }
-
-    history.commit(
-      [...periods, ...newPeriodIds.map((id) => ({ id, enrollments: [] }))].sort(
-        (a, b) => comparePeriodKeys(a.id, b.id),
-      ),
-    );
+    history.commit(result.periods);
   }
 
   function handleDragEnd({ source, destination }: DropResult) {
@@ -142,36 +116,22 @@ export default function TrajectoryBoard({
     )
       return;
 
-    const sourceIndex = periods.findIndex((p) => p.id === source.droppableId);
-    const destinationIndex = periods.findIndex(
-      (p) => p.id === destination.droppableId,
-    );
-    const enrollment = periods[sourceIndex]?.enrollments[source.index];
-    const destinationPeriod = periods[destinationIndex];
-    if (!enrollment || !destinationPeriod) return;
-
-    if (
-      sourceIndex !== destinationIndex &&
-      destinationPeriod.enrollments.length >= MAX_ENROLLMENTS_PER_PERIOD
-    ) {
-      toast("❌ Límite de cursos", {
-        description: `No puedes mover un curso a un periodo con ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
-      });
-      return;
-    }
-
-    const error = getMoveError(
+    const result = moveEnrollment(
       periods,
-      sourceIndex,
-      destinationIndex,
-      courses.get(enrollment.courseId),
+      { periodId: source.droppableId, index: source.index },
+      { periodId: destination.droppableId, index: destination.index },
+      courses,
     );
-    if (error) {
-      toast("❌ Movimiento inválido", { description: error });
+    if (result.error) {
+      const title =
+        result.error === "PERIOD_FULL"
+          ? PERIOD_FULL_TOAST.title
+          : "❌ Movimiento inválido";
+      toast(title, { description: MOVE_ERROR_DESCRIPTIONS[result.error] });
       return;
     }
 
-    history.commit(moveEnrollment(periods, source, destination));
+    history.commit(result.periods);
   }
 
   return (
@@ -219,7 +179,9 @@ export default function TrajectoryBoard({
                               enrollment={enrollment}
                               course={course}
                               color={color}
-                              isAvailable={isAvailable(course)}
+                              isAvailable={
+                                !course || isAvailable(course, progress)
+                              }
                               editMode={editMode}
                               isDragging={snapshot.isDragging}
                               onOpen={() => {
@@ -232,7 +194,7 @@ export default function TrajectoryBoard({
                                 history.commit(
                                   setEnrollmentStatus(
                                     periods,
-                                    enrollment,
+                                    enrollment.id,
                                     status,
                                     courses,
                                   ),
@@ -240,12 +202,7 @@ export default function TrajectoryBoard({
                               }
                               onDelete={() =>
                                 history.commit(
-                                  periods.map((p) => ({
-                                    ...p,
-                                    enrollments: p.enrollments.filter(
-                                      (e) => e.id !== enrollment.id,
-                                    ),
-                                  })),
+                                  removeEnrollment(periods, enrollment.id),
                                 )
                               }
                             />
@@ -335,7 +292,7 @@ export default function TrajectoryBoard({
         course={openedCourse?.course ?? null}
         color={openedCourse?.color ?? DEFAULT_COURSE_COLOR}
         courses={courses}
-        progress={{ approvedCourseIds, approvedCredits }}
+        progress={progress}
       />
 
       <AddEnrollmentDialog
@@ -343,147 +300,21 @@ export default function TrajectoryBoard({
         onOpenChange={(isOpen) => {
           if (!isOpen) setAddEnrollmentPeriodId(null);
         }}
-        courses={coursesAllowedToAdd}
-        onAdd={addEnrollment}
+        courses={getAddableCourses(
+          courses,
+          periods.flatMap((p) => p.enrollments),
+        )}
+        onAdd={handleAddEnrollment}
       />
 
       <AddPeriodDialog
         open={isAddPeriodOpen}
         onOpenChange={setIsAddPeriodOpen}
-        onAdd={addPeriod}
+        onAdd={(year, term) =>
+          history.commit(addPeriod(periods, { year, term }))
+        }
         periods={periods}
       />
     </>
   );
-}
-
-function moveEnrollment(
-  periods: PeriodWithEnrollments[],
-  source: DraggableLocation,
-  destination: DraggableLocation,
-) {
-  const enrollmentsByPeriod = new Map(
-    periods.map((p) => [p.id as string, [...p.enrollments]]),
-  );
-  const [moved] =
-    enrollmentsByPeriod.get(source.droppableId)?.splice(source.index, 1) ?? [];
-  if (!moved) return periods;
-
-  enrollmentsByPeriod
-    .get(destination.droppableId)
-    ?.splice(destination.index, 0, moved);
-
-  return periods.map((p) => {
-    if (p.id !== source.droppableId && p.id !== destination.droppableId) {
-      return p;
-    }
-
-    const { year, term } = parsePeriodKey(p.id);
-
-    return {
-      ...p,
-      enrollments: (enrollmentsByPeriod.get(p.id) ?? []).map((e, index) => ({
-        ...e,
-        position: index + 1,
-        year,
-        term,
-      })),
-    };
-  });
-}
-
-function getMoveError(
-  periods: PeriodWithEnrollments[],
-  sourceIndex: number,
-  destinationIndex: number,
-  course: ExtendedCourse | undefined,
-) {
-  if (!course || course.isElective || sourceIndex === destinationIndex) {
-    return null;
-  }
-
-  const destinationPeriod = periods[destinationIndex];
-  if (!destinationPeriod) return null;
-
-  if (destinationPeriod.enrollments.some((e) => e.courseId === course.id)) {
-    return "Este periodo ya tiene este curso.";
-  }
-
-  const isMovingForward = sourceIndex < destinationIndex;
-  const relatedIds = isMovingForward
-    ? course.successorIds
-    : course.prerequisiteIds;
-
-  const hasRelatedCourse = (period: PeriodWithEnrollments) =>
-    period.enrollments.some((e) => relatedIds.includes(e.courseId));
-
-  if (hasRelatedCourse(destinationPeriod)) {
-    return isMovingForward
-      ? "Este periodo tiene un curso sucesor."
-      : "Este periodo tiene un curso prerequisito.";
-  }
-
-  const [start, end] = isMovingForward
-    ? [sourceIndex, destinationIndex]
-    : [destinationIndex, sourceIndex];
-
-  if (periods.slice(start, end).some(hasRelatedCourse)) {
-    return isMovingForward
-      ? "Hay un curso sucesor en el camino."
-      : "Hay un curso prerequisito en el camino.";
-  }
-
-  return null;
-}
-
-function setEnrollmentStatus(
-  periods: PeriodWithEnrollments[],
-  target: Enrollment,
-  status: EnrollmentStatus,
-  courses: Map<number, ExtendedCourse>,
-) {
-  const revertedCourseIds =
-    status === "APPROVED"
-      ? new Set<number>()
-      : getApprovedSuccessorIds(periods, target.courseId, courses);
-
-  return periods.map((p) => ({
-    ...p,
-    enrollments: p.enrollments.map((e) => {
-      if (e.id === target.id) return { ...e, status };
-      if (revertedCourseIds.has(e.courseId)) {
-        return { ...e, status: "PENDING" as const };
-      }
-      return e;
-    }),
-  }));
-}
-
-function getApprovedSuccessorIds(
-  periods: PeriodWithEnrollments[],
-  courseId: number,
-  courses: Map<number, ExtendedCourse>,
-) {
-  const approvedCourseIds = new Set(
-    periods
-      .flatMap((p) => p.enrollments)
-      .filter((e) => e.status === "APPROVED")
-      .map((e) => e.courseId),
-  );
-  const successorIds = new Set<number>();
-  const pendingIds = [courseId];
-
-  for (let id = pendingIds.pop(); id !== undefined; id = pendingIds.pop()) {
-    for (const successorId of courses.get(id)?.successorIds ?? []) {
-      if (
-        approvedCourseIds.has(successorId) &&
-        !successorIds.has(successorId)
-      ) {
-        successorIds.add(successorId);
-        pendingIds.push(successorId);
-      }
-    }
-  }
-
-  return successorIds;
 }
