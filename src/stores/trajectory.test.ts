@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { migrateTrajectoryState } from "@/stores/trajectory";
 
 describe("migrateTrajectoryState", () => {
-  test("keeps a version 2 trajectory under the new field names", () => {
+  test("renames the fields of a version 1 trajectory already in calendar years", () => {
     const state = migrateTrajectoryState(
       {
         curriculums: [
@@ -10,7 +10,7 @@ describe("migrateTrajectoryState", () => {
             id: "t1",
             path: "udp/derecho",
             year: 2024,
-            term: 3,
+            term: 1,
             enrolledCourses: [
               {
                 id: "e1",
@@ -25,7 +25,7 @@ describe("migrateTrajectoryState", () => {
         ],
         activeCurriculumId: "t1",
       },
-      2,
+      1,
     );
 
     expect(state).toEqual({
@@ -33,7 +33,7 @@ describe("migrateTrajectoryState", () => {
         {
           id: "t1",
           curriculumPath: "udp/derecho",
-          entry: { year: 2024, term: 3 },
+          entry: { year: 2024, term: 1 },
           enrollments: [
             {
               id: "e1",

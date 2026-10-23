@@ -21,7 +21,7 @@ type TrajectoryActions = {
   updateActiveEnrollments: (enrollments: Enrollment[]) => void;
 };
 
-type PersistedStateV2 = {
+type PersistedStateV1 = {
   curriculums: {
     id: string;
     path: string;
@@ -36,7 +36,7 @@ export function migrateTrajectoryState(
   persistedState: unknown,
   version: number,
 ): TrajectoryState {
-  const state = persistedState as PersistedStateV2;
+  const state = persistedState as PersistedStateV1;
 
   if (version < 2) {
     state.activeCurriculumId ??= state.curriculums[0]?.id ?? null;
@@ -104,7 +104,7 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
     }),
     {
       name: "curriculum-storage",
-      version: 3,
+      version: 2,
       migrate: migrateTrajectoryState,
     },
   ),
