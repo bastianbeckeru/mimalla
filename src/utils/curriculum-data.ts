@@ -17,7 +17,7 @@ export async function fetchCurriculum(
 export async function fetchProgramCurriculums(
   path: string,
 ): Promise<ProgramCurriculum[]> {
-  const response = await fetch(`/api/curriculums/${path}`);
+  const response = await fetch(`/api/curriculums/${path}/curriculums`);
 
   if (response.status === 404) return [];
   if (!response.ok) {
