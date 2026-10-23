@@ -20,7 +20,8 @@
     "validate": "bun scripts/validate-curriculums.ts",
     "import": "bun scripts/import-curriculum.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "bun scripts/seed.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
