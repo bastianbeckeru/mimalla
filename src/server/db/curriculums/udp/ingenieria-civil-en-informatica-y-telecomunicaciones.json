@@ -212,8 +212,8 @@
       "id": 8,
       "name": "Formación en Ingeniería Aplicada: Informática",
       "color": "#AFCEC3",
-      "courseIds": "47, 50, 51, 55, 58, 60, 62, 68, 71",
-      "subareaIds": ""
+      "courseIds": [47, 50, 51, 55, 58, 60, 62, 68, 71],
+      "subareaIds": []
     },
     {
       "id": 9,
