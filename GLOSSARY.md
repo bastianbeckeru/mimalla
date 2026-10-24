@@ -19,11 +19,22 @@ _Avoid_: Career, carrera, degree
 **Catalog**:
 Every program available in Mi Malla, grouped by institution and department.
 
-## Official curriculum
+## Curriculums
 
 **Curriculum**:
-One official version of the course layout of a program, with its slots, areas, courses and tracks. It applies to the students who enter the program from its year on, until a newer curriculum replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
-_Avoid_: Malla, structure, program data
+A course layout of a program, with its slots, areas, courses and tracks. Shown in the UI as "malla curricular".
+_Avoid_: Malla (alone), structure, program data
+
+**Official curriculum**:
+A curriculum the institution publishes and Mi Malla lists in its catalog. It applies to the students who enter the program from its year on, until a newer one replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
+
+**Effective year**:
+The first year of entry a curriculum applies to. Students who enter the program that year or later follow it, until a curriculum with a later effective year replaces it.
+_Avoid_: Year (alone), start year
+
+**Builder**:
+Where anyone lays out a curriculum from scratch and downloads it as a file. A curriculum made in the builder is not official. Shown in the UI as "constructor de mallas".
+_Avoid_: Editor, creator
 
 **Course**:
 A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
@@ -31,6 +42,12 @@ _Avoid_: Ramo, subject, asignatura
 
 **Curriculum course**:
 A course as it appears in one curriculum, with the rules that curriculum sets for it: its prerequisites, the minimum approved credits it requires, its duration and whether it is an elective.
+
+**Default credits**:
+The most common credits among the courses of a curriculum, such as 5 or 3 depending on the institution. The height of a course is shown relative to them.
+
+**Duration**:
+The number of consecutive terms a course spans in a curriculum, counting winter and summer terms.
 
 **Slot**:
 The place of a course in a curriculum: the program year, the term and the position within that term.
@@ -78,12 +95,16 @@ The period in which the student started the program; it anchors the trajectory t
 _Avoid_: Start, ingreso date
 
 **Period**:
-A calendar year and term in a trajectory, such as the first semester of 2026.
+A year and a term. In a trajectory the year is a calendar year, such as the first semester of 2026; in a curriculum it is a program year, such as the first semester of year 1.
 _Avoid_: Column, semester (when it may be a summer or winter term)
 
 **Term**:
-The part of the year a period covers: first semester, winter, second semester or summer.
+The part of a year a period or slot covers: a regular term of the term system, or an intensive winter or summer term.
 _Avoid_: Season
+
+**Term system**:
+How a curriculum splits each program year into regular terms: two semesters, or one annual term.
+_Avoid_: Régimen, calendar
 
 **Semester**:
 A first or second semester term. Winter and summer terms are not semesters and do not count toward the semester number.
