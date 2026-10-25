@@ -11,6 +11,7 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Action } from "@/builder/apply";
+import { getCourseColor } from "@/builder/colors";
 import type { Curriculum } from "@/builder/draft";
 import { getCourseHeight, getDefaultCredits } from "@/builder/grid";
 import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
@@ -195,6 +196,7 @@ export default function CurriculumGrid({
             key={card.dragId}
             dragId={card.dragId}
             course={card.course}
+            color={getCourseColor(curriculum, card.course)}
             isSelected={card.course.id === selectedCourseId}
             onSelect={() => onSelectCourse(card.course.id)}
             style={{

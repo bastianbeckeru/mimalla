@@ -1,3 +1,4 @@
+import { type AreaAction, areaHandlers } from "@/builder/actions/areas";
 import { type CourseAction, courseHandlers } from "@/builder/actions/courses";
 import {
   type CurriculumAction,
@@ -6,11 +7,12 @@ import {
 import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
 import type { Draft, Handlers } from "@/builder/draft";
 
-export type Action = CurriculumAction | CourseAction | SlotAction;
+export type Action = CurriculumAction | CourseAction | AreaAction | SlotAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
   ...courseHandlers,
+  ...areaHandlers,
   ...slotHandlers,
 };
 

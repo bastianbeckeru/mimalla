@@ -33,6 +33,14 @@ export function exportFile({ curriculum }: Draft) {
       return slotA && slotB ? compareSlots(slotA, slotB) : 0;
     });
 
+  const areaIds = [
+    ...new Set([
+      ...courses.flatMap((course) => course.areaId ?? []),
+      ...curriculum.areas.map((area) => area.id),
+    ]),
+  ];
+  const exportedAreaId = (areaId: number) => areaIds.indexOf(areaId) + 1;
+
   return JSON.stringify({
     schemaVersion: SCHEMA_VERSION,
     program: { name: curriculum.programName },
@@ -41,10 +49,18 @@ export function exportFile({ curriculum }: Draft) {
     periods: curriculum.periods
       .toSorted(comparePeriods)
       .map(({ programYear, term }) => ({ programYear, term })),
+    areas: curriculum.areas
+      .map((area) => ({
+        id: exportedAreaId(area.id),
+        name: area.name,
+        color: area.color,
+      }))
+      .toSorted((a, b) => a.id - b.id),
     courses: courses.map((course, index) => ({
       id: index + 1,
       name: course.name,
       credits: course.credits,
+      ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
       slots: course.slots.map(({ programYear, term, position }) => ({
         programYear,
         term,

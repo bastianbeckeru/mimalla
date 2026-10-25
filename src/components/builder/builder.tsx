@@ -2,6 +2,7 @@
 
 import { Loader2, Monitor } from "lucide-react";
 import { useState } from "react";
+import AreasManager from "@/components/builder/areas-manager";
 import CoursePanel from "@/components/builder/course-panel";
 import CurriculumGrid from "@/components/builder/curriculum-grid";
 import DetailsForm from "@/components/builder/details-form";
@@ -45,6 +46,7 @@ function BuilderWorkspace() {
             Constructor de mallas
           </h1>
           <DetailsForm curriculum={draft.curriculum} dispatch={dispatch} />
+          <AreasManager draft={draft} dispatch={dispatch} />
           <DownloadButton draft={draft} />
         </header>
         <div className="flex-1 overflow-auto p-4">
@@ -60,6 +62,7 @@ function BuilderWorkspace() {
         <CoursePanel
           key={selectedCourse.id}
           course={selectedCourse}
+          areas={draft.curriculum.areas}
           dispatch={dispatch}
           onClose={() => setSelectedCourseId(null)}
         />
