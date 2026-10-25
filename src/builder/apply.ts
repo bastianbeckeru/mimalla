@@ -5,19 +5,22 @@ import {
   curriculumHandlers,
 } from "@/builder/actions/curriculum";
 import { type PeriodAction, periodHandlers } from "@/builder/actions/periods";
+import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
 import type { Draft, Handlers } from "@/builder/draft";
 
 export type Action =
   | CurriculumAction
   | CourseAction
   | AreaAction
-  | PeriodAction;
+  | PeriodAction
+  | SlotAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
   ...courseHandlers,
   ...areaHandlers,
   ...periodHandlers,
+  ...slotHandlers,
 };
 
 export function apply(draft: Draft, action: Action): Draft {

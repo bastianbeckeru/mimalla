@@ -41,3 +41,74 @@ export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
   while (occupied.has(position)) position++;
   return position;
 }
+
+type SlotRef = { courseId: number; slotIndex: number };
+
+export function pushDownCollisions(
+  curriculum: Curriculum,
+  anchor: SlotRef,
+): Curriculum {
+  const defaultCredits = getDefaultCredits(curriculum);
+  const anchorCourse = curriculum.courses.find(
+    (course) => course.id === anchor.courseId,
+  );
+  const anchorSlot = anchorCourse?.slots[anchor.slotIndex];
+  if (!anchorCourse || !anchorSlot) return curriculum;
+
+  const isAnchor = (courseId: number, slotIndex: number) =>
+    courseId === anchor.courseId && slotIndex === anchor.slotIndex;
+
+  const others = curriculum.courses
+    .flatMap((course) =>
+      course.slots.map((slot, slotIndex) => ({
+        courseId: course.id,
+        slotIndex,
+        slot,
+        height: getCourseHeight(course.credits, defaultCredits),
+      })),
+    )
+    .filter(
+      ({ courseId, slotIndex, slot }) =>
+        !isAnchor(courseId, slotIndex) && isSamePeriod(slot, anchorSlot),
+    )
+    .sort((a, b) => a.slot.position - b.slot.position);
+
+  const placed = [
+    {
+      start: anchorSlot.position,
+      end:
+        anchorSlot.position +
+        getCourseHeight(anchorCourse.credits, defaultCredits),
+    },
+  ];
+  const newPositions = new Map<string, number>();
+
+  for (const { courseId, slotIndex, slot, height } of others) {
+    let position = slot.position;
+    let blocker = placed.find(
+      ({ start, end }) => position < end && start < position + height,
+    );
+    while (blocker) {
+      position = blocker.end;
+      blocker = placed.find(
+        ({ start, end }) => position < end && start < position + height,
+      );
+    }
+    placed.push({ start: position, end: position + height });
+    if (position !== slot.position)
+      newPositions.set(`${courseId}/${slotIndex}`, position);
+  }
+
+  if (newPositions.size === 0) return curriculum;
+
+  return {
+    ...curriculum,
+    courses: curriculum.courses.map((course) => ({
+      ...course,
+      slots: course.slots.map((slot, slotIndex) => {
+        const position = newPositions.get(`${course.id}/${slotIndex}`);
+        return position === undefined ? slot : { ...slot, position };
+      }),
+    })),
+  };
+}

@@ -37,6 +37,18 @@ describe("adding a course", () => {
       slots: [{ ...FIRST_SEMESTER, position: 2 }],
     });
   });
+
+  test("places it at the empty cell it is created on, leaving a gap above", () => {
+    const draft = draftAfter({
+      type: "addCourse",
+      period: FIRST_SEMESTER,
+      position: 4,
+    });
+
+    expect(slotsOf(draft)).toEqual([
+      { id: 1, credits: 5, slots: [{ ...FIRST_SEMESTER, position: 4 }] },
+    ]);
+  });
 });
 
 describe("editing a course", () => {

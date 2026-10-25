@@ -2,7 +2,7 @@ import type { Course, Draft, Handlers, Period } from "@/builder/draft";
 import { getDefaultCredits, getFirstFreePosition } from "@/builder/grid";
 
 export type CourseAction =
-  | { type: "addCourse"; period: Period }
+  | { type: "addCourse"; period: Period; position?: number }
   | {
       type: "editCourse";
       courseId: number;
@@ -22,7 +22,7 @@ function isValidCredits(credits: number) {
 }
 
 export const courseHandlers: Handlers<CourseAction> = {
-  addCourse: (draft, { period }) => {
+  addCourse: (draft, { period, position }) => {
     const { curriculum } = draft;
     const course = {
       id: nextCourseId(draft),
@@ -31,7 +31,10 @@ export const courseHandlers: Handlers<CourseAction> = {
       areaId: null,
       duration: 1,
       slots: [
-        { ...period, position: getFirstFreePosition(curriculum, period) },
+        {
+          ...period,
+          position: position ?? getFirstFreePosition(curriculum, period),
+        },
       ],
     };
 
