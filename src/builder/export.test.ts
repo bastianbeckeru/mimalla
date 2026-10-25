@@ -90,6 +90,22 @@ describe("exporting a curriculum", () => {
     );
   });
 
+  test("writes the term system and the periods in chronological order", () => {
+    const draft = draftAfter(
+      { type: "createCurriculum", termSystem: "annual" },
+      details,
+      { type: "removeLastProgramYear" },
+      { type: "removeLastProgramYear" },
+      { type: "removeLastProgramYear" },
+      { type: "addIntensiveTerm", programYear: 2, term: 4 },
+      { type: "addIntensiveTerm", programYear: 1, term: 4 },
+    );
+
+    expect(exportFile(draft)).toContain(
+      '"termSystem":"annual","periods":[{"programYear":1,"term":1},{"programYear":1,"term":4},{"programYear":2,"term":1},{"programYear":2,"term":4}]',
+    );
+  });
+
   test("names the file after the program", () => {
     const draft = draftAfter({
       type: "editDetails",
