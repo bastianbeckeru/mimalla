@@ -1,0 +1,50 @@
+"use client";
+
+import type { TermSystem } from "@/builder/draft";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const TERM_SYSTEMS: { value: TermSystem; label: string }[] = [
+  { value: "semester", label: "Semestral" },
+  { value: "annual", label: "Anual" },
+];
+
+export default function TermSystemSelect({
+  id,
+  value,
+  onChange,
+  disabled,
+}: {
+  id: string;
+  value: TermSystem;
+  onChange: (termSystem: TermSystem) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Select
+      items={TERM_SYSTEMS}
+      value={value}
+      onValueChange={(termSystem) => termSystem && onChange(termSystem)}
+      disabled={disabled}
+    >
+      <SelectTrigger id={id} className="w-32">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {TERM_SYSTEMS.map((termSystem) => (
+            <SelectItem key={termSystem.value} value={termSystem.value}>
+              {termSystem.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}

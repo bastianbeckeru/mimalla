@@ -7,6 +7,10 @@ import CoursePanel from "@/components/builder/course-panel";
 import CurriculumGrid from "@/components/builder/curriculum-grid";
 import DetailsForm from "@/components/builder/details-form";
 import DownloadButton from "@/components/builder/download-button";
+import NewCurriculumDialog from "@/components/builder/new-curriculum-dialog";
+import ProgramYearControls from "@/components/builder/program-year-controls";
+import TermSystemSelect from "@/components/builder/term-system-select";
+import { Label } from "@/components/ui/label";
 import { useBuilderHasHydrated, useBuilderStore } from "@/stores/builder";
 
 export default function Builder() {
@@ -47,14 +51,30 @@ function BuilderWorkspace() {
           </h1>
           <DetailsForm curriculum={draft.curriculum} dispatch={dispatch} />
           <AreasManager draft={draft} dispatch={dispatch} />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="builder-term-system">Régimen</Label>
+            <TermSystemSelect
+              id="builder-term-system"
+              value={draft.curriculum.termSystem}
+              disabled={draft.curriculum.courses.length > 0}
+              onChange={(termSystem) =>
+                dispatch({ type: "setTermSystem", termSystem })
+              }
+            />
+          </div>
+          <NewCurriculumDialog dispatch={dispatch} />
           <DownloadButton draft={draft} />
         </header>
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex flex-1 items-start gap-4 overflow-auto p-4">
           <CurriculumGrid
             curriculum={draft.curriculum}
             dispatch={dispatch}
             selectedCourseId={selectedCourse?.id ?? null}
             onSelectCourse={setSelectedCourseId}
+          />
+          <ProgramYearControls
+            curriculum={draft.curriculum}
+            dispatch={dispatch}
           />
         </div>
       </div>

@@ -29,6 +29,7 @@ export const courseHandlers: Handlers<CourseAction> = {
       name: NEW_COURSE_NAME,
       credits: getDefaultCredits(curriculum),
       areaId: null,
+      duration: 1,
       slots: [
         { ...period, position: getFirstFreePosition(curriculum, period) },
       ],

@@ -4,14 +4,20 @@ import {
   type CurriculumAction,
   curriculumHandlers,
 } from "@/builder/actions/curriculum";
+import { type PeriodAction, periodHandlers } from "@/builder/actions/periods";
 import type { Draft, Handlers } from "@/builder/draft";
 
-export type Action = CurriculumAction | CourseAction | AreaAction;
+export type Action =
+  | CurriculumAction
+  | CourseAction
+  | AreaAction
+  | PeriodAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
   ...courseHandlers,
   ...areaHandlers,
+  ...periodHandlers,
 };
 
 export function apply(draft: Draft, action: Action): Draft {

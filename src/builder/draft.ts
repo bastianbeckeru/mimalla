@@ -17,6 +17,7 @@ export type Course = {
   name: string;
   credits: number;
   areaId: number | null;
+  duration: number;
   slots: Slot[];
 };
 
