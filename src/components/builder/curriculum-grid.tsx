@@ -6,6 +6,7 @@ import type { Curriculum } from "@/builder/draft";
 import { getCourseHeight, getDefaultCredits } from "@/builder/grid";
 import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
 import CourseCard from "@/components/builder/course-card";
+import PeriodHeader from "@/components/builder/period-header";
 import { Button } from "@/components/ui/button";
 import {
   GRID_CELL_HEIGHT,
@@ -57,13 +58,13 @@ export default function CurriculumGrid({
       }}
     >
       {curriculum.periods.map((period, index) => (
-        <h2
+        <PeriodHeader
           key={`${period.programYear}-${period.term}`}
-          className="text-balance text-center font-medium text-muted-foreground text-xs"
+          curriculum={curriculum}
+          period={period}
+          dispatch={dispatch}
           style={{ gridColumn: index + 1, gridRow: 1 }}
-        >
-          {getPeriodLabel(curriculum.termSystem, period)}
-        </h2>
+        />
       ))}
       {cards.map((card) => (
         <CourseCard

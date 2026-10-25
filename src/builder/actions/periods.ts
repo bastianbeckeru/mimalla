@@ -6,10 +6,11 @@ import {
   type TermSystem,
 } from "@/builder/draft";
 import {
+  canRemoveLastProgramYear,
   canRemovePeriod,
   comparePeriods,
   getAvailableIntensiveTerms,
-  isPeriodOccupied,
+  getLastProgramYear,
   isSamePeriod,
   REGULAR_TERMS,
 } from "@/builder/periods";
@@ -24,10 +25,6 @@ export type PeriodAction =
 
 function withPeriods(draft: Draft, periods: Period[]): Draft {
   return { ...draft, curriculum: { ...draft.curriculum, periods } };
-}
-
-function getLastProgramYear(periods: Period[]) {
-  return Math.max(0, ...periods.map((period) => period.programYear));
 }
 
 export const periodHandlers: Handlers<PeriodAction> = {
@@ -51,6 +48,7 @@ export const periodHandlers: Handlers<PeriodAction> = {
       },
     };
   },
+
   addProgramYear: (draft) => {
     const { periods, termSystem } = draft.curriculum;
     const programYear = getLastProgramYear(periods) + 1;
@@ -62,15 +60,14 @@ export const periodHandlers: Handlers<PeriodAction> = {
 
   removeLastProgramYear: (draft) => {
     const { curriculum } = draft;
+    if (!canRemoveLastProgramYear(curriculum)) return draft;
     const lastProgramYear = getLastProgramYear(curriculum.periods);
-    const isInLastYear = (period: Period) =>
-      period.programYear === lastProgramYear;
-    const kept = curriculum.periods.filter((period) => !isInLastYear(period));
-    const isLastYearOccupied = curriculum.periods
-      .filter(isInLastYear)
-      .some((period) => isPeriodOccupied(curriculum, period));
-    if (kept.length === 0 || isLastYearOccupied) return draft;
-    return withPeriods(draft, kept);
+    return withPeriods(
+      draft,
+      curriculum.periods.filter(
+        (period) => period.programYear !== lastProgramYear,
+      ),
+    );
   },
 
   addIntensiveTerm: (draft, { programYear, term }) => {

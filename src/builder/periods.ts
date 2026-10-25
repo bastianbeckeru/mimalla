@@ -15,7 +15,22 @@ function findPeriodIndex(periods: Period[], period: Period) {
   return periods.findIndex((candidate) => isSamePeriod(candidate, period));
 }
 
-export function isPeriodOccupied(curriculum: Curriculum, period: Period) {
+export function getLastProgramYear(periods: Period[]) {
+  return Math.max(0, ...periods.map((period) => period.programYear));
+}
+
+export function canRemoveLastProgramYear(curriculum: Curriculum) {
+  const lastProgramYear = getLastProgramYear(curriculum.periods);
+  const lastYearPeriods = curriculum.periods.filter(
+    (period) => period.programYear === lastProgramYear,
+  );
+  return (
+    lastYearPeriods.length < curriculum.periods.length &&
+    !lastYearPeriods.some((period) => isPeriodOccupied(curriculum, period))
+  );
+}
+
+function isPeriodOccupied(curriculum: Curriculum, period: Period) {
   const index = findPeriodIndex(curriculum.periods, period);
   return curriculum.courses.some((course) =>
     course.slots.some((slot) => {
