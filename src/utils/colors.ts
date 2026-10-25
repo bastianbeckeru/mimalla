@@ -84,7 +84,7 @@ export function checkContrasts({
 }
 
 // Convertir HEX a HSL
-function hexToHSL(hex: HexColor) {
+export function hexToHSL(hex: HexColor) {
   let r = 0,
     g = 0,
     b = 0;
@@ -130,7 +130,7 @@ function hexToHSL(hex: HexColor) {
 }
 
 // Convertir HSL a HEX
-function hslToHex(h: number, s: number, l: number): HexColor {
+export function hslToHex(h: number, s: number, l: number): HexColor {
   s /= 100;
   l /= 100;
 

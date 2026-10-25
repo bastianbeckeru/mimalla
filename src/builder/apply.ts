@@ -1,3 +1,4 @@
+import { type AreaAction, areaHandlers } from "@/builder/actions/areas";
 import { type CourseAction, courseHandlers } from "@/builder/actions/courses";
 import {
   type CurriculumAction,
@@ -5,11 +6,12 @@ import {
 } from "@/builder/actions/curriculum";
 import type { Draft, Handlers } from "@/builder/draft";
 
-export type Action = CurriculumAction | CourseAction;
+export type Action = CurriculumAction | CourseAction | AreaAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
   ...courseHandlers,
+  ...areaHandlers,
 };
 
 export function apply(draft: Draft, action: Action): Draft {
