@@ -3,13 +3,15 @@ import {
   type CurriculumAction,
   curriculumHandlers,
 } from "@/builder/actions/curriculum";
+import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
 import type { Draft, Handlers } from "@/builder/draft";
 
-export type Action = CurriculumAction | CourseAction;
+export type Action = CurriculumAction | CourseAction | SlotAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
   ...courseHandlers,
+  ...slotHandlers,
 };
 
 export function apply(draft: Draft, action: Action): Draft {
