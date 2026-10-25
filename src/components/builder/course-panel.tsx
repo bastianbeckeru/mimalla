@@ -3,7 +3,8 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import type { Action } from "@/builder/apply";
-import type { Course } from "@/builder/draft";
+import type { Area, Course } from "@/builder/draft";
+import AreaSelect from "@/components/builder/area-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,10 +13,12 @@ const CREDITS_PATTERN = /^\d+$/;
 
 export default function CoursePanel({
   course,
+  areas,
   dispatch,
   onClose,
 }: {
   course: Course;
+  areas: Area[];
   dispatch: (action: Action) => void;
   onClose: () => void;
 }) {
@@ -78,6 +81,7 @@ export default function CoursePanel({
           </p>
         )}
       </div>
+      <AreaSelect course={course} areas={areas} dispatch={dispatch} />
     </aside>
   );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { type Action, apply } from "@/builder/apply";
-import { createDraft } from "@/builder/draft";
+import { type Area, createDraft } from "@/builder/draft";
 import { exportFile, getFileName } from "@/builder/export";
 
 function draftAfter(...actions: Action[]) {
@@ -22,8 +22,40 @@ const PERIODS =
 describe("exporting a curriculum", () => {
   test("writes minified JSON with schema version 1 and only the fields set", () => {
     expect(exportFile(draftAfter(details))).toBe(
-      `{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"courses":[]}`,
+      `{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"areas":[],"courses":[]}`,
     );
+  });
+
+  test("writes areas by first appearance with renumbered ids, and each course's areaId", () => {
+    const draft = draftAfter(
+      details,
+      { type: "addArea", name: "Sin cursos" },
+      { type: "addArea", name: "Público" },
+      { type: "addArea", name: "Privado" },
+      { type: "setAreaColor", areaId: 3, color: "#ff8800" },
+      { type: "setBaseColor", color: "#16a34a" },
+      { type: "addCourse", period: { programYear: 2, term: 1 } },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "assignArea", courseId: 1, areaId: 2 },
+      { type: "assignArea", courseId: 2, areaId: 3 },
+    );
+    const [unused, publico] = draft.curriculum.areas as [Area, Area];
+    const file = exportFile(draft);
+
+    expect(JSON.parse(file).areas).toEqual([
+      { id: 1, name: "Privado", color: "#ff8800" },
+      { id: 2, name: "Público", color: publico.color },
+      { id: 3, name: "Sin cursos", color: unused.color },
+    ]);
+    expect(file).toContain(
+      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"areaId":1,"slots":[{"programYear":1,"term":1,"position":1}]},' +
+        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]},' +
+        '{"id":3,"name":"Nuevo curso","credits":5,"areaId":2,"slots":[{"programYear":2,"term":1,"position":1}]}]',
+    );
+    expect(file).not.toContain("16a34a");
+    expect(file).not.toContain("baseColor");
+    expect(file).not.toContain("handColored");
   });
 
   test("sorts courses by their first slot and renumbers their ids from 1", () => {

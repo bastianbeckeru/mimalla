@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import type { Action } from "@/builder/apply";
+import { getCourseColor } from "@/builder/colors";
 import type { Curriculum } from "@/builder/draft";
 import { getCourseHeight, getDefaultCredits } from "@/builder/grid";
 import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
@@ -69,6 +70,7 @@ export default function CurriculumGrid({
         <CourseCard
           key={card.key}
           course={card.course}
+          color={getCourseColor(curriculum, card.course)}
           isSelected={card.course.id === selectedCourseId}
           onSelect={() => onSelectCourse(card.course.id)}
           style={{
