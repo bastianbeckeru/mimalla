@@ -7,16 +7,16 @@ const MAX_EFFECTIVE_YEAR = 2100;
 
 type RequiredDetail = keyof Pick<Curriculum, "programName" | "effectiveYear">;
 
-function isValidEffectiveYear(year: number | null): year is number {
+export function isValidEffectiveYear(year: unknown): year is number {
   return (
-    year !== null &&
+    typeof year === "number" &&
     Number.isInteger(year) &&
     year >= MIN_EFFECTIVE_YEAR &&
     year <= MAX_EFFECTIVE_YEAR
   );
 }
 
-const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 1;
 
 export function exportFile({ curriculum }: Draft) {
   const courses = curriculum.courses
