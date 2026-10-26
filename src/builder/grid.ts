@@ -28,7 +28,10 @@ export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
   const periodIndex = findPeriodIndex(curriculum.periods, period);
   const occupied = new Set<number>();
 
-  for (const { box } of getSlotBoxes(curriculum)) {
+  for (const { box } of getSlotBoxes(
+    curriculum,
+    getDefaultCredits(curriculum),
+  )) {
     if (box.left > periodIndex || periodIndex >= box.right) continue;
     for (let row = box.top; row < box.bottom; row++) occupied.add(row);
   }
@@ -79,8 +82,7 @@ function overlaps(a: Box, b: Box) {
   );
 }
 
-function getSlotBoxes(curriculum: Curriculum) {
-  const defaultCredits = getDefaultCredits(curriculum);
+function getSlotBoxes(curriculum: Curriculum, defaultCredits: number) {
   return curriculum.courses.flatMap((course) =>
     course.slots.map((slot, slotIndex) => {
       const left = findPeriodIndex(curriculum.periods, slot);
@@ -102,6 +104,7 @@ function getSlotBoxes(curriculum: Curriculum) {
 export function pushDownCollisions(
   curriculum: Curriculum,
   anchors: SlotRef[] = [],
+  defaultCredits = getDefaultCredits(curriculum),
 ): Curriculum {
   const anchorIndex = ({ courseId, slotIndex }: SlotRef) =>
     anchors.findIndex(
@@ -113,7 +116,7 @@ export function pushDownCollisions(
     return index === -1 ? anchors.length : index;
   };
 
-  const slots = getSlotBoxes(curriculum).toSorted(
+  const slots = getSlotBoxes(curriculum, defaultCredits).toSorted(
     (a, b) =>
       rank(a) - rank(b) || a.box.top - b.box.top || a.box.left - b.box.left,
   );
@@ -147,4 +150,27 @@ export function pushDownCollisions(
       }),
     })),
   };
+}
+
+export function changeCourse(
+  curriculum: Curriculum,
+  courseId: number,
+  change: (course: Course) => Course,
+  anchorSlotIndexes: number[],
+): Curriculum {
+  const withChange = (target: Curriculum) => ({
+    ...target,
+    courses: target.courses.map((course) =>
+      course.id === courseId ? change(course) : course,
+    ),
+  });
+  const rescaled = pushDownCollisions(
+    curriculum,
+    [],
+    getDefaultCredits(withChange(curriculum)),
+  );
+  return pushDownCollisions(
+    withChange(rescaled),
+    anchorSlotIndexes.map((slotIndex) => ({ courseId, slotIndex })),
+  );
 }

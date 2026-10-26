@@ -1,8 +1,8 @@
 import { findCourse } from "@/builder/draft";
 import {
+  changeCourse,
   getDefaultCredits,
   getFirstFreePosition,
-  pushDownCollisions,
   slotsFitInPeriods,
 } from "@/builder/grid";
 import { compareSlots } from "@/builder/periods";
@@ -71,17 +71,13 @@ export const courseHandlers: Handlers<CourseAction> = {
     )
       return draft;
 
-    const edited = {
-      ...curriculum,
-      courses: curriculum.courses.map((candidate) =>
-        candidate === course ? applyChanges(course, changes) : candidate,
-      ),
-    };
     return {
       ...draft,
-      curriculum: pushDownCollisions(
-        edited,
-        course.slots.map((_, slotIndex) => ({ courseId, slotIndex })),
+      curriculum: changeCourse(
+        curriculum,
+        courseId,
+        (course) => applyChanges(course, changes),
+        course.slots.map((_, slotIndex) => slotIndex),
       ),
     };
   },

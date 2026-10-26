@@ -1,8 +1,8 @@
 import { findCourse } from "@/builder/draft";
 import {
+  changeCourse,
   getCourseHeight,
   getDefaultCredits,
-  pushDownCollisions,
   slotsFitInPeriods,
 } from "@/builder/grid";
 import type { Handlers, ResizeAction } from "@/types/builder";
@@ -26,16 +26,14 @@ export const resizeHandlers: Handlers<ResizeAction> = {
 
     const credits = isSameHeight ? course.credits : rows * defaultCredits;
 
-    const resized = {
-      ...curriculum,
-      courses: curriculum.courses.map((candidate) =>
-        candidate === course ? { ...course, credits, duration } : candidate,
-      ),
-    };
-
     return {
       ...draft,
-      curriculum: pushDownCollisions(resized, [{ courseId, slotIndex }]),
+      curriculum: changeCourse(
+        curriculum,
+        courseId,
+        (course) => ({ ...course, credits, duration }),
+        [slotIndex],
+      ),
     };
   },
 };
