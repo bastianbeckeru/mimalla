@@ -295,6 +295,14 @@ describe("rejecting an invalid file", () => {
     ).toEqual(rejection("El curso 2 debe tener un nombre."));
   });
 
+  test("rejects a course with a blank name", () => {
+    expect(
+      importChanged((file) => {
+        file.courses[1].name = "  ";
+      }),
+    ).toEqual(rejection("El curso 2 debe tener un nombre."));
+  });
+
   test("rejects a course code that is not text", () => {
     expect(
       importChanged((file) => {

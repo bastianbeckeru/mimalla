@@ -196,7 +196,8 @@ function readCourse(
 ): Course {
   const id = value.id as number;
   const { name } = value;
-  if (typeof name !== "string") reject(`El curso ${id} debe tener un nombre.`);
+  if (typeof name !== "string" || name.trim() === "")
+    reject(`El curso ${id} debe tener un nombre.`);
   const code = readOptionalText(
     value.code,
     `El código del curso "${name}" debe ser texto.`,

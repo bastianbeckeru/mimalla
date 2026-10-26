@@ -8,7 +8,14 @@ import type { Draft } from "@/types/builder";
 const DETAIL_LABELS = {
   programName: "el nombre del programa",
   effectiveYear: "el año de vigencia (entre 1900 y 2100)",
+  courseNames: "el nombre de algún curso",
 };
+
+function joinWithAnd(items: string[]) {
+  return items.length <= 1
+    ? items.join("")
+    : `${items.slice(0, -1).join(", ")} y ${items.at(-1)}`;
+}
 
 function downloadText(text: string, fileName: string) {
   const url = URL.createObjectURL(
@@ -36,7 +43,7 @@ export default function DownloadButton({ draft }: { draft: Draft }) {
       {missingDetails.length > 0 && (
         <p className="text-muted-foreground text-xs">
           Falta{" "}
-          {missingDetails.map((detail) => DETAIL_LABELS[detail]).join(" y ")}
+          {joinWithAnd(missingDetails.map((detail) => DETAIL_LABELS[detail]))}
         </p>
       )}
     </div>

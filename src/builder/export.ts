@@ -5,7 +5,9 @@ import { slugify } from "@/utils/strings";
 const MIN_EFFECTIVE_YEAR = 1900;
 const MAX_EFFECTIVE_YEAR = 2100;
 
-type RequiredDetail = keyof Pick<Curriculum, "programName" | "effectiveYear">;
+type RequiredDetail =
+  | keyof Pick<Curriculum, "programName" | "effectiveYear">
+  | "courseNames";
 
 export function isValidEffectiveYear(year: unknown): year is number {
   return (
@@ -96,5 +98,7 @@ export function getMissingDetails({ curriculum }: Draft): RequiredDetail[] {
   if (curriculum.programName.trim() === "") missing.push("programName");
   if (!isValidEffectiveYear(curriculum.effectiveYear))
     missing.push("effectiveYear");
+  if (curriculum.courses.some((course) => course.name.trim() === ""))
+    missing.push("courseNames");
   return missing;
 }
