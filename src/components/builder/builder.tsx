@@ -3,6 +3,7 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor } from "lucide-react";
 import { useState } from "react";
+import { getMaxDuration } from "@/builder/grid";
 import AreasManager from "@/components/builder/areas-manager";
 import CoursePanel from "@/components/builder/course-panel";
 import CurriculumGrid from "@/components/builder/curriculum-grid";
@@ -89,6 +90,7 @@ function BuilderWorkspace() {
           key={selectedCourse.id}
           course={selectedCourse}
           areas={draft.curriculum.areas}
+          maxDuration={getMaxDuration(draft.curriculum, selectedCourse)}
           dispatch={dispatch}
           onClose={() => setSelectedCourseId(null)}
         />

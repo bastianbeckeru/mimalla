@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { type Action, apply } from "@/builder/apply";
-import { createDraft, type Draft } from "@/builder/draft";
+import { type Course, createDraft, type Draft } from "@/builder/draft";
 import { exportFile } from "@/builder/export";
+import { getMaxDuration } from "@/builder/grid";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };
@@ -184,6 +185,19 @@ describe("moving a course that spans several columns", () => {
     expect(positionsOf(draft)[1]).toEqual([
       { ...SECOND_SEMESTER, position: 2 },
     ]);
+  });
+});
+
+describe("maximum duration", () => {
+  test("reaches up to the last column", () => {
+    const { curriculum } = draftAfter(
+      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", period: { programYear: 5, term: 1 } },
+    );
+    const [first, second] = curriculum.courses as [Course, Course];
+
+    expect(getMaxDuration(curriculum, first)).toBe(10);
+    expect(getMaxDuration(curriculum, second)).toBe(2);
   });
 });
 

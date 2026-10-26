@@ -1,4 +1,4 @@
-import type { Curriculum, Period } from "@/builder/draft";
+import type { Course, Curriculum, Period } from "@/builder/draft";
 import { isSamePeriod } from "@/builder/periods";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
@@ -53,6 +53,16 @@ export function fitsInColumns(
     Number.isInteger(duration) &&
     duration >= 1 &&
     start + duration <= curriculum.periods.length
+  );
+}
+
+export function getMaxDuration(curriculum: Curriculum, course: Course) {
+  return Math.min(
+    ...course.slots.map(
+      (slot) =>
+        curriculum.periods.length -
+        curriculum.periods.findIndex((period) => isSamePeriod(period, slot)),
+    ),
   );
 }
 
