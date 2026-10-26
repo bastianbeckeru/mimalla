@@ -42,9 +42,14 @@ function isInteger(value: unknown): value is number {
   return Number.isInteger(value);
 }
 
-function readOptionalText(value: unknown, reason: string) {
+function readOptionalText(
+  value: unknown,
+  notTextReason: string,
+  emptyReason: string,
+) {
   if (value === undefined) return "";
-  if (typeof value !== "string") reject(reason);
+  if (typeof value !== "string") reject(notTextReason);
+  if (value === "") reject(emptyReason);
   return value;
 }
 
@@ -195,6 +200,7 @@ function readCourse(
   const code = readOptionalText(
     value.code,
     `El código del curso "${name}" debe ser texto.`,
+    `El código del curso "${name}" no puede estar vacío (se omite cuando no tiene).`,
   );
   if (!isInteger(value.credits) || value.credits < 0)
     reject(
@@ -313,12 +319,14 @@ function readCurriculum(file: unknown): Curriculum {
   const institution = readOptionalText(
     (file.program as FileObject).institution,
     "La institución debe ser texto.",
+    "La institución no puede estar vacía (se omite cuando no hay).",
   );
   if (!isValidEffectiveYear(file.effectiveYear))
     reject("El año de vigencia debe ser un número entero entre 1900 y 2100.");
   const versionName = readOptionalText(
     file.versionName,
     "La versión debe ser texto.",
+    "La versión no puede estar vacía (se omite cuando no hay).",
   );
   const termSystem = readTermSystem(file.termSystem);
   const periods = readPeriods(file.periods, termSystem);

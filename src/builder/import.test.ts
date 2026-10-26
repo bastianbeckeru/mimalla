@@ -127,6 +127,18 @@ describe("rejecting an invalid file", () => {
     ).toEqual(rejection("La institución debe ser texto."));
   });
 
+  test("rejects an empty institution written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.program.institution = "";
+      }),
+    ).toEqual(
+      rejection(
+        "La institución no puede estar vacía (se omite cuando no hay).",
+      ),
+    );
+  });
+
   test("rejects an effective year outside 1900–2100", () => {
     expect(
       importChanged((file) => {
@@ -157,6 +169,16 @@ describe("rejecting an invalid file", () => {
         file.versionName = 6;
       }),
     ).toEqual(rejection("La versión debe ser texto."));
+  });
+
+  test("rejects an empty version name written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.versionName = "";
+      }),
+    ).toEqual(
+      rejection("La versión no puede estar vacía (se omite cuando no hay)."),
+    );
   });
 
   test("rejects an unknown term system", () => {
@@ -281,6 +303,18 @@ describe("rejecting an invalid file", () => {
     ).toEqual(
       rejection(
         'El código del curso "Introducción al Derecho" debe ser texto.',
+      ),
+    );
+  });
+
+  test("rejects an empty course code written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.courses[0].code = "";
+      }),
+    ).toEqual(
+      rejection(
+        'El código del curso "Introducción al Derecho" no puede estar vacío (se omite cuando no tiene).',
       ),
     );
   });
