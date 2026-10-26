@@ -87,10 +87,46 @@ describe("historyReducer", () => {
     expect(recommitted).toBe(history);
     expect(recommitted.future).toHaveLength(1);
   });
+
+  test("consecutive commits of the same group are undone as one step", () => {
+    const history = run(
+      createHistory("a"),
+      commit("ab", "name"),
+      commit("abc", "name"),
+      { type: "undo" },
+    );
+
+    expect(history.present).toBe("a");
+    expect(run(history, { type: "redo" }).present).toBe("abc");
+  });
+
+  test("a commit of the same group after an undo starts a new step", () => {
+    const history = run(
+      createHistory("a"),
+      commit("b", "name"),
+      commit("bc", "name"),
+      { type: "undo" },
+      commit("ad", "name"),
+    );
+
+    expect(history.future).toEqual([]);
+    expect(run(history, { type: "undo" }).present).toBe("a");
+  });
+
+  test("a group that returns to the state before it leaves no undo step", () => {
+    const history = run(
+      createHistory("a"),
+      commit("ab", "name"),
+      commit("a", "name"),
+    );
+
+    expect(history.present).toBe("a");
+    expect(history.past).toEqual([]);
+  });
 });
 
-function commit<T>(present: T) {
-  return { type: "commit", present } as const;
+function commit<T>(present: T, group?: string) {
+  return { type: "commit", present, group } as const;
 }
 
 type History<T> = ReturnType<typeof createHistory<T>>;
