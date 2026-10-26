@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import type { Action } from "@/builder/apply";
 import type { Area, Course, TermSystem } from "@/builder/draft";
 import AreaSelect from "@/components/builder/area-select";
@@ -20,6 +20,7 @@ export default function CoursePanel({
   termSystem,
   dispatch,
   onClose,
+  children,
 }: {
   course: Course;
   areas: Area[];
@@ -27,6 +28,7 @@ export default function CoursePanel({
   termSystem: TermSystem;
   dispatch: (action: Action, options?: { group?: string }) => void;
   onClose: () => void;
+  children: ReactNode;
 }) {
   const [creditsText, setCreditsText] = useState(String(course.credits));
   const [prevCredits, setPrevCredits] = useState(course.credits);
@@ -37,7 +39,7 @@ export default function CoursePanel({
   const hasValidCredits = CREDITS_PATTERN.test(creditsText);
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col gap-4 border-l p-4">
+    <aside className="flex w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold">Detalles del curso</h2>
         <Button
@@ -127,6 +129,7 @@ export default function CoursePanel({
         termSystem={termSystem}
         dispatch={dispatch}
       />
+      {children}
       <Button
         variant="destructive"
         className="mt-auto"

@@ -22,17 +22,20 @@ import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
 import CourseCard from "@/components/builder/course-card";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
+import PathsOverlay from "@/components/curriculum/paths-overlay";
 import { Button } from "@/components/ui/button";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
 } from "@/utils/curriculum-grid";
+import { createConnectionPaths } from "@/utils/pathfinding";
 
 const MIN_ROWS = 6;
 const HEADER_ROWS = 1;
 const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
+const PREREQUISITE_LINE_COLOR = "#34d399";
 
 const sensors = [
   PointerSensor.configure({
@@ -64,6 +67,7 @@ export default function CurriculumGrid({
   const firstCellRef = useRef<HTMLDivElement>(null);
   const [landing, setLanding] = useState<Landing | null>(null);
   const [resize, setResize] = useState<Resize | null>(null);
+  const [hoveredCourseId, setHoveredCourseId] = useState<number | null>(null);
   const defaultCredits = getDefaultCredits(curriculum);
   const columns = curriculum.periods.length;
 
@@ -77,6 +81,7 @@ export default function CurriculumGrid({
       return {
         dragId,
         course,
+        slot,
         slotIndex,
         column:
           curriculum.periods.findIndex((period) => isSamePeriod(period, slot)) +
@@ -97,6 +102,25 @@ export default function CurriculumGrid({
       landing ? landing.row + landing.height - 1 : 0,
     ) + SPARE_ROWS;
   const footRow = HEADER_ROWS + rows + 1;
+
+  const prerequisitePaths =
+    hoveredCourseId === null || landing || resize
+      ? []
+      : createConnectionPaths(
+          rows,
+          columns,
+          cards.map((card) => ({
+            id: card.dragId,
+            x: card.column,
+            y: card.row,
+            w: card.duration,
+            h: card.height,
+            programYear: card.slot.programYear,
+            term: card.slot.term,
+            courseId: card.course.id,
+            course: card.course.id === hoveredCourseId ? card.course : null,
+          })),
+        ).map(({ data }) => ({ data, color: PREREQUISITE_LINE_COLOR }));
 
   const occupied = new Set(
     cards.flatMap((card) =>
@@ -206,7 +230,7 @@ export default function CurriculumGrid({
       }}
     >
       <div
-        className="grid w-max"
+        className="relative grid w-max"
         style={{
           gridTemplateColumns: `repeat(${columns}, ${GRID_CELL_WIDTH}rem)`,
           gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem) auto`,
@@ -242,6 +266,17 @@ export default function CurriculumGrid({
             <Plus className="size-4 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
           </button>
         ))}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute z-0"
+          style={{
+            gridColumn: "1 / -1",
+            gridRow: `${HEADER_ROWS + 1} / span ${rows}`,
+            inset: `-${GRID_GAP}rem`,
+          }}
+        >
+          <PathsOverlay paths={prerequisitePaths} />
+        </div>
         {cards.map((card) => (
           <CourseCard
             key={card.dragId}
@@ -250,6 +285,9 @@ export default function CurriculumGrid({
             color={getCourseColor(curriculum, card.course)}
             isSelected={card.course.id === selectedCourseId}
             onSelect={() => onSelectCourse(card.course.id)}
+            onHoverChange={(isHovered) =>
+              setHoveredCourseId(isHovered ? card.course.id : null)
+            }
             style={{
               gridColumn: `${card.column} / span ${card.duration}`,
               gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
