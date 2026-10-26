@@ -1,12 +1,17 @@
 import type { Course, Draft, Handlers, Period } from "@/builder/draft";
-import { getDefaultCredits, getFirstFreePosition } from "@/builder/grid";
+import {
+  fitsInColumns,
+  getDefaultCredits,
+  getFirstFreePosition,
+  pushDownCollisions,
+} from "@/builder/grid";
 
 export type CourseAction =
   | { type: "addCourse"; period: Period; position?: number }
   | {
       type: "editCourse";
       courseId: number;
-      changes: Partial<Pick<Course, "name" | "credits">>;
+      changes: Partial<Pick<Course, "name" | "credits" | "duration">>;
     };
 
 const NEW_COURSE_NAME = "Nuevo curso";
@@ -45,18 +50,33 @@ export const courseHandlers: Handlers<CourseAction> = {
   },
 
   editCourse: (draft, { courseId, changes }) => {
-    if (changes.credits !== undefined && !isValidCredits(changes.credits))
+    const { curriculum } = draft;
+    const course = curriculum.courses.find((course) => course.id === courseId);
+    if (
+      !course ||
+      (changes.credits !== undefined && !isValidCredits(changes.credits))
+    )
       return draft;
 
-    const { curriculum } = draft;
+    const { duration } = changes;
+    if (
+      duration !== undefined &&
+      !course.slots.every((slot) => fitsInColumns(curriculum, slot, duration))
+    )
+      return draft;
+
+    const edited = {
+      ...curriculum,
+      courses: curriculum.courses.map((candidate) =>
+        candidate === course ? { ...course, ...changes } : candidate,
+      ),
+    };
     return {
       ...draft,
-      curriculum: {
-        ...curriculum,
-        courses: curriculum.courses.map((course) =>
-          course.id === courseId ? { ...course, ...changes } : course,
-        ),
-      },
+      curriculum: pushDownCollisions(
+        edited,
+        course.slots.map((_, slotIndex) => ({ courseId, slotIndex })),
+      ),
     };
   },
 };

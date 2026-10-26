@@ -60,6 +60,7 @@ export function exportFile({ curriculum }: Draft) {
       id: index + 1,
       name: course.name,
       credits: course.credits,
+      ...(course.duration !== 1 && { duration: course.duration }),
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
       slots: course.slots.map(({ programYear, term, position }) => ({
         programYear,
