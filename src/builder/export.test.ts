@@ -26,6 +26,32 @@ describe("exporting a curriculum", () => {
     );
   });
 
+  test("writes the institution in the program and the version name after the effective year", () => {
+    const draft = draftAfter(details, {
+      type: "editDetails",
+      changes: { versionName: "v6.0", institution: "UDP" },
+    });
+
+    expect(exportFile(draft)).toStartWith(
+      '{"schemaVersion":1,"program":{"name":"Derecho","institution":"UDP"},"effectiveYear":2023,"versionName":"v6.0","termSystem":"semester",',
+    );
+  });
+
+  test("omits an institution and version name cleared back to empty", () => {
+    const draft = draftAfter(
+      details,
+      {
+        type: "editDetails",
+        changes: { institution: "UDP", versionName: "v6.0" },
+      },
+      { type: "editDetails", changes: { institution: "", versionName: "" } },
+    );
+
+    expect(exportFile(draft)).toStartWith(
+      '{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester",',
+    );
+  });
+
   test("writes areas by first appearance with renumbered ids, and each course's areaId", () => {
     const draft = draftAfter(
       details,
@@ -135,6 +161,47 @@ describe("exporting a curriculum", () => {
 
     expect(exportFile(draft)).toContain(
       '"termSystem":"annual","periods":[{"programYear":1,"term":1},{"programYear":1,"term":4},{"programYear":2,"term":1},{"programYear":2,"term":4}]',
+    );
+  });
+
+  test("writes the course code after the name, and omits it when empty", () => {
+    const course: Action = {
+      type: "addCourse",
+      period: { programYear: 1, term: 1 },
+    };
+    const draft = draftAfter(
+      details,
+      course,
+      course,
+      { type: "editCourse", courseId: 1, changes: { code: "DER101" } },
+      { type: "editCourse", courseId: 2, changes: { code: "DER102" } },
+      { type: "editCourse", courseId: 2, changes: { code: "" } },
+    );
+
+    expect(exportFile(draft)).toContain(
+      '"courses":[{"id":1,"name":"Nuevo curso","code":"DER101","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
+        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
+    );
+  });
+
+  test("writes isElective before the slots of an elective and omits it otherwise", () => {
+    const draft = draftAfter(
+      details,
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "editCourse", courseId: 1, changes: { isElective: true } },
+      { type: "addSlot", courseId: 1 },
+      {
+        type: "moveSlot",
+        courseId: 1,
+        slotIndex: 1,
+        to: { programYear: 2, term: 1, position: 1 },
+      },
+    );
+
+    expect(exportFile(draft)).toContain(
+      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"isElective":true,"slots":[{"programYear":1,"term":1,"position":1},{"programYear":2,"term":1,"position":1}]},' +
+        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
     );
   });
 

@@ -82,6 +82,22 @@ describe("re-scaling when the default credits change", () => {
     ]);
   });
 
+  test("deleting a course that changes the default credits pushes the grown course's neighbors down", () => {
+    const fives = addCourses(createDraft("semester"), SECOND_SEMESTER, [5, 5]);
+    const before = addCourses(fives, FIRST_SEMESTER, [7, 5, 4, 4]);
+    expect(getDefaultCredits(before.curriculum)).toBe(5);
+
+    const after = apply(before, { type: "deleteCourse", courseId: 1 });
+
+    expect(getDefaultCredits(after.curriculum)).toBe(4);
+    expect(creditsAndPositionsIn(after, FIRST_SEMESTER)).toEqual([
+      [7, 1],
+      [5, 3],
+      [4, 4],
+      [4, 5],
+    ]);
+  });
+
   test("editing credits so a course grows pushes the course below it down", () => {
     const draft = setCredits(
       addCourses(createDraft("semester"), FIRST_SEMESTER, [5, 5, 5]),

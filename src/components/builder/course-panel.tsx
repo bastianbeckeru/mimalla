@@ -1,11 +1,12 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { useState } from "react";
 import type { Action } from "@/builder/apply";
-import type { Area, Course } from "@/builder/draft";
+import type { Area, Course, TermSystem } from "@/builder/draft";
 import AreaSelect from "@/components/builder/area-select";
 import DurationInput from "@/components/builder/duration-input";
+import ElectiveSlots from "@/components/builder/elective-slots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +17,14 @@ export default function CoursePanel({
   course,
   areas,
   maxDuration,
+  termSystem,
   dispatch,
   onClose,
 }: {
   course: Course;
   areas: Area[];
   maxDuration: number;
+  termSystem: TermSystem;
   dispatch: (action: Action, options?: { group?: string }) => void;
   onClose: () => void;
 }) {
@@ -65,6 +68,24 @@ export default function CoursePanel({
         />
       </div>
       <div className="flex flex-col gap-1.5">
+        <Label htmlFor="builder-course-code">Código</Label>
+        <Input
+          id="builder-course-code"
+          placeholder="Opcional"
+          value={course.code}
+          onChange={(event) =>
+            dispatch(
+              {
+                type: "editCourse",
+                courseId: course.id,
+                changes: { code: event.target.value },
+              },
+              { group: `course-${course.id}-code` },
+            )
+          }
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
         <Label htmlFor="builder-course-credits">Créditos</Label>
         <Input
           id="builder-course-credits"
@@ -101,6 +122,19 @@ export default function CoursePanel({
         dispatch={dispatch}
       />
       <AreaSelect course={course} areas={areas} dispatch={dispatch} />
+      <ElectiveSlots
+        course={course}
+        termSystem={termSystem}
+        dispatch={dispatch}
+      />
+      <Button
+        variant="destructive"
+        className="mt-auto"
+        onClick={() => dispatch({ type: "deleteCourse", courseId: course.id })}
+      >
+        <Trash2 />
+        Eliminar curso
+      </Button>
     </aside>
   );
 }

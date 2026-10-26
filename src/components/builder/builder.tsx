@@ -42,6 +42,15 @@ function BuilderWorkspace() {
 
   useHotkey("Mod+Z", undo, { enabled: hasHydrated, ignoreInputs: true });
   useHotkey("Mod+Shift+Z", redo, { enabled: hasHydrated, ignoreInputs: true });
+  useHotkey(
+    "Delete",
+    () => {
+      if (selectedCourseId === null) return;
+      dispatch({ type: "deleteCourse", courseId: selectedCourseId });
+      setSelectedCourseId(null);
+    },
+    { enabled: hasHydrated && selectedCourseId !== null, ignoreInputs: true },
+  );
 
   if (!hasHydrated) return <Loader2 className="m-auto size-8 animate-spin" />;
 
@@ -91,6 +100,7 @@ function BuilderWorkspace() {
           course={selectedCourse}
           areas={draft.curriculum.areas}
           maxDuration={getMaxDuration(draft.curriculum, selectedCourse)}
+          termSystem={draft.curriculum.termSystem}
           dispatch={dispatch}
           onClose={() => setSelectedCourseId(null)}
         />

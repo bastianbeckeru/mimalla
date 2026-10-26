@@ -15,9 +15,11 @@ export type Slot = Period & {
 export type Course = {
   id: number;
   name: string;
+  code: string;
   credits: number;
   areaId: number | null;
   duration: number;
+  isElective: boolean;
   slots: Slot[];
 };
 
@@ -29,7 +31,9 @@ export type Area = {
 
 export type Curriculum = {
   programName: string;
+  institution: string;
   effectiveYear: number | null;
+  versionName: string;
   termSystem: TermSystem;
   periods: Period[];
   areas: Area[];
@@ -57,7 +61,9 @@ export function createDraft(termSystem: TermSystem): Draft {
   return {
     curriculum: {
       programName: "",
+      institution: "",
       effectiveYear: null,
+      versionName: "",
       termSystem,
       periods: programYears.flatMap((programYear) =>
         REGULAR_TERMS[termSystem].map((term) => ({ programYear, term })),

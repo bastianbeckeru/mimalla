@@ -51,6 +51,26 @@ describe("adding a course", () => {
   });
 });
 
+describe("deleting a course", () => {
+  test("removes it and leaves the other courses where they are", () => {
+    const draft = draftAfter(
+      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "deleteCourse", courseId: 1 },
+    );
+
+    expect(slotsOf(draft)).toEqual([
+      { id: 2, credits: 5, slots: [{ ...FIRST_SEMESTER, position: 2 }] },
+    ]);
+  });
+
+  test("ignores a course that does not exist", () => {
+    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+
+    expect(apply(before, { type: "deleteCourse", courseId: 9 })).toBe(before);
+  });
+});
+
 describe("editing a course", () => {
   const withCourse = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
 

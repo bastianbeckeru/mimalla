@@ -4,6 +4,10 @@ import {
   type CurriculumAction,
   curriculumHandlers,
 } from "@/builder/actions/curriculum";
+import {
+  type ElectiveAction,
+  electiveHandlers,
+} from "@/builder/actions/electives";
 import { type PeriodAction, periodHandlers } from "@/builder/actions/periods";
 import { type ResizeAction, resizeHandlers } from "@/builder/actions/resize";
 import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
@@ -16,7 +20,8 @@ export type Action =
   | AreaAction
   | PeriodAction
   | SlotAction
-  | ResizeAction;
+  | ResizeAction
+  | ElectiveAction;
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,
@@ -25,6 +30,7 @@ const handlers: Handlers<Action> = {
   ...periodHandlers,
   ...slotHandlers,
   ...resizeHandlers,
+  ...electiveHandlers,
 };
 
 export function apply(draft: Draft, action: Action): Draft {
