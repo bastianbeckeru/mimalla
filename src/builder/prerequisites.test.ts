@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
-import { createDraft, type Draft } from "@/builder/draft";
+import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
 import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
+import type { Action, Draft } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };
@@ -186,6 +187,38 @@ describe("prerequisite placement warnings with duration", () => {
 
     expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([1]);
     expect(getMisplacedPrerequisiteIds(draft.curriculum, 3)).toEqual([]);
+  });
+});
+
+describe("prerequisite placement warnings with several placements", () => {
+  const electivePrerequisite: Action[] = [
+    { type: "addCourse", period: THIRD_SEMESTER },
+    { type: "addCourse", period: SECOND_SEMESTER },
+    { type: "editCourse", courseId: 1, changes: { isElective: true } },
+    { type: "addSlot", courseId: 1 },
+    { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
+  ];
+
+  test("warns when no placement of the prerequisite finishes before the course", () => {
+    const draft = draftAfter(...electivePrerequisite, {
+      type: "moveSlot",
+      courseId: 1,
+      slotIndex: 1,
+      to: { ...SECOND_SEMESTER, position: 2 },
+    });
+
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([1]);
+  });
+
+  test("does not warn when a later placement of the prerequisite finishes before the course", () => {
+    const draft = draftAfter(...electivePrerequisite, {
+      type: "moveSlot",
+      courseId: 1,
+      slotIndex: 1,
+      to: { ...FIRST_SEMESTER, position: 1 },
+    });
+
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([]);
   });
 });
 

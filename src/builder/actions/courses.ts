@@ -1,22 +1,12 @@
-import type { Course, Draft, Handlers, Period } from "@/builder/draft";
+import { findCourse } from "@/builder/draft";
 import {
-  fitsInColumns,
+  changeCourse,
   getDefaultCredits,
   getFirstFreePosition,
-  pushDownCollisions,
+  slotsFitInPeriods,
 } from "@/builder/grid";
 import { compareSlots } from "@/builder/periods";
-
-export type CourseAction =
-  | { type: "addCourse"; period: Period; position?: number }
-  | {
-      type: "editCourse";
-      courseId: number;
-      changes: Partial<
-        Pick<Course, "name" | "code" | "credits" | "duration" | "isElective">
-      >;
-    }
-  | { type: "deleteCourse"; courseId: number };
+import type { Course, CourseAction, Draft, Handlers } from "@/types/builder";
 
 const NEW_COURSE_NAME = "Nuevo curso";
 
@@ -67,7 +57,7 @@ export const courseHandlers: Handlers<CourseAction> = {
 
   editCourse: (draft, { courseId, changes }) => {
     const { curriculum } = draft;
-    const course = curriculum.courses.find((course) => course.id === courseId);
+    const course = findCourse(curriculum, courseId);
     if (
       !course ||
       (changes.credits !== undefined && !isValidCredits(changes.credits))
@@ -77,21 +67,17 @@ export const courseHandlers: Handlers<CourseAction> = {
     const { duration } = changes;
     if (
       duration !== undefined &&
-      !course.slots.every((slot) => fitsInColumns(curriculum, slot, duration))
+      !slotsFitInPeriods(curriculum, course.slots, duration)
     )
       return draft;
 
-    const edited = {
-      ...curriculum,
-      courses: curriculum.courses.map((candidate) =>
-        candidate === course ? applyChanges(course, changes) : candidate,
-      ),
-    };
     return {
       ...draft,
-      curriculum: pushDownCollisions(
-        edited,
-        course.slots.map((_, slotIndex) => ({ courseId, slotIndex })),
+      curriculum: changeCourse(
+        curriculum,
+        courseId,
+        (course) => applyChanges(course, changes),
+        course.slots.map((_, slotIndex) => slotIndex),
       ),
     };
   },

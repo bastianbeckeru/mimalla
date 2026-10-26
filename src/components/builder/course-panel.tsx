@@ -2,14 +2,13 @@
 
 import { Trash2, X } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import type { Action } from "@/builder/apply";
-import type { Area, Course, TermSystem } from "@/builder/draft";
 import AreaSelect from "@/components/builder/area-select";
 import DurationInput from "@/components/builder/duration-input";
 import ElectiveSlots from "@/components/builder/elective-slots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { Action, Area, Course, TermSystem } from "@/types/builder";
 
 const CREDITS_PATTERN = /^\d+$/;
 

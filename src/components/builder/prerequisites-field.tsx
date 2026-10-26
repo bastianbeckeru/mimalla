@@ -2,8 +2,6 @@
 
 import { Plus, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
-import type { Action } from "@/builder/apply";
-import type { Course, Curriculum } from "@/builder/draft";
 import { getPeriodLabel } from "@/builder/periods";
 import {
   canAddPrerequisite,
@@ -24,6 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Action, Course, Curriculum } from "@/types/builder";
 
 const CREDITS_PATTERN = /^\d+$/;
 

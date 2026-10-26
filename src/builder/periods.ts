@@ -1,4 +1,4 @@
-import type { Curriculum, Period, Slot, TermSystem } from "@/builder/draft";
+import type { Curriculum, Period, Slot, TermSystem } from "@/types/builder";
 import { TERM_LABELS } from "@/utils/period-key";
 
 export const REGULAR_TERMS: Record<TermSystem, number[]> = {
@@ -11,7 +11,7 @@ export const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
   annual: [4],
 };
 
-function findPeriodIndex(periods: Period[], period: Period) {
+export function findPeriodIndex(periods: Period[], period: Period) {
   return periods.findIndex((candidate) => isSamePeriod(candidate, period));
 }
 

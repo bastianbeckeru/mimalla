@@ -4,13 +4,14 @@ import { cn } from "cn";
 import { Check } from "lucide-react";
 import type { ComponentProps } from "react";
 import { getTextColor } from "@/builder/colors";
+import type { HexColor } from "@/types/colors";
 
 export default function ColorSwatch({
   color,
   isSelected = false,
   className,
   ...props
-}: ComponentProps<"button"> & { color: string; isSelected?: boolean }) {
+}: ComponentProps<"button"> & { color: HexColor; isSelected?: boolean }) {
   return (
     <button
       type="button"

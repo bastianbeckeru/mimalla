@@ -1,9 +1,7 @@
 "use client";
 
 import { Palette, Plus, Trash2 } from "lucide-react";
-import type { Action } from "@/builder/apply";
 import { BASE_COLORS } from "@/builder/colors";
-import type { Draft } from "@/builder/draft";
 import AreaColorPicker from "@/components/builder/area-color-picker";
 import ColorSwatch from "@/components/builder/color-swatch";
 import { Button } from "@/components/ui/button";
@@ -13,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Action, Draft } from "@/types/builder";
 
 const NEW_AREA_NAME = "Nueva área";
 

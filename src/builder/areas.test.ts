@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
+import { apply } from "@/builder/apply";
 import { getAreaShades, getCourseColor, getTextColor } from "@/builder/colors";
-import { type Area, type Course, createDraft } from "@/builder/draft";
+import { createDraft } from "@/builder/draft";
+import type { Action, Area, Course } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 import { getLuminance } from "@/utils/colors";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
@@ -36,7 +38,7 @@ describe("creating an area", () => {
 
     expect(draft.curriculum.areas.map((area) => area.color)).toEqual([
       ...shades,
-      shades[0] as string,
+      shades[0] as HexColor,
     ]);
   });
 });
@@ -151,9 +153,9 @@ describe("coloring areas", () => {
 
     expect(draft.baseColor).toBe("#16a34a");
     expect(draft.curriculum.areas.map((area) => area.color)).toEqual([
-      shades[0] as string,
+      shades[0] as HexColor,
       "#ff8800",
-      shades[2] as string,
+      shades[2] as HexColor,
     ]);
   });
 
@@ -167,7 +169,7 @@ describe("coloring areas", () => {
     );
 
     expect(draft.curriculum.areas[2]?.color).toBe(
-      getAreaShades("#16a34a")[2] as string,
+      getAreaShades("#16a34a")[2] as HexColor,
     );
   });
 
@@ -194,7 +196,7 @@ describe("course colors", () => {
     expect(getCourseColor(draft.curriculum, unassigned)).toBe("#fafafa");
   });
 
-  test.each([
+  test.each<[HexColor, string]>([
     ["#ffffff", "#0a0a0a"],
     ["#fafafa", "#0a0a0a"],
     ["#facc15", "#0a0a0a"],
@@ -216,16 +218,15 @@ describe("the shade scale of a base color", () => {
   });
 
   test("orders the shades so consecutive ones contrast", () => {
-    const pairs = shades.map((shade, index) => [
-      shade,
-      shades[(index + 1) % shades.length] as string,
-    ]);
+    const pairs = shades.map(
+      (shade, index) =>
+        [shade, shades[(index + 1) % shades.length] as HexColor] as const,
+    );
 
     for (const [a, b] of pairs) {
-      const [lighter, darker] = [
-        getLuminance(a as `#${string}`),
-        getLuminance(b as `#${string}`),
-      ].toSorted((x, y) => y - x) as [number, number];
+      const [lighter, darker] = [getLuminance(a), getLuminance(b)].toSorted(
+        (x, y) => y - x,
+      ) as [number, number];
       expect((lighter + 0.05) / (darker + 0.05)).toBeGreaterThan(1.5);
     }
   });

@@ -1,9 +1,12 @@
-import type { Curriculum, Draft, Handlers, Slot } from "@/builder/draft";
+import { findCourse } from "@/builder/draft";
 import { getFirstFreePosition, pushDownCollisions } from "@/builder/grid";
-
-export type ElectiveAction =
-  | { type: "addSlot"; courseId: number }
-  | { type: "removeSlot"; courseId: number; slotIndex: number };
+import type {
+  Curriculum,
+  Draft,
+  ElectiveAction,
+  Handlers,
+  Slot,
+} from "@/types/builder";
 
 function withSlots(
   { curriculum }: Draft,
@@ -23,7 +26,7 @@ function withSlots(
 export const electiveHandlers: Handlers<ElectiveAction> = {
   addSlot: (draft, { courseId }) => {
     const { curriculum } = draft;
-    const course = curriculum.courses.find((course) => course.id === courseId);
+    const course = findCourse(curriculum, courseId);
     const lastSlot = course?.slots.at(-1);
     if (!course?.isElective || !lastSlot) return draft;
 
@@ -43,9 +46,7 @@ export const electiveHandlers: Handlers<ElectiveAction> = {
   },
 
   removeSlot: (draft, { courseId, slotIndex }) => {
-    const course = draft.curriculum.courses.find(
-      (course) => course.id === courseId,
-    );
+    const course = findCourse(draft.curriculum, courseId);
     if (!course || course.slots.length <= 1 || !course.slots[slotIndex])
       return draft;
 

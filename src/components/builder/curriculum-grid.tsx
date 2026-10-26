@@ -10,20 +10,20 @@ import {
 import { DragDropProvider } from "@dnd-kit/react";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
-import type { Action } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
-import type { Curriculum } from "@/builder/draft";
 import {
   getCourseHeight,
   getDefaultCredits,
   getMaxDuration,
 } from "@/builder/grid";
-import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
+import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
+import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
 import CourseCard from "@/components/builder/course-card";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
 import PathsOverlay from "@/components/curriculum/paths-overlay";
 import { Button } from "@/components/ui/button";
+import type { Action, Curriculum } from "@/types/builder";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -36,6 +36,7 @@ const HEADER_ROWS = 1;
 const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
 const PREREQUISITE_LINE_COLOR = "#34d399";
+const MISPLACED_PREREQUISITE_LINE_COLOR = "var(--warning)";
 
 const sensors = [
   PointerSensor.configure({
@@ -83,9 +84,7 @@ export default function CurriculumGrid({
         course,
         slot,
         slotIndex,
-        column:
-          curriculum.periods.findIndex((period) => isSamePeriod(period, slot)) +
-          1,
+        column: findPeriodIndex(curriculum.periods, slot) + 1,
         row: slot.position,
         size,
         ...(resize?.dragId === dragId ? resize : size),
@@ -103,6 +102,15 @@ export default function CurriculumGrid({
     ) + SPARE_ROWS;
   const footRow = HEADER_ROWS + rows + 1;
 
+  const misplacedPrerequisiteIds =
+    hoveredCourseId === null
+      ? []
+      : getMisplacedPrerequisiteIds(curriculum, hoveredCourseId);
+  const misplacedCardIds = new Set(
+    cards
+      .filter((card) => misplacedPrerequisiteIds.includes(card.course.id))
+      .map((card) => card.dragId),
+  );
   const prerequisitePaths =
     hoveredCourseId === null || landing || resize
       ? []
@@ -120,7 +128,13 @@ export default function CurriculumGrid({
             courseId: card.course.id,
             course: card.course.id === hoveredCourseId ? card.course : null,
           })),
-        ).map(({ data }) => ({ data, color: PREREQUISITE_LINE_COLOR }));
+          { includeAllPrerequisites: true },
+        ).map(({ data, originCardId }) => ({
+          data,
+          color: misplacedCardIds.has(originCardId)
+            ? MISPLACED_PREREQUISITE_LINE_COLOR
+            : PREREQUISITE_LINE_COLOR,
+        }));
 
   const occupied = new Set(
     cards.flatMap((card) =>

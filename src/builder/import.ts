@@ -2,7 +2,17 @@ import {
   BASE_COLORS,
   DEFAULT_BASE_COLOR,
   getAreaShades,
+  isHexColor,
 } from "@/builder/colors";
+import { isValidEffectiveYear, SCHEMA_VERSION } from "@/builder/export";
+import { pushDownCollisions, slotsFitInPeriods } from "@/builder/grid";
+import {
+  comparePeriods,
+  INTENSIVE_TERMS,
+  isSamePeriod,
+  REGULAR_TERMS,
+} from "@/builder/periods";
+import { dependsOn } from "@/builder/prerequisites";
 import type {
   Area,
   Course,
@@ -11,16 +21,8 @@ import type {
   Period,
   Slot,
   TermSystem,
-} from "@/builder/draft";
-import { isValidEffectiveYear, SCHEMA_VERSION } from "@/builder/export";
-import { fitsInColumns, pushDownCollisions } from "@/builder/grid";
-import {
-  comparePeriods,
-  INTENSIVE_TERMS,
-  isSamePeriod,
-  REGULAR_TERMS,
-} from "@/builder/periods";
-import { dependsOn } from "@/builder/prerequisites";
+} from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 
 type ImportResult = { ok: true; draft: Draft } | { ok: false; reason: string };
 
@@ -40,9 +42,14 @@ function isInteger(value: unknown): value is number {
   return Number.isInteger(value);
 }
 
-function readOptionalText(value: unknown, reason: string) {
+function readOptionalText(
+  value: unknown,
+  notTextReason: string,
+  emptyReason: string,
+) {
   if (value === undefined) return "";
-  if (typeof value !== "string") reject(reason);
+  if (typeof value !== "string") reject(notTextReason);
+  if (value === "") reject(emptyReason);
   return value;
 }
 
@@ -118,7 +125,13 @@ function checkIds(items: FileObject[], reason: string) {
   if (!isSequence) reject(reason);
 }
 
-const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/;
+function isLowerCaseHexColor(color: unknown): color is HexColor {
+  return (
+    typeof color === "string" &&
+    isHexColor(color) &&
+    color === color.toLowerCase()
+  );
+}
 
 function readAreas(value: unknown): Area[] {
   const areas = readObjects(value, "La malla debe tener una lista de áreas.");
@@ -128,7 +141,7 @@ function readAreas(value: unknown): Area[] {
   );
   return areas.map(({ id, name, color }) => {
     if (typeof name !== "string") reject(`El área ${id} debe tener un nombre.`);
-    if (typeof color !== "string" || !HEX_COLOR_PATTERN.test(color))
+    if (!isLowerCaseHexColor(color))
       reject(
         `El color del área "${name}" debe tener el formato #rrggbb en minúsculas.`,
       );
@@ -183,10 +196,12 @@ function readCourse(
 ): Course {
   const id = value.id as number;
   const { name } = value;
-  if (typeof name !== "string") reject(`El curso ${id} debe tener un nombre.`);
+  if (typeof name !== "string" || name.trim() === "")
+    reject(`El curso ${id} debe tener un nombre.`);
   const code = readOptionalText(
     value.code,
     `El código del curso "${name}" debe ser texto.`,
+    `El código del curso "${name}" no puede estar vacío (se omite cuando no tiene).`,
   );
   if (!isInteger(value.credits) || value.credits < 0)
     reject(
@@ -254,11 +269,7 @@ function readCourse(
 
 function checkLayout(curriculum: Curriculum) {
   for (const course of curriculum.courses) {
-    if (
-      !course.slots.every((slot) =>
-        fitsInColumns(curriculum, slot, course.duration),
-      )
-    )
+    if (!slotsFitInPeriods(curriculum, course.slots, course.duration))
       reject(
         `El curso "${course.name}" se extiende más allá de la última columna.`,
       );
@@ -309,12 +320,14 @@ function readCurriculum(file: unknown): Curriculum {
   const institution = readOptionalText(
     (file.program as FileObject).institution,
     "La institución debe ser texto.",
+    "La institución no puede estar vacía (se omite cuando no hay).",
   );
   if (!isValidEffectiveYear(file.effectiveYear))
     reject("El año de vigencia debe ser un número entero entre 1900 y 2100.");
   const versionName = readOptionalText(
     file.versionName,
     "La versión debe ser texto.",
+    "La versión no puede estar vacía (se omite cuando no hay).",
   );
   const termSystem = readTermSystem(file.termSystem);
   const periods = readPeriods(file.periods, termSystem);
@@ -335,9 +348,9 @@ function readCurriculum(file: unknown): Curriculum {
 }
 
 function restoreDraft(curriculum: Curriculum): Draft {
-  const isShadeOf = (baseColor: string) => (area: Area) =>
+  const isShadeOf = (baseColor: HexColor) => (area: Area) =>
     getAreaShades(baseColor).some((shade) => shade === area.color);
-  const baseColor = BASE_COLORS.reduce<string>(
+  const baseColor = BASE_COLORS.reduce<HexColor>(
     (best, candidate) =>
       curriculum.areas.filter(isShadeOf(candidate)).length >
       curriculum.areas.filter(isShadeOf(best)).length

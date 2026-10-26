@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createHistory, historyReducer } from "@/hooks/use-history";
+import type { History, HistoryAction } from "@/types/history";
+import { createHistory, historyReducer } from "@/utils/history";
 
 describe("historyReducer", () => {
   test("undo after a commit restores the previous state", () => {
@@ -123,17 +124,27 @@ describe("historyReducer", () => {
     expect(history.present).toBe("a");
     expect(history.past).toEqual([]);
   });
+
+  test("a commit of the same group after the group ends starts a new step", () => {
+    const history = run(
+      createHistory("a"),
+      commit("ab", "name"),
+      { type: "endGroup" },
+      commit("abc", "name"),
+    );
+
+    expect(history.past).toEqual(["a", "ab"]);
+    expect(run(history, { type: "undo" }).present).toBe("ab");
+  });
 });
 
 function commit<T>(present: T, group?: string) {
   return { type: "commit", present, group } as const;
 }
 
-type History<T> = ReturnType<typeof createHistory<T>>;
-
 function run<T>(
   history: History<T>,
-  ...actions: Parameters<typeof historyReducer<T>>[1][]
+  ...actions: HistoryAction<T>[]
 ): History<T> {
   return actions.reduce(
     (state, action) => historyReducer(state, action),

@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
+import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { exportFile } from "@/builder/export";
 import { importFile } from "@/builder/import";
+import type { Action } from "@/types/builder";
 
 type FileRecord = Record<string, unknown>;
 type CourseFixture = FileRecord & { slots: FileRecord[] };
@@ -126,6 +127,18 @@ describe("rejecting an invalid file", () => {
     ).toEqual(rejection("La institución debe ser texto."));
   });
 
+  test("rejects an empty institution written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.program.institution = "";
+      }),
+    ).toEqual(
+      rejection(
+        "La institución no puede estar vacía (se omite cuando no hay).",
+      ),
+    );
+  });
+
   test("rejects an effective year outside 1900–2100", () => {
     expect(
       importChanged((file) => {
@@ -156,6 +169,16 @@ describe("rejecting an invalid file", () => {
         file.versionName = 6;
       }),
     ).toEqual(rejection("La versión debe ser texto."));
+  });
+
+  test("rejects an empty version name written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.versionName = "";
+      }),
+    ).toEqual(
+      rejection("La versión no puede estar vacía (se omite cuando no hay)."),
+    );
   });
 
   test("rejects an unknown term system", () => {
@@ -272,6 +295,14 @@ describe("rejecting an invalid file", () => {
     ).toEqual(rejection("El curso 2 debe tener un nombre."));
   });
 
+  test("rejects a course with a blank name", () => {
+    expect(
+      importChanged((file) => {
+        file.courses[1].name = "  ";
+      }),
+    ).toEqual(rejection("El curso 2 debe tener un nombre."));
+  });
+
   test("rejects a course code that is not text", () => {
     expect(
       importChanged((file) => {
@@ -280,6 +311,18 @@ describe("rejecting an invalid file", () => {
     ).toEqual(
       rejection(
         'El código del curso "Introducción al Derecho" debe ser texto.',
+      ),
+    );
+  });
+
+  test("rejects an empty course code written in the file", () => {
+    expect(
+      importChanged((file) => {
+        file.courses[0].code = "";
+      }),
+    ).toEqual(
+      rejection(
+        'El código del curso "Introducción al Derecho" no puede estar vacío (se omite cuando no tiene).',
       ),
     );
   });

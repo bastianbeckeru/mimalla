@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { getMissingDetails } from "@/builder/export";
+import type { Action } from "@/types/builder";
 
 describe("curriculum details", () => {
   test("editing sets the program name and effective year", () => {
@@ -43,6 +44,21 @@ describe("curriculum details", () => {
       expect(getMissingDetails(draft)).toEqual(["effectiveYear"]);
     },
   );
+
+  test("a course with a blank name is missing its name", () => {
+    const actions: Action[] = [
+      {
+        type: "editDetails",
+        changes: { programName: "Derecho", effectiveYear: 2023 },
+      },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "editCourse", courseId: 2, changes: { name: " " } },
+    ];
+    const draft = actions.reduce(apply, createDraft("semester"));
+
+    expect(getMissingDetails(draft)).toEqual(["courseNames"]);
+  });
 
   test("nothing is missing with a program name and a valid effective year", () => {
     const draft = apply(createDraft("semester"), {

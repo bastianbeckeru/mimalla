@@ -2,7 +2,6 @@
 
 import { Upload } from "lucide-react";
 import { useRef, useState } from "react";
-import type { Draft } from "@/builder/draft";
 import { importFile } from "@/builder/import";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
+import type { Draft } from "@/types/builder";
 
 export default function ImportButton({
   onLoad,

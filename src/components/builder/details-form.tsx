@@ -1,9 +1,8 @@
 "use client";
 
-import type { Action } from "@/builder/apply";
-import type { Curriculum } from "@/builder/draft";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { Action, Curriculum } from "@/types/builder";
 
 export default function DetailsForm({
   curriculum,

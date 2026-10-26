@@ -1,14 +1,11 @@
 import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { type Action, apply } from "@/builder/apply";
-import { createDraft, type Draft } from "@/builder/draft";
-import {
-  createHistory,
-  type History,
-  type HistoryAction,
-  historyReducer,
-} from "@/hooks/use-history";
+import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
+import type { Action, Draft } from "@/types/builder";
+import type { History, HistoryAction } from "@/types/history";
+import { createHistory, historyReducer } from "@/utils/history";
 
 type BuilderState = {
   draft: Draft;
@@ -20,6 +17,7 @@ type BuilderActions = {
   load: (draft: Draft) => void;
   undo: () => void;
   redo: () => void;
+  endGroup: () => void;
 };
 
 const initialDraft = createDraft("semester");
@@ -51,6 +49,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         load: (draft) => update(() => ({ type: "reset", present: draft })),
         undo: () => update(() => ({ type: "undo" })),
         redo: () => update(() => ({ type: "redo" })),
+        endGroup: () => update(() => ({ type: "endGroup" })),
       };
     },
     {

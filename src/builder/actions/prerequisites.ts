@@ -1,10 +1,11 @@
-import type { Course, Draft, Handlers } from "@/builder/draft";
+import { findCourse } from "@/builder/draft";
 import { canAddPrerequisite } from "@/builder/prerequisites";
-
-export type PrerequisiteAction =
-  | { type: "addPrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "removePrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "setPrerequisiteCredits"; courseId: number; credits: number };
+import type {
+  Course,
+  Draft,
+  Handlers,
+  PrerequisiteAction,
+} from "@/types/builder";
 
 function updateCourse(
   draft: Draft,
@@ -34,9 +35,7 @@ export const prerequisiteHandlers: Handlers<PrerequisiteAction> = {
   },
 
   removePrerequisite: (draft, { courseId, prerequisiteId }) => {
-    const course = draft.curriculum.courses.find(
-      (course) => course.id === courseId,
-    );
+    const course = findCourse(draft.curriculum, courseId);
     if (!course?.prerequisiteIds.includes(prerequisiteId)) return draft;
     return updateCourse(draft, courseId, (course) => ({
       ...course,

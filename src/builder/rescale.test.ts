@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
-import { createDraft, type Draft, type Period } from "@/builder/draft";
+import { createDraft } from "@/builder/draft";
 import { getDefaultCredits } from "@/builder/grid";
 import { isSamePeriod } from "@/builder/periods";
+import type { Draft, Period } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };
@@ -95,6 +96,51 @@ describe("re-scaling when the default credits change", () => {
       [5, 3],
       [4, 4],
       [4, 5],
+    ]);
+  });
+
+  test("editing a course's credits so the course above it grows pushes the edited course down", () => {
+    const before = addCourses(createDraft("semester"), FIRST_SEMESTER, [7, 5]);
+    expect(creditsAndPositionsIn(before, FIRST_SEMESTER)).toEqual([
+      [7, 1],
+      [5, 2],
+    ]);
+
+    const after = setCredits(before, [2], 4);
+
+    expect(getDefaultCredits(after.curriculum)).toBe(4);
+    expect(creditsAndPositionsIn(after, FIRST_SEMESTER)).toEqual([
+      [7, 1],
+      [4, 3],
+    ]);
+  });
+
+  test("resizing a course so the course above it grows pushes the resized course down", () => {
+    const firstColumn = addCourses(
+      createDraft("semester"),
+      FIRST_SEMESTER,
+      [7, 5],
+    );
+    const withFive = addCourses(firstColumn, SECOND_SEMESTER, [5]);
+    const before = addCourses(withFive, THIRD_SEMESTER, [4]);
+    expect(getDefaultCredits(before.curriculum)).toBe(5);
+    expect(creditsAndPositionsIn(before, FIRST_SEMESTER)).toEqual([
+      [7, 1],
+      [5, 2],
+    ]);
+
+    const after = apply(before, {
+      type: "resizeCourse",
+      courseId: 2,
+      slotIndex: 0,
+      rows: 2,
+      duration: 1,
+    });
+
+    expect(getDefaultCredits(after.curriculum)).toBe(4);
+    expect(creditsAndPositionsIn(after, FIRST_SEMESTER)).toEqual([
+      [7, 1],
+      [10, 3],
     ]);
   });
 

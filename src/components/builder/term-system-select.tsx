@@ -1,6 +1,5 @@
 "use client";
 
-import type { TermSystem } from "@/builder/draft";
 import {
   Select,
   SelectContent,
@@ -9,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { TermSystem } from "@/types/builder";
 
 const TERM_SYSTEMS: { value: TermSystem; label: string }[] = [
   { value: "semester", label: "Semestral" },

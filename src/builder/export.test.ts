@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
-import { type Area, createDraft } from "@/builder/draft";
+import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
 import { exportFile, getFileName } from "@/builder/export";
+import type { Action, Area } from "@/types/builder";
 
 function draftAfter(...actions: Action[]) {
   return actions.reduce(apply, createDraft("semester"));

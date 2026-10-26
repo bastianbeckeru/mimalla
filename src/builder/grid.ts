@@ -1,5 +1,5 @@
-import type { Course, Curriculum, Period } from "@/builder/draft";
-import { isSamePeriod } from "@/builder/periods";
+import { findPeriodIndex } from "@/builder/periods";
+import type { Course, Curriculum, Period, Slot } from "@/types/builder";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
 
@@ -25,13 +25,14 @@ export function getCourseHeight(credits: number, defaultCredits: number) {
 }
 
 export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
-  const column = curriculum.periods.findIndex((candidate) =>
-    isSamePeriod(candidate, period),
-  );
+  const periodIndex = findPeriodIndex(curriculum.periods, period);
   const occupied = new Set<number>();
 
-  for (const { box } of getSlotBoxes(curriculum)) {
-    if (box.left > column || column >= box.right) continue;
+  for (const { box } of getSlotBoxes(
+    curriculum,
+    getDefaultCredits(curriculum),
+  )) {
+    if (box.left > periodIndex || periodIndex >= box.right) continue;
     for (let row = box.top; row < box.bottom; row++) occupied.add(row);
   }
 
@@ -40,14 +41,12 @@ export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
   return position;
 }
 
-export function fitsInColumns(
+export function fitsInPeriods(
   curriculum: Curriculum,
   period: Period,
   duration: number,
 ) {
-  const start = curriculum.periods.findIndex((candidate) =>
-    isSamePeriod(candidate, period),
-  );
+  const start = findPeriodIndex(curriculum.periods, period);
   return (
     start !== -1 &&
     Number.isInteger(duration) &&
@@ -56,12 +55,19 @@ export function fitsInColumns(
   );
 }
 
+export function slotsFitInPeriods(
+  curriculum: Curriculum,
+  slots: Slot[],
+  duration: number,
+) {
+  return slots.every((slot) => fitsInPeriods(curriculum, slot, duration));
+}
+
 export function getMaxDuration(curriculum: Curriculum, course: Course) {
   return Math.min(
     ...course.slots.map(
       (slot) =>
-        curriculum.periods.length -
-        curriculum.periods.findIndex((period) => isSamePeriod(period, slot)),
+        curriculum.periods.length - findPeriodIndex(curriculum.periods, slot),
     ),
   );
 }
@@ -76,13 +82,10 @@ function overlaps(a: Box, b: Box) {
   );
 }
 
-function getSlotBoxes(curriculum: Curriculum) {
-  const defaultCredits = getDefaultCredits(curriculum);
+function getSlotBoxes(curriculum: Curriculum, defaultCredits: number) {
   return curriculum.courses.flatMap((course) =>
     course.slots.map((slot, slotIndex) => {
-      const left = curriculum.periods.findIndex((period) =>
-        isSamePeriod(period, slot),
-      );
+      const left = findPeriodIndex(curriculum.periods, slot);
       return {
         courseId: course.id,
         slotIndex,
@@ -101,6 +104,7 @@ function getSlotBoxes(curriculum: Curriculum) {
 export function pushDownCollisions(
   curriculum: Curriculum,
   anchors: SlotRef[] = [],
+  defaultCredits = getDefaultCredits(curriculum),
 ): Curriculum {
   const anchorIndex = ({ courseId, slotIndex }: SlotRef) =>
     anchors.findIndex(
@@ -112,7 +116,7 @@ export function pushDownCollisions(
     return index === -1 ? anchors.length : index;
   };
 
-  const slots = getSlotBoxes(curriculum).toSorted(
+  const slots = getSlotBoxes(curriculum, defaultCredits).toSorted(
     (a, b) =>
       rank(a) - rank(b) || a.box.top - b.box.top || a.box.left - b.box.left,
   );
@@ -146,4 +150,27 @@ export function pushDownCollisions(
       }),
     })),
   };
+}
+
+export function changeCourse(
+  curriculum: Curriculum,
+  courseId: number,
+  change: (course: Course) => Course,
+  anchorSlotIndexes: number[],
+): Curriculum {
+  const withChange = (target: Curriculum) => ({
+    ...target,
+    courses: target.courses.map((course) =>
+      course.id === courseId ? change(course) : course,
+    ),
+  });
+  const rescaled = pushDownCollisions(
+    curriculum,
+    [],
+    getDefaultCredits(withChange(curriculum)),
+  );
+  return pushDownCollisions(
+    withChange(rescaled),
+    anchorSlotIndexes.map((slotIndex) => ({ courseId, slotIndex })),
+  );
 }

@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
-import { createDraft, type Draft } from "@/builder/draft";
+import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
 import { exportFile } from "@/builder/export";
+import type { Action, Draft } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };
