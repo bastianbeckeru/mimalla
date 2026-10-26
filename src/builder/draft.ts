@@ -19,6 +19,8 @@ export type Course = {
   credits: number;
   areaId: number | null;
   duration: number;
+  prerequisiteIds: number[];
+  prerequisiteCredits: number;
   isElective: boolean;
   slots: Slot[];
 };

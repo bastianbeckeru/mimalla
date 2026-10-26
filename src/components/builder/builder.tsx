@@ -10,6 +10,7 @@ import CurriculumGrid from "@/components/builder/curriculum-grid";
 import DetailsForm from "@/components/builder/details-form";
 import DownloadButton from "@/components/builder/download-button";
 import NewCurriculumDialog from "@/components/builder/new-curriculum-dialog";
+import PrerequisitesField from "@/components/builder/prerequisites-field";
 import ProgramYearControls from "@/components/builder/program-year-controls";
 import TermSystemSelect from "@/components/builder/term-system-select";
 import { Label } from "@/components/ui/label";
@@ -103,7 +104,13 @@ function BuilderWorkspace() {
           termSystem={draft.curriculum.termSystem}
           dispatch={dispatch}
           onClose={() => setSelectedCourseId(null)}
-        />
+        >
+          <PrerequisitesField
+            curriculum={draft.curriculum}
+            course={selectedCourse}
+            dispatch={dispatch}
+          />
+        </CoursePanel>
       )}
     </>
   );

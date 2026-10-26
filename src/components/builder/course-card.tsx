@@ -12,6 +12,7 @@ export default function CourseCard({
   color,
   isSelected,
   onSelect,
+  onHoverChange,
   style,
   children,
 }: {
@@ -20,13 +21,19 @@ export default function CourseCard({
   color: string;
   isSelected: boolean;
   onSelect: () => void;
+  onHoverChange: (isHovered: boolean) => void;
   style: CSSProperties;
   children: ReactNode;
 }) {
   const { ref, isDragging } = useDraggable({ id: dragId });
 
   return (
-    <div className="relative" style={style}>
+    <div
+      className="relative"
+      style={style}
+      onPointerEnter={() => onHoverChange(true)}
+      onPointerLeave={() => onHoverChange(false)}
+    >
       <button
         ref={ref}
         type="button"

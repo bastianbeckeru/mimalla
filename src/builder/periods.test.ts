@@ -221,6 +221,8 @@ describe("removing a column", () => {
             credits: 10,
             areaId: null,
             duration: 2,
+            prerequisiteIds: [],
+            prerequisiteCredits: 0,
             isElective: false,
             slots: [{ programYear: 1, term: 1, position: 1 }],
           },
