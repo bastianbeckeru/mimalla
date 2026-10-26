@@ -1,5 +1,6 @@
 "use client";
 
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor } from "lucide-react";
 import { useState } from "react";
 import AreasManager from "@/components/builder/areas-manager";
@@ -34,7 +35,12 @@ function BuilderWorkspace() {
   const hasHydrated = useBuilderHasHydrated();
   const draft = useBuilderStore((state) => state.draft);
   const dispatch = useBuilderStore((state) => state.dispatch);
+  const undo = useBuilderStore((state) => state.undo);
+  const redo = useBuilderStore((state) => state.redo);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+
+  useHotkey("Mod+Z", undo, { enabled: hasHydrated, ignoreInputs: true });
+  useHotkey("Mod+Shift+Z", redo, { enabled: hasHydrated, ignoreInputs: true });
 
   if (!hasHydrated) return <Loader2 className="m-auto size-8 animate-spin" />;
 
