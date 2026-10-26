@@ -65,6 +65,7 @@ export function exportFile({ curriculum }: Draft) {
       name: course.name,
       ...(course.code !== "" && { code: course.code }),
       credits: course.credits,
+      ...(course.duration !== 1 && { duration: course.duration }),
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
       ...(course.isElective && { isElective: true }),
       slots: course.slots.map(({ programYear, term, position }) => ({

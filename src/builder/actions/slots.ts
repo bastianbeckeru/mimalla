@@ -1,5 +1,5 @@
 import type { Curriculum, Handlers, Slot } from "@/builder/draft";
-import { pushDownCollisions } from "@/builder/grid";
+import { fitsInColumns, pushDownCollisions } from "@/builder/grid";
 import { isSamePeriod } from "@/builder/periods";
 
 export type SlotAction = {
@@ -9,22 +9,23 @@ export type SlotAction = {
   to: Slot;
 };
 
-function isValidSlot(curriculum: Curriculum, slot: Slot) {
+function isValidSlot(curriculum: Curriculum, slot: Slot, duration: number) {
   return (
     Number.isInteger(slot.position) &&
     slot.position >= 1 &&
-    curriculum.periods.some((period) => isSamePeriod(period, slot))
+    fitsInColumns(curriculum, slot, duration)
   );
 }
 
 export const slotHandlers: Handlers<SlotAction> = {
   moveSlot: (draft, { courseId, slotIndex, to }) => {
     const { curriculum } = draft;
-    const current = curriculum.courses.find((course) => course.id === courseId)
-      ?.slots[slotIndex];
+    const course = curriculum.courses.find((course) => course.id === courseId);
+    const current = course?.slots[slotIndex];
     if (
+      !course ||
       !current ||
-      !isValidSlot(curriculum, to) ||
+      !isValidSlot(curriculum, to, course.duration) ||
       (isSamePeriod(current, to) && current.position === to.position)
     )
       return draft;
@@ -45,7 +46,7 @@ export const slotHandlers: Handlers<SlotAction> = {
 
     return {
       ...draft,
-      curriculum: pushDownCollisions(moved, { courseId, slotIndex }),
+      curriculum: pushDownCollisions(moved, [{ courseId, slotIndex }]),
     };
   },
 };

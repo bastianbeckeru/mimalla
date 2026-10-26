@@ -1,4 +1,4 @@
-import type { Curriculum, Period } from "@/builder/draft";
+import type { Course, Curriculum, Period } from "@/builder/draft";
 import { isSamePeriod } from "@/builder/periods";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
@@ -25,16 +25,14 @@ export function getCourseHeight(credits: number, defaultCredits: number) {
 }
 
 export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
-  const defaultCredits = getDefaultCredits(curriculum);
+  const column = curriculum.periods.findIndex((candidate) =>
+    isSamePeriod(candidate, period),
+  );
   const occupied = new Set<number>();
 
-  for (const course of curriculum.courses) {
-    const height = getCourseHeight(course.credits, defaultCredits);
-    for (const slot of course.slots) {
-      if (!isSamePeriod(slot, period)) continue;
-      for (let row = slot.position; row < slot.position + height; row++)
-        occupied.add(row);
-    }
+  for (const { box } of getSlotBoxes(curriculum)) {
+    if (box.left > column || column >= box.right) continue;
+    for (let row = box.top; row < box.bottom; row++) occupied.add(row);
   }
 
   let position = 1;
@@ -42,61 +40,98 @@ export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
   return position;
 }
 
+export function fitsInColumns(
+  curriculum: Curriculum,
+  period: Period,
+  duration: number,
+) {
+  const start = curriculum.periods.findIndex((candidate) =>
+    isSamePeriod(candidate, period),
+  );
+  return (
+    start !== -1 &&
+    Number.isInteger(duration) &&
+    duration >= 1 &&
+    start + duration <= curriculum.periods.length
+  );
+}
+
+export function getMaxDuration(curriculum: Curriculum, course: Course) {
+  return Math.min(
+    ...course.slots.map(
+      (slot) =>
+        curriculum.periods.length -
+        curriculum.periods.findIndex((period) => isSamePeriod(period, slot)),
+    ),
+  );
+}
+
 type SlotRef = { courseId: number; slotIndex: number };
+
+type Box = { left: number; right: number; top: number; bottom: number };
+
+function overlaps(a: Box, b: Box) {
+  return (
+    a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+  );
+}
+
+function getSlotBoxes(curriculum: Curriculum) {
+  const defaultCredits = getDefaultCredits(curriculum);
+  return curriculum.courses.flatMap((course) =>
+    course.slots.map((slot, slotIndex) => {
+      const left = curriculum.periods.findIndex((period) =>
+        isSamePeriod(period, slot),
+      );
+      return {
+        courseId: course.id,
+        slotIndex,
+        box: {
+          left,
+          right: left + course.duration,
+          top: slot.position,
+          bottom:
+            slot.position + getCourseHeight(course.credits, defaultCredits),
+        },
+      };
+    }),
+  );
+}
 
 export function pushDownCollisions(
   curriculum: Curriculum,
-  anchor: SlotRef,
+  anchors: SlotRef[] = [],
 ): Curriculum {
-  const defaultCredits = getDefaultCredits(curriculum);
-  const anchorCourse = curriculum.courses.find(
-    (course) => course.id === anchor.courseId,
+  const anchorIndex = ({ courseId, slotIndex }: SlotRef) =>
+    anchors.findIndex(
+      (anchor) =>
+        anchor.courseId === courseId && anchor.slotIndex === slotIndex,
+    );
+  const rank = (ref: SlotRef) => {
+    const index = anchorIndex(ref);
+    return index === -1 ? anchors.length : index;
+  };
+
+  const slots = getSlotBoxes(curriculum).toSorted(
+    (a, b) =>
+      rank(a) - rank(b) || a.box.top - b.box.top || a.box.left - b.box.left,
   );
-  const anchorSlot = anchorCourse?.slots[anchor.slotIndex];
-  if (!anchorCourse || !anchorSlot) return curriculum;
 
-  const isAnchor = (courseId: number, slotIndex: number) =>
-    courseId === anchor.courseId && slotIndex === anchor.slotIndex;
-
-  const others = curriculum.courses
-    .flatMap((course) =>
-      course.slots.map((slot, slotIndex) => ({
-        courseId: course.id,
-        slotIndex,
-        slot,
-        height: getCourseHeight(course.credits, defaultCredits),
-      })),
-    )
-    .filter(
-      ({ courseId, slotIndex, slot }) =>
-        !isAnchor(courseId, slotIndex) && isSamePeriod(slot, anchorSlot),
-    )
-    .sort((a, b) => a.slot.position - b.slot.position);
-
-  const placed = [
-    {
-      start: anchorSlot.position,
-      end:
-        anchorSlot.position +
-        getCourseHeight(anchorCourse.credits, defaultCredits),
-    },
-  ];
+  const placed: Box[] = [];
   const newPositions = new Map<string, number>();
 
-  for (const { courseId, slotIndex, slot, height } of others) {
-    let position = slot.position;
-    let blocker = placed.find(
-      ({ start, end }) => position < end && start < position + height,
-    );
+  for (const { courseId, slotIndex, box } of slots) {
+    const height = box.bottom - box.top;
+    const current = { ...box };
+    let blocker = placed.find((other) => overlaps(other, current));
     while (blocker) {
-      position = blocker.end;
-      blocker = placed.find(
-        ({ start, end }) => position < end && start < position + height,
-      );
+      current.top = blocker.bottom;
+      current.bottom = current.top + height;
+      blocker = placed.find((other) => overlaps(other, current));
     }
-    placed.push({ start: position, end: position + height });
-    if (position !== slot.position)
-      newPositions.set(`${courseId}/${slotIndex}`, position);
+    placed.push(current);
+    if (current.top !== box.top)
+      newPositions.set(`${courseId}/${slotIndex}`, current.top);
   }
 
   if (newPositions.size === 0) return curriculum;

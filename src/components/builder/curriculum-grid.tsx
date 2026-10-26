@@ -13,10 +13,15 @@ import { useRef, useState } from "react";
 import type { Action } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
 import type { Curriculum } from "@/builder/draft";
-import { getCourseHeight, getDefaultCredits } from "@/builder/grid";
+import {
+  getCourseHeight,
+  getDefaultCredits,
+  getMaxDuration,
+} from "@/builder/grid";
 import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
 import CourseCard from "@/components/builder/course-card";
 import PeriodHeader from "@/components/builder/period-header";
+import ResizeHandle from "@/components/builder/resize-handle";
 import { Button } from "@/components/ui/button";
 import {
   GRID_CELL_HEIGHT,
@@ -41,7 +46,9 @@ const sensors = [
 ];
 
 type Cell = { column: number; row: number };
-type Landing = Cell & { dragId: string; height: number };
+type Size = { height: number; duration: number };
+type Landing = Cell & Size & { dragId: string };
+type Resize = Size & { dragId: string };
 
 export default function CurriculumGrid({
   curriculum,
@@ -56,21 +63,32 @@ export default function CurriculumGrid({
 }) {
   const firstCellRef = useRef<HTMLDivElement>(null);
   const [landing, setLanding] = useState<Landing | null>(null);
+  const [resize, setResize] = useState<Resize | null>(null);
   const defaultCredits = getDefaultCredits(curriculum);
   const columns = curriculum.periods.length;
 
   const cards = curriculum.courses.flatMap((course) =>
-    course.slots.map((slot, slotIndex) => ({
-      dragId: `${course.id}/${slotIndex}`,
-      course,
-      slotIndex,
-      column:
-        curriculum.periods.findIndex((period) => isSamePeriod(period, slot)) +
-        1,
-      row: slot.position,
-      height: getCourseHeight(course.credits, defaultCredits),
-    })),
+    course.slots.map((slot, slotIndex) => {
+      const dragId = `${course.id}/${slotIndex}`;
+      const size = {
+        height: getCourseHeight(course.credits, defaultCredits),
+        duration: course.duration,
+      };
+      return {
+        dragId,
+        course,
+        slotIndex,
+        column:
+          curriculum.periods.findIndex((period) => isSamePeriod(period, slot)) +
+          1,
+        row: slot.position,
+        size,
+        ...(resize?.dragId === dragId ? resize : size),
+      };
+    }),
   );
+
+  type Card = (typeof cards)[number];
 
   const rows =
     Math.max(
@@ -82,10 +100,13 @@ export default function CurriculumGrid({
 
   const occupied = new Set(
     cards.flatMap((card) =>
-      Array.from(
-        { length: card.height },
-        (_, offset) => `${card.column}/${card.row + offset}`,
-      ),
+      Array.from({ length: card.height }, (_, rowOffset) =>
+        Array.from(
+          { length: card.duration },
+          (_, columnOffset) =>
+            `${card.column + columnOffset}/${card.row + rowOffset}`,
+        ),
+      ).flat(),
     ),
   );
   const emptyCells = Array.from({ length: rows }, (_, rowIndex) =>
@@ -98,7 +119,7 @@ export default function CurriculumGrid({
     .flat()
     .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
 
-  function getCellAt(left: number, top: number): Cell | null {
+  function getCellAt(left: number, top: number, duration: number): Cell | null {
     const firstCell = firstCellRef.current?.getBoundingClientRect();
     if (!firstCell) return null;
     const rootFontSize = Number.parseFloat(
@@ -110,7 +131,7 @@ export default function CurriculumGrid({
     );
     const row = Math.round((top - firstCell.top) / (firstCell.height + gap));
     return {
-      column: Math.min(Math.max(column, 0), columns - 1) + 1,
+      column: Math.min(Math.max(column, 0), columns - duration) + 1,
       row: Math.max(row, 0) + 1,
     };
   }
@@ -118,8 +139,36 @@ export default function CurriculumGrid({
   function getLanding(operation: DragMoveEvent["operation"]) {
     const card = cards.find((card) => card.dragId === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
-    const cell = rect && getCellAt(rect.left, rect.top);
+    const cell = card && rect && getCellAt(rect.left, rect.top, card.duration);
     return card && cell ? { card, cell } : null;
+  }
+
+  function getResizedSize(card: Card, delta: Partial<Size>): Size {
+    return {
+      height: Math.max(1, card.size.height + (delta.height ?? 0)),
+      duration: Math.min(
+        Math.max(1, card.size.duration + (delta.duration ?? 0)),
+        getMaxDuration(curriculum, card.course),
+      ),
+    };
+  }
+
+  function resizeCard(card: Card, delta: Partial<Size>) {
+    const size = getResizedSize(card, delta);
+    if (size.height !== resize?.height || size.duration !== resize.duration)
+      setResize({ ...size, dragId: card.dragId });
+  }
+
+  function releaseCard(card: Card, delta: Partial<Size>) {
+    setResize(null);
+    const { height, duration } = getResizedSize(card, delta);
+    dispatch({
+      type: "resizeCourse",
+      courseId: card.course.id,
+      slotIndex: card.slotIndex,
+      rows: height,
+      duration,
+    });
   }
 
   return (
@@ -140,6 +189,7 @@ export default function CurriculumGrid({
             ...next.cell,
             dragId: next.card.dragId,
             height: next.card.height,
+            duration: next.card.duration,
           });
       }}
       onDragEnd={({ operation, canceled }) => {
@@ -201,17 +251,30 @@ export default function CurriculumGrid({
             isSelected={card.course.id === selectedCourseId}
             onSelect={() => onSelectCourse(card.course.id)}
             style={{
-              gridColumn: card.column,
+              gridColumn: `${card.column} / span ${card.duration}`,
               gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
             }}
-          />
+          >
+            <ResizeHandle
+              edge="bottom"
+              label="Cambiar créditos"
+              onResize={(rows) => resizeCard(card, { height: rows })}
+              onRelease={(rows) => releaseCard(card, { height: rows })}
+            />
+            <ResizeHandle
+              edge="right"
+              label="Cambiar duración"
+              onResize={(columns) => resizeCard(card, { duration: columns })}
+              onRelease={(columns) => releaseCard(card, { duration: columns })}
+            />
+          </CourseCard>
         ))}
         {landing && (
           <div
             aria-hidden
             className="pointer-events-none z-10 rounded-lg border-2 border-primary border-dashed bg-primary/10"
             style={{
-              gridColumn: landing.column,
+              gridColumn: `${landing.column} / span ${landing.duration}`,
               gridRow: `${HEADER_ROWS + landing.row} / span ${landing.height}`,
             }}
           />
