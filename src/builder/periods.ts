@@ -1,4 +1,4 @@
-import type { Curriculum, Period, TermSystem } from "@/builder/draft";
+import type { Curriculum, Period, Slot, TermSystem } from "@/builder/draft";
 import { TERM_LABELS } from "@/utils/period-key";
 
 export const REGULAR_TERMS: Record<TermSystem, number[]> = {
@@ -74,4 +74,8 @@ export function isSamePeriod(a: Period, b: Period) {
 
 export function comparePeriods(a: Period, b: Period) {
   return a.programYear - b.programYear || a.term - b.term;
+}
+
+export function compareSlots(a: Slot, b: Slot) {
+  return comparePeriods(a, b) || a.position - b.position;
 }

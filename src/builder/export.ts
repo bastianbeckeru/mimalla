@@ -1,5 +1,5 @@
-import type { Curriculum, Draft, Slot } from "@/builder/draft";
-import { comparePeriods } from "@/builder/periods";
+import type { Curriculum, Draft } from "@/builder/draft";
+import { comparePeriods, compareSlots } from "@/builder/periods";
 import { slugify } from "@/utils/strings";
 
 const MIN_EFFECTIVE_YEAR = 1900;
@@ -17,10 +17,6 @@ function isValidEffectiveYear(year: number | null): year is number {
 }
 
 const SCHEMA_VERSION = 1;
-
-function compareSlots(a: Slot, b: Slot) {
-  return comparePeriods(a, b) || a.position - b.position;
-}
 
 export function exportFile({ curriculum }: Draft) {
   const courses = curriculum.courses
@@ -43,8 +39,16 @@ export function exportFile({ curriculum }: Draft) {
 
   return JSON.stringify({
     schemaVersion: SCHEMA_VERSION,
-    program: { name: curriculum.programName },
+    program: {
+      name: curriculum.programName,
+      ...(curriculum.institution !== "" && {
+        institution: curriculum.institution,
+      }),
+    },
     effectiveYear: curriculum.effectiveYear,
+    ...(curriculum.versionName !== "" && {
+      versionName: curriculum.versionName,
+    }),
     termSystem: curriculum.termSystem,
     periods: curriculum.periods
       .toSorted(comparePeriods)
@@ -59,8 +63,10 @@ export function exportFile({ curriculum }: Draft) {
     courses: courses.map((course, index) => ({
       id: index + 1,
       name: course.name,
+      ...(course.code !== "" && { code: course.code }),
       credits: course.credits,
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
+      ...(course.isElective && { isElective: true }),
       slots: course.slots.map(({ programYear, term, position }) => ({
         programYear,
         term,
