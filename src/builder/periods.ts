@@ -6,7 +6,7 @@ export const REGULAR_TERMS: Record<TermSystem, number[]> = {
   annual: [1],
 };
 
-const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
+export const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
   semester: [2, 4],
   annual: [4],
 };

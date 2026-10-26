@@ -9,6 +9,7 @@ import CoursePanel from "@/components/builder/course-panel";
 import CurriculumGrid from "@/components/builder/curriculum-grid";
 import DetailsForm from "@/components/builder/details-form";
 import DownloadButton from "@/components/builder/download-button";
+import ImportButton from "@/components/builder/import-button";
 import NewCurriculumDialog from "@/components/builder/new-curriculum-dialog";
 import PrerequisitesField from "@/components/builder/prerequisites-field";
 import ProgramYearControls from "@/components/builder/program-year-controls";
@@ -37,6 +38,7 @@ function BuilderWorkspace() {
   const hasHydrated = useBuilderHasHydrated();
   const draft = useBuilderStore((state) => state.draft);
   const dispatch = useBuilderStore((state) => state.dispatch);
+  const load = useBuilderStore((state) => state.load);
   const undo = useBuilderStore((state) => state.undo);
   const redo = useBuilderStore((state) => state.redo);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -80,6 +82,12 @@ function BuilderWorkspace() {
             />
           </div>
           <NewCurriculumDialog dispatch={dispatch} />
+          <ImportButton
+            onLoad={(loadedDraft) => {
+              load(loadedDraft);
+              setSelectedCourseId(null);
+            }}
+          />
           <DownloadButton draft={draft} />
         </header>
         <div className="flex flex-1 items-start gap-4 overflow-auto p-4">

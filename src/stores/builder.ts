@@ -17,6 +17,7 @@ type BuilderState = {
 
 type BuilderActions = {
   dispatch: (action: Action, options?: { group?: string }) => void;
+  load: (draft: Draft) => void;
   undo: () => void;
   redo: () => void;
 };
@@ -47,6 +48,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
               ? { type: "reset", present: next }
               : { type: "commit", present: next, group: options?.group };
           }),
+        load: (draft) => update(() => ({ type: "reset", present: draft })),
         undo: () => update(() => ({ type: "undo" })),
         redo: () => update(() => ({ type: "redo" })),
       };

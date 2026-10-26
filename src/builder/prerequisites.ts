@@ -28,7 +28,11 @@ export function getMisplacedPrerequisiteIds(
   });
 }
 
-function dependsOn(curriculum: Curriculum, fromId: number, targetId: number) {
+export function dependsOn(
+  curriculum: Curriculum,
+  fromId: number,
+  targetId: number,
+) {
   const visited = new Set<number>();
   const pending = [fromId];
   while (pending.length > 0) {
