@@ -43,6 +43,8 @@ export const courseHandlers: Handlers<CourseAction> = {
       credits: getDefaultCredits(curriculum),
       areaId: null,
       duration: 1,
+      prerequisiteIds: [],
+      prerequisiteCredits: 0,
       isElective: false,
       slots: [
         {
@@ -83,7 +85,18 @@ export const courseHandlers: Handlers<CourseAction> = {
       ...draft,
       curriculum: {
         ...curriculum,
-        courses: curriculum.courses.filter((course) => course.id !== courseId),
+        courses: curriculum.courses
+          .filter((course) => course.id !== courseId)
+          .map((course) =>
+            course.prerequisiteIds.includes(courseId)
+              ? {
+                  ...course,
+                  prerequisiteIds: course.prerequisiteIds.filter(
+                    (id) => id !== courseId,
+                  ),
+                }
+              : course,
+          ),
       },
     };
   },

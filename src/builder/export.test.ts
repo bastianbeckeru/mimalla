@@ -205,6 +205,29 @@ describe("exporting a curriculum", () => {
     );
   });
 
+  test("writes renumbered prerequisites and prerequisite credits after the area, and omits them when empty or 0", () => {
+    const draft = draftAfter(
+      details,
+      { type: "addArea", name: "Privado" },
+      { type: "addCourse", period: { programYear: 2, term: 1 } },
+      { type: "addCourse", period: { programYear: 1, term: 3 } },
+      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      { type: "assignArea", courseId: 1, areaId: 1 },
+      { type: "editCourse", courseId: 1, changes: { isElective: true } },
+      { type: "addPrerequisite", courseId: 1, prerequisiteId: 2 },
+      { type: "addPrerequisite", courseId: 1, prerequisiteId: 3 },
+      { type: "setPrerequisiteCredits", courseId: 1, credits: 30 },
+      { type: "setPrerequisiteCredits", courseId: 2, credits: 10 },
+      { type: "setPrerequisiteCredits", courseId: 2, credits: 0 },
+    );
+
+    expect(exportFile(draft)).toContain(
+      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
+        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":3,"position":1}]},' +
+        '{"id":3,"name":"Nuevo curso","credits":5,"areaId":1,"prerequisiteIds":[1,2],"prerequisiteCredits":30,"isElective":true,"slots":[{"programYear":2,"term":1,"position":1}]}]',
+    );
+  });
+
   test("names the file after the program", () => {
     const draft = draftAfter({
       type: "editDetails",

@@ -36,6 +36,8 @@ export function exportFile({ curriculum }: Draft) {
     ]),
   ];
   const exportedAreaId = (areaId: number) => areaIds.indexOf(areaId) + 1;
+  const exportedCourseId = (courseId: number) =>
+    courses.findIndex((course) => course.id === courseId) + 1;
 
   return JSON.stringify({
     schemaVersion: SCHEMA_VERSION,
@@ -66,6 +68,14 @@ export function exportFile({ curriculum }: Draft) {
       ...(course.code !== "" && { code: course.code }),
       credits: course.credits,
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
+      ...(course.prerequisiteIds.length > 0 && {
+        prerequisiteIds: course.prerequisiteIds
+          .map(exportedCourseId)
+          .toSorted((a, b) => a - b),
+      }),
+      ...(course.prerequisiteCredits > 0 && {
+        prerequisiteCredits: course.prerequisiteCredits,
+      }),
       ...(course.isElective && { isElective: true }),
       slots: course.slots.map(({ programYear, term, position }) => ({
         programYear,
