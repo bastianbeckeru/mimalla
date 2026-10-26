@@ -17,6 +17,7 @@ import {
   getMaxDuration,
 } from "@/builder/grid";
 import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
+import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
 import CourseCard from "@/components/builder/course-card";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
@@ -35,6 +36,7 @@ const HEADER_ROWS = 1;
 const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
 const PREREQUISITE_LINE_COLOR = "#34d399";
+const MISPLACED_PREREQUISITE_LINE_COLOR = "var(--warning)";
 
 const sensors = [
   PointerSensor.configure({
@@ -100,6 +102,15 @@ export default function CurriculumGrid({
     ) + SPARE_ROWS;
   const footRow = HEADER_ROWS + rows + 1;
 
+  const misplacedPrerequisiteIds =
+    hoveredCourseId === null
+      ? []
+      : getMisplacedPrerequisiteIds(curriculum, hoveredCourseId);
+  const misplacedCardIds = new Set(
+    cards
+      .filter((card) => misplacedPrerequisiteIds.includes(card.course.id))
+      .map((card) => card.dragId),
+  );
   const prerequisitePaths =
     hoveredCourseId === null || landing || resize
       ? []
@@ -117,7 +128,13 @@ export default function CurriculumGrid({
             courseId: card.course.id,
             course: card.course.id === hoveredCourseId ? card.course : null,
           })),
-        ).map(({ data }) => ({ data, color: PREREQUISITE_LINE_COLOR }));
+          { includeAllPrerequisites: true },
+        ).map(({ data, originCardId }) => ({
+          data,
+          color: misplacedCardIds.has(originCardId)
+            ? MISPLACED_PREREQUISITE_LINE_COLOR
+            : PREREQUISITE_LINE_COLOR,
+        }));
 
   const occupied = new Set(
     cards.flatMap((card) =>

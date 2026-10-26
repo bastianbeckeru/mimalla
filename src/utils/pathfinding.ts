@@ -39,6 +39,7 @@ export function createConnectionPaths(
   rows: number,
   cols: number,
   cards: ConnectableCard[],
+  { includeAllPrerequisites = false } = {},
 ): Path[] {
   const grid = createNavigationGrid(rows, cols, cards);
   const paths: Path[] = [];
@@ -50,17 +51,25 @@ export function createConnectionPaths(
     const { prerequisiteIds } = course;
 
     prerequisiteIds.forEach((id) => {
-      const relatedCard = cards.find(
+      const earlierCard = cards.find(
         (slot) =>
           slot.courseId === id &&
           ((slot.programYear === programYear && slot.term < term) ||
             slot.programYear < programYear),
       );
+      const relatedCard =
+        earlierCard ??
+        (includeAllPrerequisites
+          ? cards.find((slot) => slot.courseId === id)
+          : undefined);
 
       if (!relatedCard) return;
 
-      const start = getCardEdgePoint(relatedCard, "right");
-      const end = getCardEdgePoint(card, "left");
+      const [startSide, endSide] = earlierCard
+        ? (["right", "left"] as const)
+        : getMisplacedConnectionSides(relatedCard, card);
+      const start = getCardEdgePoint(relatedCard, startSide);
+      const end = getCardEdgePoint(card, endSide);
       const path = findPath(grid, start, end);
 
       const fixedPath: Path = {
@@ -126,6 +135,15 @@ function createNavigationGrid(
   });
 
   return grid;
+}
+
+function getMisplacedConnectionSides(
+  origin: Card,
+  destination: Card,
+): ["left" | "right", "left" | "right"] {
+  return origin.x >= destination.x + destination.w
+    ? ["left", "right"]
+    : ["right", "right"];
 }
 
 function getCardEdgePoint(
