@@ -34,6 +34,24 @@ export default function DetailsForm({
         />
       </div>
       <div className="flex flex-col gap-1.5">
+        <Label htmlFor="builder-institution">Institución</Label>
+        <Input
+          id="builder-institution"
+          className="w-40"
+          placeholder="Opcional"
+          value={curriculum.institution}
+          onChange={(event) =>
+            dispatch(
+              {
+                type: "editDetails",
+                changes: { institution: event.target.value },
+              },
+              { group: "institution" },
+            )
+          }
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
         <Label htmlFor="builder-effective-year">Vigente desde</Label>
         <Input
           id="builder-effective-year"
@@ -58,6 +76,24 @@ export default function DetailsForm({
                 },
               },
               { group: "effective-year" },
+            )
+          }
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="builder-version-name">Versión</Label>
+        <Input
+          id="builder-version-name"
+          className="w-32"
+          placeholder="v6.0"
+          value={curriculum.versionName}
+          onChange={(event) =>
+            dispatch(
+              {
+                type: "editDetails",
+                changes: { versionName: event.target.value },
+              },
+              { group: "version-name" },
             )
           }
         />
