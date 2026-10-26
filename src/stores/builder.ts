@@ -17,6 +17,7 @@ type BuilderActions = {
   load: (draft: Draft) => void;
   undo: () => void;
   redo: () => void;
+  endGroup: () => void;
 };
 
 const initialDraft = createDraft("semester");
@@ -48,6 +49,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         load: (draft) => update(() => ({ type: "reset", present: draft })),
         undo: () => update(() => ({ type: "undo" })),
         redo: () => update(() => ({ type: "redo" })),
+        endGroup: () => update(() => ({ type: "endGroup" })),
       };
     },
     {

@@ -2,7 +2,7 @@
 
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { findCourse } from "@/builder/draft";
 import { getMaxDuration } from "@/builder/grid";
 import AreasManager from "@/components/builder/areas-manager";
@@ -42,7 +42,13 @@ function BuilderWorkspace() {
   const load = useBuilderStore((state) => state.load);
   const undo = useBuilderStore((state) => state.undo);
   const redo = useBuilderStore((state) => state.redo);
+  const endGroup = useBuilderStore((state) => state.endGroup);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+
+  useEffect(() => {
+    document.addEventListener("focusout", endGroup);
+    return () => document.removeEventListener("focusout", endGroup);
+  }, [endGroup]);
 
   useHotkey("Mod+Z", undo, { enabled: hasHydrated, ignoreInputs: true });
   useHotkey("Mod+Shift+Z", redo, { enabled: hasHydrated, ignoreInputs: true });

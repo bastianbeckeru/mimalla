@@ -51,6 +51,11 @@ export function historyReducer<T>(
         future,
       };
     }
+    case "endGroup": {
+      if (history.group === undefined) return history;
+      const { group: _, ...ended } = history;
+      return ended;
+    }
     case "reset":
       return createHistory(action.present);
   }
