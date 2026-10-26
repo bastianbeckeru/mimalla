@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createHistory, historyReducer } from "@/hooks/use-history";
+import { createHistory, historyReducer } from "@/utils/history";
 
 describe("historyReducer", () => {
   test("undo after a commit restores the previous state", () => {

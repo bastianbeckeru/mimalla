@@ -3,13 +3,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import {
-  createHistory,
-  type History,
-  type HistoryAction,
-  historyReducer,
-} from "@/hooks/use-history";
 import type { Action, Draft } from "@/types/builder";
+import type { History, HistoryAction } from "@/types/history";
+import { createHistory, historyReducer } from "@/utils/history";
 
 type BuilderState = {
   draft: Draft;
