@@ -5,7 +5,7 @@ import {
   isHexColor,
 } from "@/builder/colors";
 import { isValidEffectiveYear, SCHEMA_VERSION } from "@/builder/export";
-import { fitsInColumns, pushDownCollisions } from "@/builder/grid";
+import { pushDownCollisions, slotsFitInPeriods } from "@/builder/grid";
 import {
   comparePeriods,
   INTENSIVE_TERMS,
@@ -262,11 +262,7 @@ function readCourse(
 
 function checkLayout(curriculum: Curriculum) {
   for (const course of curriculum.courses) {
-    if (
-      !course.slots.every((slot) =>
-        fitsInColumns(curriculum, slot, course.duration),
-      )
-    )
+    if (!slotsFitInPeriods(curriculum, course.slots, course.duration))
       reject(
         `El curso "${course.name}" se extiende más allá de la última columna.`,
       );

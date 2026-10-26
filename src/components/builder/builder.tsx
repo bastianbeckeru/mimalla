@@ -3,6 +3,7 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor } from "lucide-react";
 import { useState } from "react";
+import { findCourse } from "@/builder/draft";
 import { getMaxDuration } from "@/builder/grid";
 import AreasManager from "@/components/builder/areas-manager";
 import CoursePanel from "@/components/builder/course-panel";
@@ -57,9 +58,10 @@ function BuilderWorkspace() {
 
   if (!hasHydrated) return <Loader2 className="m-auto size-8 animate-spin" />;
 
-  const selectedCourse = draft.curriculum.courses.find(
-    (course) => course.id === selectedCourseId,
-  );
+  const selectedCourse =
+    selectedCourseId === null
+      ? undefined
+      : findCourse(draft.curriculum, selectedCourseId);
 
   return (
     <>

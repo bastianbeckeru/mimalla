@@ -1,8 +1,9 @@
+import { findCourse } from "@/builder/draft";
 import {
-  fitsInColumns,
   getCourseHeight,
   getDefaultCredits,
   pushDownCollisions,
+  slotsFitInPeriods,
 } from "@/builder/grid";
 import type { Handlers, ResizeAction } from "@/types/builder";
 
@@ -10,12 +11,12 @@ export const resizeHandlers: Handlers<ResizeAction> = {
   resizeCourse: (draft, { courseId, slotIndex, rows, duration }) => {
     const { curriculum } = draft;
     const defaultCredits = getDefaultCredits(curriculum);
-    const course = curriculum.courses.find((course) => course.id === courseId);
+    const course = findCourse(curriculum, courseId);
     if (
       !course?.slots[slotIndex] ||
       !Number.isInteger(rows) ||
       rows < 1 ||
-      !course.slots.every((slot) => fitsInColumns(curriculum, slot, duration))
+      !slotsFitInPeriods(curriculum, course.slots, duration)
     )
       return draft;
 

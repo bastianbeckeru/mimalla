@@ -11,7 +11,7 @@ export const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
   annual: [4],
 };
 
-function findPeriodIndex(periods: Period[], period: Period) {
+export function findPeriodIndex(periods: Period[], period: Period) {
   return periods.findIndex((candidate) => isSamePeriod(candidate, period));
 }
 

@@ -1,3 +1,4 @@
+import { findCourse } from "@/builder/draft";
 import { canAddPrerequisite } from "@/builder/prerequisites";
 import type {
   Course,
@@ -34,9 +35,7 @@ export const prerequisiteHandlers: Handlers<PrerequisiteAction> = {
   },
 
   removePrerequisite: (draft, { courseId, prerequisiteId }) => {
-    const course = draft.curriculum.courses.find(
-      (course) => course.id === courseId,
-    );
+    const course = findCourse(draft.curriculum, courseId);
     if (!course?.prerequisiteIds.includes(prerequisiteId)) return draft;
     return updateCourse(draft, courseId, (course) => ({
       ...course,

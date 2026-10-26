@@ -1,8 +1,9 @@
+import { findCourse } from "@/builder/draft";
 import {
-  fitsInColumns,
   getDefaultCredits,
   getFirstFreePosition,
   pushDownCollisions,
+  slotsFitInPeriods,
 } from "@/builder/grid";
 import { compareSlots } from "@/builder/periods";
 import type { Course, CourseAction, Draft, Handlers } from "@/types/builder";
@@ -56,7 +57,7 @@ export const courseHandlers: Handlers<CourseAction> = {
 
   editCourse: (draft, { courseId, changes }) => {
     const { curriculum } = draft;
-    const course = curriculum.courses.find((course) => course.id === courseId);
+    const course = findCourse(curriculum, courseId);
     if (
       !course ||
       (changes.credits !== undefined && !isValidCredits(changes.credits))
@@ -66,7 +67,7 @@ export const courseHandlers: Handlers<CourseAction> = {
     const { duration } = changes;
     if (
       duration !== undefined &&
-      !course.slots.every((slot) => fitsInColumns(curriculum, slot, duration))
+      !slotsFitInPeriods(curriculum, course.slots, duration)
     )
       return draft;
 

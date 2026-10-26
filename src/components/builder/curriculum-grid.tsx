@@ -16,7 +16,7 @@ import {
   getDefaultCredits,
   getMaxDuration,
 } from "@/builder/grid";
-import { getPeriodLabel, isSamePeriod } from "@/builder/periods";
+import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
 import CourseCard from "@/components/builder/course-card";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
@@ -82,9 +82,7 @@ export default function CurriculumGrid({
         course,
         slot,
         slotIndex,
-        column:
-          curriculum.periods.findIndex((period) => isSamePeriod(period, slot)) +
-          1,
+        column: findPeriodIndex(curriculum.periods, slot) + 1,
         row: slot.position,
         size,
         ...(resize?.dragId === dragId ? resize : size),

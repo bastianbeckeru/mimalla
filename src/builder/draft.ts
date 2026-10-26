@@ -1,6 +1,6 @@
 import { DEFAULT_BASE_COLOR } from "@/builder/colors";
 import { REGULAR_TERMS } from "@/builder/periods";
-import type { Draft, TermSystem } from "@/types/builder";
+import type { Curriculum, Draft, TermSystem } from "@/types/builder";
 
 const INITIAL_PROGRAM_YEARS = 5;
 
@@ -26,4 +26,8 @@ export function createDraft(termSystem: TermSystem): Draft {
     baseColor: DEFAULT_BASE_COLOR,
     handColoredAreaIds: [],
   };
+}
+
+export function findCourse(curriculum: Curriculum, courseId: number) {
+  return curriculum.courses.find((course) => course.id === courseId);
 }

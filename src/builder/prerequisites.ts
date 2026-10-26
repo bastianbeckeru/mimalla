@@ -1,30 +1,27 @@
-import { isSamePeriod } from "@/builder/periods";
+import { findCourse } from "@/builder/draft";
+import { findPeriodIndex } from "@/builder/periods";
 import type { Course, Curriculum } from "@/types/builder";
 
-function getColumnIndexes(curriculum: Curriculum, course: Course) {
-  return course.slots.map((slot) =>
-    curriculum.periods.findIndex((period) => isSamePeriod(period, slot)),
-  );
+function getPeriodIndexes(curriculum: Curriculum, course: Course) {
+  return course.slots.map((slot) => findPeriodIndex(curriculum.periods, slot));
 }
 
 export function getMisplacedPrerequisiteIds(
   curriculum: Curriculum,
   courseId: number,
 ) {
-  const course = curriculum.courses.find((course) => course.id === courseId);
+  const course = findCourse(curriculum, courseId);
   if (!course) return [];
-  const firstColumn = Math.min(...getColumnIndexes(curriculum, course));
+  const firstPeriodIndex = Math.min(...getPeriodIndexes(curriculum, course));
 
   return course.prerequisiteIds.filter((prerequisiteId) => {
-    const prerequisite = curriculum.courses.find(
-      (course) => course.id === prerequisiteId,
-    );
+    const prerequisite = findCourse(curriculum, prerequisiteId);
     if (!prerequisite) return false;
-    const lastColumnOfFirstPlacement =
-      Math.min(...getColumnIndexes(curriculum, prerequisite)) +
+    const lastPeriodIndexOfFirstPlacement =
+      Math.min(...getPeriodIndexes(curriculum, prerequisite)) +
       prerequisite.duration -
       1;
-    return lastColumnOfFirstPlacement >= firstColumn;
+    return lastPeriodIndexOfFirstPlacement >= firstPeriodIndex;
   });
 }
 
@@ -40,7 +37,7 @@ export function dependsOn(
     if (id === undefined || visited.has(id)) continue;
     if (id === targetId) return true;
     visited.add(id);
-    const course = curriculum.courses.find((course) => course.id === id);
+    const course = findCourse(curriculum, id);
     pending.push(...(course?.prerequisiteIds ?? []));
   }
   return false;
@@ -51,7 +48,7 @@ export function canAddPrerequisite(
   courseId: number,
   prerequisiteId: number,
 ) {
-  const course = curriculum.courses.find((course) => course.id === courseId);
+  const course = findCourse(curriculum, courseId);
   return (
     course !== undefined &&
     !course.prerequisiteIds.includes(prerequisiteId) &&
