@@ -19,7 +19,7 @@ export default function CoursePanel({
 }: {
   course: Course;
   areas: Area[];
-  dispatch: (action: Action) => void;
+  dispatch: (action: Action, options?: { group?: string }) => void;
   onClose: () => void;
 }) {
   const [creditsText, setCreditsText] = useState(String(course.credits));
@@ -45,11 +45,14 @@ export default function CoursePanel({
           required
           value={course.name}
           onChange={(event) =>
-            dispatch({
-              type: "editCourse",
-              courseId: course.id,
-              changes: { name: event.target.value },
-            })
+            dispatch(
+              {
+                type: "editCourse",
+                courseId: course.id,
+                changes: { name: event.target.value },
+              },
+              { group: `course-${course.id}-name` },
+            )
           }
         />
       </div>
@@ -65,11 +68,14 @@ export default function CoursePanel({
             const text = event.target.value.trim();
             setCreditsText(text);
             if (CREDITS_PATTERN.test(text))
-              dispatch({
-                type: "editCourse",
-                courseId: course.id,
-                changes: { credits: Number(text) },
-              });
+              dispatch(
+                {
+                  type: "editCourse",
+                  courseId: course.id,
+                  changes: { credits: Number(text) },
+                },
+                { group: `course-${course.id}-credits` },
+              );
           }}
         />
         {!hasValidCredits && (

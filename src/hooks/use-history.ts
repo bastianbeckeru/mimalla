@@ -2,14 +2,15 @@ import { useMemo, useReducer } from "react";
 
 const MAX_HISTORY = 50;
 
-type History<T> = {
+export type History<T> = {
   past: T[];
   present: T;
   future: T[];
+  group?: string;
 };
 
-type HistoryAction<T> =
-  | { type: "commit"; present: T }
+export type HistoryAction<T> =
+  | { type: "commit"; present: T; group?: string }
   | { type: "undo" }
   | { type: "redo" }
   | { type: "reset"; present: T };
@@ -25,11 +26,23 @@ export function historyReducer<T>(
   switch (action.type) {
     case "commit":
       if (isDeepEqual(action.present, history.present)) return history;
+      if (action.group !== undefined && action.group === history.group) {
+        const previous = history.past.at(-1);
+        if (isDeepEqual(action.present, previous))
+          return {
+            past: history.past.slice(0, -1),
+            present: action.present,
+            future: [],
+          };
+
+        return { ...history, present: action.present };
+      }
 
       return {
         past: [...history.past, history.present].slice(-MAX_HISTORY),
         present: action.present,
         future: [],
+        group: action.group,
       };
     case "undo": {
       const previous = history.past.at(-1);

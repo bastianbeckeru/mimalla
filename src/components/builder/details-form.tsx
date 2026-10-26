@@ -10,7 +10,7 @@ export default function DetailsForm({
   dispatch,
 }: {
   curriculum: Curriculum;
-  dispatch: (action: Action) => void;
+  dispatch: (action: Action, options?: { group?: string }) => void;
 }) {
   return (
     <div className="flex items-end gap-3">
@@ -23,10 +23,13 @@ export default function DetailsForm({
           required
           value={curriculum.programName}
           onChange={(event) =>
-            dispatch({
-              type: "editDetails",
-              changes: { programName: event.target.value },
-            })
+            dispatch(
+              {
+                type: "editDetails",
+                changes: { programName: event.target.value },
+              },
+              { group: "program-name" },
+            )
           }
         />
       </div>
@@ -44,13 +47,18 @@ export default function DetailsForm({
           step={1}
           value={curriculum.effectiveYear ?? ""}
           onChange={(event) =>
-            dispatch({
-              type: "editDetails",
-              changes: {
-                effectiveYear:
-                  event.target.value === "" ? null : Number(event.target.value),
+            dispatch(
+              {
+                type: "editDetails",
+                changes: {
+                  effectiveYear:
+                    event.target.value === ""
+                      ? null
+                      : Number(event.target.value),
+                },
               },
-            })
+              { group: "effective-year" },
+            )
           }
         />
       </div>
