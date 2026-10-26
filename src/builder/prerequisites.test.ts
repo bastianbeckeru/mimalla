@@ -173,6 +173,22 @@ describe("prerequisite placement warnings", () => {
   });
 });
 
+describe("prerequisite placement warnings with duration", () => {
+  test("warns about an earlier prerequisite whose last spanned column reaches the course", () => {
+    const draft = draftAfter(
+      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", period: SECOND_SEMESTER, position: 3 },
+      { type: "addCourse", period: THIRD_SEMESTER, position: 3 },
+      { type: "editCourse", courseId: 1, changes: { duration: 2 } },
+      { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
+      { type: "addPrerequisite", courseId: 3, prerequisiteId: 1 },
+    );
+
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([1]);
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 3)).toEqual([]);
+  });
+});
+
 describe("deleting a course", () => {
   test("removes it from the prerequisites of the other courses", () => {
     const draft = draftAfter(

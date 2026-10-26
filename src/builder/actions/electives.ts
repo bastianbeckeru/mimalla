@@ -37,7 +37,7 @@ export const electiveHandlers: Handlers<ElectiveAction> = {
       ...draft,
       curriculum: pushDownCollisions(
         withSlots(draft, courseId, (slots) => [...slots, slot]),
-        { courseId, slotIndex: course.slots.length },
+        [{ courseId, slotIndex: course.slots.length }],
       ),
     };
   },

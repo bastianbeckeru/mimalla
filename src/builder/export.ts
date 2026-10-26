@@ -67,6 +67,7 @@ export function exportFile({ curriculum }: Draft) {
       name: course.name,
       ...(course.code !== "" && { code: course.code }),
       credits: course.credits,
+      ...(course.duration !== 1 && { duration: course.duration }),
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
       ...(course.prerequisiteIds.length > 0 && {
         prerequisiteIds: course.prerequisiteIds

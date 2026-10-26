@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Action } from "@/builder/apply";
 import type { Area, Course, TermSystem } from "@/builder/draft";
 import AreaSelect from "@/components/builder/area-select";
+import DurationInput from "@/components/builder/duration-input";
 import ElectiveSlots from "@/components/builder/elective-slots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,17 +16,24 @@ const CREDITS_PATTERN = /^\d+$/;
 export default function CoursePanel({
   course,
   areas,
+  maxDuration,
   termSystem,
   dispatch,
   onClose,
 }: {
   course: Course;
   areas: Area[];
+  maxDuration: number;
   termSystem: TermSystem;
   dispatch: (action: Action, options?: { group?: string }) => void;
   onClose: () => void;
 }) {
   const [creditsText, setCreditsText] = useState(String(course.credits));
+  const [prevCredits, setPrevCredits] = useState(course.credits);
+  if (course.credits !== prevCredits) {
+    setPrevCredits(course.credits);
+    setCreditsText(String(course.credits));
+  }
   const hasValidCredits = CREDITS_PATTERN.test(creditsText);
 
   return (
@@ -108,6 +116,11 @@ export default function CoursePanel({
           </p>
         )}
       </div>
+      <DurationInput
+        course={course}
+        maxDuration={maxDuration}
+        dispatch={dispatch}
+      />
       <AreaSelect course={course} areas={areas} dispatch={dispatch} />
       <ElectiveSlots
         course={course}

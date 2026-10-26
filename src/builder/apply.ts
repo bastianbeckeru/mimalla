@@ -13,8 +13,10 @@ import {
   type PrerequisiteAction,
   prerequisiteHandlers,
 } from "@/builder/actions/prerequisites";
+import { type ResizeAction, resizeHandlers } from "@/builder/actions/resize";
 import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
 import type { Draft, Handlers } from "@/builder/draft";
+import { pushDownCollisions } from "@/builder/grid";
 
 export type Action =
   | CurriculumAction
@@ -22,6 +24,7 @@ export type Action =
   | AreaAction
   | PeriodAction
   | SlotAction
+  | ResizeAction
   | ElectiveAction
   | PrerequisiteAction;
 
@@ -31,6 +34,7 @@ const handlers: Handlers<Action> = {
   ...areaHandlers,
   ...periodHandlers,
   ...slotHandlers,
+  ...resizeHandlers,
   ...electiveHandlers,
   ...prerequisiteHandlers,
 };
@@ -40,5 +44,8 @@ export function apply(draft: Draft, action: Action): Draft {
     draft: Draft,
     action: Action,
   ) => Draft;
-  return handle(draft, action);
+  const next = handle(draft, action);
+  if (next === draft) return draft;
+  const curriculum = pushDownCollisions(next.curriculum);
+  return curriculum === next.curriculum ? next : { ...next, curriculum };
 }
