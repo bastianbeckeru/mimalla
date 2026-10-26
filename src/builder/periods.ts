@@ -1,4 +1,4 @@
-import type { Curriculum, Period, Slot, TermSystem } from "@/builder/draft";
+import type { Curriculum, Period, Slot, TermSystem } from "@/types/builder";
 import { TERM_LABELS } from "@/utils/period-key";
 
 export const REGULAR_TERMS: Record<TermSystem, number[]> = {

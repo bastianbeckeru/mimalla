@@ -1,10 +1,10 @@
-import type { Course, Draft, Handlers } from "@/builder/draft";
 import { canAddPrerequisite } from "@/builder/prerequisites";
-
-export type PrerequisiteAction =
-  | { type: "addPrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "removePrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "setPrerequisiteCredits"; courseId: number; credits: number };
+import type {
+  Course,
+  Draft,
+  Handlers,
+  PrerequisiteAction,
+} from "@/types/builder";
 
 function updateCourse(
   draft: Draft,

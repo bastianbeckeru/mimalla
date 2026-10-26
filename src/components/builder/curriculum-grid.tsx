@@ -10,9 +10,7 @@ import {
 import { DragDropProvider } from "@dnd-kit/react";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
-import type { Action } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
-import type { Curriculum } from "@/builder/draft";
 import {
   getCourseHeight,
   getDefaultCredits,
@@ -24,6 +22,7 @@ import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
 import PathsOverlay from "@/components/curriculum/paths-overlay";
 import { Button } from "@/components/ui/button";
+import type { Action, Curriculum } from "@/types/builder";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,

@@ -1,18 +1,10 @@
-import type { Handlers } from "@/builder/draft";
 import {
   fitsInColumns,
   getCourseHeight,
   getDefaultCredits,
   pushDownCollisions,
 } from "@/builder/grid";
-
-export type ResizeAction = {
-  type: "resizeCourse";
-  courseId: number;
-  slotIndex: number;
-  rows: number;
-  duration: number;
-};
+import type { Handlers, ResizeAction } from "@/types/builder";
 
 export const resizeHandlers: Handlers<ResizeAction> = {
   resizeCourse: (draft, { courseId, slotIndex, rows, duration }) => {

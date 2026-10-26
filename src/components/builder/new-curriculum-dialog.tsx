@@ -2,8 +2,6 @@
 
 import { FilePlus } from "lucide-react";
 import { useState } from "react";
-import type { Action } from "@/builder/apply";
-import type { TermSystem } from "@/builder/draft";
 import TermSystemSelect from "@/components/builder/term-system-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import type { Action, TermSystem } from "@/types/builder";
 
 export default function NewCurriculumDialog({
   dispatch,

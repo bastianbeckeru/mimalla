@@ -1,14 +1,4 @@
-import type { Curriculum, Handlers } from "@/builder/draft";
-
-export type CurriculumAction = {
-  type: "editDetails";
-  changes: Partial<
-    Pick<
-      Curriculum,
-      "programName" | "institution" | "effectiveYear" | "versionName"
-    >
-  >;
-};
+import type { CurriculumAction, Handlers } from "@/types/builder";
 
 export const curriculumHandlers: Handlers<CurriculumAction> = {
   editDetails: (draft, { changes }) => ({

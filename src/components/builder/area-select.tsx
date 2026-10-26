@@ -1,7 +1,5 @@
 "use client";
 
-import type { Action } from "@/builder/apply";
-import type { Area, Course } from "@/builder/draft";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -10,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Action, Area, Course } from "@/types/builder";
 
 const NO_AREA_LABEL = "Sin área";
 

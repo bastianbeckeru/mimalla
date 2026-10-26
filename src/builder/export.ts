@@ -1,5 +1,5 @@
-import type { Curriculum, Draft } from "@/builder/draft";
 import { comparePeriods, compareSlots } from "@/builder/periods";
+import type { Curriculum, Draft } from "@/types/builder";
 import { slugify } from "@/utils/strings";
 
 const MIN_EFFECTIVE_YEAR = 1900;

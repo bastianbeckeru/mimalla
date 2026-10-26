@@ -1,10 +1,9 @@
 "use client";
 
 import { CalendarMinus, CalendarPlus } from "lucide-react";
-import type { Action } from "@/builder/apply";
-import type { Curriculum } from "@/builder/draft";
 import { canRemoveLastProgramYear } from "@/builder/periods";
 import { Button } from "@/components/ui/button";
+import type { Action, Curriculum } from "@/types/builder";
 
 export default function ProgramYearControls({
   curriculum,

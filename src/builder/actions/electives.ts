@@ -1,9 +1,11 @@
-import type { Curriculum, Draft, Handlers, Slot } from "@/builder/draft";
 import { getFirstFreePosition, pushDownCollisions } from "@/builder/grid";
-
-export type ElectiveAction =
-  | { type: "addSlot"; courseId: number }
-  | { type: "removeSlot"; courseId: number; slotIndex: number };
+import type {
+  Curriculum,
+  Draft,
+  ElectiveAction,
+  Handlers,
+  Slot,
+} from "@/types/builder";
 
 function withSlots(
   { curriculum }: Draft,

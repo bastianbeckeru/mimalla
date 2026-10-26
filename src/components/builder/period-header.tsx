@@ -2,8 +2,6 @@
 
 import { Ellipsis, Plus, Trash2 } from "lucide-react";
 import type { CSSProperties } from "react";
-import type { Action } from "@/builder/apply";
-import type { Curriculum, Period } from "@/builder/draft";
 import {
   canRemovePeriod,
   getAvailableIntensiveTerms,
@@ -15,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Action, Curriculum, Period } from "@/types/builder";
 import { TERM_LABELS } from "@/utils/period-key";
 
 export default function PeriodHeader({

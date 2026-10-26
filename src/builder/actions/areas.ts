@@ -1,17 +1,9 @@
-import { getAreaShades, isHexColor } from "@/builder/colors";
-import type { Area, Draft, Handlers } from "@/builder/draft";
-
-export type AreaAction =
-  | { type: "addArea"; name: string }
-  | {
-      type: "editArea";
-      areaId: number;
-      changes: Partial<Pick<Area, "name">>;
-    }
-  | { type: "deleteArea"; areaId: number }
-  | { type: "setAreaColor"; areaId: number; color: string }
-  | { type: "setBaseColor"; color: string }
-  | { type: "assignArea"; courseId: number; areaId: number | null };
+import {
+  getAreaShade,
+  isHexColor,
+  toLowerCaseHexColor,
+} from "@/builder/colors";
+import type { Area, AreaAction, Draft, Handlers } from "@/types/builder";
 
 function nextAreaId(draft: Draft) {
   return Math.max(0, ...draft.curriculum.areas.map((area) => area.id)) + 1;
@@ -41,11 +33,10 @@ function updateArea(
 export const areaHandlers: Handlers<AreaAction> = {
   addArea: (draft, { name }) => {
     const { curriculum } = draft;
-    const shades = getAreaShades(draft.baseColor);
     const area = {
       id: nextAreaId(draft),
       name,
-      color: shades[curriculum.areas.length % shades.length] as string,
+      color: getAreaShade(draft.baseColor, curriculum.areas.length),
     };
 
     return {
@@ -79,7 +70,7 @@ export const areaHandlers: Handlers<AreaAction> = {
 
     const colored = updateArea(draft, areaId, (area) => ({
       ...area,
-      color: color.toLowerCase(),
+      color: toLowerCaseHexColor(color),
     }));
     return {
       ...colored,
@@ -93,8 +84,7 @@ export const areaHandlers: Handlers<AreaAction> = {
   setBaseColor: (draft, { color }) => {
     if (!isHexColor(color)) return draft;
 
-    const baseColor = color.toLowerCase();
-    const shades = getAreaShades(baseColor);
+    const baseColor = toLowerCaseHexColor(color);
     const { curriculum } = draft;
     return {
       ...draft,
@@ -104,7 +94,7 @@ export const areaHandlers: Handlers<AreaAction> = {
         areas: curriculum.areas.map((area, index) =>
           draft.handColoredAreaIds.includes(area.id)
             ? area
-            : { ...area, color: shades[index % shades.length] as string },
+            : { ...area, color: getAreaShade(baseColor, index) },
         ),
       },
     };

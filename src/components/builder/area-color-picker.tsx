@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Action } from "@/builder/apply";
 import { BASE_COLORS, getAreaShades, isHexColor } from "@/builder/colors";
-import type { Area } from "@/builder/draft";
 import ColorSwatch from "@/components/builder/color-swatch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +10,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Action, Area } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 
 export default function AreaColorPicker({
   area,
@@ -19,13 +19,13 @@ export default function AreaColorPicker({
   dispatch,
 }: {
   area: Area;
-  baseColor: string;
+  baseColor: HexColor;
   dispatch: (action: Action) => void;
 }) {
-  const [hexText, setHexText] = useState(area.color);
+  const [hexText, setHexText] = useState<string>(area.color);
   const hexInputId = `builder-area-${area.id}-hex`;
 
-  function setColor(color: string) {
+  function setColor(color: HexColor) {
     setHexText(color);
     dispatch({ type: "setAreaColor", areaId: area.id, color });
   }
@@ -86,9 +86,9 @@ function ColorGroup({
   onSelect,
 }: {
   label: string;
-  colors: readonly string[];
+  colors: readonly HexColor[];
   selectedColor: string;
-  onSelect: (color: string) => void;
+  onSelect: (color: HexColor) => void;
 }) {
   return (
     <div className="flex flex-col gap-1.5">

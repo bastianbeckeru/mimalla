@@ -1,32 +1,13 @@
-import { type AreaAction, areaHandlers } from "@/builder/actions/areas";
-import { type CourseAction, courseHandlers } from "@/builder/actions/courses";
-import {
-  type CurriculumAction,
-  curriculumHandlers,
-} from "@/builder/actions/curriculum";
-import {
-  type ElectiveAction,
-  electiveHandlers,
-} from "@/builder/actions/electives";
-import { type PeriodAction, periodHandlers } from "@/builder/actions/periods";
-import {
-  type PrerequisiteAction,
-  prerequisiteHandlers,
-} from "@/builder/actions/prerequisites";
-import { type ResizeAction, resizeHandlers } from "@/builder/actions/resize";
-import { type SlotAction, slotHandlers } from "@/builder/actions/slots";
-import type { Draft, Handlers } from "@/builder/draft";
+import { areaHandlers } from "@/builder/actions/areas";
+import { courseHandlers } from "@/builder/actions/courses";
+import { curriculumHandlers } from "@/builder/actions/curriculum";
+import { electiveHandlers } from "@/builder/actions/electives";
+import { periodHandlers } from "@/builder/actions/periods";
+import { prerequisiteHandlers } from "@/builder/actions/prerequisites";
+import { resizeHandlers } from "@/builder/actions/resize";
+import { slotHandlers } from "@/builder/actions/slots";
 import { pushDownCollisions } from "@/builder/grid";
-
-export type Action =
-  | CurriculumAction
-  | CourseAction
-  | AreaAction
-  | PeriodAction
-  | SlotAction
-  | ResizeAction
-  | ElectiveAction
-  | PrerequisiteAction;
+import type { Action, Draft, Handlers } from "@/types/builder";
 
 const handlers: Handlers<Action> = {
   ...curriculumHandlers,

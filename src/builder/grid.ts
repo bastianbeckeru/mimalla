@@ -1,5 +1,5 @@
-import type { Course, Curriculum, Period } from "@/builder/draft";
 import { isSamePeriod } from "@/builder/periods";
+import type { Course, Curriculum, Period } from "@/types/builder";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
 

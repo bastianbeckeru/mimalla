@@ -4,7 +4,8 @@ import { useDraggable } from "@dnd-kit/react";
 import { cn } from "cn";
 import type { CSSProperties, ReactNode } from "react";
 import { getTextColor } from "@/builder/colors";
-import type { Course } from "@/builder/draft";
+import type { Course } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 
 export default function CourseCard({
   dragId,
@@ -18,7 +19,7 @@ export default function CourseCard({
 }: {
   dragId: string;
   course: Course;
-  color: string;
+  color: HexColor;
   isSelected: boolean;
   onSelect: () => void;
   onHoverChange: (isHovered: boolean) => void;

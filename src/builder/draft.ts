@@ -1,56 +1,6 @@
 import { DEFAULT_BASE_COLOR } from "@/builder/colors";
 import { REGULAR_TERMS } from "@/builder/periods";
-
-export type TermSystem = "semester" | "annual";
-
-export type Period = {
-  programYear: number;
-  term: number;
-};
-
-export type Slot = Period & {
-  position: number;
-};
-
-export type Course = {
-  id: number;
-  name: string;
-  code: string;
-  credits: number;
-  areaId: number | null;
-  duration: number;
-  prerequisiteIds: number[];
-  prerequisiteCredits: number;
-  isElective: boolean;
-  slots: Slot[];
-};
-
-export type Area = {
-  id: number;
-  name: string;
-  color: string;
-};
-
-export type Curriculum = {
-  programName: string;
-  institution: string;
-  effectiveYear: number | null;
-  versionName: string;
-  termSystem: TermSystem;
-  periods: Period[];
-  areas: Area[];
-  courses: Course[];
-};
-
-export type Draft = {
-  curriculum: Curriculum;
-  baseColor: string;
-  handColoredAreaIds: number[];
-};
-
-export type Handlers<A extends { type: string }> = {
-  [K in A["type"]]: (draft: Draft, action: Extract<A, { type: K }>) => Draft;
-};
+import type { Draft, TermSystem } from "@/types/builder";
 
 const INITIAL_PROGRAM_YEARS = 5;
 

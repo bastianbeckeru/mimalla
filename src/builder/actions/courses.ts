@@ -1,4 +1,3 @@
-import type { Course, Draft, Handlers, Period } from "@/builder/draft";
 import {
   fitsInColumns,
   getDefaultCredits,
@@ -6,17 +5,7 @@ import {
   pushDownCollisions,
 } from "@/builder/grid";
 import { compareSlots } from "@/builder/periods";
-
-export type CourseAction =
-  | { type: "addCourse"; period: Period; position?: number }
-  | {
-      type: "editCourse";
-      courseId: number;
-      changes: Partial<
-        Pick<Course, "name" | "code" | "credits" | "duration" | "isElective">
-      >;
-    }
-  | { type: "deleteCourse"; courseId: number };
+import type { Course, CourseAction, Draft, Handlers } from "@/types/builder";
 
 const NEW_COURSE_NAME = "Nuevo curso";
 

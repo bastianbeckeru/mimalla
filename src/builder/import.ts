@@ -2,16 +2,8 @@ import {
   BASE_COLORS,
   DEFAULT_BASE_COLOR,
   getAreaShades,
+  isHexColor,
 } from "@/builder/colors";
-import type {
-  Area,
-  Course,
-  Curriculum,
-  Draft,
-  Period,
-  Slot,
-  TermSystem,
-} from "@/builder/draft";
 import { isValidEffectiveYear, SCHEMA_VERSION } from "@/builder/export";
 import { fitsInColumns, pushDownCollisions } from "@/builder/grid";
 import {
@@ -21,6 +13,16 @@ import {
   REGULAR_TERMS,
 } from "@/builder/periods";
 import { dependsOn } from "@/builder/prerequisites";
+import type {
+  Area,
+  Course,
+  Curriculum,
+  Draft,
+  Period,
+  Slot,
+  TermSystem,
+} from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 
 type ImportResult = { ok: true; draft: Draft } | { ok: false; reason: string };
 
@@ -118,7 +120,13 @@ function checkIds(items: FileObject[], reason: string) {
   if (!isSequence) reject(reason);
 }
 
-const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/;
+function isLowerCaseHexColor(color: unknown): color is HexColor {
+  return (
+    typeof color === "string" &&
+    isHexColor(color) &&
+    color === color.toLowerCase()
+  );
+}
 
 function readAreas(value: unknown): Area[] {
   const areas = readObjects(value, "La malla debe tener una lista de áreas.");
@@ -128,7 +136,7 @@ function readAreas(value: unknown): Area[] {
   );
   return areas.map(({ id, name, color }) => {
     if (typeof name !== "string") reject(`El área ${id} debe tener un nombre.`);
-    if (typeof color !== "string" || !HEX_COLOR_PATTERN.test(color))
+    if (!isLowerCaseHexColor(color))
       reject(
         `El color del área "${name}" debe tener el formato #rrggbb en minúsculas.`,
       );
@@ -335,9 +343,9 @@ function readCurriculum(file: unknown): Curriculum {
 }
 
 function restoreDraft(curriculum: Curriculum): Draft {
-  const isShadeOf = (baseColor: string) => (area: Area) =>
+  const isShadeOf = (baseColor: HexColor) => (area: Area) =>
     getAreaShades(baseColor).some((shade) => shade === area.color);
-  const baseColor = BASE_COLORS.reduce<string>(
+  const baseColor = BASE_COLORS.reduce<HexColor>(
     (best, candidate) =>
       curriculum.areas.filter(isShadeOf(candidate)).length >
       curriculum.areas.filter(isShadeOf(best)).length

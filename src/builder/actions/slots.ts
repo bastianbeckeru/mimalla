@@ -1,13 +1,6 @@
-import type { Curriculum, Handlers, Slot } from "@/builder/draft";
 import { fitsInColumns, pushDownCollisions } from "@/builder/grid";
 import { isSamePeriod } from "@/builder/periods";
-
-export type SlotAction = {
-  type: "moveSlot";
-  courseId: number;
-  slotIndex: number;
-  to: Slot;
-};
+import type { Curriculum, Handlers, Slot, SlotAction } from "@/types/builder";
 
 function isValidSlot(curriculum: Curriculum, slot: Slot, duration: number) {
   return (

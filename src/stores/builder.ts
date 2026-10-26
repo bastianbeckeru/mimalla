@@ -1,14 +1,15 @@
 import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { type Action, apply } from "@/builder/apply";
-import { createDraft, type Draft } from "@/builder/draft";
+import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
 import {
   createHistory,
   type History,
   type HistoryAction,
   historyReducer,
 } from "@/hooks/use-history";
+import type { Action, Draft } from "@/types/builder";
 
 type BuilderState = {
   draft: Draft;

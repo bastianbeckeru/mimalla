@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { type Action, apply } from "@/builder/apply";
+import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { exportFile } from "@/builder/export";
 import { importFile } from "@/builder/import";
+import type { Action } from "@/types/builder";
 
 type FileRecord = Record<string, unknown>;
 type CourseFixture = FileRecord & { slots: FileRecord[] };

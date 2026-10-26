@@ -1,5 +1,5 @@
-import type { Course, Curriculum } from "@/builder/draft";
 import { isSamePeriod } from "@/builder/periods";
+import type { Course, Curriculum } from "@/types/builder";
 
 function getColumnIndexes(curriculum: Curriculum, course: Course) {
   return course.slots.map((slot) =>

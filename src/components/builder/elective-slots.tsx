@@ -1,12 +1,11 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import type { Action } from "@/builder/apply";
-import type { Course, TermSystem } from "@/builder/draft";
 import { getPeriodLabel } from "@/builder/periods";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import type { Action, Course, TermSystem } from "@/types/builder";
 
 export default function ElectiveSlots({
   course,

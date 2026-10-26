@@ -1,10 +1,4 @@
-import {
-  createDraft,
-  type Draft,
-  type Handlers,
-  type Period,
-  type TermSystem,
-} from "@/builder/draft";
+import { createDraft } from "@/builder/draft";
 import {
   canRemoveLastProgramYear,
   canRemovePeriod,
@@ -14,14 +8,7 @@ import {
   isSamePeriod,
   REGULAR_TERMS,
 } from "@/builder/periods";
-
-export type PeriodAction =
-  | { type: "createCurriculum"; termSystem: TermSystem }
-  | { type: "setTermSystem"; termSystem: TermSystem }
-  | { type: "addProgramYear" }
-  | { type: "removeLastProgramYear" }
-  | { type: "addIntensiveTerm"; programYear: number; term: number }
-  | { type: "removePeriod"; period: Period };
+import type { Draft, Handlers, Period, PeriodAction } from "@/types/builder";
 
 function withPeriods(draft: Draft, periods: Period[]): Draft {
   return { ...draft, curriculum: { ...draft.curriculum, periods } };

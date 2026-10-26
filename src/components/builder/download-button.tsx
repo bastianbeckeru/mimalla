@@ -1,9 +1,9 @@
 "use client";
 
 import { Download } from "lucide-react";
-import type { Draft } from "@/builder/draft";
 import { exportFile, getFileName, getMissingDetails } from "@/builder/export";
 import { Button } from "@/components/ui/button";
+import type { Draft } from "@/types/builder";
 
 const DETAIL_LABELS = {
   programName: "el nombre del programa",
