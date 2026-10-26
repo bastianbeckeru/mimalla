@@ -217,9 +217,11 @@ describe("removing a column", () => {
           {
             id: 1,
             name: "Taller anual",
+            code: "",
             credits: 10,
             areaId: null,
             duration: 2,
+            isElective: false,
             slots: [{ programYear: 1, term: 1, position: 1 }],
           },
         ],
