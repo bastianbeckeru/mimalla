@@ -17,11 +17,9 @@ export function getMisplacedPrerequisiteIds(
   return course.prerequisiteIds.filter((prerequisiteId) => {
     const prerequisite = findCourse(curriculum, prerequisiteId);
     if (!prerequisite) return false;
-    const lastPeriodIndexOfFirstPlacement =
-      Math.min(...getPeriodIndexes(curriculum, prerequisite)) +
-      prerequisite.duration -
-      1;
-    return lastPeriodIndexOfFirstPlacement >= firstPeriodIndex;
+    return !getPeriodIndexes(curriculum, prerequisite).some(
+      (start) => start + prerequisite.duration - 1 < firstPeriodIndex,
+    );
   });
 }
 

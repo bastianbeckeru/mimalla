@@ -190,6 +190,38 @@ describe("prerequisite placement warnings with duration", () => {
   });
 });
 
+describe("prerequisite placement warnings with several placements", () => {
+  const electivePrerequisite: Action[] = [
+    { type: "addCourse", period: THIRD_SEMESTER },
+    { type: "addCourse", period: SECOND_SEMESTER },
+    { type: "editCourse", courseId: 1, changes: { isElective: true } },
+    { type: "addSlot", courseId: 1 },
+    { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
+  ];
+
+  test("warns when no placement of the prerequisite finishes before the course", () => {
+    const draft = draftAfter(...electivePrerequisite, {
+      type: "moveSlot",
+      courseId: 1,
+      slotIndex: 1,
+      to: { ...SECOND_SEMESTER, position: 2 },
+    });
+
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([1]);
+  });
+
+  test("does not warn when a later placement of the prerequisite finishes before the course", () => {
+    const draft = draftAfter(...electivePrerequisite, {
+      type: "moveSlot",
+      courseId: 1,
+      slotIndex: 1,
+      to: { ...FIRST_SEMESTER, position: 1 },
+    });
+
+    expect(getMisplacedPrerequisiteIds(draft.curriculum, 2)).toEqual([]);
+  });
+});
+
 describe("deleting a course", () => {
   test("removes it from the prerequisites of the other courses", () => {
     const draft = draftAfter(
