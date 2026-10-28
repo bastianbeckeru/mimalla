@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 1,
+  "program": {
+    "name": "Ingeniería Civil en Informática y Telecomunicaciones",
+    "institution": "Universidad Diego Portales"
+  },
+  "effectiveYear": 2020,
+  "versionName": "v4",
+  "termSystem": "semester",
+  "periods": [
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 },
+    { "programYear": 6, "term": 1 }
+  ],
+  "areas": [
+    { "id": 1, "name": "Formación en Ciencias Básicas", "color": "#34c1cd" },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#bbe5eb"
+    },
+    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
+    { "id": 4, "name": "Formación General", "color": "#ffffff" },
+    {
+      "id": 5,
+      "name": "Formación en Ingeniería Aplicada: Informática",
+      "color": "#afcec3"
+    },
+    {
+      "id": 6,
+      "name": "Formación en Ingeniería Aplicada: Telecomunicaciones",
+      "color": "#719fc0"
+    },
+    { "id": 7, "name": "Formación en Inglés General", "color": "#ffffff" },
+    {
+      "id": 8,
+      "name": "Formación en Ingeniería Aplicada: Proyectos e Integración",
+      "color": "#afc7da"
+    }
+  ],
+  "tracks": [],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 2,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 3,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 4,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "areaId": 2,
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 5,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 6,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [1],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 7,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 8,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 9,
+      "name": "Programación Avanzada",
+      "code": "CIT1010",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [4],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 10,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "areaId": 4,
+      "isElective": true,
+      "slots": [
+        { "programYear": 1, "term": 3, "position": 5 },
+        { "programYear": 3, "term": 1, "position": 5 },
+        { "programYear": 3, "term": 3, "position": 5 },
+        { "programYear": 4, "term": 1, "position": 5 }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Ecuaciones Diferenciales",
+      "code": "CBM1005",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [6, 7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 12,
+      "name": "Cálculo III",
+      "code": "CBM1006",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 13,
+      "name": "Calor y Ondas",
+      "code": "CBF1001",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [7, 8],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 14,
+      "name": "Estructura de Datos y Algoritmos",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [9],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 15,
+      "name": "Redes de Datos",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [9],
+      "slots": [{ "programYear": 2, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 16,
+      "name": "Probabilidades y Estadísticas",
+      "code": "CBE2000",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 17,
+      "name": "Electrónica y Electrotecnia",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [8, 11, 12],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 18,
+      "name": "Electricidad y Magnetismo",
+      "code": "CBF1002",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [11, 12],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 19,
+      "name": "Bases de Datos",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [14],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 20,
+      "name": "Desarrollo Web y Móvil",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [9],
+      "slots": [{ "programYear": 2, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 21,
+      "name": "Inglés I",
+      "code": "CIG1012",
+      "credits": 5,
+      "areaId": 7,
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 22,
+      "name": "Práctica Profesional I",
+      "credits": 7,
+      "duration": 2,
+      "prerequisiteCredits": 134,
+      "slots": [{ "programYear": 2, "term": 3, "position": 7 }]
+    },
+    {
+      "id": 23,
+      "name": "Optimización",
+      "code": "CII2750",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [6, 12],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 24,
+      "name": "Taller de Redes y Servicios",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [15, 16],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 25,
+      "name": "Proyecto en TICs I",
+      "credits": 6,
+      "areaId": 8,
+      "prerequisiteIds": [15, 20],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 26,
+      "name": "Bases de Datos Avanzadas",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [19],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 27,
+      "name": "Inglés II",
+      "code": "CIG1013",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [21],
+      "slots": [{ "programYear": 3, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 28,
+      "name": "Contabilidad y Costos",
+      "code": "CII1000",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 29,
+      "name": "Arquitectura y Organización de Computadores",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [15, 17],
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 30,
+      "name": "Señales y Sistemas",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [13, 17],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 31,
+      "name": "Sistemas Operativos",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [14, 24],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 32,
+      "name": "Inglés III",
+      "code": "CIG1014",
+      "credits": 5,
+      "areaId": 7,
+      "slots": [{ "programYear": 3, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 33,
+      "name": "Gestión Organizacional",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [22],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 34,
+      "name": "Sistemas Distribuidos",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [15, 31],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 35,
+      "name": "Comunicaciones Digitales",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [18, 30],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 36,
+      "name": "Ingeniería de Software",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [19, 25],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 37,
+      "name": "Introducción a la Economía",
+      "code": "CII2100",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 38,
+      "name": "Tecnologías Inalámbricas",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [35],
+      "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 39,
+      "name": "Criptografía y Seguridad de Redes",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [24],
+      "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 40,
+      "name": "Inteligencia Artificial",
+      "credits": 6,
+      "prerequisiteIds": [16, 19, 23],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 41,
+      "name": "Evaluación de Proyectos TIC",
+      "credits": 6,
+      "areaId": 8,
+      "prerequisiteIds": [28, 33, 36],
+      "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 42,
+      "name": "Práctica Profesional II",
+      "credits": 7,
+      "duration": 2,
+      "prerequisiteCredits": 268,
+      "slots": [{ "programYear": 4, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 43,
+      "name": "Electivo Profesional",
+      "code": "CITXXXX",
+      "credits": 6,
+      "areaId": 5,
+      "isElective": true,
+      "slots": [
+        { "programYear": 5, "term": 1, "position": 1 },
+        { "programYear": 5, "term": 3, "position": 1 },
+        { "programYear": 5, "term": 3, "position": 4 }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Arquitecturas Emergentes",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [34],
+      "slots": [{ "programYear": 5, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 45,
+      "name": "Electivo Profesional",
+      "code": "CITYYYY",
+      "credits": 6,
+      "areaId": 6,
+      "isElective": true,
+      "slots": [
+        { "programYear": 5, "term": 1, "position": 3 },
+        { "programYear": 5, "term": 3, "position": 2 },
+        { "programYear": 5, "term": 3, "position": 3 }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Arquitectura de Software",
+      "credits": 6,
+      "areaId": 5,
+      "prerequisiteIds": [36],
+      "slots": [{ "programYear": 5, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 47,
+      "name": "Data Science",
+      "credits": 6,
+      "areaId": 8,
+      "prerequisiteIds": [26, 40],
+      "slots": [{ "programYear": 5, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 48,
+      "name": "Proyecto en TICs II",
+      "credits": 6,
+      "areaId": 8,
+      "prerequisiteIds": [41],
+      "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 49,
+      "name": "Actividad de Titulación",
+      "credits": 30,
+      "prerequisiteIds": [22, 42],
+      "prerequisiteCredits": 336,
+      "isElective": true,
+      "slots": [{ "programYear": 6, "term": 1, "position": 1 }]
+    }
+  ]
+}

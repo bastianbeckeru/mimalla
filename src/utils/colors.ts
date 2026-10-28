@@ -1,4 +1,4 @@
-type HexColor = `#${string}`;
+import type { HexColor } from "@/types/colors";
 
 export const DEFAULT_COURSE_COLOR = "#fafafa";
 
@@ -83,8 +83,7 @@ export function checkContrasts({
   };
 }
 
-// Convertir HEX a HSL
-function hexToHSL(hex: HexColor) {
+export function hexToHSL(hex: HexColor) {
   let r = 0,
     g = 0,
     b = 0;
@@ -129,8 +128,7 @@ function hexToHSL(hex: HexColor) {
   return { h: h * 360, s: s * 100, l: l * 100 };
 }
 
-// Convertir HSL a HEX
-function hslToHex(h: number, s: number, l: number): HexColor {
+export function hslToHex(h: number, s: number, l: number): HexColor {
   s /= 100;
   l /= 100;
 

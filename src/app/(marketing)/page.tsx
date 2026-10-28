@@ -2,8 +2,6 @@ import { cn } from "cn";
 import { ArrowDown, ArrowRight, Check, Lock } from "lucide-react";
 import Image from "next/image";
 import { LandingButton } from "@/components/landing-button";
-import { ProgramPicker } from "@/components/program-picker";
-import { getCatalog } from "@/server/db/curriculums";
 
 function FloatingCard({
   className,
@@ -199,22 +197,6 @@ function Doodle({ name, className }: { name: string; className?: string }) {
   );
 }
 
-function MissingProgramNote({ className }: { className?: string }) {
-  return (
-    <p className={cn("text-[15px] text-muted-foreground", className)}>
-      ¿No está la tuya?{" "}
-      <a
-        href="https://github.com/bastianbeckeru/mimalla/blob/main/CONTRIBUTING.md"
-        target="_blank"
-        rel="noreferrer"
-        className="font-semibold text-blue-700 hover:text-foreground dark:text-blue-300"
-      >
-        Ayúdanos a sumarla
-      </a>
-    </p>
-  );
-}
-
 export default function IndexPage() {
   return (
     <main>
@@ -350,29 +332,6 @@ export default function IndexPage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section
-        id="carreras"
-        className="mx-auto flex max-w-300 scroll-mt-6 flex-wrap gap-5 px-4 pb-16 sm:gap-10 sm:px-6 sm:pb-24"
-      >
-        <div className="flex min-w-0 flex-[1_1_18.75rem] flex-col gap-2.5 sm:gap-3.5">
-          <h2 className="font-semibold text-[clamp(1.75rem,3.6vw,2.5rem)] leading-[1.1] tracking-[-0.03em]">
-            Parte desde tu malla oficial.
-          </h2>
-          <p className="text-[15px] text-muted-foreground leading-relaxed sm:text-base">
-            Por ahora, carreras de la Universidad Diego Portales. Vamos sumando
-            más.
-          </p>
-          <MissingProgramNote className="mt-1.5 hidden sm:block" />
-          <Doodle
-            name="reading"
-            className="mt-3 hidden w-70 max-w-full sm:block"
-          />
-        </div>
-        <ProgramPicker catalog={getCatalog()} />
-        <MissingProgramNote className="w-full text-center sm:hidden" />
-        <Doodle name="reading" className="mx-auto w-57.5 sm:hidden" />
       </section>
 
       <section className="mx-auto max-w-300 px-2.5 pb-14 sm:px-6 sm:pb-24">

@@ -25,7 +25,7 @@ export function ThemeToggle({
     <Button
       aria-label="Cambiar tema"
       id={id}
-      className={cn(!isIcon && "min-w-28", className)}
+      className={cn(!isIcon && "press-blur min-w-28", className)}
       onClick={handleThemeChange}
       size={isIcon ? "icon" : "default"}
       variant={isIcon ? "ghost" : "outline"}

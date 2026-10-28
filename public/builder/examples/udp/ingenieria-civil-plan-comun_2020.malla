@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "program": {
+    "name": "Ingeniería Civil Plan Común",
+    "institution": "Universidad Diego Portales"
+  },
+  "effectiveYear": 2020,
+  "versionName": "v4",
+  "termSystem": "semester",
+  "periods": [{ "programYear": 1, "term": 1 }, { "programYear": 1, "term": 3 }],
+  "areas": [
+    { "id": 1, "name": "Formación en Ciencias Básicas", "color": "#34c1cd" },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#bbe5eb"
+    },
+    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
+    {
+      "id": 4,
+      "name": "Programación Avanzada o Ingeniería de los Materiales",
+      "color": "#bbe5eb"
+    },
+    { "id": 5, "name": "Formación General", "color": "#ffffff" }
+  ],
+  "tracks": [],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 2,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 3,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 4,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "areaId": 2,
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 5,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 6,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [1],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 7,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 8,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 9,
+      "name": "Programación Avanzada o Ingeniería de los Materiales",
+      "code": "CIT1010 / COC2001",
+      "credits": 6,
+      "areaId": 4,
+      "prerequisiteIds": [3, 4],
+      "isElective": true,
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 10,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "areaId": 5,
+      "isElective": true,
+      "slots": [{ "programYear": 1, "term": 3, "position": 5 }]
+    }
+  ]
+}

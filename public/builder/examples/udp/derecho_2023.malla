@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "program": { "name": "Derecho", "institution": "Universidad Diego Portales" },
+  "effectiveYear": 2023,
+  "versionName": "v6.0",
+  "termSystem": "semester",
+  "periods": [
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 }
+  ],
+  "areas": [
+    { "id": 1, "name": "Derecho Privado", "color": "#a87796" },
+    { "id": 2, "name": "Derecho Público", "color": "#575656" },
+    { "id": 3, "name": "Destrezas para la Profesión", "color": "#caadc0" },
+    { "id": 4, "name": "Teoría y Filosofía del Derecho", "color": "#dadad9" },
+    { "id": 5, "name": "Derecho Procesal", "color": "#9b9b9b" },
+    { "id": 6, "name": "Formación General", "color": "#ffffff" },
+    { "id": 7, "name": "Derecho de los Negocios", "color": "#dcc8d5" },
+    { "id": 8, "name": "Derecho Penal", "color": "#1c1c1c" },
+    { "id": 9, "name": "Clínicas Jurídicas", "color": "#ede3ea" },
+    {
+      "id": 10,
+      "name": "Cursos Optativos de Especialización",
+      "color": "#ede3ea"
+    },
+    {
+      "id": 11,
+      "name": "Curso de Integración y Actividad de Licenciatura",
+      "color": "#ffffff"
+    }
+  ],
+  "tracks": [],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Fundamentos Histórico-Sociales del Derecho Privado",
+      "code": "DER06111",
+      "credits": 5,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 2,
+      "name": "Instituciones Políticas y Derechos Humanos",
+      "code": "DER06112",
+      "credits": 5,
+      "areaId": 2,
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 3,
+      "name": "Taller de Razonamiento Jurídico",
+      "code": "DER06113",
+      "credits": 10,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 4,
+      "name": "Taller de Investigación y Escritura Legal",
+      "code": "DER06114",
+      "credits": 5,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 5,
+      "name": "Comunicación Oral",
+      "code": "DER06115",
+      "credits": 3,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 6,
+      "name": "Persona y Acto Jurídico",
+      "code": "DER06121",
+      "credits": 5,
+      "areaId": 1,
+      "prerequisiteIds": [1],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 7,
+      "name": "Derecho Constitucional Orgánico",
+      "code": "DER06122",
+      "credits": 5,
+      "areaId": 2,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 8,
+      "name": "Introducción al Derecho I",
+      "code": "DER06123",
+      "credits": 5,
+      "areaId": 4,
+      "prerequisiteIds": [3],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 9,
+      "name": "Bases Generales del Derecho Procesal",
+      "code": "DER06124",
+      "credits": 5,
+      "areaId": 5,
+      "prerequisiteIds": [3],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 10,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "areaId": 6,
+      "isElective": true,
+      "slots": [
+        { "programYear": 1, "term": 3, "position": 5 },
+        { "programYear": 2, "term": 1, "position": 5 },
+        { "programYear": 2, "term": 3, "position": 5 },
+        { "programYear": 3, "term": 1, "position": 6 },
+        { "programYear": 3, "term": 3, "position": 5 },
+        { "programYear": 3, "term": 3, "position": 6 }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Inglés I",
+      "code": "CIG1012",
+      "credits": 5,
+      "slots": [{ "programYear": 1, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 12,
+      "name": "Derechos Reales y Derecho Inmobiliario",
+      "code": "DER06211",
+      "credits": 5,
+      "areaId": 1,
+      "prerequisiteIds": [6],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 13,
+      "name": "Derechos Fundamentales",
+      "code": "DER06212",
+      "credits": 7,
+      "areaId": 2,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 14,
+      "name": "Introducción al Derecho II",
+      "code": "DER06213",
+      "credits": 5,
+      "areaId": 4,
+      "prerequisiteIds": [8],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 15,
+      "name": "Economía y Derecho",
+      "code": "DER06214",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [4],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 16,
+      "name": "Inglés II",
+      "code": "CIG1013",
+      "credits": 5,
+      "prerequisiteIds": [11],
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 17,
+      "name": "Derecho de las Obligaciones",
+      "code": "DER06221",
+      "credits": 5,
+      "areaId": 1,
+      "prerequisiteIds": [12],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 18,
+      "name": "Derecho Penal Parte General I",
+      "code": "DER06222",
+      "credits": 5,
+      "areaId": 8,
+      "prerequisiteIds": [8],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 19,
+      "name": "Taller Destrezas Litigación Oral",
+      "code": "DER06223",
+      "credits": 5,
+      "areaId": 5,
+      "prerequisiteIds": [5, 9, 12, 13, 14],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 20,
+      "name": "Derecho Regulatorio",
+      "code": "DER06224",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [15],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 21,
+      "name": "Inglés III",
+      "code": "CIG1014",
+      "credits": 5,
+      "prerequisiteIds": [16],
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 22,
+      "name": "Derecho de Daños",
+      "code": "DER06311",
+      "credits": 5,
+      "areaId": 1,
+      "prerequisiteIds": [17],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 23,
+      "name": "Derecho Internacional Público",
+      "code": "DER06312",
+      "credits": 5,
+      "areaId": 2,
+      "prerequisiteIds": [13],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 24,
+      "name": "Derecho Penal Parte General II",
+      "code": "DER06313",
+      "credits": 5,
+      "areaId": 8,
+      "prerequisiteIds": [14, 18],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 25,
+      "name": "Procedimientos Judiciales",
+      "code": "DER06314",
+      "credits": 5,
+      "areaId": 5,
+      "prerequisiteIds": [19],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 26,
+      "name": "Derecho Comercial",
+      "code": "DER06315",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [20],
+      "slots": [{ "programYear": 3, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 27,
+      "name": "Contratos",
+      "code": "DER06321",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [4, 22],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 28,
+      "name": "Derecho Administrativo",
+      "code": "DER06322",
+      "credits": 5,
+      "areaId": 2,
+      "prerequisiteIds": [19, 20],
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 29,
+      "name": "Derecho Penal Parte Especial",
+      "code": "DER06323",
+      "credits": 5,
+      "areaId": 8,
+      "prerequisiteIds": [24],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 30,
+      "name": "Derecho Societario",
+      "code": "DER06324",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [26],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 31,
+      "name": "Derecho de Familia y Sucesorio",
+      "code": "DER06411",
+      "credits": 5,
+      "areaId": 1,
+      "prerequisiteIds": [27],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 32,
+      "name": "Derecho y Medio Ambiente",
+      "code": "DER06412",
+      "credits": 5,
+      "areaId": 2,
+      "prerequisiteIds": [28],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 33,
+      "name": "Proceso Penal",
+      "code": "DER06413",
+      "credits": 5,
+      "areaId": 8,
+      "prerequisiteIds": [29],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 34,
+      "name": "Taller de Negociación en Procesos Colaborativos",
+      "code": "DER06414",
+      "credits": 5,
+      "areaId": 5,
+      "prerequisiteIds": [25],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 35,
+      "name": "Derecho Tributario",
+      "code": "DER06415",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [30],
+      "slots": [{ "programYear": 4, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 36,
+      "name": "Derecho del Trabajo",
+      "code": "DER06416",
+      "credits": 5,
+      "areaId": 7,
+      "prerequisiteIds": [15, 19],
+      "slots": [{ "programYear": 4, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 37,
+      "name": "Clínicas Jurídicas (o Pasantía Supervisada)",
+      "code": "DER06C_F1",
+      "credits": 12,
+      "areaId": 9,
+      "prerequisiteIds": [31, 32, 33, 34],
+      "isElective": true,
+      "slots": [
+        { "programYear": 4, "term": 3, "position": 1 },
+        { "programYear": 5, "term": 1, "position": 1 }
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Curso Optativo",
+      "code": "DER06OPT",
+      "credits": 5,
+      "areaId": 10,
+      "prerequisiteIds": [27, 28, 29, 30],
+      "isElective": true,
+      "slots": [
+        { "programYear": 4, "term": 3, "position": 3 },
+        { "programYear": 4, "term": 3, "position": 4 },
+        { "programYear": 4, "term": 3, "position": 5 },
+        { "programYear": 5, "term": 1, "position": 4 },
+        { "programYear": 5, "term": 3, "position": 7 }
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Filosofía del Derecho",
+      "code": "DER06511",
+      "credits": 5,
+      "areaId": 4,
+      "prerequisiteIds": [14],
+      "slots": [{ "programYear": 5, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 40,
+      "name": "Seminario de Investigación y Escritura Jurídica Avanzada",
+      "code": "DER06512",
+      "credits": 10,
+      "areaId": 3,
+      "prerequisiteIds": [37],
+      "slots": [{ "programYear": 5, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 41,
+      "name": "Curso de Integración y Actividad de Licenciatura",
+      "code": "DER06521",
+      "credits": 18,
+      "areaId": 11,
+      "prerequisiteIds": [35, 36, 37, 39, 40],
+      "slots": [{ "programYear": 5, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 42,
+      "name": "Ética y Responsabilidad Profesional en la Abogacía",
+      "code": "DER06522",
+      "credits": 3,
+      "prerequisiteIds": [37],
+      "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 43,
+      "name": "Taller de Inserción y Emprendimiento Profesional",
+      "code": "DER06523",
+      "credits": 3,
+      "areaId": 3,
+      "prerequisiteIds": [37],
+      "slots": [{ "programYear": 5, "term": 3, "position": 6 }]
+    }
+  ]
+}
