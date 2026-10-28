@@ -33,8 +33,12 @@ The first year of entry a curriculum applies to. Students who enter the program 
 _Avoid_: Year (alone), start year
 
 **Builder**:
-Where anyone lays out a curriculum from scratch and downloads it as a file. A curriculum made in the builder is not official. Shown in the UI as "constructor de mallas".
+Where anyone lays out a curriculum from scratch and downloads it as a curriculum file. A curriculum made in the builder is not official until it enters the catalog. Shown in the UI as "constructor de mallas".
 _Avoid_: Editor, creator
+
+**Curriculum file**:
+A curriculum saved as a `.malla` file. It is the only way a curriculum travels: the builder downloads and loads it, and the catalog imports it. It holds the curriculum alone, not catalog data such as the department or the program codes.
+_Avoid_: JSON, builder file, malla file
 
 **Course**:
 A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
@@ -74,15 +78,15 @@ A course that stands for a choice among several options, such as "Curso de Forma
 _Avoid_: Optional, OFG
 
 **Area**:
-A group of related courses in a curriculum, shown with one color. An area can contain subareas.
-_Avoid_: Category, line
+A group of related courses in a curriculum, shown with one color. Each course belongs to at most one area, and areas do not contain other areas.
+_Avoid_: Category, line, subarea
 
 **Track**:
-A path to a degree or title within a curriculum: the courses and credits it requires and the credential it grants. A track can contain other tracks. Shown in the UI as "plan".
-_Avoid_: Plan (in code: it clashes with "plan de estudios" and with planning a trajectory), mención, degree path
+A set of courses of a curriculum whose completion is a milestone for the student, such as Plan Común, a licenciatura, a professional title or a mention. It may grant a credential. A track is complete when all its courses are approved. Tracks do not contain other tracks, and a course can belong to several tracks. Shown in the UI as "plan".
+_Avoid_: Plan (in code: it clashes with "plan de estudios" and with planning a trajectory), degree path
 
 **Credential**:
-The degree, title or certificate a track grants.
+What completing a track grants, if anything: a professional title, an academic degree, a technical title, a certificate or a mention. A student can earn several mentions.
 _Avoid_: Diploma
 
 ## Trajectories
