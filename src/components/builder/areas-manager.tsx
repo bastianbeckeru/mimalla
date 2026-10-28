@@ -28,13 +28,18 @@ export default function AreasManager({
     <Popover>
       <PopoverTrigger
         render={
-          <Button variant="outline">
+          <Button variant="ghost" size="sm" className="text-muted-foreground">
             <Palette />
             Áreas
           </Button>
         }
       />
-      <PopoverContent align="end" className="w-80 gap-4">
+      <PopoverContent
+        side="top"
+        align="end"
+        sideOffset={8}
+        className="w-80 gap-4"
+      >
         <div className="flex flex-col gap-1.5">
           <span className="font-medium text-muted-foreground text-xs">
             Color base

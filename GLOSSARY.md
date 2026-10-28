@@ -65,6 +65,10 @@ _Avoid_: Requirement
 A course that has a given course as a prerequisite.
 _Avoid_: Subsequent, dependent
 
+**Misplaced prerequisite**:
+A prerequisite none of whose slots ends before the first term of the course that requires it, so the curriculum cannot be followed as laid out. Seen from the prerequisite, the course that requires it is a misplaced successor.
+_Avoid_: Invalid prerequisite, conflicting prerequisite
+
 **Elective**:
 A course that stands for a choice among several options, such as "Curso de Formación General", so it can appear more than once in a period. The student can write down which course they actually chose for each of its enrollments.
 _Avoid_: Optional, OFG

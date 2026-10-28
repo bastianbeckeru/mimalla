@@ -1,10 +1,10 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
-import { getPeriodLabel } from "@/builder/periods";
+import { Plus, Shuffle, X } from "lucide-react";
+import { getPeriodTitle } from "@/builder/periods";
+import PropertyRow from "@/components/builder/property-row";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import type { Action, Course, TermSystem } from "@/types/builder";
 
 export default function ElectiveSlots({
@@ -19,10 +19,15 @@ export default function ElectiveSlots({
   const hasSeveralSlots = course.slots.length > 1;
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <Checkbox
+    <>
+      <PropertyRow
+        icon={Shuffle}
+        label="Electivo"
+        htmlFor="builder-course-elective"
+      >
+        <Switch
           id="builder-course-elective"
+          className="ml-2"
           checked={course.isElective}
           onCheckedChange={(isElective) =>
             dispatch({
@@ -32,27 +37,30 @@ export default function ElectiveSlots({
             })
           }
         />
-        <Label htmlFor="builder-course-elective">Electivo</Label>
-      </div>
+      </PropertyRow>
       {course.isElective && (
-        <>
+        <div className="mt-1 ml-9 flex flex-col gap-2 border-l pl-3">
           <p className="text-muted-foreground text-xs">
             Un electivo puede ubicarse en varias posiciones de la malla.
           </p>
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col">
             {course.slots.map((slot, slotIndex) => (
               <li
                 key={`${slot.programYear}-${slot.term}-${slot.position}`}
-                className="flex items-center justify-between gap-2 text-sm"
+                className="flex h-7 items-center justify-between gap-2 text-sm"
               >
                 <span>
-                  {getPeriodLabel(termSystem, slot)} · Fila {slot.position}
+                  {getPeriodTitle(termSystem, slot)}
+                  <span className="text-muted-foreground">
+                    {" · "}Fila {slot.position}
+                  </span>
                 </span>
                 {hasSeveralSlots && (
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon-xs"
                     aria-label="Quitar ubicación"
+                    className="text-muted-foreground"
                     onClick={() =>
                       dispatch({
                         type: "removeSlot",
@@ -68,8 +76,9 @@ export default function ElectiveSlots({
             ))}
           </ul>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
+            className="-ml-2.5 self-start text-muted-foreground"
             onClick={() => dispatch({ type: "addSlot", courseId: course.id })}
           >
             <Plus />
@@ -80,8 +89,8 @@ export default function ElectiveSlots({
               Si deja de ser electivo, se conserva solo su primera ubicación.
             </p>
           )}
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 }

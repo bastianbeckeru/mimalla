@@ -4,7 +4,7 @@ Read the curriculum ("malla curricular") of one study program from a PDF and wri
 
 ## Steps
 
-1. **Read the details.** From the PDF, take the program name, the institution, the effective year (the first entry year the curriculum applies to, often "vigente desde" or "plan 2019") and the version name if one is printed ("v6.0", "Plan 2019-B"). Ask the user for the program name or the effective year when the PDF lacks them; a guessed value turns into a wrong curriculum that loads without error.
+1. **Read the details.** From the PDF, take the program name, the institution, the effective year (the first entry year the curriculum applies to, often "vigente desde" or "plan 2019") and the version name if one is printed ("v6.0", "Plan 2019-B"). Ask the user for the program name, the institution or the effective year when the PDF lacks them; a guessed value turns into a wrong curriculum that loads without error.
 2. **Pick the term system.** `semester` when columns are semesters, `annual` when courses last a whole academic year. For trimesters or any other system, stop and tell the user: the format cannot express them.
 3. **List the periods.** One period per column of the PDF, mapped with [Terms](#terms). Include winter and summer columns only where the PDF places courses in them.
 4. **List the areas.** One area per entry of the PDF's color legend (or per group heading), with the legend's color as lowercase `#rrggbb`. No legend means `"areas": []`.
@@ -75,7 +75,7 @@ Optional fields are **omitted** when they hold their default; an empty string, `
 | --- | --- | --- |
 | `schemaVersion` | integer | always `1` |
 | `program.name` | string | required, not empty |
-| `program.institution` | string | optional, not empty |
+| `program.institution` | string | required, not empty |
 | `effectiveYear` | integer | required, 1900–2100 |
 | `versionName` | string | optional, not empty |
 | `termSystem` | `"semester"` \| `"annual"` | required |

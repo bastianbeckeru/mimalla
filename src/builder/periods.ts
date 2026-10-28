@@ -64,6 +64,14 @@ export function getPeriodLabel(termSystem: TermSystem, period: Period) {
   return `${PERIOD_NAMES[termSystem][period.term]} ${arabicToRoman(getPeriodNumber(termSystem, period))}`;
 }
 
+/** The period label in sentence case, e.g. "Semestre IV". */
+export function getPeriodTitle(termSystem: TermSystem, period: Period) {
+  return getPeriodLabel(termSystem, period).replace(
+    /^(\S)(\S*)/,
+    (_, first: string, rest: string) => first + rest.toLowerCase(),
+  );
+}
+
 export function isSamePeriod(a: Period, b: Period) {
   return a.programYear === b.programYear && a.term === b.term;
 }

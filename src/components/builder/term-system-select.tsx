@@ -20,8 +20,10 @@ export default function TermSystemSelect({
   value,
   onChange,
   disabled,
+  className = "w-32",
 }: {
   id: string;
+  className?: string;
   value: TermSystem;
   onChange: (termSystem: TermSystem) => void;
   disabled?: boolean;
@@ -33,7 +35,7 @@ export default function TermSystemSelect({
       onValueChange={(termSystem) => termSystem && onChange(termSystem)}
       disabled={disabled}
     >
-      <SelectTrigger id={id} className="w-32">
+      <SelectTrigger id={id} className={className}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

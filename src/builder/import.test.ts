@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { exportFile } from "@/builder/export";
+import { exportFile, isExportable } from "@/builder/export";
 import { importFile } from "@/builder/import";
 import type { Action } from "@/types/builder";
 
@@ -553,6 +553,15 @@ describe("rejecting an invalid file", () => {
 });
 
 describe("importing a file", () => {
+  test("loads a file without an institution as an incomplete draft", () => {
+    const result = importChanged((file) => {
+      Reflect.deleteProperty(file.program, "institution");
+    });
+
+    expect(result.ok && result.draft.curriculum.institution).toBe("");
+    expect(result.ok && isExportable(result.draft)).toBe(false);
+  });
+
   test("restores the curriculum of a valid file", () => {
     const result = importFile(JSON.stringify(exampleFile()));
 

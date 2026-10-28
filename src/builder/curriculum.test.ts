@@ -17,7 +17,7 @@ describe("curriculum details", () => {
     });
   });
 
-  test("a new curriculum without a program name and effective year cannot be exported", () => {
+  test("a new curriculum without a program name, institution and effective year cannot be exported", () => {
     expect(isExportable(createDraft("semester"))).toBe(false);
   });
 
@@ -46,7 +46,11 @@ describe("curriculum details", () => {
     const actions: Action[] = [
       {
         type: "editDetails",
-        changes: { programName: "Derecho", effectiveYear: 2023 },
+        changes: {
+          programName: "Derecho",
+          institution: "UDP",
+          effectiveYear: 2023,
+        },
       },
       {
         type: "addCourse",
@@ -65,10 +69,26 @@ describe("curriculum details", () => {
     expect(isExportable(draft)).toBe(false);
   });
 
-  test("a program name and a valid effective year allow the export", () => {
+  test.each(["", "   "])(
+    "an institution of %p blocks the export",
+    (institution) => {
+      const draft = apply(createDraft("semester"), {
+        type: "editDetails",
+        changes: { programName: "Derecho", institution, effectiveYear: 2023 },
+      });
+
+      expect(isExportable(draft)).toBe(false);
+    },
+  );
+
+  test("a program name, an institution and a valid effective year allow the export", () => {
     const draft = apply(createDraft("semester"), {
       type: "editDetails",
-      changes: { programName: "Derecho", effectiveYear: 1900 },
+      changes: {
+        programName: "Derecho",
+        institution: "UDP",
+        effectiveYear: 1900,
+      },
     });
 
     expect(isExportable(draft)).toBe(true);

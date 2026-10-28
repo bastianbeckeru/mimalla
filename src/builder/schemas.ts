@@ -17,7 +17,7 @@ const effectiveYearSchema = z
 
 export const detailsSchema = z.object({
   programName: z.string().trim().min(1, "Ingresa el nombre del programa"),
-  institution: z.string().trim(),
+  institution: z.string().trim().min(1, "Ingresa la institución"),
   effectiveYear: effectiveYearSchema,
   versionName: z.string().trim(),
 });
