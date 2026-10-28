@@ -35,6 +35,7 @@ export const courseHandlers: Handlers<CourseAction> = {
       code: "",
       credits: getDefaultCredits(curriculum),
       areaId: null,
+      trackIds: [],
       duration: 1,
       prerequisiteIds: [],
       prerequisiteCredits: 0,

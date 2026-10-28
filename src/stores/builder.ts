@@ -55,6 +55,21 @@ function isStarted(draft: Draft) {
   );
 }
 
+function addTracks(draft: Draft): Draft {
+  const { curriculum } = draft;
+  return {
+    ...draft,
+    curriculum: {
+      ...curriculum,
+      tracks: curriculum.tracks ?? [],
+      courses: curriculum.courses.map((course) => ({
+        ...course,
+        trackIds: course.trackIds ?? [],
+      })),
+    },
+  };
+}
+
 export const useBuilderStore = create<BuilderState & BuilderActions>()(
   persist(
     (set) => {
@@ -135,19 +150,33 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
     },
     {
       name: "builder-storage",
-      version: 2,
+      version: 3,
       partialize: (state): PersistedState => ({
         curricula: state.curricula,
         activeId: state.activeId,
       }),
       migrate: (persisted, version) => {
-        if (version >= 2) return persisted as PersistedState;
-        // Version 1 kept a single draft; keep it only if it was started.
-        const draft = (persisted as { draft?: Draft } | undefined)?.draft;
-        if (!draft || !isStarted(draft))
-          return { curricula: [], activeId: null };
-        const id = nanoid();
-        return { curricula: [{ id, draft }], activeId: id };
+        let state = persisted as PersistedState;
+        if (version < 2) {
+          // Version 1 kept a single draft; keep it only if it was started.
+          const draft = (persisted as { draft?: Draft } | undefined)?.draft;
+          const id = nanoid();
+          state =
+            draft && isStarted(draft)
+              ? { curricula: [{ id, draft }], activeId: id }
+              : { curricula: [], activeId: null };
+        }
+        if (version < 3) {
+          // Version 3 added tracks.
+          state = {
+            ...state,
+            curricula: state.curricula.map(({ id, draft }) => ({
+              id,
+              draft: addTracks(draft),
+            })),
+          };
+        }
+        return state;
       },
       merge: (persisted, current) => {
         const { curricula = [], activeId = null } =

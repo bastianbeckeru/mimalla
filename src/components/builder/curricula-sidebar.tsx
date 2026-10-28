@@ -50,7 +50,7 @@ import {
 import type { SavedCurriculum } from "@/stores/builder";
 import type { Draft } from "@/types/builder";
 
-export const GUIDE_URL = "/builder/pdf-to-json.md";
+export const GUIDE_URL = "/builder/pdf-to-malla.md";
 
 const MINOR_WORDS = new Set(["de", "del", "la", "las", "los", "el", "y"]);
 

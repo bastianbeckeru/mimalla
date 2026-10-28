@@ -7,7 +7,7 @@ import type { Draft } from "@/types/builder";
 
 export function downloadDraft(draft: Draft) {
   const url = URL.createObjectURL(
-    new Blob([exportFile(draft)], { type: "application/json" }),
+    new Blob([exportFile(draft)], { type: "application/vnd.mimalla+json" }),
   );
   const link = document.createElement("a");
   link.href = url;

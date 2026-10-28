@@ -23,6 +23,8 @@ export function exportFile({ curriculum }: Draft) {
     ]),
   ];
   const exportedAreaId = (areaId: number) => areaIds.indexOf(areaId) + 1;
+  const exportedTrackId = (trackId: number) =>
+    curriculum.tracks.findIndex((track) => track.id === trackId) + 1;
   const exportedCourseId = (courseId: number) =>
     courses.findIndex((course) => course.id === courseId) + 1;
 
@@ -49,6 +51,13 @@ export function exportFile({ curriculum }: Draft) {
         color: area.color,
       }))
       .toSorted((a, b) => a.id - b.id),
+    tracks: curriculum.tracks.map((track, index) => ({
+      id: index + 1,
+      name: track.name,
+      ...(track.credentialType !== null && {
+        credentialType: track.credentialType,
+      }),
+    })),
     courses: courses.map((course, index) => ({
       id: index + 1,
       name: course.name,
@@ -56,6 +65,11 @@ export function exportFile({ curriculum }: Draft) {
       credits: course.credits,
       ...(course.duration !== 1 && { duration: course.duration }),
       ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
+      ...(course.trackIds.length > 0 && {
+        trackIds: course.trackIds
+          .map(exportedTrackId)
+          .toSorted((a, b) => a - b),
+      }),
       ...(course.prerequisiteIds.length > 0 && {
         prerequisiteIds: course.prerequisiteIds
           .map(exportedCourseId)
@@ -75,7 +89,10 @@ export function exportFile({ curriculum }: Draft) {
 }
 
 export function getFileName({ curriculum }: Draft) {
-  return `${slugify(curriculum.programName)}.json`;
+  const slug = slugify(curriculum.programName);
+  return curriculum.effectiveYear === null
+    ? `${slug}.malla`
+    : `${slug}_${curriculum.effectiveYear}.malla`;
 }
 
 export function isExportable({ curriculum }: Draft) {

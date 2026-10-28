@@ -17,6 +17,7 @@ export type Course = {
   code: string;
   credits: number;
   areaId: number | null;
+  trackIds: number[];
   duration: number;
   prerequisiteIds: number[];
   prerequisiteCredits: number;
@@ -30,6 +31,19 @@ export type Area = {
   color: HexColor;
 };
 
+export type CredentialType =
+  | "professional"
+  | "academic"
+  | "technical"
+  | "certificate"
+  | "mention";
+
+export type Track = {
+  id: number;
+  name: string;
+  credentialType: CredentialType | null;
+};
+
 export type Curriculum = {
   programName: string;
   institution: string;
@@ -38,6 +52,7 @@ export type Curriculum = {
   termSystem: TermSystem;
   periods: Period[];
   areas: Area[];
+  tracks: Track[];
   courses: Course[];
 };
 
@@ -84,6 +99,16 @@ export type AreaAction =
   | { type: "setBaseColor"; color: string }
   | { type: "assignArea"; courseId: number; areaId: number | null };
 
+export type TrackAction =
+  | { type: "addTrack"; name: string }
+  | {
+      type: "editTrack";
+      trackId: number;
+      changes: Partial<Pick<Track, "name" | "credentialType">>;
+    }
+  | { type: "deleteTrack"; trackId: number }
+  | { type: "assignTracks"; courseId: number; trackIds: number[] };
+
 export type PeriodAction =
   | {
       type: "createCurriculum";
@@ -123,6 +148,7 @@ export type Action =
   | CurriculumAction
   | CourseAction
   | AreaAction
+  | TrackAction
   | PeriodAction
   | SlotAction
   | ResizeAction

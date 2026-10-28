@@ -95,7 +95,7 @@ export default function CurriculumStart({
           <StartOption
             icon={<Upload />}
             title="Cargar archivo"
-            description="Un .json del constructor"
+            description="Un archivo .malla"
           />
         </button>
         <button

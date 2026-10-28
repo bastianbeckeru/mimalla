@@ -268,6 +268,7 @@ describe("removing a column", () => {
             code: "",
             credits: 10,
             areaId: null,
+            trackIds: [],
             duration: 2,
             prerequisiteIds: [],
             prerequisiteCredits: 0,

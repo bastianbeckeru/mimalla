@@ -1,0 +1,517 @@
+{
+  "schemaVersion": 1,
+  "program": {
+    "name": "Ingeniería Civil Industrial",
+    "institution": "Universidad Diego Portales"
+  },
+  "effectiveYear": 2020,
+  "versionName": "v4",
+  "termSystem": "semester",
+  "periods": [
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 },
+    { "programYear": 6, "term": 1 }
+  ],
+  "areas": [
+    { "id": 1, "name": "Formación en Ciencias Básicas", "color": "#34c1cd" },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#bbe5eb"
+    },
+    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
+    { "id": 4, "name": "Formación en Ingeniería Aplicada", "color": "#818284" }
+  ],
+  "tracks": [
+    {
+      "id": 1,
+      "name": "Licenciatura en Ciencias de la Ingeniería",
+      "credentialType": "academic"
+    },
+    {
+      "id": 2,
+      "name": "Ingeniería Civil Industrial",
+      "credentialType": "professional"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 2,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 3,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 4,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 5,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "areaId": 3,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 6,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [1],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 7,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 8,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 9,
+      "name": "Programación Avanzada",
+      "code": "CIT1010",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [4],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 10,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "areaId": 3,
+      "trackIds": [1, 2],
+      "isElective": true,
+      "slots": [
+        { "programYear": 1, "term": 3, "position": 5 },
+        { "programYear": 2, "term": 1, "position": 5 },
+        { "programYear": 2, "term": 3, "position": 5 },
+        { "programYear": 3, "term": 1, "position": 5 }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Ecuaciones Diferenciales",
+      "code": "CBM1005",
+      "credits": 6,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [6, 7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 12,
+      "name": "Cálculo III",
+      "code": "CBM1006",
+      "credits": 6,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 13,
+      "name": "Calor y Ondas",
+      "code": "CBF1001",
+      "credits": 7,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [7, 8],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 14,
+      "name": "Contabilidad y Costos",
+      "code": "CII1000",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 15,
+      "name": "Inglés I",
+      "code": "CIG1012",
+      "credits": 5,
+      "areaId": 3,
+      "trackIds": [1, 2],
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 16,
+      "name": "Probabilidades y Estadísticas",
+      "code": "CBE2000",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 17,
+      "name": "Estática",
+      "code": "CII2250",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [8],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 18,
+      "name": "Electricidad y Magnetismo",
+      "code": "CBF1002",
+      "credits": 7,
+      "areaId": 1,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [11, 12],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 19,
+      "name": "Introducción a la Economía",
+      "code": "CII2100",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 20,
+      "name": "Inglés II",
+      "code": "CIG1013",
+      "credits": 5,
+      "areaId": 3,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [15],
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 21,
+      "name": "Práctica Profesional I",
+      "code": "ICI5011",
+      "credits": 7,
+      "duration": 2,
+      "trackIds": [1, 2],
+      "prerequisiteCredits": 131,
+      "slots": [{ "programYear": 2, "term": 3, "position": 7 }]
+    },
+    {
+      "id": 22,
+      "name": "Inferencia Estadística",
+      "code": "CII2751",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [16],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 23,
+      "name": "Mecánica de Fluidos",
+      "code": "CII2401",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [17, 18],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 24,
+      "name": "Optimización",
+      "code": "CII2750",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [6, 12],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 25,
+      "name": "Teoría Organizacional",
+      "code": "CII1001",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [5],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 26,
+      "name": "Inglés III",
+      "code": "CIG1014",
+      "credits": 5,
+      "areaId": 3,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [20],
+      "slots": [{ "programYear": 3, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 27,
+      "name": "Bases de Datos",
+      "code": "CII2501",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [9],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 28,
+      "name": "Termodinámica",
+      "code": "CII2402",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [13, 23],
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 29,
+      "name": "Modelos Estocásticos",
+      "code": "CII2755",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [16, 24],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 30,
+      "name": "Microeconomía",
+      "code": "CII2101",
+      "credits": 6,
+      "areaId": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [19, 24],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 31,
+      "name": "Ingeniería Económica",
+      "code": "CII2002",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [14],
+      "slots": [{ "programYear": 3, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 32,
+      "name": "Econometría",
+      "code": "CII2756",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [22, 30],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 33,
+      "name": "Proyectos Energéticos",
+      "code": "CII2403",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [28],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 34,
+      "name": "Producción",
+      "code": "CII2253",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [24],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 35,
+      "name": "Marketing",
+      "code": "CII2102",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [19, 25],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 36,
+      "name": "Finanzas",
+      "code": "CII2003",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [31],
+      "slots": [{ "programYear": 4, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 37,
+      "name": "Data Science",
+      "code": "CII2504",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [22, 24],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 38,
+      "name": "Simulación",
+      "code": "CII2757",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [29],
+      "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 39,
+      "name": "Logística",
+      "code": "CII2254",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [34],
+      "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 40,
+      "name": "Gestión Estratégica",
+      "code": "CII2103",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [35],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 41,
+      "name": "Evaluación de Proyectos",
+      "code": "CII2004",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [36],
+      "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 42,
+      "name": "Práctica Profesional II",
+      "code": "ICI5022",
+      "credits": 6,
+      "duration": 2,
+      "trackIds": [1, 2],
+      "prerequisiteIds": [21],
+      "prerequisiteCredits": 256,
+      "slots": [{ "programYear": 4, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 43,
+      "name": "Electivo Profesional",
+      "code": "CIIXXXX",
+      "credits": 6,
+      "areaId": 4,
+      "trackIds": [2],
+      "isElective": true,
+      "slots": [
+        { "programYear": 5, "term": 1, "position": 1 },
+        { "programYear": 5, "term": 1, "position": 2 },
+        { "programYear": 5, "term": 1, "position": 3 },
+        { "programYear": 5, "term": 1, "position": 4 },
+        { "programYear": 5, "term": 3, "position": 1 },
+        { "programYear": 5, "term": 3, "position": 2 },
+        { "programYear": 5, "term": 3, "position": 3 },
+        { "programYear": 5, "term": 3, "position": 4 }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Liderazgo y Emprendimiento",
+      "code": "CII3101",
+      "credits": 6,
+      "areaId": 3,
+      "trackIds": [2],
+      "prerequisiteIds": [40, 41],
+      "slots": [{ "programYear": 5, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 45,
+      "name": "Taller de Ingeniería Industrial",
+      "code": "CII3102",
+      "credits": 6,
+      "areaId": 3,
+      "trackIds": [2],
+      "prerequisiteIds": [41],
+      "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 46,
+      "name": "Actividad de Titulación",
+      "code": "ICIXXXX",
+      "credits": 30,
+      "trackIds": [2],
+      "prerequisiteIds": [21, 42],
+      "prerequisiteCredits": 330,
+      "isElective": true,
+      "slots": [{ "programYear": 6, "term": 1, "position": 1 }]
+    }
+  ]
+}

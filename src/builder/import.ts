@@ -17,11 +17,13 @@ import { isValidEffectiveYear } from "@/builder/schemas";
 import type {
   Area,
   Course,
+  CredentialType,
   Curriculum,
   Draft,
   Period,
   Slot,
   TermSystem,
+  Track,
 } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
 
@@ -150,6 +152,40 @@ function readAreas(value: unknown): Area[] {
   });
 }
 
+const CREDENTIAL_TYPES: CredentialType[] = [
+  "professional",
+  "academic",
+  "technical",
+  "certificate",
+  "mention",
+];
+
+function isCredentialType(value: unknown): value is CredentialType {
+  return CREDENTIAL_TYPES.includes(value as CredentialType);
+}
+
+function readTracks(value: unknown): Track[] {
+  const tracks = readObjects(value, "La malla debe tener una lista de planes.");
+  checkIds(
+    tracks,
+    `Los ids de los planes deben ir de 1 a ${tracks.length}, sin saltos ni repetirse.`,
+  );
+  return tracks.map(({ id, name, credentialType }) => {
+    if (typeof name !== "string" || name.trim() === "")
+      reject(`El plan ${id} debe tener un nombre.`);
+    return {
+      id: id as number,
+      name,
+      credentialType: readOptional<CredentialType | null>(
+        credentialType,
+        null,
+        isCredentialType,
+        `La credencial del plan "${name}" debe ser "professional", "academic", "technical", "certificate" o "mention" (se omite cuando no otorga ninguna).`,
+      ),
+    };
+  });
+}
+
 function readOptional<T>(
   value: unknown,
   fallback: T,
@@ -193,6 +229,7 @@ function readCourse(
   value: FileObject,
   periods: Period[],
   areas: Area[],
+  tracks: Track[],
   courseCount: number,
 ): Course {
   const id = value.id as number;
@@ -219,6 +256,16 @@ function readCourse(
     null,
     (areaId): areaId is number => areas.some((area) => area.id === areaId),
     `El área del curso "${name}" no existe.`,
+  );
+  const trackIds = readOptional(
+    value.trackIds,
+    [],
+    (ids): ids is number[] =>
+      Array.isArray(ids) &&
+      ids.length > 0 &&
+      new Set(ids).size === ids.length &&
+      ids.every((trackId) => tracks.some((track) => track.id === trackId)),
+    `Los planes del curso "${name}" deben ser una lista de ids distintos de planes que existen (se omite cuando no tiene).`,
   );
   const prerequisiteIds = readOptional(
     value.prerequisiteIds,
@@ -260,6 +307,7 @@ function readCourse(
     code,
     credits: value.credits,
     areaId,
+    trackIds,
     duration,
     prerequisiteIds,
     prerequisiteCredits,
@@ -300,6 +348,7 @@ function readCourses(
   value: unknown,
   periods: Period[],
   areas: Area[],
+  tracks: Track[],
 ): Course[] {
   const courses = readObjects(
     value,
@@ -310,8 +359,15 @@ function readCourses(
     `Los ids de los cursos deben ir de 1 a ${courses.length}, sin saltos ni repetirse.`,
   );
   return courses.map((course) =>
-    readCourse(course, periods, areas, courses.length),
+    readCourse(course, periods, areas, tracks, courses.length),
   );
+}
+
+function checkTracksHaveCourses({ tracks, courses }: Curriculum) {
+  const empty = tracks.find(
+    (track) => !courses.some((course) => course.trackIds.includes(track.id)),
+  );
+  if (empty) reject(`El plan "${empty.name}" no tiene cursos.`);
 }
 
 function readCurriculum(file: unknown): Curriculum {
@@ -333,6 +389,7 @@ function readCurriculum(file: unknown): Curriculum {
   const termSystem = readTermSystem(file.termSystem);
   const periods = readPeriods(file.periods, termSystem);
   const areas = readAreas(file.areas);
+  const tracks = readTracks(file.tracks);
 
   const curriculum = {
     programName,
@@ -342,8 +399,10 @@ function readCurriculum(file: unknown): Curriculum {
     termSystem,
     periods,
     areas,
-    courses: readCourses(file.courses, periods, areas),
+    tracks,
+    courses: readCourses(file.courses, periods, areas, tracks),
   };
+  checkTracksHaveCourses(curriculum);
   checkLayout(curriculum);
   return curriculum;
 }

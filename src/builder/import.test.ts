@@ -11,6 +11,7 @@ type FileFixture = FileRecord & {
   program: FileRecord;
   periods: FileRecord[];
   areas: [FileRecord];
+  tracks: [FileRecord];
   courses: [CourseFixture, CourseFixture, CourseFixture];
 };
 
@@ -28,6 +29,9 @@ function exampleFile(): FileFixture {
       { programYear: 2, term: 1 },
     ],
     areas: [{ id: 1, name: "Derecho Privado", color: "#4f46e5" }],
+    tracks: [
+      { id: 1, name: "Licenciatura en Derecho", credentialType: "academic" },
+    ],
     courses: [
       {
         id: 1,
@@ -35,6 +39,7 @@ function exampleFile(): FileFixture {
         code: "DER101",
         credits: 6,
         areaId: 1,
+        trackIds: [1],
         slots: [{ programYear: 1, term: 1, position: 1 }],
       },
       {
@@ -42,6 +47,7 @@ function exampleFile(): FileFixture {
         name: "Derecho Civil",
         credits: 10,
         duration: 2,
+        trackIds: [1],
         prerequisiteIds: [1],
         prerequisiteCredits: 30,
         slots: [{ programYear: 1, term: 3, position: 1 }],
@@ -287,6 +293,66 @@ describe("rejecting an invalid file", () => {
     );
   });
 
+  test("rejects a missing track list", () => {
+    expect(
+      importChanged((file) => {
+        Reflect.deleteProperty(file, "tracks");
+      }),
+    ).toEqual(rejection("La malla debe tener una lista de planes."));
+  });
+
+  test("rejects track ids with gaps", () => {
+    expect(
+      importChanged((file) => {
+        file.tracks[0].id = 2;
+      }),
+    ).toEqual(
+      rejection(
+        "Los ids de los planes deben ir de 1 a 1, sin saltos ni repetirse.",
+      ),
+    );
+  });
+
+  test("rejects a track with a blank name", () => {
+    expect(
+      importChanged((file) => {
+        file.tracks[0].name = " ";
+      }),
+    ).toEqual(rejection("El plan 1 debe tener un nombre."));
+  });
+
+  test("rejects an unknown credential type", () => {
+    expect(
+      importChanged((file) => {
+        file.tracks[0].credentialType = "doctorate";
+      }),
+    ).toEqual(
+      rejection(
+        'La credencial del plan "Licenciatura en Derecho" debe ser "professional", "academic", "technical", "certificate" o "mention" (se omite cuando no otorga ninguna).',
+      ),
+    );
+  });
+
+  test("rejects a credential type written as null", () => {
+    expect(
+      importChanged((file) => {
+        file.tracks[0].credentialType = null;
+      }),
+    ).toEqual(
+      rejection(
+        'La credencial del plan "Licenciatura en Derecho" debe ser "professional", "academic", "technical", "certificate" o "mention" (se omite cuando no otorga ninguna).',
+      ),
+    );
+  });
+
+  test("rejects a track without courses", () => {
+    expect(
+      importChanged((file) => {
+        file.tracks.push({ id: 2, name: "Título de Abogado" });
+      }),
+    ).toEqual(rejection('El plan "Título de Abogado" no tiene cursos.'));
+  });
+
   test("rejects a course without a name", () => {
     expect(
       importChanged((file) => {
@@ -403,6 +469,31 @@ describe("rejecting an invalid file", () => {
         file.courses[1].areaId = null;
       }),
     ).toEqual(rejection('El área del curso "Derecho Civil" no existe.'));
+  });
+
+  test("rejects a track that does not exist", () => {
+    expect(
+      importChanged((file) => {
+        file.courses[0].trackIds = [1, 2];
+      }),
+    ).toEqual(
+      rejection(
+        'Los planes del curso "Introducción al Derecho" deben ser una lista de ids distintos de planes que existen (se omite cuando no tiene).',
+      ),
+    );
+  });
+
+  test("rejects an empty or repeated track list", () => {
+    for (const trackIds of [[], [1, 1]])
+      expect(
+        importChanged((file) => {
+          file.courses[0].trackIds = trackIds;
+        }),
+      ).toEqual(
+        rejection(
+          'Los planes del curso "Introducción al Derecho" deben ser una lista de ids distintos de planes que existen (se omite cuando no tiene).',
+        ),
+      );
   });
 
   test("rejects an empty prerequisite list", () => {
@@ -581,6 +672,13 @@ describe("importing a file", () => {
             { programYear: 2, term: 1 },
           ],
           areas: [{ id: 1, name: "Derecho Privado", color: "#4f46e5" }],
+          tracks: [
+            {
+              id: 1,
+              name: "Licenciatura en Derecho",
+              credentialType: "academic",
+            },
+          ],
           courses: [
             {
               id: 1,
@@ -588,6 +686,7 @@ describe("importing a file", () => {
               code: "DER101",
               credits: 6,
               areaId: 1,
+              trackIds: [1],
               duration: 1,
               prerequisiteIds: [],
               prerequisiteCredits: 0,
@@ -600,6 +699,7 @@ describe("importing a file", () => {
               code: "",
               credits: 10,
               areaId: null,
+              trackIds: [1],
               duration: 2,
               prerequisiteIds: [1],
               prerequisiteCredits: 30,
@@ -612,6 +712,7 @@ describe("importing a file", () => {
               code: "",
               credits: 5,
               areaId: null,
+              trackIds: [],
               duration: 1,
               prerequisiteIds: [],
               prerequisiteCredits: 0,
@@ -682,6 +783,11 @@ const curriculumActions: Action[] = [
   { type: "assignArea", courseId: 3, areaId: 1 },
   { type: "addPrerequisite", courseId: 3, prerequisiteId: 1 },
   { type: "setPrerequisiteCredits", courseId: 3, credits: 30 },
+  { type: "addTrack", name: "Plan Común" },
+  { type: "addTrack", name: "Licenciatura" },
+  { type: "editTrack", trackId: 2, changes: { credentialType: "academic" } },
+  { type: "assignTracks", courseId: 1, trackIds: [1, 2] },
+  { type: "assignTracks", courseId: 3, trackIds: [2] },
 ];
 
 describe("loading back a downloaded file", () => {

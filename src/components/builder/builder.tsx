@@ -217,6 +217,7 @@ function BuilderWorkspace() {
                   key={selectedCourse.id}
                   course={selectedCourse}
                   areas={draft.curriculum.areas}
+                  tracks={draft.curriculum.tracks}
                   maxDuration={getMaxDuration(draft.curriculum, selectedCourse)}
                   termSystem={draft.curriculum.termSystem}
                   dispatch={dispatch}

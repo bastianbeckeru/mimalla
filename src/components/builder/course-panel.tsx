@@ -10,10 +10,11 @@ import ElectiveSlots from "@/components/builder/elective-slots";
 import PropertyRow, {
   propertyControlClassName,
 } from "@/components/builder/property-row";
+import TrackSelect from "@/components/builder/track-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
-import type { Action, Area, Course, TermSystem } from "@/types/builder";
+import type { Action, Area, Course, TermSystem, Track } from "@/types/builder";
 
 const CREDITS_PATTERN = /^\d+$/;
 
@@ -88,6 +89,7 @@ function CreditsStepper({
 export default function CoursePanel({
   course,
   areas,
+  tracks,
   maxDuration,
   termSystem,
   dispatch,
@@ -96,6 +98,7 @@ export default function CoursePanel({
 }: {
   course: Course;
   areas: Area[];
+  tracks: Track[];
   maxDuration: number;
   termSystem: TermSystem;
   dispatch: (action: Action, options?: { group?: string }) => void;
@@ -174,6 +177,7 @@ export default function CoursePanel({
           <CreditsStepper course={course} dispatch={dispatch} />
         </PropertyRow>
         <AreaSelect course={course} areas={areas} dispatch={dispatch} />
+        <TrackSelect course={course} tracks={tracks} dispatch={dispatch} />
         <DurationSelect
           course={course}
           maxDuration={maxDuration}

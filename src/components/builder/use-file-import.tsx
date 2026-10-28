@@ -28,7 +28,7 @@ export function useFileImport(onLoad: (draft: Draft) => void) {
       <input
         ref={inputRef}
         type="file"
-        accept="application/json,.json"
+        accept=".malla"
         className="hidden"
         onChange={(event) => {
           const file = event.target.files?.[0];

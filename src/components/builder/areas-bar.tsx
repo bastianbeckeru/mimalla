@@ -1,4 +1,5 @@
 import AreasManager from "@/components/builder/areas-manager";
+import TracksManager from "@/components/builder/tracks-manager";
 import type { Action, Draft } from "@/types/builder";
 
 export default function AreasBar({
@@ -30,7 +31,10 @@ export default function AreasBar({
           </li>
         ))}
       </ul>
-      <AreasManager draft={draft} dispatch={dispatch} />
+      <div className="flex shrink-0 items-center gap-1">
+        <TracksManager draft={draft} dispatch={dispatch} />
+        <AreasManager draft={draft} dispatch={dispatch} />
+      </div>
     </footer>
   );
 }

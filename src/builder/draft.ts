@@ -21,6 +21,7 @@ export function createDraft(termSystem: TermSystem): Draft {
         REGULAR_TERMS[termSystem].map((term) => ({ programYear, term })),
       ),
       areas: [],
+      tracks: [],
       courses: [],
     },
     baseColor: DEFAULT_BASE_COLOR,

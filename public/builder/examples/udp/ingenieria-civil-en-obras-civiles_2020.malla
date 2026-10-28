@@ -1,0 +1,477 @@
+{
+  "schemaVersion": 1,
+  "program": {
+    "name": "Ingeniería Civil en Obras Civiles",
+    "institution": "Universidad Diego Portales"
+  },
+  "effectiveYear": 2020,
+  "versionName": "v4",
+  "termSystem": "semester",
+  "periods": [
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 },
+    { "programYear": 6, "term": 1 }
+  ],
+  "areas": [
+    { "id": 1, "name": "Formación en Ciencias Básicas", "color": "#34c1cd" },
+    {
+      "id": 2,
+      "name": "Formación en Ciencias de la Ingeniería",
+      "color": "#bbe5eb"
+    },
+    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
+    { "id": 4, "name": "Formación General", "color": "#ffffff" },
+    { "id": 5, "name": "Formación en Inglés General", "color": "#ffffff" },
+    { "id": 6, "name": "Formación en Ingeniería Aplicada", "color": "#818284" }
+  ],
+  "tracks": [],
+  "courses": [
+    {
+      "id": 1,
+      "name": "Álgebra y Geometría",
+      "code": "CBM1000",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 2,
+      "name": "Cálculo I",
+      "code": "CBM1001",
+      "credits": 7,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 3,
+      "name": "Química",
+      "code": "CBQ1000",
+      "credits": 6,
+      "areaId": 1,
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 4,
+      "name": "Programación",
+      "code": "CIT1000",
+      "credits": 6,
+      "areaId": 2,
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 5,
+      "name": "Comunicación para la Ingeniería",
+      "code": "FIC1000",
+      "credits": 5,
+      "areaId": 3,
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": 6,
+      "name": "Álgebra Lineal",
+      "code": "CBM1002",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [1],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 7,
+      "name": "Cálculo II",
+      "code": "CBM1003",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 8,
+      "name": "Mecánica",
+      "code": "CBF1000",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [2],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 9,
+      "name": "Ingeniería de Materiales",
+      "code": "COC2001",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [3],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 10,
+      "name": "Curso de Formación General",
+      "code": "CFGXXXX",
+      "credits": 5,
+      "areaId": 4,
+      "isElective": true,
+      "slots": [
+        { "programYear": 1, "term": 3, "position": 5 },
+        { "programYear": 2, "term": 1, "position": 5 },
+        { "programYear": 3, "term": 1, "position": 5 },
+        { "programYear": 4, "term": 1, "position": 5 }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Ecuaciones Diferenciales",
+      "code": "CBM1005",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [6, 7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 12,
+      "name": "Cálculo III",
+      "code": "CBM1006",
+      "credits": 6,
+      "areaId": 1,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 13,
+      "name": "Calor y Ondas",
+      "code": "CBF1001",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [7, 8],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 14,
+      "name": "Estática",
+      "code": "COC2100",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [7, 8],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 15,
+      "name": "Inglés I",
+      "code": "CIG1012",
+      "credits": 5,
+      "areaId": 5,
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 16,
+      "name": "Probabilidades y Estadísticas",
+      "code": "CBE2000",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 17,
+      "name": "Mecánica de Fluidos",
+      "code": "COC2200",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [14],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 18,
+      "name": "Electricidad y Magnetismo",
+      "code": "CBF1002",
+      "credits": 7,
+      "areaId": 1,
+      "prerequisiteIds": [11, 12],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 19,
+      "name": "Mecánica de Sólidos",
+      "code": "COC2101",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [14],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 20,
+      "name": "Edificación",
+      "code": "COC2002",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [9],
+      "slots": [{ "programYear": 2, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 21,
+      "name": "Inglés II",
+      "code": "CIG1013",
+      "credits": 5,
+      "areaId": 5,
+      "prerequisiteIds": [15],
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 22,
+      "name": "Optimización",
+      "code": "CII2750",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [6, 12],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 23,
+      "name": "Hidráulica",
+      "code": "COC2201",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [17],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 24,
+      "name": "Topografía",
+      "code": "COC2006",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [20],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 25,
+      "name": "Análisis Estructural",
+      "code": "COC2102",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [19],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 26,
+      "name": "Inglés III",
+      "code": "CIG1014",
+      "credits": 5,
+      "areaId": 5,
+      "slots": [{ "programYear": 3, "term": 1, "position": 6 }]
+    },
+    {
+      "id": 27,
+      "name": "Introducción a la Economía",
+      "code": "CII2100",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [7],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 28,
+      "name": "Ingeniería Ambiental",
+      "code": "COC2203",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [3],
+      "prerequisiteCredits": 120,
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 29,
+      "name": "Tecnología del Hormigón",
+      "code": "COC2003",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [16, 20],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 30,
+      "name": "Diseño Estructural",
+      "code": "COC2103",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteIds": [19],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 31,
+      "name": "Seminario Ciencias de la Ingeniería",
+      "code": "COC2300",
+      "credits": 6,
+      "areaId": 2,
+      "prerequisiteCredits": 120,
+      "slots": [{ "programYear": 3, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 32,
+      "name": "Práctica Profesional I",
+      "code": "COC2104",
+      "credits": 6,
+      "areaId": 3,
+      "prerequisiteIds": [23, 25, 29],
+      "isElective": true,
+      "slots": [{ "programYear": 3, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 33,
+      "name": "Mecánica de Suelos",
+      "code": "COC2204",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [17, 25],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 34,
+      "name": "Hidrología",
+      "code": "COC2004",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [16, 23],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 35,
+      "name": "Administración de Proyectos Civiles",
+      "code": "COC2004",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [20, 27],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
+    },
+    {
+      "id": 36,
+      "name": "Diseño en Hormigón",
+      "code": "COC2105",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [30],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
+    },
+    {
+      "id": 37,
+      "name": "Fundaciones",
+      "code": "COC2106",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [33],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 38,
+      "name": "Hidráulica Urbana",
+      "code": "COC2205",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [34],
+      "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 39,
+      "name": "Planificación de Proyectos",
+      "code": "COC2005",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [35],
+      "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
+    },
+    {
+      "id": 40,
+      "name": "Diseño en Acero",
+      "code": "COC2107",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [30],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
+    },
+    {
+      "id": 41,
+      "name": "Ingeniería Sísmica",
+      "code": "COC3100",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [36],
+      "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
+    },
+    {
+      "id": 42,
+      "name": "Práctica Profesional II",
+      "credits": 6,
+      "areaId": 3,
+      "prerequisiteCredits": 262,
+      "isElective": true,
+      "slots": [{ "programYear": 4, "term": 3, "position": 6 }]
+    },
+    {
+      "id": 43,
+      "name": "BIM",
+      "code": "FIC1003",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [36, 38],
+      "slots": [{ "programYear": 5, "term": 1, "position": 1 }]
+    },
+    {
+      "id": 44,
+      "name": "Ingeniería de Costos",
+      "code": "COC3000",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [39],
+      "slots": [{ "programYear": 5, "term": 1, "position": 2 }]
+    },
+    {
+      "id": 45,
+      "name": "Electivo Profesional",
+      "code": "COCXXXX",
+      "credits": 6,
+      "areaId": 6,
+      "isElective": true,
+      "slots": [
+        { "programYear": 5, "term": 1, "position": 3 },
+        { "programYear": 5, "term": 1, "position": 4 },
+        { "programYear": 5, "term": 1, "position": 5 },
+        { "programYear": 5, "term": 3, "position": 3 },
+        { "programYear": 5, "term": 3, "position": 4 },
+        { "programYear": 5, "term": 3, "position": 5 }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Taller de Proyectos",
+      "code": "COC3300",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [43],
+      "slots": [{ "programYear": 5, "term": 3, "position": 1 }]
+    },
+    {
+      "id": 47,
+      "name": "Diseño de Caminos",
+      "code": "COC3001",
+      "credits": 6,
+      "areaId": 6,
+      "prerequisiteIds": [33, 36],
+      "slots": [{ "programYear": 5, "term": 3, "position": 2 }]
+    },
+    {
+      "id": 48,
+      "name": "Actividad de Titulación",
+      "credits": 30,
+      "areaId": 3,
+      "prerequisiteIds": [32, 42],
+      "isElective": true,
+      "slots": [{ "programYear": 6, "term": 1, "position": 1 }]
+    }
+  ]
+}

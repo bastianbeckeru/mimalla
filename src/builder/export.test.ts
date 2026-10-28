@@ -23,7 +23,7 @@ const PERIODS =
 describe("exporting a curriculum", () => {
   test("writes minified JSON with schema version 1 and only the fields set", () => {
     expect(exportFile(draftAfter(details))).toBe(
-      `{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"areas":[],"courses":[]}`,
+      `{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"areas":[],"tracks":[],"courses":[]}`,
     );
   });
 
@@ -95,6 +95,35 @@ describe("exporting a curriculum", () => {
     expect(file).not.toContain("16a34a");
     expect(file).not.toContain("baseColor");
     expect(file).not.toContain("handColored");
+  });
+
+  test("writes tracks in order with their credential type when set, and each course's trackIds after its area", () => {
+    const draft = draftAfter(
+      details,
+      { type: "addArea", name: "Privado" },
+      { type: "addTrack", name: "Sin uso" },
+      { type: "addTrack", name: "Plan Común" },
+      { type: "addTrack", name: "Licenciatura en Derecho" },
+      {
+        type: "editTrack",
+        trackId: 3,
+        changes: { credentialType: "academic" },
+      },
+      { type: "deleteTrack", trackId: 1 },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
+      { type: "assignArea", courseId: 1, areaId: 1 },
+      { type: "assignTracks", courseId: 1, trackIds: [3, 2] },
+    );
+    const file = exportFile(draft);
+
+    expect(file).toContain(
+      '"tracks":[{"id":1,"name":"Plan Común"},{"id":2,"name":"Licenciatura en Derecho","credentialType":"academic"}],' +
+        '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"areaId":1,"trackIds":[1,2],"slots":[{"programYear":1,"term":1,"position":1}]}]',
+    );
   });
 
   test("sorts courses by their first slot and renumbers their ids from 1", () => {
@@ -283,12 +312,24 @@ describe("exporting a curriculum", () => {
     );
   });
 
-  test("names the file after the program", () => {
+  test("names the file after the program and its effective year", () => {
+    const draft = draftAfter({
+      type: "editDetails",
+      changes: {
+        programName: "Ingeniería Civil Industrial",
+        effectiveYear: 2020,
+      },
+    });
+
+    expect(getFileName(draft)).toBe("ingenieria-civil-industrial_2020.malla");
+  });
+
+  test("leaves the year out of the name while it is missing", () => {
     const draft = draftAfter({
       type: "editDetails",
       changes: { programName: "Ingeniería Civil Industrial" },
     });
 
-    expect(getFileName(draft)).toBe("ingenieria-civil-industrial.json");
+    expect(getFileName(draft)).toBe("ingenieria-civil-industrial.malla");
   });
 });
