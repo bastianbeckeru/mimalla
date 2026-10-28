@@ -17,13 +17,12 @@ import {
   getMaxDuration,
 } from "@/builder/grid";
 import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
-import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
 import AddButton from "@/components/builder/add-button";
+import ConnectionsOverlay from "@/components/builder/connections-overlay";
 import CourseCard from "@/components/builder/course-card";
 import NewCourseDialog from "@/components/builder/new-course-dialog";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
-import PathsOverlay from "@/components/curriculum/paths-overlay";
 import type {
   Action,
   Curriculum,
@@ -37,14 +36,11 @@ import {
   GRID_CELL_WIDTH,
   GRID_GAP,
 } from "@/utils/curriculum-grid";
-import { createConnectionPaths } from "@/utils/pathfinding";
 
 const MIN_ROWS = 6;
 const HEADER_ROWS = 1;
 const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
-const PREREQUISITE_LINE_COLOR = "#34d399";
-const MISPLACED_PREREQUISITE_LINE_COLOR = "var(--warning)";
 
 const sensors = [
   PointerSensor.configure({
@@ -103,7 +99,6 @@ export default function CurriculumGrid({
   const dropOrigin = useRef<{ dragId: string; x: number; y: number } | null>(
     null,
   );
-  const [hoveredCourseId, setHoveredCourseId] = useState<number | null>(null);
   const [newCourse, setNewCourse] = useState<NewCourse | null>(null);
   const [isNewCourseOpen, setIsNewCourseOpen] = useState(false);
   const { curriculum } = draft;
@@ -113,49 +108,17 @@ export default function CurriculumGrid({
   // resize ended now, so the rest of the grid makes room while it happens.
   const baseCards = getCards(curriculum);
   const baseCardsById = new Map(baseCards.map((card) => [card.dragId, card]));
-  const cards = gesture
-    ? getCards(apply(draft, gesture.action).curriculum)
-    : baseCards;
+  const shownCurriculum = gesture
+    ? apply(draft, gesture.action).curriculum
+    : curriculum;
+  const cards = gesture ? getCards(shownCurriculum) : baseCards;
   const draggedId = gesture?.action.type === "moveSlot" ? gesture.dragId : null;
+  const gestureCourseId = gesture?.action.courseId ?? null;
   const landing = cards.find((card) => card.dragId === draggedId);
 
   const rows =
     Math.max(MIN_ROWS, ...cards.map((card) => card.row + card.height - 1)) +
     SPARE_ROWS;
-
-  const misplacedPrerequisiteIds =
-    hoveredCourseId === null
-      ? []
-      : getMisplacedPrerequisiteIds(curriculum, hoveredCourseId);
-  const misplacedCardIds = new Set(
-    cards
-      .filter((card) => misplacedPrerequisiteIds.includes(card.course.id))
-      .map((card) => card.dragId),
-  );
-  const prerequisitePaths =
-    hoveredCourseId === null || gesture
-      ? []
-      : createConnectionPaths(
-          rows,
-          columns,
-          cards.map((card) => ({
-            id: card.dragId,
-            x: card.column,
-            y: card.row,
-            w: card.duration,
-            h: card.height,
-            programYear: card.slot.programYear,
-            term: card.slot.term,
-            courseId: card.course.id,
-            course: card.course.id === hoveredCourseId ? card.course : null,
-          })),
-          { includeAllPrerequisites: true },
-        ).map(({ data, originCardId }) => ({
-          data,
-          color: misplacedCardIds.has(originCardId)
-            ? MISPLACED_PREREQUISITE_LINE_COLOR
-            : PREREQUISITE_LINE_COLOR,
-        }));
 
   const occupied = new Set(
     cards.flatMap((card) =>
@@ -314,7 +277,20 @@ export default function CurriculumGrid({
             inset: `-${GRID_GAP}rem`,
           }}
         >
-          <PathsOverlay paths={prerequisitePaths} />
+          <ConnectionsOverlay
+            curriculum={shownCurriculum}
+            cards={cards.map((card) => ({
+              id: card.dragId,
+              courseId: card.course.id,
+              column: card.column,
+              row: card.row,
+              duration: card.duration,
+              height: card.height,
+            }))}
+            size={{ rows, columns }}
+            gestureCourseId={gestureCourseId}
+            selectedCourseId={selectedCourseId}
+          />
         </div>
         {cards.map((shownCard) => {
           // dnd-kit lifts the dragged card from where it started, so it keeps
@@ -326,12 +302,11 @@ export default function CurriculumGrid({
               key={card.dragId}
               dragId={card.dragId}
               course={card.course}
+              curriculum={shownCurriculum}
+              gestureCourseId={gestureCourseId}
               color={getCourseColor(curriculum, card.course)}
               isSelected={card.course.id === selectedCourseId}
               onSelect={() => onSelectCourse(card.course.id)}
-              onHoverChange={(isHovered) =>
-                setHoveredCourseId(isHovered ? card.course.id : null)
-              }
               takeDropOrigin={() => takeDropOrigin(card.dragId)}
               style={{
                 gridColumn: `${card.column} / span ${card.duration}`,
