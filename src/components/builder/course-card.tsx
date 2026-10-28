@@ -2,8 +2,12 @@
 
 import { useDraggable } from "@dnd-kit/react";
 import { cn } from "cn";
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, type ReactNode, useRef } from "react";
 import { getTextColor } from "@/builder/colors";
+import {
+  useLayoutFlip,
+  useSizeReveal,
+} from "@/components/builder/use-layout-flip";
 import type { Course } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
 
@@ -14,6 +18,7 @@ export default function CourseCard({
   isSelected,
   onSelect,
   onHoverChange,
+  takeDropOrigin,
   style,
   children,
 }: {
@@ -23,15 +28,22 @@ export default function CourseCard({
   isSelected: boolean;
   onSelect: () => void;
   onHoverChange: (isHovered: boolean) => void;
+  takeDropOrigin: () => { x: number; y: number } | null;
   style: CSSProperties;
   children: ReactNode;
 }) {
   const { ref, isDragging } = useDraggable({ id: dragId });
+  const cellRef = useRef<HTMLDivElement>(null);
+  const surfaceRef = useRef<HTMLSpanElement>(null);
+  useLayoutFlip(cellRef, takeDropOrigin);
+  useSizeReveal(cellRef, surfaceRef);
 
   return (
     <div
-      className="relative"
-      style={style}
+      ref={cellRef}
+      className="group/card relative"
+      data-selected={isSelected || undefined}
+      style={{ ...style, color: getTextColor(color) }}
       onPointerEnter={() => onHoverChange(true)}
       onPointerLeave={() => onHoverChange(false)}
     >
@@ -39,15 +51,26 @@ export default function CourseCard({
         ref={ref}
         type="button"
         className={cn(
-          "flex size-full cursor-grab flex-col justify-between overflow-hidden rounded-lg p-2 text-left text-xs ring-1 ring-foreground/10 transition-[filter] hover:brightness-110",
-          isSelected && "ring-2 ring-ring ring-offset-2 ring-offset-background",
+          "relative isolate size-full cursor-grab rounded-lg p-2 text-center text-xs transition-[filter] hover:brightness-110",
           isDragging && "cursor-grabbing shadow-lg",
         )}
-        style={{ backgroundColor: color, color: getTextColor(color) }}
         onClick={onSelect}
       >
-        <span className="line-clamp-3 font-medium">{course.name}</span>
-        <span className="opacity-75">{course.credits} créditos</span>
+        {/* The card's painted body, kept apart from the text so it can be
+            clipped to animate a change of size. */}
+        <span
+          ref={surfaceRef}
+          aria-hidden
+          className={cn(
+            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10",
+            isSelected &&
+              "ring-2 ring-ring ring-offset-2 ring-offset-background",
+          )}
+          style={{ backgroundColor: color }}
+        />
+        <span className="flex size-full items-center justify-center overflow-hidden">
+          <span className="line-clamp-3 font-medium">{course.name}</span>
+        </span>
       </button>
       {children}
     </div>

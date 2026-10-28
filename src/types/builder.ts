@@ -41,6 +41,11 @@ export type Curriculum = {
   courses: Course[];
 };
 
+export type CurriculumDetails = Pick<
+  Curriculum,
+  "programName" | "institution" | "effectiveYear" | "versionName"
+>;
+
 export type Draft = {
   curriculum: Curriculum;
   baseColor: HexColor;
@@ -53,16 +58,11 @@ export type Handlers<A extends { type: string }> = {
 
 export type CurriculumAction = {
   type: "editDetails";
-  changes: Partial<
-    Pick<
-      Curriculum,
-      "programName" | "institution" | "effectiveYear" | "versionName"
-    >
-  >;
+  changes: Partial<CurriculumDetails>;
 };
 
 export type CourseAction =
-  | { type: "addCourse"; period: Period; position?: number }
+  | { type: "addCourse"; name: string; period: Period; position?: number }
   | {
       type: "editCourse";
       courseId: number;
@@ -85,10 +85,13 @@ export type AreaAction =
   | { type: "assignArea"; courseId: number; areaId: number | null };
 
 export type PeriodAction =
-  | { type: "createCurriculum"; termSystem: TermSystem }
+  | {
+      type: "createCurriculum";
+      termSystem: TermSystem;
+      details: CurriculumDetails;
+    }
   | { type: "setTermSystem"; termSystem: TermSystem }
-  | { type: "addProgramYear" }
-  | { type: "removeLastProgramYear" }
+  | { type: "addPeriod" }
   | { type: "addIntensiveTerm"; programYear: number; term: number }
   | { type: "removePeriod"; period: Period };
 

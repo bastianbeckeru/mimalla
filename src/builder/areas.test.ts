@@ -61,7 +61,7 @@ describe("renaming an area", () => {
 describe("assigning a course to an area", () => {
   const before = draftAfter(
     { type: "addArea", name: "Privado" },
-    { type: "addCourse", period: FIRST_SEMESTER },
+    { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
   );
 
   test("sets the course's area, and can clear it again", () => {
@@ -92,8 +92,8 @@ describe("deleting an area", () => {
     const draft = draftAfter(
       { type: "addArea", name: "Privado" },
       { type: "addArea", name: "Público" },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "assignArea", courseId: 1, areaId: 1 },
       { type: "assignArea", courseId: 2, areaId: 2 },
       { type: "deleteArea", areaId: 1 },
@@ -186,8 +186,8 @@ describe("course colors", () => {
     const draft = draftAfter(
       { type: "addArea", name: "Privado" },
       { type: "setAreaColor", areaId: 1, color: "#ff8800" },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "assignArea", courseId: 1, areaId: 1 },
     );
     const [assigned, unassigned] = draft.curriculum.courses as [Course, Course];

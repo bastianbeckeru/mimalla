@@ -28,9 +28,9 @@ function creditsOf(draft: Draft) {
 describe("resizing a course's height", () => {
   test("sets the credits to rows × default credits", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "resizeCourse", courseId: 3, slotIndex: 0, rows: 3, duration: 1 },
     );
 
@@ -39,9 +39,14 @@ describe("resizing a course's height", () => {
 
   test("growing into the course below pushes it down", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER, position: 5 },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+        position: 5,
+      },
       { type: "resizeCourse", courseId: 1, slotIndex: 0, rows: 3, duration: 1 },
     );
 
@@ -56,7 +61,7 @@ describe("resizing a course's height", () => {
 describe("resizing a course's width", () => {
   test("sets its duration in consecutive columns", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "resizeCourse", courseId: 1, slotIndex: 0, rows: 1, duration: 3 },
     );
 
@@ -65,8 +70,8 @@ describe("resizing a course's width", () => {
 
   test("growing into a course in the next column pushes it down", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       { type: "resizeCourse", courseId: 1, slotIndex: 0, rows: 1, duration: 2 },
     );
 
@@ -79,7 +84,11 @@ describe("resizing a course's width", () => {
 
 describe("rejecting a resize", () => {
   test("cannot span past the last column", () => {
-    const before = draftAfter({ type: "addCourse", period: LAST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: LAST_SEMESTER,
+    });
 
     expect(
       apply(before, {
@@ -99,7 +108,11 @@ describe("rejecting a resize", () => {
     ["a fractional duration", { rows: 1, duration: 1.5 }],
     ["the same size", { rows: 1, duration: 1 }],
   ])("keeps the draft for %s", (_, size) => {
-    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(
       apply(before, {
@@ -115,8 +128,8 @@ describe("rejecting a resize", () => {
 describe("setting the duration from the panel", () => {
   test("widens the course and pushes the course it grows into down", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       { type: "editCourse", courseId: 1, changes: { duration: 2 } },
     );
 
@@ -132,7 +145,11 @@ describe("setting the duration from the panel", () => {
     ["of 0", 0],
     ["that is fractional", 1.5],
   ])("rejects a duration %s", (_, duration) => {
-    const before = draftAfter({ type: "addCourse", period: LAST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: LAST_SEMESTER,
+    });
 
     expect(
       apply(before, { type: "editCourse", courseId: 1, changes: { duration } }),
@@ -143,7 +160,7 @@ describe("setting the duration from the panel", () => {
 describe("moving a course that spans several columns", () => {
   test("cannot be dropped where it would span past the last column", () => {
     const before = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "editCourse", courseId: 1, changes: { duration: 2 } },
     );
 
@@ -159,8 +176,13 @@ describe("moving a course that spans several columns", () => {
 
   test("pushes down a course in any column it lands on", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: SECOND_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER, position: 3 },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+        position: 3,
+      },
       { type: "editCourse", courseId: 2, changes: { duration: 2 } },
       {
         type: "moveSlot",
@@ -178,9 +200,9 @@ describe("moving a course that spans several columns", () => {
 
   test("a new course goes below the courses spanning into its column", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "editCourse", courseId: 1, changes: { duration: 2 } },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
     );
 
     expect(positionsOf(draft)[1]).toEqual([
@@ -192,8 +214,12 @@ describe("moving a course that spans several columns", () => {
 describe("maximum duration", () => {
   test("reaches up to the last column", () => {
     const { curriculum } = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: { programYear: 5, term: 1 } },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 5, term: 1 },
+      },
     );
     const [first, second] = curriculum.courses as [Course, Course];
 
@@ -205,8 +231,8 @@ describe("maximum duration", () => {
 describe("exporting the duration", () => {
   test("writes it after the credits and omits it when 1", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "addArea", name: "Privado" },
       { type: "assignArea", courseId: 1, areaId: 1 },
       { type: "editCourse", courseId: 1, changes: { duration: 2 } },

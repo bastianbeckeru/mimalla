@@ -1,5 +1,5 @@
 import type { Curriculum, Period, Slot, TermSystem } from "@/types/builder";
-import { TERM_LABELS } from "@/utils/period-key";
+import { arabicToRoman } from "@/utils/numbers";
 
 export const REGULAR_TERMS: Record<TermSystem, number[]> = {
   semester: [1, 3],
@@ -13,21 +13,6 @@ export const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
 
 export function findPeriodIndex(periods: Period[], period: Period) {
   return periods.findIndex((candidate) => isSamePeriod(candidate, period));
-}
-
-export function getLastProgramYear(periods: Period[]) {
-  return Math.max(0, ...periods.map((period) => period.programYear));
-}
-
-export function canRemoveLastProgramYear(curriculum: Curriculum) {
-  const lastProgramYear = getLastProgramYear(curriculum.periods);
-  const lastYearPeriods = curriculum.periods.filter(
-    (period) => period.programYear === lastProgramYear,
-  );
-  return (
-    lastYearPeriods.length < curriculum.periods.length &&
-    !lastYearPeriods.some((period) => isPeriodOccupied(curriculum, period))
-  );
 }
 
 function isPeriodOccupied(curriculum: Curriculum, period: Period) {
@@ -59,13 +44,24 @@ export function getAvailableIntensiveTerms(
   );
 }
 
-const TERM_LABELS_BY_SYSTEM: Record<TermSystem, Record<number, string>> = {
-  semester: TERM_LABELS,
-  annual: { 1: "Año académico", 4: "Verano" },
+const PERIOD_NAMES: Record<TermSystem, Record<number, string>> = {
+  semester: { 1: "SEMESTRE", 2: "INVIERNO", 3: "SEMESTRE", 4: "VERANO" },
+  annual: { 1: "AÑO", 4: "VERANO" },
 };
 
+function getPeriodNumber(
+  termSystem: TermSystem,
+  { programYear, term }: Period,
+) {
+  const regularTerms = REGULAR_TERMS[termSystem];
+  const regularIndex = regularTerms.indexOf(term);
+  return regularIndex === -1
+    ? programYear
+    : (programYear - 1) * regularTerms.length + regularIndex + 1;
+}
+
 export function getPeriodLabel(termSystem: TermSystem, period: Period) {
-  return `Año ${period.programYear} · ${TERM_LABELS_BY_SYSTEM[termSystem][period.term]}`;
+  return `${PERIOD_NAMES[termSystem][period.term]} ${arabicToRoman(getPeriodNumber(termSystem, period))}`;
 }
 
 export function isSamePeriod(a: Period, b: Period) {

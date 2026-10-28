@@ -1,21 +1,38 @@
 import { createDraft } from "@/builder/draft";
 import {
-  canRemoveLastProgramYear,
   canRemovePeriod,
   comparePeriods,
   getAvailableIntensiveTerms,
-  getLastProgramYear,
   isSamePeriod,
   REGULAR_TERMS,
 } from "@/builder/periods";
-import type { Draft, Handlers, Period, PeriodAction } from "@/types/builder";
+import type {
+  Curriculum,
+  Draft,
+  Handlers,
+  Period,
+  PeriodAction,
+} from "@/types/builder";
 
 function withPeriods(draft: Draft, periods: Period[]): Draft {
   return { ...draft, curriculum: { ...draft.curriculum, periods } };
 }
 
+function getNextRegularPeriod({ termSystem, periods }: Curriculum): Period {
+  const [firstTerm = 1, ...laterTerms] = REGULAR_TERMS[termSystem];
+  const last = periods.toSorted(comparePeriods).at(-1);
+  if (!last) return { programYear: 1, term: firstTerm };
+  const term = laterTerms.find((candidate) => candidate > last.term);
+  return term === undefined
+    ? { programYear: last.programYear + 1, term: firstTerm }
+    : { programYear: last.programYear, term };
+}
+
 export const periodHandlers: Handlers<PeriodAction> = {
-  createCurriculum: (_, { termSystem }) => createDraft(termSystem),
+  createCurriculum: (_, { termSystem, details }) => {
+    const draft = createDraft(termSystem);
+    return { ...draft, curriculum: { ...draft.curriculum, ...details } };
+  },
 
   setTermSystem: (draft, { termSystem }) => {
     const { curriculum } = draft;
@@ -36,26 +53,11 @@ export const periodHandlers: Handlers<PeriodAction> = {
     };
   },
 
-  addProgramYear: (draft) => {
-    const { periods, termSystem } = draft.curriculum;
-    const programYear = getLastProgramYear(periods) + 1;
-    return withPeriods(draft, [
-      ...periods,
-      ...REGULAR_TERMS[termSystem].map((term) => ({ programYear, term })),
-    ]);
-  },
-
-  removeLastProgramYear: (draft) => {
-    const { curriculum } = draft;
-    if (!canRemoveLastProgramYear(curriculum)) return draft;
-    const lastProgramYear = getLastProgramYear(curriculum.periods);
-    return withPeriods(
-      draft,
-      curriculum.periods.filter(
-        (period) => period.programYear !== lastProgramYear,
-      ),
-    );
-  },
+  addPeriod: (draft) =>
+    withPeriods(draft, [
+      ...draft.curriculum.periods,
+      getNextRegularPeriod(draft.curriculum),
+    ]),
 
   addIntensiveTerm: (draft, { programYear, term }) => {
     const { curriculum } = draft;

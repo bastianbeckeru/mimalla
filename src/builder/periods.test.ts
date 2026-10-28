@@ -19,29 +19,41 @@ describe("a new annual curriculum", () => {
     expect(curriculum.periods).toEqual(
       [1, 2, 3, 4, 5].map((programYear) => ({ programYear, term: 1 })),
     );
-    expect(getPeriodLabel("annual", { programYear: 1, term: 1 })).toBe(
-      "Año 1 · Año académico",
-    );
+    expect(getPeriodLabel("annual", { programYear: 1, term: 1 })).toBe("AÑO I");
   });
 });
 
 describe("creating a curriculum", () => {
-  test("replaces the current draft with a blank one in the chosen term system", () => {
+  test("replaces the current draft with a blank one in the chosen term system and details", () => {
+    const details = {
+      programName: "Medicina",
+      institution: "Universidad de Chile",
+      effectiveYear: 2024,
+      versionName: "v2",
+    };
     const draft = draftAfter(
       { type: "editDetails", changes: { programName: "Derecho" } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
-      { type: "addProgramYear" },
-      { type: "createCurriculum", termSystem: "annual" },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
+      { type: "addPeriod" },
+      { type: "createCurriculum", termSystem: "annual", details },
     );
 
-    expect(draft).toEqual(createDraft("annual"));
+    const blank = createDraft("annual");
+    expect(draft).toEqual({
+      ...blank,
+      curriculum: { ...blank.curriculum, ...details },
+    });
   });
 });
 
 describe("changing the term system", () => {
   test("swaps the columns for the regular terms of the new system while there are no courses", () => {
     const draft = draftAfter(
-      { type: "addProgramYear" },
+      { type: "addPeriod" },
       { type: "addIntensiveTerm", programYear: 1, term: 4 },
       { type: "setTermSystem", termSystem: "annual" },
     );
@@ -55,6 +67,7 @@ describe("changing the term system", () => {
   test("is not possible while the curriculum has courses", () => {
     const withCourse = draftAfter({
       type: "addCourse",
+      name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
     });
 
@@ -76,15 +89,48 @@ describe("changing the term system", () => {
   });
 });
 
-describe("adding a program year", () => {
-  test("appends the regular terms of the next program year", () => {
-    const draft = draftAfter({ type: "addProgramYear" });
+describe("adding a period", () => {
+  test("appends the next semester of the last program year", () => {
+    const draft = draftAfter(
+      { type: "removePeriod", period: { programYear: 5, term: 3 } },
+      { type: "addPeriod" },
+    );
+
+    expect(draft.curriculum.periods.slice(-2)).toEqual([
+      { programYear: 5, term: 1 },
+      { programYear: 5, term: 3 },
+    ]);
+  });
+
+  test("starts the next program year after its last regular term", () => {
+    const draft = draftAfter({ type: "addPeriod" }, { type: "addPeriod" });
 
     expect(draft.curriculum.periods.slice(-3)).toEqual([
       { programYear: 5, term: 3 },
       { programYear: 6, term: 1 },
       { programYear: 6, term: 3 },
     ]);
+  });
+
+  test("starts the next program year after a summer", () => {
+    const draft = draftAfter(
+      { type: "addIntensiveTerm", programYear: 5, term: 4 },
+      { type: "addPeriod" },
+    );
+
+    expect(draft.curriculum.periods.slice(-2)).toEqual([
+      { programYear: 5, term: 4 },
+      { programYear: 6, term: 1 },
+    ]);
+  });
+
+  test("appends the next academic year in the annual system", () => {
+    const draft = apply(createDraft("annual"), { type: "addPeriod" });
+
+    expect(draft.curriculum.periods.at(-1)).toEqual({
+      programYear: 6,
+      term: 1,
+    });
   });
 });
 
@@ -104,12 +150,12 @@ describe("adding an intensive term", () => {
     ]);
   });
 
-  test("labels winter and summer in Spanish", () => {
+  test("labels winter and summer in Spanish with the program year in roman numerals", () => {
     expect(getPeriodLabel("semester", { programYear: 2, term: 2 })).toBe(
-      "Año 2 · Invierno",
+      "INVIERNO II",
     );
     expect(getPeriodLabel("annual", { programYear: 1, term: 4 })).toBe(
-      "Año 1 · Verano",
+      "VERANO I",
     );
   });
 
@@ -199,6 +245,7 @@ describe("removing a column", () => {
   test("is not possible while the column has courses", () => {
     const withCourse = draftAfter({
       type: "addCourse",
+      name: "Nuevo curso",
       period: SECOND_SEMESTER,
     });
 
@@ -242,11 +289,11 @@ describe("removing a column", () => {
 
   test("is not possible for the only column left", () => {
     const oneColumn = draftAfter(
-      ...Array.from(
-        { length: 4 },
-        (): Action => ({
-          type: "removeLastProgramYear",
-        }),
+      ...[2, 3, 4, 5].flatMap((programYear): Action[] =>
+        [1, 3].map((term) => ({
+          type: "removePeriod",
+          period: { programYear, term },
+        })),
       ),
       { type: "removePeriod", period: SECOND_SEMESTER },
     );
@@ -271,46 +318,6 @@ describe("removing a column", () => {
   });
 });
 
-describe("removing the last program year", () => {
-  test("removes all its columns when they are empty", () => {
-    const draft = draftAfter(
-      { type: "addIntensiveTerm", programYear: 5, term: 4 },
-      { type: "removeLastProgramYear" },
-    );
-
-    expect(draft.curriculum.periods.at(-1)).toEqual({
-      programYear: 4,
-      term: 3,
-    });
-    expect(draft.curriculum.periods).toHaveLength(8);
-  });
-
-  test("is not possible while it has courses", () => {
-    const withCourse = draftAfter({
-      type: "addCourse",
-      period: { programYear: 5, term: 3 },
-    });
-
-    expect(apply(withCourse, { type: "removeLastProgramYear" })).toBe(
-      withCourse,
-    );
-  });
-
-  test("is not possible when it is the only program year", () => {
-    const oneYear = draftAfter(
-      ...Array.from(
-        { length: 4 },
-        (): Action => ({
-          type: "removeLastProgramYear",
-        }),
-      ),
-    );
-
-    expect(oneYear.curriculum.periods).toHaveLength(2);
-    expect(apply(oneYear, { type: "removeLastProgramYear" })).toBe(oneYear);
-  });
-});
-
 describe("a new semester curriculum", () => {
   const { curriculum } = createDraft("semester");
 
@@ -329,12 +336,12 @@ describe("a new semester curriculum", () => {
     ]);
   });
 
-  test("labels its columns in Spanish", () => {
+  test("numbers its semesters in roman numerals across program years", () => {
     expect(
       curriculum.periods
-        .slice(0, 2)
+        .slice(0, 4)
         .map((period) => getPeriodLabel(curriculum.termSystem, period)),
-    ).toEqual(["Año 1 · Primer semestre", "Año 1 · Segundo semestre"]);
+    ).toEqual(["SEMESTRE I", "SEMESTRE II", "SEMESTRE III", "SEMESTRE IV"]);
   });
 
   test("starts without courses or details", () => {

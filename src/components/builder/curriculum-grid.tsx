@@ -8,8 +8,8 @@ import {
   PointerSensor,
 } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
-import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
+import { apply } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
 import {
   getCourseHeight,
@@ -18,12 +18,20 @@ import {
 } from "@/builder/grid";
 import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
 import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
+import AddButton from "@/components/builder/add-button";
 import CourseCard from "@/components/builder/course-card";
+import NewCourseDialog from "@/components/builder/new-course-dialog";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
 import PathsOverlay from "@/components/curriculum/paths-overlay";
-import { Button } from "@/components/ui/button";
-import type { Action, Curriculum } from "@/types/builder";
+import type {
+  Action,
+  Curriculum,
+  Draft,
+  Period,
+  ResizeAction,
+  SlotAction,
+} from "@/types/builder";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -51,56 +59,69 @@ const sensors = [
 
 type Cell = { column: number; row: number };
 type Size = { height: number; duration: number };
-type Landing = Cell & Size & { dragId: string };
-type Resize = Size & { dragId: string };
+type Gesture = { dragId: string; action: SlotAction | ResizeAction };
+type NewCourse = { period: Period; position: number };
+
+function getCards(curriculum: Curriculum) {
+  const defaultCredits = getDefaultCredits(curriculum);
+  return curriculum.courses.flatMap((course) =>
+    course.slots.map((slot, slotIndex) => ({
+      dragId: `${course.id}/${slotIndex}`,
+      course,
+      slot,
+      slotIndex,
+      column: findPeriodIndex(curriculum.periods, slot) + 1,
+      row: slot.position,
+      height: getCourseHeight(course.credits, defaultCredits),
+      duration: course.duration,
+    })),
+  );
+}
+
+type Card = ReturnType<typeof getCards>[number];
+
+function isSameGesture(a: Gesture | null, b: Gesture) {
+  return (
+    a?.dragId === b.dragId &&
+    JSON.stringify(a.action) === JSON.stringify(b.action)
+  );
+}
 
 export default function CurriculumGrid({
-  curriculum,
+  draft,
   dispatch,
   selectedCourseId,
   onSelectCourse,
 }: {
-  curriculum: Curriculum;
+  draft: Draft;
   dispatch: (action: Action) => void;
   selectedCourseId: number | null;
   onSelectCourse: (courseId: number) => void;
 }) {
   const firstCellRef = useRef<HTMLDivElement>(null);
-  const [landing, setLanding] = useState<Landing | null>(null);
-  const [resize, setResize] = useState<Resize | null>(null);
+  const [gesture, setGesture] = useState<Gesture | null>(null);
+  const dropOrigin = useRef<{ dragId: string; x: number; y: number } | null>(
+    null,
+  );
   const [hoveredCourseId, setHoveredCourseId] = useState<number | null>(null);
-  const defaultCredits = getDefaultCredits(curriculum);
+  const [newCourse, setNewCourse] = useState<NewCourse | null>(null);
+  const [isNewCourseOpen, setIsNewCourseOpen] = useState(false);
+  const { curriculum } = draft;
   const columns = curriculum.periods.length;
 
-  const cards = curriculum.courses.flatMap((course) =>
-    course.slots.map((slot, slotIndex) => {
-      const dragId = `${course.id}/${slotIndex}`;
-      const size = {
-        height: getCourseHeight(course.credits, defaultCredits),
-        duration: course.duration,
-      };
-      return {
-        dragId,
-        course,
-        slot,
-        slotIndex,
-        column: findPeriodIndex(curriculum.periods, slot) + 1,
-        row: slot.position,
-        size,
-        ...(resize?.dragId === dragId ? resize : size),
-      };
-    }),
-  );
-
-  type Card = (typeof cards)[number];
+  // The cards as they stand, and as they would stand if the ongoing drag or
+  // resize ended now, so the rest of the grid makes room while it happens.
+  const baseCards = getCards(curriculum);
+  const baseCardsById = new Map(baseCards.map((card) => [card.dragId, card]));
+  const cards = gesture
+    ? getCards(apply(draft, gesture.action).curriculum)
+    : baseCards;
+  const draggedId = gesture?.action.type === "moveSlot" ? gesture.dragId : null;
+  const landing = cards.find((card) => card.dragId === draggedId);
 
   const rows =
-    Math.max(
-      MIN_ROWS,
-      ...cards.map((card) => card.row + card.height - 1),
-      landing ? landing.row + landing.height - 1 : 0,
-    ) + SPARE_ROWS;
-  const footRow = HEADER_ROWS + rows + 1;
+    Math.max(MIN_ROWS, ...cards.map((card) => card.row + card.height - 1)) +
+    SPARE_ROWS;
 
   const misplacedPrerequisiteIds =
     hoveredCourseId === null
@@ -112,7 +133,7 @@ export default function CurriculumGrid({
       .map((card) => card.dragId),
   );
   const prerequisitePaths =
-    hoveredCourseId === null || landing || resize
+    hoveredCourseId === null || gesture
       ? []
       : createConnectionPaths(
           rows,
@@ -157,6 +178,11 @@ export default function CurriculumGrid({
     .flat()
     .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
 
+  function openNewCourse(course: NewCourse) {
+    setNewCourse(course);
+    setIsNewCourseOpen(true);
+  }
+
   function getCellAt(left: number, top: number, duration: number): Cell | null {
     const firstCell = firstCellRef.current?.getBoundingClientRect();
     if (!firstCell) return null;
@@ -174,39 +200,48 @@ export default function CurriculumGrid({
     };
   }
 
-  function getLanding(operation: DragMoveEvent["operation"]) {
-    const card = cards.find((card) => card.dragId === operation.source?.id);
+  function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
+    const card = baseCards.find((card) => card.dragId === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
     const cell = card && rect && getCellAt(rect.left, rect.top, card.duration);
-    return card && cell ? { card, cell } : null;
-  }
-
-  function getResizedSize(card: Card, delta: Partial<Size>): Size {
+    const period = cell && curriculum.periods[cell.column - 1];
+    if (!card || !cell || !period) return null;
     return {
-      height: Math.max(1, card.size.height + (delta.height ?? 0)),
-      duration: Math.min(
-        Math.max(1, card.size.duration + (delta.duration ?? 0)),
-        getMaxDuration(curriculum, card.course),
-      ),
+      dragId: card.dragId,
+      action: {
+        type: "moveSlot",
+        courseId: card.course.id,
+        slotIndex: card.slotIndex,
+        to: { ...period, position: cell.row },
+      },
     };
   }
 
-  function resizeCard(card: Card, delta: Partial<Size>) {
-    const size = getResizedSize(card, delta);
-    if (size.height !== resize?.height || size.duration !== resize.duration)
-      setResize({ ...size, dragId: card.dragId });
+  function getResize(card: Card, delta: Size): Gesture {
+    return {
+      dragId: card.dragId,
+      action: {
+        type: "resizeCourse",
+        courseId: card.course.id,
+        slotIndex: card.slotIndex,
+        rows: Math.max(1, card.height + delta.height),
+        duration: Math.min(
+          Math.max(1, card.duration + delta.duration),
+          getMaxDuration(curriculum, card.course),
+        ),
+      },
+    };
   }
 
-  function releaseCard(card: Card, delta: Partial<Size>) {
-    setResize(null);
-    const { height, duration } = getResizedSize(card, delta);
-    dispatch({
-      type: "resizeCourse",
-      courseId: card.course.id,
-      slotIndex: card.slotIndex,
-      rows: height,
-      duration,
-    });
+  function takeDropOrigin(dragId: string) {
+    if (dropOrigin.current?.dragId !== dragId) return null;
+    const { x, y } = dropOrigin.current;
+    dropOrigin.current = null;
+    return { x, y };
+  }
+
+  function updateGesture(next: Gesture | null) {
+    if (next && !isSameGesture(gesture, next)) setGesture(next);
   }
 
   return (
@@ -216,38 +251,25 @@ export default function CurriculumGrid({
         ...defaults,
         Feedback.configure({ dropAnimation: null }),
       ]}
-      onDragMove={({ operation }) => {
-        const next = getLanding(operation);
-        if (
-          next &&
-          (next.cell.column !== landing?.column ||
-            next.cell.row !== landing.row)
-        )
-          setLanding({
-            ...next.cell,
-            dragId: next.card.dragId,
-            height: next.card.height,
-            duration: next.card.duration,
-          });
-      }}
+      onDragMove={({ operation }) => updateGesture(getMove(operation))}
       onDragEnd={({ operation, canceled }) => {
-        setLanding(null);
-        const drop = getLanding(operation);
-        const period = drop && curriculum.periods[drop.cell.column - 1];
-        if (canceled || !drop || !period) return;
-        dispatch({
-          type: "moveSlot",
-          courseId: drop.card.course.id,
-          slotIndex: drop.card.slotIndex,
-          to: { ...period, position: drop.cell.row },
-        });
+        setGesture(null);
+        const rect = operation.shape?.current.boundingRectangle;
+        if (rect && typeof operation.source?.id === "string")
+          dropOrigin.current = {
+            dragId: operation.source.id,
+            x: rect.left,
+            y: rect.top,
+          };
+        const drop = getMove(operation);
+        if (!canceled && drop) dispatch(drop.action);
       }}
     >
       <div
         className="relative grid w-max"
         style={{
-          gridTemplateColumns: `repeat(${columns}, ${GRID_CELL_WIDTH}rem)`,
-          gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem) auto`,
+          gridTemplateColumns: `repeat(${columns + 1}, ${GRID_CELL_WIDTH}rem)`,
+          gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem)`,
           gap: `${GRID_GAP}rem`,
         }}
       >
@@ -267,82 +289,87 @@ export default function CurriculumGrid({
           style={{ gridColumn: 1, gridRow: HEADER_ROWS + 1 }}
         />
         {emptyCells.map(({ period, column, row }) => (
-          <button
+          <AddButton
             key={`${column}/${row}`}
-            type="button"
-            aria-label={`Agregar curso en ${getPeriodLabel(curriculum.termSystem, period)}, fila ${row}`}
-            className="group flex items-center justify-center rounded-lg border border-transparent border-dashed text-muted-foreground transition-colors hover:border-border focus-visible:border-border focus-visible:outline-none"
+            label={`Agregar curso en ${getPeriodLabel(curriculum.termSystem, period)}, fila ${row}`}
+            revealOnHover
             style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
-            onClick={() =>
-              dispatch({ type: "addCourse", period, position: row })
-            }
-          >
-            <Plus className="size-4 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
-          </button>
+            onClick={() => openNewCourse({ period, position: row })}
+          />
         ))}
+        <AddButton
+          label="Agregar periodo"
+          style={{
+            gridColumn: columns + 1,
+            gridRow: `${HEADER_ROWS + 1} / span ${rows}`,
+          }}
+          onClick={() => dispatch({ type: "addPeriod" })}
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute z-0"
           style={{
-            gridColumn: "1 / -1",
+            gridColumn: `1 / span ${columns}`,
             gridRow: `${HEADER_ROWS + 1} / span ${rows}`,
             inset: `-${GRID_GAP}rem`,
           }}
         >
           <PathsOverlay paths={prerequisitePaths} />
         </div>
-        {cards.map((card) => (
-          <CourseCard
-            key={card.dragId}
-            dragId={card.dragId}
-            course={card.course}
-            color={getCourseColor(curriculum, card.course)}
-            isSelected={card.course.id === selectedCourseId}
-            onSelect={() => onSelectCourse(card.course.id)}
-            onHoverChange={(isHovered) =>
-              setHoveredCourseId(isHovered ? card.course.id : null)
-            }
-            style={{
-              gridColumn: `${card.column} / span ${card.duration}`,
-              gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
-            }}
-          >
-            <ResizeHandle
-              edge="bottom"
-              label="Cambiar créditos"
-              onResize={(rows) => resizeCard(card, { height: rows })}
-              onRelease={(rows) => releaseCard(card, { height: rows })}
-            />
-            <ResizeHandle
-              edge="right"
-              label="Cambiar duración"
-              onResize={(columns) => resizeCard(card, { duration: columns })}
-              onRelease={(columns) => releaseCard(card, { duration: columns })}
-            />
-          </CourseCard>
-        ))}
+        {cards.map((shownCard) => {
+          // dnd-kit lifts the dragged card from where it started, so it keeps
+          // that place; the landing outline shows where it ends up instead.
+          const baseCard = baseCardsById.get(shownCard.dragId) ?? shownCard;
+          const card = shownCard.dragId === draggedId ? baseCard : shownCard;
+          return (
+            <CourseCard
+              key={card.dragId}
+              dragId={card.dragId}
+              course={card.course}
+              color={getCourseColor(curriculum, card.course)}
+              isSelected={card.course.id === selectedCourseId}
+              onSelect={() => onSelectCourse(card.course.id)}
+              onHoverChange={(isHovered) =>
+                setHoveredCourseId(isHovered ? card.course.id : null)
+              }
+              takeDropOrigin={() => takeDropOrigin(card.dragId)}
+              style={{
+                gridColumn: `${card.column} / span ${card.duration}`,
+                gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
+              }}
+            >
+              <ResizeHandle
+                onResize={(delta) => updateGesture(getResize(baseCard, delta))}
+                onRelease={(delta) => {
+                  setGesture(null);
+                  dispatch(getResize(baseCard, delta).action);
+                }}
+              />
+            </CourseCard>
+          );
+        })}
         {landing && (
           <div
             aria-hidden
-            className="pointer-events-none z-10 rounded-lg border-2 border-primary border-dashed bg-primary/10"
+            className="pointer-events-none z-10 rounded-lg bg-primary/10"
             style={{
               gridColumn: `${landing.column} / span ${landing.duration}`,
               gridRow: `${HEADER_ROWS + landing.row} / span ${landing.height}`,
             }}
           />
         )}
-        {curriculum.periods.map((period, index) => (
-          <Button
-            key={`${period.programYear}-${period.term}`}
-            variant="ghost"
-            aria-label={`Agregar curso en ${getPeriodLabel(curriculum.termSystem, period)}`}
-            style={{ gridColumn: index + 1, gridRow: footRow }}
-            onClick={() => dispatch({ type: "addCourse", period })}
-          >
-            <Plus />
-          </Button>
-        ))}
       </div>
+      {newCourse && (
+        <NewCourseDialog
+          open={isNewCourseOpen}
+          periodLabel={getPeriodLabel(curriculum.termSystem, newCourse.period)}
+          onOpenChange={setIsNewCourseOpen}
+          onCreate={(name) => {
+            dispatch({ type: "addCourse", name, ...newCourse });
+            setIsNewCourseOpen(false);
+          }}
+        />
+      )}
     </DragDropProvider>
   );
 }

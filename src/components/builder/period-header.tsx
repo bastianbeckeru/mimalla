@@ -7,12 +7,13 @@ import {
   getAvailableIntensiveTerms,
   getPeriodLabel,
 } from "@/builder/periods";
-import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Action, Curriculum, Period } from "@/types/builder";
 import { TERM_LABELS } from "@/utils/period-key";
 
@@ -35,28 +36,19 @@ export default function PeriodHeader({
   const isRemovable = canRemovePeriod(curriculum, period);
 
   return (
-    <div className="flex items-start gap-1" style={style}>
-      <h2 className="flex-1 text-balance text-center font-medium text-muted-foreground text-xs">
-        {label}
-      </h2>
-      <Popover>
-        <PopoverTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              aria-label={`Opciones de ${label}`}
-            />
-          }
+    <h2 style={style}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          aria-label={`Opciones de ${label}`}
+          className="group/header flex w-full items-center gap-1 rounded-md px-2 py-1 text-left font-semibold text-muted-foreground text-xs outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted data-popup-open:text-foreground"
         >
-          <Ellipsis />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto gap-1 p-1" align="end">
+          <span className="flex-1 truncate">{label}</span>
+          <Ellipsis className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover/header:opacity-100 group-focus-visible/header:opacity-100 group-data-popup-open/header:opacity-100" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-auto">
           {intensiveTerms.map((term) => (
-            <Button
+            <DropdownMenuItem
               key={term}
-              variant="ghost"
-              className="justify-start"
               onClick={() =>
                 dispatch({
                   type: "addIntensiveTerm",
@@ -67,23 +59,23 @@ export default function PeriodHeader({
             >
               <Plus /> Agregar {TERM_LABELS[term]?.toLowerCase()} al año{" "}
               {period.programYear}
-            </Button>
+            </DropdownMenuItem>
           ))}
-          <Button
+          {intensiveTerms.length > 0 && <DropdownMenuSeparator />}
+          <DropdownMenuItem
             variant="destructive"
-            className="justify-start"
             disabled={!isRemovable}
             onClick={() => dispatch({ type: "removePeriod", period })}
           >
             <Trash2 /> Eliminar columna
-          </Button>
+          </DropdownMenuItem>
           {!isRemovable && (
-            <p className="max-w-56 px-2 pb-1 text-muted-foreground text-xs">
+            <p className="max-w-56 px-1.5 py-1 text-muted-foreground text-xs">
               Solo se pueden eliminar columnas sin cursos.
             </p>
           )}
-        </PopoverContent>
-      </Popover>
-    </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </h2>
   );
 }

@@ -18,7 +18,7 @@ function positionsOf(draft: Draft) {
 describe("moving a course", () => {
   test("places it at the column and row it is dropped on", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       {
         type: "moveSlot",
         courseId: 1,
@@ -32,8 +32,8 @@ describe("moving a course", () => {
 
   test("dropping an 8-credit course on top of another pushes it down 2 rows", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       { type: "editCourse", courseId: 2, changes: { credits: 8 } },
       {
         type: "moveSlot",
@@ -51,10 +51,10 @@ describe("moving a course", () => {
 
   test("pushes down a chain of colliding courses and leaves those above in place", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       { type: "editCourse", courseId: 4, changes: { credits: 10 } },
       {
         type: "moveSlot",
@@ -74,9 +74,9 @@ describe("moving a course", () => {
 
   test("keeps the gap below a pushed course when it does not reach the next one", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       {
         type: "moveSlot",
         courseId: 3,
@@ -106,7 +106,11 @@ describe("moving a course", () => {
       { programYear: 9, term: 1, position: 1 },
     ],
   ])("rejects a drop on %s and keeps the draft", (_, to) => {
-    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(
       apply(before, { type: "moveSlot", courseId: 1, slotIndex: 0, to }),
@@ -114,7 +118,11 @@ describe("moving a course", () => {
   });
 
   test("keeps the draft when the course is dropped where it already is", () => {
-    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(
       apply(before, {
@@ -128,8 +136,8 @@ describe("moving a course", () => {
 
   test("exports the pushed-down positions and the order they produce", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       {
         type: "moveSlot",
         courseId: 2,
@@ -147,8 +155,8 @@ describe("moving a course", () => {
 
   test("leaves the courses below in place when a course moves away", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       {
         type: "moveSlot",
         courseId: 1,

@@ -23,8 +23,8 @@ const markElective: Action = {
 describe("elective slots", () => {
   test("an elective gets another slot in the first free row of its last slot's column", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       markElective,
       { type: "addSlot", courseId: 1 },
     );
@@ -39,14 +39,18 @@ describe("elective slots", () => {
   });
 
   test("a non-elective keeps its single slot", () => {
-    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(apply(before, { type: "addSlot", courseId: 1 })).toBe(before);
   });
 
   test("each slot of an elective is dragged on its own", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       markElective,
       { type: "addSlot", courseId: 1 },
       {
@@ -67,7 +71,7 @@ describe("elective slots", () => {
 
   test("removing a slot of an elective keeps the others", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       markElective,
       { type: "addSlot", courseId: 1 },
       { type: "addSlot", courseId: 1 },
@@ -84,7 +88,7 @@ describe("elective slots", () => {
 
   test("unmarking an elective keeps only its earliest slot", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       markElective,
       { type: "addSlot", courseId: 1 },
       { type: "addSlot", courseId: 1 },
@@ -109,7 +113,7 @@ describe("elective slots", () => {
 
   test("the last slot of a course cannot be removed", () => {
     const before = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       markElective,
     );
 

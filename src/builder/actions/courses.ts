@@ -8,8 +8,6 @@ import {
 import { compareSlots } from "@/builder/periods";
 import type { Course, CourseAction, Draft, Handlers } from "@/types/builder";
 
-const NEW_COURSE_NAME = "Nuevo curso";
-
 function nextCourseId(draft: Draft) {
   return (
     Math.max(0, ...draft.curriculum.courses.map((course) => course.id)) + 1
@@ -29,11 +27,11 @@ function applyChanges(course: Course, changes: Partial<Course>): Course {
 }
 
 export const courseHandlers: Handlers<CourseAction> = {
-  addCourse: (draft, { period, position }) => {
+  addCourse: (draft, { name, period, position }) => {
     const { curriculum } = draft;
     const course = {
       id: nextCourseId(draft),
-      name: NEW_COURSE_NAME,
+      name,
       code: "",
       credits: getDefaultCredits(curriculum),
       areaId: null,

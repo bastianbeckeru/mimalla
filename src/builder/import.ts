@@ -4,7 +4,7 @@ import {
   getAreaShades,
   isHexColor,
 } from "@/builder/colors";
-import { isValidEffectiveYear, SCHEMA_VERSION } from "@/builder/export";
+import { SCHEMA_VERSION } from "@/builder/export";
 import { pushDownCollisions, slotsFitInPeriods } from "@/builder/grid";
 import {
   comparePeriods,
@@ -13,6 +13,7 @@ import {
   REGULAR_TERMS,
 } from "@/builder/periods";
 import { dependsOn } from "@/builder/prerequisites";
+import { isValidEffectiveYear } from "@/builder/schemas";
 import type {
   Area,
   Course,

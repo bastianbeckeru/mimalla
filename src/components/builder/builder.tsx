@@ -5,18 +5,26 @@ import { Loader2, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 import { findCourse } from "@/builder/draft";
 import { getMaxDuration } from "@/builder/grid";
+import { detailsSchema } from "@/builder/schemas";
 import AreasManager from "@/components/builder/areas-manager";
 import CoursePanel from "@/components/builder/course-panel";
 import CurriculumGrid from "@/components/builder/curriculum-grid";
+import CurriculumStart from "@/components/builder/curriculum-start";
 import DetailsForm from "@/components/builder/details-form";
 import DownloadButton from "@/components/builder/download-button";
 import ImportButton from "@/components/builder/import-button";
 import NewCurriculumDialog from "@/components/builder/new-curriculum-dialog";
 import PrerequisitesField from "@/components/builder/prerequisites-field";
-import ProgramYearControls from "@/components/builder/program-year-controls";
 import TermSystemSelect from "@/components/builder/term-system-select";
 import { Label } from "@/components/ui/label";
 import { useBuilderHasHydrated, useBuilderStore } from "@/stores/builder";
+import type { Curriculum, Draft } from "@/types/builder";
+
+function isStarted(curriculum: Curriculum) {
+  return (
+    curriculum.courses.length > 0 || detailsSchema.safeParse(curriculum).success
+  );
+}
 
 export default function Builder() {
   return (
@@ -44,14 +52,18 @@ function BuilderWorkspace() {
   const redo = useBuilderStore((state) => state.redo);
   const endGroup = useBuilderStore((state) => state.endGroup);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [isStarting, setIsStarting] = useState<boolean | null>(null);
+  if (hasHydrated && isStarting === null)
+    setIsStarting(!isStarted(draft.curriculum));
+  const isEditing = isStarting === false;
 
   useEffect(() => {
     document.addEventListener("focusout", endGroup);
     return () => document.removeEventListener("focusout", endGroup);
   }, [endGroup]);
 
-  useHotkey("Mod+Z", undo, { enabled: hasHydrated, ignoreInputs: true });
-  useHotkey("Mod+Shift+Z", redo, { enabled: hasHydrated, ignoreInputs: true });
+  useHotkey("Mod+Z", undo, { enabled: isEditing, ignoreInputs: true });
+  useHotkey("Mod+Shift+Z", redo, { enabled: isEditing, ignoreInputs: true });
   useHotkey(
     "Delete",
     () => {
@@ -59,10 +71,26 @@ function BuilderWorkspace() {
       dispatch({ type: "deleteCourse", courseId: selectedCourseId });
       setSelectedCourseId(null);
     },
-    { enabled: hasHydrated && selectedCourseId !== null, ignoreInputs: true },
+    { enabled: isEditing && selectedCourseId !== null, ignoreInputs: true },
   );
 
-  if (!hasHydrated) return <Loader2 className="m-auto size-8 animate-spin" />;
+  function loadDraft(loadedDraft: Draft) {
+    load(loadedDraft);
+    setSelectedCourseId(null);
+    setIsStarting(false);
+  }
+
+  if (isStarting === null)
+    return <Loader2 className="m-auto size-8 animate-spin" />;
+
+  if (isStarting)
+    return (
+      <CurriculumStart
+        dispatch={dispatch}
+        onStart={() => setIsStarting(false)}
+        onLoad={loadDraft}
+      />
+    );
 
   const selectedCourse =
     selectedCourseId === null
@@ -90,24 +118,15 @@ function BuilderWorkspace() {
             />
           </div>
           <NewCurriculumDialog dispatch={dispatch} />
-          <ImportButton
-            onLoad={(loadedDraft) => {
-              load(loadedDraft);
-              setSelectedCourseId(null);
-            }}
-          />
+          <ImportButton onLoad={loadDraft} />
           <DownloadButton draft={draft} />
         </header>
         <div className="flex flex-1 items-start gap-4 overflow-auto p-4">
           <CurriculumGrid
-            curriculum={draft.curriculum}
+            draft={draft}
             dispatch={dispatch}
             selectedCourseId={selectedCourse?.id ?? null}
             onSelectCourse={setSelectedCourseId}
-          />
-          <ProgramYearControls
-            curriculum={draft.curriculum}
-            dispatch={dispatch}
           />
         </div>
       </div>

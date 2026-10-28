@@ -19,7 +19,11 @@ function slotsOf(draft: ReturnType<typeof draftAfter>) {
 
 describe("adding a course", () => {
   test("places it in the first row of an empty column with 5 credits", () => {
-    const draft = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const draft = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(slotsOf(draft)).toEqual([
       { id: 1, credits: 5, slots: [{ ...FIRST_SEMESTER, position: 1 }] },
@@ -28,8 +32,8 @@ describe("adding a course", () => {
 
   test("places it below the courses already in the column", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
     );
 
     expect(slotsOf(draft)[1]).toEqual({
@@ -42,6 +46,7 @@ describe("adding a course", () => {
   test("places it at the empty cell it is created on, leaving a gap above", () => {
     const draft = draftAfter({
       type: "addCourse",
+      name: "Nuevo curso",
       period: FIRST_SEMESTER,
       position: 4,
     });
@@ -55,8 +60,8 @@ describe("adding a course", () => {
 describe("deleting a course", () => {
   test("removes it and leaves the other courses where they are", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "deleteCourse", courseId: 1 },
     );
 
@@ -66,14 +71,22 @@ describe("deleting a course", () => {
   });
 
   test("ignores a course that does not exist", () => {
-    const before = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+    const before = draftAfter({
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    });
 
     expect(apply(before, { type: "deleteCourse", courseId: 9 })).toBe(before);
   });
 });
 
 describe("editing a course", () => {
-  const withCourse = draftAfter({ type: "addCourse", period: FIRST_SEMESTER });
+  const withCourse = draftAfter({
+    type: "addCourse",
+    name: "Nuevo curso",
+    period: FIRST_SEMESTER,
+  });
 
   test("changes its name and credits", () => {
     const draft = apply(withCourse, {

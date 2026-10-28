@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { getMissingDetails } from "@/builder/export";
+import { isExportable } from "@/builder/export";
 import type { Action } from "@/types/builder";
 
 describe("curriculum details", () => {
@@ -17,55 +17,60 @@ describe("curriculum details", () => {
     });
   });
 
-  test("a new curriculum is missing the program name and effective year", () => {
-    expect(getMissingDetails(createDraft("semester"))).toEqual([
-      "programName",
-      "effectiveYear",
-    ]);
+  test("a new curriculum without a program name and effective year cannot be exported", () => {
+    expect(isExportable(createDraft("semester"))).toBe(false);
   });
 
-  test("a blank program name is missing", () => {
+  test("a blank program name blocks the export", () => {
     const draft = apply(createDraft("semester"), {
       type: "editDetails",
       changes: { programName: "   ", effectiveYear: 2023 },
     });
 
-    expect(getMissingDetails(draft)).toEqual(["programName"]);
+    expect(isExportable(draft)).toBe(false);
   });
 
   test.each([1899, 2101, 2023.5])(
-    "an effective year of %p is missing",
+    "an effective year of %p blocks the export",
     (effectiveYear) => {
       const draft = apply(createDraft("semester"), {
         type: "editDetails",
         changes: { programName: "Derecho", effectiveYear },
       });
 
-      expect(getMissingDetails(draft)).toEqual(["effectiveYear"]);
+      expect(isExportable(draft)).toBe(false);
     },
   );
 
-  test("a course with a blank name is missing its name", () => {
+  test("a course with a blank name blocks the export", () => {
     const actions: Action[] = [
       {
         type: "editDetails",
         changes: { programName: "Derecho", effectiveYear: 2023 },
       },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
       { type: "editCourse", courseId: 2, changes: { name: " " } },
     ];
     const draft = actions.reduce(apply, createDraft("semester"));
 
-    expect(getMissingDetails(draft)).toEqual(["courseNames"]);
+    expect(isExportable(draft)).toBe(false);
   });
 
-  test("nothing is missing with a program name and a valid effective year", () => {
+  test("a program name and a valid effective year allow the export", () => {
     const draft = apply(createDraft("semester"), {
       type: "editDetails",
       changes: { programName: "Derecho", effectiveYear: 1900 },
     });
 
-    expect(getMissingDetails(draft)).toEqual([]);
+    expect(isExportable(draft)).toBe(true);
   });
 });

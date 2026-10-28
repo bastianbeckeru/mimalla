@@ -1,5 +1,6 @@
 "use client";
 
+import { detailsSchema } from "@/builder/schemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Action, Curriculum } from "@/types/builder";
@@ -11,6 +12,8 @@ export default function DetailsForm({
   curriculum: Curriculum;
   dispatch: (action: Action, options?: { group?: string }) => void;
 }) {
+  const { programName, effectiveYear } = detailsSchema.shape;
+
   return (
     <div className="flex items-end gap-3">
       <div className="flex flex-col gap-1.5">
@@ -20,6 +23,7 @@ export default function DetailsForm({
           className="w-64"
           placeholder="Derecho"
           required
+          aria-invalid={!programName.safeParse(curriculum.programName).success}
           value={curriculum.programName}
           onChange={(event) =>
             dispatch(
@@ -62,6 +66,9 @@ export default function DetailsForm({
           min={1900}
           max={2100}
           step={1}
+          aria-invalid={
+            !effectiveYear.safeParse(curriculum.effectiveYear).success
+          }
           value={curriculum.effectiveYear ?? ""}
           onChange={(event) =>
             dispatch(

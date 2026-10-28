@@ -61,9 +61,21 @@ describe("exporting a curriculum", () => {
       { type: "addArea", name: "Privado" },
       { type: "setAreaColor", areaId: 3, color: "#ff8800" },
       { type: "setBaseColor", color: "#16a34a" },
-      { type: "addCourse", period: { programYear: 2, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 2, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
       { type: "assignArea", courseId: 1, areaId: 2 },
       { type: "assignArea", courseId: 2, areaId: 3 },
     );
@@ -88,9 +100,21 @@ describe("exporting a curriculum", () => {
   test("sorts courses by their first slot and renumbers their ids from 1", () => {
     const draft = draftAfter(
       details,
-      { type: "addCourse", period: { programYear: 2, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 3 } },
-      { type: "addCourse", period: { programYear: 1, term: 3 } },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 2, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 3 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 3 },
+      },
       { type: "editCourse", courseId: 1, changes: { name: "Penal" } },
       { type: "editCourse", courseId: 2, changes: { name: "Romano" } },
       {
@@ -125,6 +149,7 @@ describe("exporting a curriculum", () => {
   test("writes keys in a fixed order regardless of the editing order", () => {
     const course: Action = {
       type: "addCourse",
+      name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
     };
     const first = draftAfter(details, course, {
@@ -151,11 +176,19 @@ describe("exporting a curriculum", () => {
 
   test("writes the term system and the periods in chronological order", () => {
     const draft = draftAfter(
-      { type: "createCurriculum", termSystem: "annual" },
-      details,
-      { type: "removeLastProgramYear" },
-      { type: "removeLastProgramYear" },
-      { type: "removeLastProgramYear" },
+      {
+        type: "createCurriculum",
+        termSystem: "annual",
+        details: {
+          programName: "Derecho",
+          institution: "",
+          effectiveYear: 2023,
+          versionName: "",
+        },
+      },
+      { type: "removePeriod", period: { programYear: 5, term: 1 } },
+      { type: "removePeriod", period: { programYear: 4, term: 1 } },
+      { type: "removePeriod", period: { programYear: 3, term: 1 } },
       { type: "addIntensiveTerm", programYear: 2, term: 4 },
       { type: "addIntensiveTerm", programYear: 1, term: 4 },
     );
@@ -168,6 +201,7 @@ describe("exporting a curriculum", () => {
   test("writes the course code after the name, and omits it when empty", () => {
     const course: Action = {
       type: "addCourse",
+      name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
     };
     const draft = draftAfter(
@@ -188,8 +222,16 @@ describe("exporting a curriculum", () => {
   test("writes isElective before the slots of an elective and omits it otherwise", () => {
     const draft = draftAfter(
       details,
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
       { type: "editCourse", courseId: 1, changes: { isElective: true } },
       { type: "addSlot", courseId: 1 },
       {
@@ -210,9 +252,21 @@ describe("exporting a curriculum", () => {
     const draft = draftAfter(
       details,
       { type: "addArea", name: "Privado" },
-      { type: "addCourse", period: { programYear: 2, term: 1 } },
-      { type: "addCourse", period: { programYear: 1, term: 3 } },
-      { type: "addCourse", period: { programYear: 1, term: 1 } },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 2, term: 1 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 3 },
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: { programYear: 1, term: 1 },
+      },
       { type: "assignArea", courseId: 1, areaId: 1 },
       { type: "editCourse", courseId: 1, changes: { isElective: true } },
       { type: "addPrerequisite", courseId: 1, prerequisiteId: 2 },

@@ -8,7 +8,11 @@ const FIRST_SEMESTER = { programYear: 1, term: 1 };
 
 function curriculumWithCredits(...credits: number[]) {
   const actions = credits.flatMap((value, index): Action[] => [
-    { type: "addCourse", period: { programYear: index + 1, term: 1 } },
+    {
+      type: "addCourse",
+      name: "Nuevo curso",
+      period: { programYear: index + 1, term: 1 },
+    },
     { type: "editCourse", courseId: index + 1, changes: { credits: value } },
   ]);
   return actions.reduce(apply, createDraft("semester")).curriculum;
@@ -50,11 +54,11 @@ describe("course height", () => {
 
   test("leaves room below a tall course for the next added course", () => {
     const actions: Action[] = [
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
       { type: "editCourse", courseId: 3, changes: { credits: 10 } },
-      { type: "addCourse", period: FIRST_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
     ];
     const { courses } = actions.reduce(
       apply,

@@ -1,22 +1,7 @@
 import { comparePeriods, compareSlots } from "@/builder/periods";
-import type { Curriculum, Draft } from "@/types/builder";
+import { exportableCurriculumSchema } from "@/builder/schemas";
+import type { Draft } from "@/types/builder";
 import { slugify } from "@/utils/strings";
-
-const MIN_EFFECTIVE_YEAR = 1900;
-const MAX_EFFECTIVE_YEAR = 2100;
-
-type RequiredDetail =
-  | keyof Pick<Curriculum, "programName" | "effectiveYear">
-  | "courseNames";
-
-export function isValidEffectiveYear(year: unknown): year is number {
-  return (
-    typeof year === "number" &&
-    Number.isInteger(year) &&
-    year >= MIN_EFFECTIVE_YEAR &&
-    year <= MAX_EFFECTIVE_YEAR
-  );
-}
 
 export const SCHEMA_VERSION = 1;
 
@@ -93,12 +78,6 @@ export function getFileName({ curriculum }: Draft) {
   return `${slugify(curriculum.programName)}.json`;
 }
 
-export function getMissingDetails({ curriculum }: Draft): RequiredDetail[] {
-  const missing: RequiredDetail[] = [];
-  if (curriculum.programName.trim() === "") missing.push("programName");
-  if (!isValidEffectiveYear(curriculum.effectiveYear))
-    missing.push("effectiveYear");
-  if (curriculum.courses.some((course) => course.name.trim() === ""))
-    missing.push("courseNames");
-  return missing;
+export function isExportable({ curriculum }: Draft) {
+  return exportableCurriculumSchema.safeParse(curriculum).success;
 }

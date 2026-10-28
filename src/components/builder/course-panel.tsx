@@ -2,6 +2,7 @@
 
 import { Trash2, X } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { courseNameSchema } from "@/builder/schemas";
 import AreaSelect from "@/components/builder/area-select";
 import DurationInput from "@/components/builder/duration-input";
 import ElectiveSlots from "@/components/builder/elective-slots";
@@ -55,6 +56,7 @@ export default function CoursePanel({
         <Input
           id="builder-course-name"
           required
+          aria-invalid={!courseNameSchema.safeParse(course.name).success}
           value={course.name}
           onChange={(event) =>
             dispatch(

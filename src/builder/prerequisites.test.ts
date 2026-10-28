@@ -20,9 +20,9 @@ function prerequisitesOf(draft: Draft) {
 }
 
 const threeCourses: Action[] = [
-  { type: "addCourse", period: FIRST_SEMESTER },
-  { type: "addCourse", period: SECOND_SEMESTER },
-  { type: "addCourse", period: THIRD_SEMESTER },
+  { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+  { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
+  { type: "addCourse", name: "Nuevo curso", period: THIRD_SEMESTER },
 ];
 
 describe("adding a prerequisite", () => {
@@ -149,7 +149,7 @@ describe("prerequisite placement warnings", () => {
   test("warns about prerequisites in the same column or a later one, not earlier ones", () => {
     const draft = draftAfter(
       ...threeCourses,
-      { type: "addCourse", period: SECOND_SEMESTER },
+      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
       { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
       { type: "addPrerequisite", courseId: 2, prerequisiteId: 3 },
       { type: "addPrerequisite", courseId: 2, prerequisiteId: 4 },
@@ -177,9 +177,19 @@ describe("prerequisite placement warnings", () => {
 describe("prerequisite placement warnings with duration", () => {
   test("warns about an earlier prerequisite whose last spanned column reaches the course", () => {
     const draft = draftAfter(
-      { type: "addCourse", period: FIRST_SEMESTER },
-      { type: "addCourse", period: SECOND_SEMESTER, position: 3 },
-      { type: "addCourse", period: THIRD_SEMESTER, position: 3 },
+      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+        position: 3,
+      },
+      {
+        type: "addCourse",
+        name: "Nuevo curso",
+        period: THIRD_SEMESTER,
+        position: 3,
+      },
       { type: "editCourse", courseId: 1, changes: { duration: 2 } },
       { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
       { type: "addPrerequisite", courseId: 3, prerequisiteId: 1 },
@@ -192,8 +202,8 @@ describe("prerequisite placement warnings with duration", () => {
 
 describe("prerequisite placement warnings with several placements", () => {
   const electivePrerequisite: Action[] = [
-    { type: "addCourse", period: THIRD_SEMESTER },
-    { type: "addCourse", period: SECOND_SEMESTER },
+    { type: "addCourse", name: "Nuevo curso", period: THIRD_SEMESTER },
+    { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
     { type: "editCourse", courseId: 1, changes: { isElective: true } },
     { type: "addSlot", courseId: 1 },
     { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },

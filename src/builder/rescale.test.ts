@@ -12,7 +12,11 @@ const FOURTH_SEMESTER = { programYear: 2, term: 3 };
 
 function addCourses(draft: Draft, period: Period, credits: number[]) {
   return credits.reduce((current, value) => {
-    const added = apply(current, { type: "addCourse", period });
+    const added = apply(current, {
+      type: "addCourse",
+      name: "Nuevo curso",
+      period,
+    });
     return apply(added, {
       type: "editCourse",
       courseId: added.curriculum.courses.length,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Builder from "@/components/builder/builder";
 
 export const metadata: Metadata = {
-  title: "Constructor de mallas | Mi Malla",
+  title: "Constructor | Mi Malla",
 };
 
 export default function BuilderPage() {
