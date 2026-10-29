@@ -36,5 +36,6 @@ yarn-error.log*
 
 # testing
 src/components/test/
-# agent worktrees
-.claude/worktrees/
+# agent config
+.claude/
+.agents/
