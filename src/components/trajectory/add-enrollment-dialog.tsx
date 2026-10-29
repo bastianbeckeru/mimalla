@@ -20,20 +20,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Course } from "@/types/builder";
-import type { Cell } from "@/utils/trajectory";
+import type { Placement } from "@/types/trajectory";
 
 export default function AddEnrollmentDialog({
-  cell,
+  placement,
   periodLabel,
   courses,
   onOpenChange,
   onAdd,
 }: {
-  cell: Cell | null;
+  placement: Placement | null;
   periodLabel: string;
   courses: Course[];
   onOpenChange: (open: boolean) => void;
-  onAdd: (cell: Cell, course: Course) => void;
+  onAdd: (placement: Placement, course: Course) => void;
 }) {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const courseOptions = courses.map((c) => ({ value: c.id, label: c.name }));
@@ -41,7 +41,7 @@ export default function AddEnrollmentDialog({
 
   return (
     <AdaptiveDialog
-      open={cell !== null}
+      open={placement !== null}
       onOpenChange={(isOpen) => {
         onOpenChange(isOpen);
         setSelectedCourseId(null);
@@ -79,7 +79,8 @@ export default function AddEnrollmentDialog({
               <Button
                 disabled={!selectedCourse}
                 onClick={() => {
-                  if (cell && selectedCourse) onAdd(cell, selectedCourse);
+                  if (placement && selectedCourse)
+                    onAdd(placement, selectedCourse);
                 }}
               />
             }

@@ -47,7 +47,6 @@ export default function CourseCard({
   cellRef?: Ref<HTMLDivElement>;
   buttonRef?: Ref<HTMLButtonElement>;
   surfaceRef?: Ref<HTMLSpanElement>;
-  // Drawn over the card's text, inside its surface.
   decoration?: ReactNode;
   children?: ReactNode;
 }) {

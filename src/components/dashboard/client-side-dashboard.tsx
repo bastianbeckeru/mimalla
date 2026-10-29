@@ -6,9 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import AreasLegend from "@/components/curriculum/areas-legend";
 import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
 import Sidebar from "@/components/dashboard/sidebar";
-import TrajectoryBoard, {
-  type Notice,
-} from "@/components/trajectory/trajectory-board";
+import TrajectoryBoard from "@/components/trajectory/trajectory-board";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -27,7 +25,7 @@ import {
 } from "@/stores/trajectory";
 import type { Curriculum } from "@/types/builder";
 import type { CatalogInstitution } from "@/types/curriculum";
-import type { Enrollment, Trajectory } from "@/types/trajectory";
+import type { ChangeNotice, Enrollment, Trajectory } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import { fetchCurriculum } from "@/utils/curriculum-file";
 import {
@@ -157,11 +155,9 @@ function TrajectoryDashboard({
     ignoreInputs: true,
   });
 
-  // On mobile every change can be undone from its notice; elsewhere only the
-  // important ones get a notice, as the header holds undo.
-  function commit(next: Enrollment[], notice: Notice) {
+  function commit(next: Enrollment[], notice: ChangeNotice) {
     history.commit(next);
-    if (!isMobile && !notice.isImportant) return;
+    if (!isMobile && !notice.isShownOnDesktop) return;
     if (noticeId.current) toast.close(noticeId.current);
     noticeId.current = toast.add({
       title: notice.title,
@@ -183,7 +179,7 @@ function TrajectoryDashboard({
         createEnrollments({ entry: trajectory.entry, curriculum }),
         context,
       ),
-      { title: "Malla reiniciada", isImportant: true },
+      { title: "Malla reiniciada", isShownOnDesktop: true },
     );
   }
 

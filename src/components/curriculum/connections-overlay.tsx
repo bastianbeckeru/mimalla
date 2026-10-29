@@ -8,7 +8,6 @@ import {
   getConnections,
 } from "@/builder/connections";
 import {
-  type Box,
   type GridSize,
   getCanvasSize,
   routeConnections,
@@ -29,12 +28,10 @@ function getStroke(connection: Connection) {
 
 // Draws the connections of the focused course: the gesture's course while a
 // card is dragged or resized, else the hovered, focused or selected one. It
-// covers the grid rows of the cards, from `firstRow` on. Connections join
-// `cards` and route around `obstacles`, every card unless given.
+// covers the grid rows of the cards, from `firstRow` on.
 export default function ConnectionsOverlay({
   curriculum,
   cards,
-  obstacles = cards,
   size,
   firstRow,
   gestureCourseId = null,
@@ -43,7 +40,6 @@ export default function ConnectionsOverlay({
 }: {
   curriculum: Curriculum;
   cards: ConnectionCard[];
-  obstacles?: Box[];
   size: GridSize;
   firstRow: number;
   gestureCourseId?: number | null;
@@ -67,7 +63,7 @@ export default function ConnectionsOverlay({
     isShown,
   );
   if (connections.length === 0) return null;
-  const paths = routeConnections(connections, obstacles, size);
+  const paths = routeConnections(connections, cards, size);
   const { width, height } = getCanvasSize(size);
 
   return (

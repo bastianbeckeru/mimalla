@@ -11,6 +11,7 @@ import type {
   Enrollment,
   EnrollmentStatus,
   Entry,
+  Placement,
   TrajectoryProgress,
 } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
@@ -36,8 +37,6 @@ export type EditError =
 type EditResult =
   | { enrollments: Enrollment[]; error?: never }
   | { enrollments?: never; error: EditError };
-
-export type Cell = { period: PeriodKey; row: number };
 
 export function createEnrollments({
   entry,
@@ -71,7 +70,7 @@ export function createEnrollments({
   });
 }
 
-export type TrajectoryContext = {
+type TrajectoryContext = {
   entry: Entry;
   curriculum: Curriculum;
 };
@@ -85,7 +84,6 @@ function getNextSemester(key: PeriodKey): PeriodKey {
   return term < 3 ? `${year}-3` : `${year + 1}-1`;
 }
 
-// Every period that holds a card, and every semester between them.
 function fillSemesters(keys: PeriodKey[]) {
   const sorted = [...new Set(keys)].sort(comparePeriodKeys);
   const first = sorted[0];
@@ -149,21 +147,19 @@ export function layOutTrajectory(
   return { periods, cards };
 }
 
-export type TrajectoryLayout = ReturnType<typeof layOutTrajectory>;
+type TrajectoryLayout = ReturnType<typeof layOutTrajectory>;
 
-export type EnrollmentCard = TrajectoryLayout["cards"][number];
+export type PlacedEnrollment = TrajectoryLayout["cards"][number];
 
 export function getNextPeriod(periods: PeriodKey[]) {
   const last = periods.at(-1);
   return last ? getNextSemester(last) : null;
 }
 
-// The trajectory as a curriculum laid out in calendar periods, each card a
-// slot of its course, so the builder's grid and connections work on it.
 export function toLayoutCurriculum(
   curriculum: Curriculum,
   { periods }: TrajectoryLayout,
-  cards: EnrollmentCard[],
+  cards: PlacedEnrollment[],
 ): Curriculum {
   return {
     ...curriculum,
@@ -183,8 +179,6 @@ export function toLayoutCurriculum(
   };
 }
 
-// Pushes cards down until none overlaps another. The anchored enrollments keep
-// their cells, in order of priority.
 export function settleEnrollments(
   enrollments: Enrollment[],
   context: TrajectoryContext,
@@ -231,12 +225,11 @@ function getEnd(card: { column: number; duration: number }) {
   return card.column + card.duration - 1;
 }
 
-function spansAny(card: EnrollmentCard, from: number, to: number) {
+function spansAny(card: PlacedEnrollment, from: number, to: number) {
   return from <= to && card.column <= to && from <= getEnd(card);
 }
 
-// Whether a card spanning these columns would push a period past the limit.
-function isAnyPeriodFull(cards: EnrollmentCard[], from: number, to: number) {
+function isAnyPeriodFull(cards: PlacedEnrollment[], from: number, to: number) {
   for (let column = from; column <= to; column++) {
     const count = cards.filter((card) => spansAny(card, column, column)).length;
     if (count >= MAX_ENROLLMENTS_PER_PERIOD) return true;
@@ -244,7 +237,10 @@ function isAnyPeriodFull(cards: EnrollmentCard[], from: number, to: number) {
   return false;
 }
 
-function placeAt(enrollment: Enrollment, { period, row }: Cell): Enrollment {
+function placeAt(
+  enrollment: Enrollment,
+  { period, row }: Placement,
+): Enrollment {
   const { year, term } = parsePeriodKey(period);
   return { ...enrollment, year, term, position: row };
 }
@@ -252,13 +248,13 @@ function placeAt(enrollment: Enrollment, { period, row }: Cell): Enrollment {
 export function addEnrollment(
   enrollments: Enrollment[],
   course: Course,
-  cell: Cell,
+  placement: Placement,
   context: TrajectoryContext,
 ): EditResult {
   const { periods, cards } = layOutTrajectory(enrollments, context, [
-    cell.period,
+    placement.period,
   ]);
-  const column = periods.indexOf(cell.period) + 1;
+  const column = periods.indexOf(placement.period) + 1;
   const end = column + course.duration - 1;
 
   if (isAnyPeriodFull(cards, column, end)) return { error: "PERIOD_FULL" };
@@ -277,7 +273,7 @@ export function addEnrollment(
       term: 0,
       position: 0,
     },
-    cell,
+    placement,
   );
   return {
     enrollments: settleEnrollments([...enrollments, enrollment], context, [
@@ -296,16 +292,16 @@ export function removeEnrollment(
 export function moveEnrollment(
   enrollments: Enrollment[],
   enrollmentId: string,
-  cell: Cell,
+  placement: Placement,
   context: TrajectoryContext,
 ): EditResult {
   const { periods, cards } = layOutTrajectory(enrollments, context, [
-    cell.period,
+    placement.period,
   ]);
   const moved = cards.find((card) => card.id === enrollmentId);
   if (!moved) return { enrollments };
 
-  const column = periods.indexOf(cell.period) + 1;
+  const column = periods.indexOf(placement.period) + 1;
   const end = column + moved.duration - 1;
   const others = cards.filter((card) => card !== moved);
 
@@ -326,18 +322,18 @@ export function moveEnrollment(
 
   return {
     enrollments: settleEnrollments(
-      enrollments.map((e) => (e.id === enrollmentId ? placeAt(e, cell) : e)),
+      enrollments.map((e) =>
+        e.id === enrollmentId ? placeAt(e, placement) : e,
+      ),
       context,
       [enrollmentId],
     ),
   };
 }
 
-// A course cannot move to or past a period that holds its prerequisite, when
-// moving back, or its successor, when moving forward.
 function getMoveError(
-  others: EnrollmentCard[],
-  moved: EnrollmentCard,
+  others: PlacedEnrollment[],
+  moved: PlacedEnrollment,
   column: number,
   end: number,
   course: ExtendedCourse,
@@ -441,8 +437,6 @@ export function isAvailable(course: Course, progress: TrajectoryProgress) {
   );
 }
 
-// Electives, and courses with no pending or approved enrollment, such as
-// failed or removed ones.
 export function getAddableCourses(
   courses: Map<number, Course>,
   enrollments: Enrollment[],
@@ -470,8 +464,6 @@ type ToggleResult =
       missingPrerequisiteIds: number[];
     };
 
-// Approves a pending enrollment, if its course is available, and returns an
-// approved or failed one to pending.
 export function toggleEnrollmentStatus(
   enrollments: Enrollment[],
   enrollmentId: string,
@@ -498,8 +490,6 @@ export function toggleEnrollmentStatus(
   };
 }
 
-// Sets an enrollment's status. Approved successors of a course that stops
-// being approved return to pending.
 export function setEnrollmentStatus(
   enrollments: Enrollment[],
   enrollmentId: string,

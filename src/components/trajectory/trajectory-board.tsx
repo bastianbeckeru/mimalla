@@ -21,7 +21,12 @@ import { toast } from "@/components/ui/toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Course, Curriculum } from "@/types/builder";
 import type { PeriodKey } from "@/types/curriculum";
-import type { Enrollment, Entry } from "@/types/trajectory";
+import type {
+  ChangeNotice,
+  Enrollment,
+  Entry,
+  Placement,
+} from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import {
   GRID_CELL_HEIGHT,
@@ -31,8 +36,6 @@ import {
 import { parsePeriodKey } from "@/utils/period-key";
 import {
   addEnrollment,
-  type EnrollmentCard as Card,
-  type Cell,
   type EditError,
   getAddableCourses,
   getNextPeriod,
@@ -42,6 +45,7 @@ import {
   layOutTrajectory,
   MAX_ENROLLMENTS_PER_PERIOD,
   moveEnrollment,
+  type PlacedEnrollment,
   removeEnrollment,
   setEnrollmentStatus,
   toggleEnrollmentStatus,
@@ -55,7 +59,6 @@ const DRAG_ACTIVATION_DISTANCE = 5;
 const TOUCH_HOLD_MS = 300;
 const TOUCH_HOLD_TOLERANCE = 8;
 const ROOT_FONT_SIZE = 16;
-// A click this soon after a drag ends belongs to the drag.
 const DRAG_CLICK_MS = 300;
 const SHAKE_MS = 300;
 const HINT_MS = 1500;
@@ -85,8 +88,8 @@ const sensors = [
     },
     keyboardCodes: {
       start: ["Space"],
-      cancel: ["Escape"],
-      end: ["Space", "Tab"],
+      cancel: ["Escape", "Tab"],
+      end: ["Space"],
       up: ["ArrowUp"],
       down: ["ArrowDown"],
       left: ["ArrowLeft"],
@@ -95,7 +98,7 @@ const sensors = [
   }),
 ];
 
-const MOVE_ERROR_DESCRIPTIONS: Record<EditError, string> = {
+const EDIT_ERROR_DESCRIPTIONS: Record<EditError, string> = {
   PERIOD_FULL: `Un periodo no puede tener más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
   DUPLICATE_COURSE: "Este periodo ya tiene este curso.",
   SUCCESSOR_IN_PERIOD: "Este periodo tiene un curso que lo requiere.",
@@ -104,20 +107,27 @@ const MOVE_ERROR_DESCRIPTIONS: Record<EditError, string> = {
   PREREQUISITE_ON_THE_WAY: "Hay uno de sus prerrequisitos en el camino.",
 };
 
-export type Notice = {
-  title: string;
-  description?: string;
-  // Shown on every screen, not only on mobile.
-  isImportant?: boolean;
-};
-
-type Gesture = { dragId: string; cell: Cell };
+type Gesture = { dragId: string; placement: Placement };
 type Hint = { courseId: number; missingIds: number[] };
 
-function getRevertedDescription(count: number) {
-  return count === 1
-    ? "1 curso que lo requería volvió a pendiente."
-    : `${count} cursos que lo requerían volvieron a pendiente.`;
+function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
+  if (revertedCount === 0) return { title };
+  return {
+    title,
+    description:
+      revertedCount === 1
+        ? "1 curso que lo requería volvió a pendiente."
+        : `${revertedCount} cursos que lo requerían volvieron a pendiente.`,
+    isShownOnDesktop: true,
+  };
+}
+
+function showEditError(title: string, error: EditError) {
+  toast.add({
+    type: "error",
+    title,
+    description: EDIT_ERROR_DESCRIPTIONS[error],
+  });
 }
 
 export default function TrajectoryBoard({
@@ -129,7 +139,7 @@ export default function TrajectoryBoard({
   enrollments: Enrollment[];
   entry: Entry;
   curriculum: Curriculum;
-  onChange: (enrollments: Enrollment[], notice: Notice) => void;
+  onChange: (enrollments: Enrollment[], notice: ChangeNotice) => void;
 }) {
   const isMobile = useIsMobile();
   const firstCellRef = useRef<HTMLDivElement>(null);
@@ -137,11 +147,12 @@ export default function TrajectoryBoard({
     null,
   );
   const lastDragEndAt = useRef(Number.NEGATIVE_INFINITY);
+  const isDragging = useRef(false);
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [panelId, setPanelId] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const selectedId = isPanelOpen ? panelId : null;
-  const [addCell, setAddCell] = useState<Cell | null>(null);
+  const [addPlacement, setAddPlacement] = useState<Placement | null>(null);
   const [shakingId, setShakingId] = useState<string | null>(null);
   const [hint, setHint] = useState<Hint | null>(null);
   const [isEntering, setIsEntering] = useState(true);
@@ -152,12 +163,11 @@ export default function TrajectoryBoard({
 
   const base = layOutTrajectory(enrollments, context);
   const nextPeriod = getNextPeriod(base.periods);
-  // While a card moves, the grid keeps its periods and one more to drop on.
   const gesturePeriods = nextPeriod
     ? [...base.periods, nextPeriod]
     : base.periods;
   const preview = gesture
-    ? moveEnrollment(enrollments, gesture.dragId, gesture.cell, context)
+    ? moveEnrollment(enrollments, gesture.dragId, gesture.placement, context)
     : null;
   const shown = gesture
     ? layOutTrajectory(
@@ -171,8 +181,8 @@ export default function TrajectoryBoard({
   const landing = gesture
     ? preview?.error
       ? draggedCard && {
-          column: shown.periods.indexOf(gesture.cell.period) + 1,
-          row: gesture.cell.row,
+          column: shown.periods.indexOf(gesture.placement.period) + 1,
+          row: gesture.placement.row,
           duration: draggedCard.duration,
           height: draggedCard.height,
         }
@@ -187,17 +197,15 @@ export default function TrajectoryBoard({
     ) + SPARE_ROWS;
 
   const selected = shown.cards.find((card) => card.id === selectedId) ?? null;
-  // Kept while the panel closes, so its content stays until it is gone.
   const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
-  // Failed enrollments take no part in connections unless selected.
-  const connectionCards = shown.cards.filter(
-    (card) => card.enrollment.status !== "FAILED" || card.id === selectedId,
+  const startsNoConnection = new Set(
+    shown.cards
+      .filter(
+        (card) => card.enrollment.status === "FAILED" && card.id !== selectedId,
+      )
+      .map((card) => card.id),
   );
-  const layoutCurriculum = toLayoutCurriculum(
-    curriculum,
-    shown,
-    connectionCards,
-  );
+  const layoutCurriculum = toLayoutCurriculum(curriculum, shown, shown.cards);
   const gestureCourseId = draggedCard?.courseId ?? hint?.courseId ?? null;
 
   useEffect(() => {
@@ -242,7 +250,6 @@ export default function TrajectoryBoard({
       )
         .flat()
         .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
-  // On mobile, each period ends with a button to add a course below its last.
   const periodEnds = isMobile
     ? shown.periods.map((period, index) => ({
         period,
@@ -266,7 +273,11 @@ export default function TrajectoryBoard({
     return `${label} (${parsePeriodKey(period).year})`;
   }
 
-  function getCellAt(left: number, top: number, duration: number): Cell | null {
+  function getPlacementAt(
+    left: number,
+    top: number,
+    duration: number,
+  ): Placement | null {
     const firstCell = firstCellRef.current?.getBoundingClientRect();
     if (!firstCell) return null;
     const rootFontSize = Number.parseFloat(
@@ -287,25 +298,30 @@ export default function TrajectoryBoard({
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
     const card = base.cards.find((card) => card.id === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
-    const cell = card && rect && getCellAt(rect.left, rect.top, card.duration);
-    return card && cell ? { dragId: card.id, cell } : null;
+    const placement =
+      card && rect && getPlacementAt(rect.left, rect.top, card.duration);
+    return card && placement ? { dragId: card.id, placement } : null;
   }
 
   function isSameGesture(next: Gesture) {
     return (
       gesture?.dragId === next.dragId &&
-      gesture.cell.period === next.cell.period &&
-      gesture.cell.row === next.cell.row
+      gesture.placement.period === next.placement.period &&
+      gesture.placement.row === next.placement.row
     );
   }
 
-  function openPanel(card: Card) {
+  function openPanel(card: PlacedEnrollment) {
     setPanelId(card.id);
     setIsPanelOpen(true);
   }
 
-  function toggleStatus(card: Card) {
-    if (performance.now() - lastDragEndAt.current < DRAG_CLICK_MS) return;
+  function toggleStatus(card: PlacedEnrollment) {
+    if (
+      isDragging.current ||
+      performance.now() - lastDragEndAt.current < DRAG_CLICK_MS
+    )
+      return;
     const result = toggleEnrollmentStatus(enrollments, card.id, courses);
     if (result.missingPrerequisiteIds) {
       setShakingId(card.id);
@@ -315,20 +331,18 @@ export default function TrajectoryBoard({
       });
       return;
     }
-    onChange(result.enrollments, {
-      title:
-        result.status === "APPROVED"
-          ? `${card.course.name} aprobado`
-          : `${card.course.name} pendiente`,
-      ...(result.revertedCount > 0 && {
-        description: getRevertedDescription(result.revertedCount),
-        isImportant: true,
-      }),
-    });
+    onChange(
+      result.enrollments,
+      getStatusNotice(
+        `${card.course.name} ${result.status === "APPROVED" ? "aprobado" : "pendiente"}`,
+        result.revertedCount,
+      ),
+    );
   }
 
   function handleDragEnd({ operation, canceled }: DragEndEvent) {
     setGesture(null);
+    isDragging.current = false;
     lastDragEndAt.current = performance.now();
     const card = base.cards.find((card) => card.id === operation.source?.id);
     if (!card) return;
@@ -349,31 +363,28 @@ export default function TrajectoryBoard({
     const drop = getMove(operation);
     if (canceled || !drop) return;
     if (
-      drop.cell.period === base.periods[card.column - 1] &&
-      drop.cell.row === card.row
+      drop.placement.period === base.periods[card.column - 1] &&
+      drop.placement.row === card.row
     )
       return;
 
-    const result = moveEnrollment(enrollments, card.id, drop.cell, context);
+    const result = moveEnrollment(
+      enrollments,
+      card.id,
+      drop.placement,
+      context,
+    );
     if (result.error) {
-      toast.add({
-        type: "error",
-        title: "No se puede mover el curso",
-        description: MOVE_ERROR_DESCRIPTIONS[result.error],
-      });
+      showEditError("No se puede mover el curso", result.error);
       return;
     }
     onChange(result.enrollments, { title: `${card.course.name} movido` });
   }
 
-  function handleAdd(cell: Cell, course: Course) {
-    const result = addEnrollment(enrollments, course, cell, context);
+  function handleAdd(placement: Placement, course: Course) {
+    const result = addEnrollment(enrollments, course, placement, context);
     if (result.error) {
-      toast.add({
-        type: "error",
-        title: "No se puede agregar el curso",
-        description: MOVE_ERROR_DESCRIPTIONS[result.error],
-      });
+      showEditError("No se puede agregar el curso", result.error);
       return;
     }
     onChange(result.enrollments, { title: `${course.name} agregado` });
@@ -393,7 +404,10 @@ export default function TrajectoryBoard({
         ...defaults,
         Feedback.configure({ dropAnimation: null }),
       ]}
-      onDragStart={() => setHint(null)}
+      onDragStart={() => {
+        isDragging.current = true;
+        setHint(null);
+      }}
       onDragMove={({ operation }) => {
         const next = getMove(operation);
         if (next && !isSameGesture(next)) setGesture(next);
@@ -438,7 +452,7 @@ export default function TrajectoryBoard({
             label={`Agregar curso en ${getPeriodLabel(period)}, fila ${row}`}
             revealOnHover
             style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
-            onClick={() => setAddCell({ period, row })}
+            onClick={() => setAddPlacement({ period, row })}
           />
         ))}
         {periodEnds.map(({ period, column, row }) => (
@@ -446,7 +460,7 @@ export default function TrajectoryBoard({
             key={period}
             label={`Agregar curso en ${getPeriodLabel(period)}`}
             style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
-            onClick={() => setAddCell({ period, row })}
+            onClick={() => setAddPlacement({ period, row })}
           />
         ))}
         {nextPeriod && (
@@ -458,28 +472,26 @@ export default function TrajectoryBoard({
                 ? HEADER_ROWS + 1
                 : `${HEADER_ROWS + 1} / span ${rows}`,
             }}
-            onClick={() => setAddCell({ period: nextPeriod, row: 1 })}
+            onClick={() => setAddPlacement({ period: nextPeriod, row: 1 })}
           />
         )}
         {!isEntering && (
           <ConnectionsOverlay
             curriculum={layoutCurriculum}
-            cards={connectionCards}
-            obstacles={shown.cards}
+            cards={shown.cards}
             size={{ rows, columns }}
             firstRow={HEADER_ROWS + 1}
             gestureCourseId={gestureCourseId}
             selectedCourseId={selected?.courseId ?? null}
             isShown={(connection) =>
-              !hint ||
-              (connection.kind === "prerequisite" &&
-                hint.missingIds.includes(connection.from.courseId))
+              hint
+                ? connection.kind === "prerequisite" &&
+                  hint.missingIds.includes(connection.from.courseId)
+                : !startsNoConnection.has(connection.from.id)
             }
           />
         )}
         {shown.cards.map((shownCard) => {
-          // dnd-kit lifts the dragged card from where it started, so it keeps
-          // that place; the landing outline shows where it ends up instead.
           const baseCard = baseCardsById.get(shownCard.id) ?? shownCard;
           const card = shownCard.id === gesture?.dragId ? baseCard : shownCard;
           return (
@@ -521,11 +533,11 @@ export default function TrajectoryBoard({
         )}
       </div>
       <AddEnrollmentDialog
-        cell={addCell}
-        periodLabel={addCell ? getPeriodLabel(addCell.period) : ""}
+        placement={addPlacement}
+        periodLabel={addPlacement ? getPeriodLabel(addPlacement.period) : ""}
         courses={getAddableCourses(courses, enrollments)}
         onOpenChange={(open) => {
-          if (!open) setAddCell(null);
+          if (!open) setAddPlacement(null);
         }}
         onAdd={handleAdd}
       />
@@ -545,13 +557,13 @@ export default function TrajectoryBoard({
             courses,
           );
           setIsPanelOpen(false);
-          onChange(result.enrollments, {
-            title: `${panelCard.course.name} reprobado`,
-            ...(result.revertedCount > 0 && {
-              description: getRevertedDescription(result.revertedCount),
-              isImportant: true,
-            }),
-          });
+          onChange(
+            result.enrollments,
+            getStatusNotice(
+              `${panelCard.course.name} reprobado`,
+              result.revertedCount,
+            ),
+          );
         }}
         onRemove={() => {
           if (!panelCard) return;

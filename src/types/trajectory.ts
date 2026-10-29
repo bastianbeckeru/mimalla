@@ -1,3 +1,5 @@
+import type { PeriodKey } from "@/types/curriculum";
+
 export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
 
 export type Enrollment = {
@@ -24,4 +26,15 @@ export type Trajectory = {
 export type TrajectoryProgress = {
   approvedCourseIds: Set<number>;
   approvedCredits: number;
+};
+
+export type Placement = {
+  period: PeriodKey;
+  row: number;
+};
+
+export type ChangeNotice = {
+  title: string;
+  description?: string;
+  isShownOnDesktop?: boolean;
 };
