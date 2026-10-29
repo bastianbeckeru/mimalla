@@ -29,7 +29,6 @@ export default function VersionSelect({
   effectiveYear: number;
 }) {
   const router = useRouter();
-  const label = getVersionLabel(effectiveYear, effectiveYears);
 
   return (
     <DropdownMenu>
@@ -41,7 +40,6 @@ export default function VersionSelect({
         <History data-icon="inline-start" />
         <span className="text-muted-foreground">Versión</span>
         {effectiveYear}
-        {label && <Badge variant="secondary">{label}</Badge>}
         {effectiveYears.length > 1 && <ChevronsUpDown data-icon="inline-end" />}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

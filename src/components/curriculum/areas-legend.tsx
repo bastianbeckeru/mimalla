@@ -24,7 +24,7 @@ export default function AreasLegend({ areas }: { areas: Area[] }) {
   );
 }
 
-export function AreaSwatch({ color }: { color: string | undefined }) {
+function AreaSwatch({ color }: { color: string | undefined }) {
   return (
     <span
       aria-hidden

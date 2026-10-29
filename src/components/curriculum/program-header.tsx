@@ -1,3 +1,4 @@
+import { cn } from "cn";
 import { Award, Clock, GraduationCap, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 import { REGULAR_TERMS } from "@/builder/periods";
@@ -26,13 +27,20 @@ function getDuration({ termSystem, periods }: Curriculum) {
 
 function MetaItem({
   icon,
+  className,
   children,
 }: {
   icon?: ReactNode;
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <li className="flex items-center gap-1.5 [&_svg]:size-3.5 [&_svg]:shrink-0">
+    <li
+      className={cn(
+        "flex items-center gap-1.5 [&_svg]:size-3.5 [&_svg]:shrink-0",
+        className,
+      )}
+    >
       {icon}
       {children}
     </li>
@@ -67,6 +75,7 @@ export default function ProgramHeader({
           {credentials.map((track) => (
             <MetaItem
               key={track.id}
+              className="max-md:hidden"
               icon={
                 track.credentialType === "academic" ? (
                   <GraduationCap />
@@ -79,19 +88,15 @@ export default function ProgramHeader({
             </MetaItem>
           ))}
           {credentials.length > 0 && (
-            <Separator orientation="vertical" className="self-center! h-3.5" />
+            <Separator
+              orientation="vertical"
+              className="self-center! h-3.5 max-md:hidden"
+            />
           )}
           <MetaItem icon={<Sun />}>
             {program.schedule === "DAYTIME" ? "Diurna" : "Vespertina"}
           </MetaItem>
           <MetaItem icon={<Clock />}>{getDuration(curriculum)}</MetaItem>
-          <Separator orientation="vertical" className="self-center! h-3.5" />
-          <MetaItem>
-            SIES <code className="text-foreground">{program.siesCode}</code>
-          </MetaItem>
-          <MetaItem>
-            DEMRE <code className="text-foreground">{program.demreCode}</code>
-          </MetaItem>
         </ul>
       </div>
       <div className="flex shrink-0 items-center gap-2">
