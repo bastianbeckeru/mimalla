@@ -1,10 +1,7 @@
 import { nanoid } from "nanoid";
-import type {
-  Course,
-  ExtendedCourse,
-  PeriodKey,
-  Slot,
-} from "@/types/curriculum";
+import { compareSlots } from "@/builder/periods";
+import type { Course, Curriculum } from "@/types/builder";
+import type { ExtendedCourse, PeriodKey } from "@/types/curriculum";
 import type {
   Enrollment,
   EnrollmentStatus,
@@ -42,12 +39,17 @@ type EnrollmentLocation = {
 
 export function createEnrollments({
   entry,
-  slots,
+  curriculum,
 }: {
   entry: Entry;
-  slots: Slot[];
+  curriculum: Curriculum;
 }): Enrollment[] {
   const entryOffset = entry.term >= 3 ? 1 : 0;
+  const slots = curriculum.courses
+    .flatMap((course) =>
+      course.slots.map((slot) => ({ ...slot, courseId: course.id })),
+    )
+    .toSorted(compareSlots);
 
   return slots.map((slot) => {
     const semesterIndex =

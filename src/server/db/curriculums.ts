@@ -1,11 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import type {
-  CatalogInstitution,
-  CurriculumData,
-  Slot,
-  Track,
-} from "@/types/curriculum";
+import { importFile } from "@/builder/import";
+import { INSTITUTIONS, PROGRAMS } from "@/server/db/programs";
+import type { CatalogInstitution, Program } from "@/types/curriculum";
+import { getCurrentYear } from "@/utils/curriculum";
 
 const CURRICULUMS_DIR = path.join(
   process.cwd(),
@@ -15,16 +13,15 @@ const CURRICULUMS_DIR = path.join(
   "curriculums",
 );
 
-type CurriculumFile = Omit<CurriculumData, "curriculum"> & {
-  curriculum: Omit<CurriculumData["curriculum"], "slots" | "tracks"> & {
-    structure: (Omit<Slot, "programYear"> & { year: number })[];
-    plans: Track[];
-  };
-};
+const FILE_NAME_PATTERN = /^(.+)_(\d+)\.malla$/;
 
-type CurriculumParams = {
+type ProgramParams = {
   institutionAcronym: string;
   programSlug: string;
+};
+
+type CurriculumParams = ProgramParams & {
+  effectiveYear: string;
 };
 
 export function getCurriculumParams(): CurriculumParams[] {
@@ -34,47 +31,90 @@ export function getCurriculumParams(): CurriculumParams[] {
     .flatMap((institution) =>
       fs
         .readdirSync(path.join(CURRICULUMS_DIR, institution.name))
-        .filter((file) => file.endsWith(".json"))
-        .map((file) => ({
-          institutionAcronym: institution.name,
-          programSlug: path.basename(file, ".json"),
-        })),
+        .flatMap((file) => {
+          const [, programSlug, effectiveYear] =
+            FILE_NAME_PATTERN.exec(file) ?? [];
+          if (!programSlug || !effectiveYear) return [];
+          return [
+            {
+              institutionAcronym: institution.name,
+              programSlug,
+              effectiveYear,
+            },
+          ];
+        }),
     );
 }
 
-export function getProgramData({
+function toProgramPath({ institutionAcronym, programSlug }: ProgramParams) {
+  return `${institutionAcronym}/${programSlug}`;
+}
+
+export function getProgramParams(): ProgramParams[] {
+  const programs = new Map(
+    getCurriculumParams().map(({ institutionAcronym, programSlug }) => [
+      toProgramPath({ institutionAcronym, programSlug }),
+      { institutionAcronym, programSlug },
+    ]),
+  );
+  return [...programs.values()];
+}
+
+export function readCurriculumFile({
   institutionAcronym,
   programSlug,
-}: CurriculumParams): CurriculumData {
-  const file = path.join(
-    CURRICULUMS_DIR,
-    institutionAcronym,
-    `${programSlug}.json`,
+  effectiveYear,
+}: CurriculumParams) {
+  return fs.readFileSync(
+    path.join(
+      CURRICULUMS_DIR,
+      institutionAcronym,
+      `${programSlug}_${effectiveYear}.malla`,
+    ),
+    "utf-8",
   );
+}
 
-  const { curriculum, ...data }: CurriculumFile = JSON.parse(
-    fs.readFileSync(file, "utf-8"),
-  );
-  const { structure, plans, ...version } = curriculum;
+export function getCurriculum(params: CurriculumParams) {
+  const result = importFile(readCurriculumFile(params));
+  if (!result.ok)
+    throw new Error(
+      `Invalid curriculum file ${toProgramPath(params)}_${params.effectiveYear}.malla: ${result.reason}`,
+    );
+  return result.draft.curriculum;
+}
+
+export function getProgram(params: ProgramParams): Program {
+  const programPath = toProgramPath(params);
+  const institution = INSTITUTIONS[params.institutionAcronym];
+  const record = PROGRAMS[programPath];
+  if (!institution || !record)
+    throw new Error(`Program ${programPath} is not registered`);
+
+  const effectiveYears = getCurriculumParams()
+    .filter((file) => toProgramPath(file) === programPath)
+    .map((file) => Number(file.effectiveYear))
+    .toSorted((a, b) => b - a);
+  const { programName } = getCurriculum({
+    ...params,
+    effectiveYear: String(getCurrentYear(effectiveYears)),
+  });
 
   return {
-    ...data,
-    curriculum: {
-      ...version,
-      slots: structure.map(({ year, ...slot }) => ({
-        ...slot,
-        programYear: year,
-      })),
-      tracks: plans,
-    },
+    ...record,
+    name: programName,
+    path: programPath,
+    institution,
+    effectiveYears,
   };
 }
 
 export function getCatalog(): CatalogInstitution[] {
   const institutions = new Map<string, CatalogInstitution>();
 
-  for (const params of getCurriculumParams()) {
-    const { institution, department, program } = getProgramData(params);
+  for (const params of getProgramParams()) {
+    const { institution, department, name, path, effectiveYears } =
+      getProgram(params);
 
     const catalogInstitution = institutions.get(institution.acronym) ?? {
       ...institution,
@@ -90,10 +130,7 @@ export function getCatalog(): CatalogInstitution[] {
       catalogInstitution.departments.push(catalogDepartment);
     }
 
-    catalogDepartment.programs.push({
-      name: program.name,
-      path: `${params.institutionAcronym}/${params.programSlug}`,
-    });
+    catalogDepartment.programs.push({ name, path, effectiveYears });
   }
 
   const byName = (a: { name: string }, b: { name: string }) =>

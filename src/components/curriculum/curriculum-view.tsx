@@ -1,165 +1,113 @@
 "use client";
 
+import { useHotkey } from "@tanstack/react-hotkeys";
 import { useState } from "react";
+import { getCourseColor } from "@/builder/colors";
+import { findCourse } from "@/builder/draft";
+import { getCourseCards } from "@/builder/grid";
+import { getPeriodLabel } from "@/builder/periods";
+import AreasLegend from "@/components/curriculum/areas-legend";
+import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import CourseCard from "@/components/curriculum/course-card";
-import CourseModal from "@/components/curriculum/course-modal";
-import PathsOverlay, {
-  type PathData,
-} from "@/components/curriculum/paths-overlay";
-import { MotionDiv } from "@/components/motion";
-import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
-import type { CurriculumData, ExtendedSlot } from "@/types/curriculum";
-import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
+import CourseDetails from "@/components/curriculum/course-details";
+import type { Curriculum } from "@/types/builder";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-  getCurriculumGridData,
-  PADDING,
 } from "@/utils/curriculum-grid";
-import { arabicToRoman } from "@/utils/numbers";
-import { createConnectionPaths } from "@/utils/pathfinding";
 
-type CurriculumViewProps = {
-  data: CurriculumData;
-  className?: string;
-};
-
-type FocusedSlot = {
-  slot: ExtendedSlot;
-  relatedPaths: PathData[];
-};
+const HEADER_ROWS = 1;
 
 export default function CurriculumView({
-  data,
-  className,
-}: CurriculumViewProps) {
-  const { courses, periods, nCols, nRows, slots } = getCurriculumGridData(data);
-  const paths = createConnectionPaths(nRows, nCols, slots);
+  curriculum,
+}: {
+  curriculum: Curriculum;
+}) {
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const selectedCourse =
+    selectedCourseId === null
+      ? undefined
+      : findCourse(curriculum, selectedCourseId);
+  const cards = getCourseCards(curriculum);
+  const columns = curriculum.periods.length;
+  const rows = Math.max(1, ...cards.map((card) => card.row + card.height - 1));
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalSlot, setModalSlot] = useState<ExtendedSlot | null>(null);
-  const [focusedSlot, setFocusedSlot] = useState<FocusedSlot | null>(null);
-
-  const connectedCourseIds = new Set(
-    focusedSlot
-      ? [
-          focusedSlot.slot.courseId,
-          ...(focusedSlot.slot.course?.prerequisiteIds ?? []),
-          ...(focusedSlot.slot.course?.successorIds ?? []),
-        ]
-      : [],
-  );
-
-  function handleSelectCard(newSlot: ExtendedSlot | null) {
-    if (newSlot === null) {
-      setFocusedSlot(null);
-      return;
-    }
-
-    if (!newSlot.course || isModalOpen) return;
-
-    const slotId = String(newSlot.id);
-
-    setFocusedSlot({
-      slot: newSlot,
-      relatedPaths: paths
-        .filter(
-          (p) => p.originCardId === slotId || p.destinationCardId === slotId,
-        )
-        .map((p) => ({
-          ...p,
-          color: p.originCardId === slotId ? "#34d399" : "#f87171",
-        })),
-    });
-  }
-
-  function handleClickCard(newSlot: ExtendedSlot) {
-    const { course } = newSlot;
-    if (!course) return;
-
-    if (focusedSlot && !connectedCourseIds.has(course.id)) {
-      setFocusedSlot(null);
-      return;
-    }
-
-    setModalSlot(newSlot);
-    setIsModalOpen(true);
-  }
+  useHotkey("Escape", () => setSelectedCourseId(null), {
+    enabled: selectedCourse !== undefined,
+  });
 
   return (
-    <>
-      <ScrollAreaWrapper className={className}>
-        <section aria-label="Malla curricular" className="p-2 pb-4">
+    <div className="relative flex min-h-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <section
+          aria-label="Malla curricular"
+          className="flex-1 overflow-auto px-4 pt-4 pb-2 lg:px-8"
+        >
           <div
-            className="flex flex-row gap-2"
+            className="relative grid w-max"
             style={{
-              paddingLeft: `${PADDING}rem`,
-              paddingRight: `${PADDING}rem`,
+              gridTemplateColumns: `repeat(${columns}, ${GRID_CELL_WIDTH}rem)`,
+              gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem)`,
+              gap: `${GRID_GAP}rem`,
             }}
           >
-            {periods.map((pKey, pIndex) => (
-              <div
-                key={pKey}
-                className="relative flex h-7 justify-center rounded-md p-2"
-                style={{ width: `${GRID_CELL_WIDTH}rem` }}
+            {curriculum.periods.map((period, index) => (
+              <h2
+                key={`${period.programYear}-${period.term}`}
+                className="truncate px-2 py-1 font-semibold text-muted-foreground text-xs"
+                style={{ gridColumn: index + 1, gridRow: 1 }}
               >
-                <span className="w-full text-center font-bold text-muted-foreground text-xs tracking-wider">
-                  SEMESTRE {arabicToRoman(pIndex + 1)}
-                </span>
-              </div>
+                {getPeriodLabel(curriculum.termSystem, period)}
+              </h2>
+            ))}
+            <ConnectionsOverlay
+              curriculum={curriculum}
+              cards={cards}
+              size={{ rows, columns }}
+              firstRow={HEADER_ROWS + 1}
+              selectedCourseId={selectedCourseId}
+            />
+            {cards.map((card) => (
+              <CourseCard
+                key={card.id}
+                course={card.course}
+                curriculum={curriculum}
+                color={getCourseColor(curriculum, card.course)}
+                isSelected={card.courseId === selectedCourseId}
+                onSelect={() =>
+                  setSelectedCourseId(
+                    card.courseId === selectedCourseId ? null : card.courseId,
+                  )
+                }
+                className="cursor-pointer"
+                style={{
+                  gridColumn: `${card.column} / span ${card.duration}`,
+                  gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
+                }}
+              />
             ))}
           </div>
-
-          <MotionDiv
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.025 } },
-            }}
-            initial="hidden"
-            animate="visible"
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${nCols}, ${GRID_CELL_WIDTH}rem)`,
-              gridTemplateRows: `repeat(${nRows}, ${GRID_CELL_HEIGHT}rem)`,
-              gap: `${GRID_GAP}rem`,
-              padding: `${PADDING}rem`,
-            }}
-            className="relative select-none"
-            onClick={(e) => {
-              if (focusedSlot && e.target === e.currentTarget)
-                setFocusedSlot(null);
-            }}
-          >
-            <div className="contents">
-              {slots.map((slot, sIndex) => (
-                <CourseCard
-                  key={slot.id}
-                  index={sIndex}
-                  slot={slot}
-                  isSelected={focusedSlot?.slot.id === slot.id}
-                  isNotRelated={
-                    !!focusedSlot &&
-                    !(slot.course && connectedCourseIds.has(slot.course.id))
-                  }
-                  handleClick={handleClickCard}
-                  handleSelect={handleSelectCard}
-                />
-              ))}
-            </div>
-
-            <PathsOverlay paths={focusedSlot ? focusedSlot.relatedPaths : []} />
-          </MotionDiv>
         </section>
-      </ScrollAreaWrapper>
-
-      <CourseModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        course={modalSlot?.course ?? null}
-        color={modalSlot?.color ?? DEFAULT_COURSE_COLOR}
-        courses={courses}
-      />
-    </>
+        {curriculum.areas.length > 0 && (
+          <footer className="flex shrink-0 border-t px-4 py-3 lg:px-8">
+            <AreasLegend areas={curriculum.areas} />
+          </footer>
+        )}
+      </div>
+      {selectedCourse && (
+        // Slides in once when the panel opens; switching courses only swaps
+        // its content, so it stays instant.
+        <aside className="slide-in-from-right absolute inset-y-0 right-0 z-30 w-full max-w-84 animate-in overflow-y-auto border-l bg-background duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none md:static md:w-84 md:shrink-0">
+          <CourseDetails
+            key={selectedCourse.id}
+            curriculum={curriculum}
+            course={selectedCourse}
+            onSelectCourse={setSelectedCourseId}
+            onClose={() => setSelectedCourseId(null)}
+          />
+        </aside>
+      )}
+    </div>
   );
 }

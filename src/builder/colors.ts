@@ -42,8 +42,11 @@ export function getAreaShade(baseColor: HexColor, index: number) {
   return shades[index % shades.length] ?? baseColor;
 }
 
-export function getCourseColor(curriculum: Curriculum, course: Course) {
-  const area = curriculum.areas.find(({ id }) => id === course.areaId);
+export function getCourseColor(
+  { areas }: Pick<Curriculum, "areas">,
+  course: Pick<Course, "areaId">,
+) {
+  const area = areas.find(({ id }) => id === course.areaId);
   return area?.color ?? DEFAULT_COURSE_COLOR;
 }
 

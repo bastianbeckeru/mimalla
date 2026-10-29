@@ -9,6 +9,7 @@ import {
 import { cn } from "cn";
 import { Plus, Save, Undo2 } from "lucide-react";
 import { useState } from "react";
+import { getCourseColor } from "@/builder/colors";
 import CourseModal from "@/components/curriculum/course-modal";
 import { MotionDiv } from "@/components/motion";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
@@ -18,14 +19,14 @@ import PeriodContainer from "@/components/trajectory/period-container";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import type { HistoryControls } from "@/hooks/use-history";
-import type { Area, ExtendedCourse, PeriodKey } from "@/types/curriculum";
+import type { Area } from "@/types/builder";
+import type { ExtendedCourse, PeriodKey } from "@/types/curriculum";
 import type {
   Entry,
   PeriodWithEnrollments,
   TrajectoryProgress,
 } from "@/types/trajectory";
 import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
-import { getCourseArea } from "@/utils/curriculum";
 import {
   addEnrollment,
   addPeriod,
@@ -162,9 +163,9 @@ export default function TrajectoryBoard({
                 >
                   {period.enrollments.map((enrollment, index) => {
                     const course = courses.get(enrollment.courseId);
-                    const color =
-                      (course && getCourseArea(areas, course)?.color) ??
-                      DEFAULT_COURSE_COLOR;
+                    const color = course
+                      ? getCourseColor({ areas }, course)
+                      : DEFAULT_COURSE_COLOR;
 
                     return (
                       <Draggable

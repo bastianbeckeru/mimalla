@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import VersionHint from "@/components/curriculum/version-hint";
 import { EntryDateFields } from "@/components/entry-date-fields";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -26,24 +27,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/toast";
-import { useTrajectoryStore } from "@/stores/trajectory";
+import { useImportTrajectory } from "@/hooks/use-import-trajectory";
+import type { Curriculum } from "@/types/builder";
 import type {
   CatalogDepartment,
   CatalogInstitution,
   CatalogProgram,
-  CurriculumData,
 } from "@/types/curriculum";
-import { fetchProgramData } from "@/utils/curriculum-data";
 
 export default function NewTrajectoryForm({
   catalog,
   onImport,
 }: {
   catalog: CatalogInstitution[];
-  onImport: (path: string, data: CurriculumData) => void;
+  onImport: (curriculumPath: string, curriculum: Curriculum) => void;
 }) {
-  const addTrajectory = useTrajectoryStore((state) => state.addTrajectory);
+  const { importTrajectory, isImporting } = useImportTrajectory();
 
   const [selectedInstitution, setSelectedInstitution] = useState(
     catalog.length === 1 ? catalog[0] : undefined,
@@ -53,7 +52,6 @@ export default function NewTrajectoryForm({
   const [term, setTerm] = useState<number | null>(null);
 
   const [open, setOpen] = useState<boolean>(false);
-  const [isCreating, setIsCreating] = useState<boolean>(false);
 
   const institutionOptions = catalog.map((institution) => ({
     value: institution.acronym,
@@ -63,31 +61,8 @@ export default function NewTrajectoryForm({
   async function onSubmit() {
     if (!selectedProgram || !year || !term) return;
 
-    setIsCreating(true);
-
-    try {
-      const data = await fetchProgramData(selectedProgram.path);
-
-      onImport(selectedProgram.path, data);
-      addTrajectory({
-        curriculumPath: selectedProgram.path,
-        entry: { year, term },
-        slots: data.curriculum.slots,
-      });
-
-      toast.add({
-        type: "success",
-        title: "Malla importada",
-        description: `${data.program.name} ${data.curriculum.year}`,
-      });
-    } catch {
-      toast.add({
-        type: "error",
-        title: "No se pudo importar la malla",
-        description: "Inténtalo nuevamente en unos segundos.",
-      });
-      setIsCreating(false);
-    }
+    const imported = await importTrajectory(selectedProgram, { year, term });
+    if (imported) onImport(imported.curriculumPath, imported.curriculum);
   }
 
   return (
@@ -188,16 +163,22 @@ export default function NewTrajectoryForm({
               onTermChange={setTerm}
               disabled={!selectedProgram}
             />
+            {selectedProgram && (
+              <VersionHint
+                effectiveYears={selectedProgram.effectiveYears}
+                entryYear={year}
+              />
+            )}
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <Button
             className="w-full"
-            disabled={!selectedProgram || !year || !term || isCreating}
+            disabled={!selectedProgram || !year || !term || isImporting}
             onClick={onSubmit}
           >
-            {isCreating ? (
+            {isImporting ? (
               <Loader2 className="animate-spin" />
             ) : (
               "Importar malla"

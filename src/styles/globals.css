@@ -246,18 +246,7 @@
     animation: shine 4.1s linear infinite;
   }
 
-  /* SVG Line Dash */
-  @keyframes dash {
-    to {
-      stroke-dashoffset: -10;
-    }
-  }
-  .animate-dash {
-    animation: dash 0.5s linear infinite;
-    stroke-dasharray: 5, 5;
-  }
-
-  /* Builder connections: drawn from their origin once, as they appear. Paths
+  /* Curriculum connections: drawn from their origin once, as they appear. Paths
      using it set pathLength="1". */
   @keyframes connection-draw {
     from {

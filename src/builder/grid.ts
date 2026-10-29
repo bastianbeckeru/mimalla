@@ -24,6 +24,24 @@ export function getCourseHeight(credits: number, defaultCredits: number) {
   return Math.max(1, Math.round(credits / defaultCredits));
 }
 
+export function getCourseCards(curriculum: Curriculum) {
+  const defaultCredits = getDefaultCredits(curriculum);
+  return curriculum.courses.flatMap((course) =>
+    course.slots.map((slot, slotIndex) => ({
+      id: `${course.id}/${slotIndex}`,
+      courseId: course.id,
+      course,
+      slotIndex,
+      column: findPeriodIndex(curriculum.periods, slot) + 1,
+      row: slot.position,
+      height: getCourseHeight(course.credits, defaultCredits),
+      duration: course.duration,
+    })),
+  );
+}
+
+export type CourseCardLayout = ReturnType<typeof getCourseCards>[number];
+
 export function getFirstFreePosition(curriculum: Curriculum, period: Period) {
   const periodIndex = findPeriodIndex(curriculum.periods, period);
   const occupied = new Set<number>();

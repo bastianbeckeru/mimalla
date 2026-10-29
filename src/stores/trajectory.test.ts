@@ -8,7 +8,7 @@ describe("migrateTrajectoryState", () => {
         curriculums: [
           {
             id: "t1",
-            path: "udp/derecho",
+            path: "uni/program",
             year: 2024,
             term: 1,
             enrolledCourses: [
@@ -32,7 +32,7 @@ describe("migrateTrajectoryState", () => {
       trajectories: [
         {
           id: "t1",
-          curriculumPath: "udp/derecho",
+          curriculumPath: "uni/program",
           entry: { year: 2024, term: 1 },
           enrollments: [
             {
@@ -56,7 +56,7 @@ describe("migrateTrajectoryState", () => {
         curriculums: [
           {
             id: "t1",
-            path: "udp/psicologia",
+            path: "uni/other",
             year: 2023,
             term: 2,
             enrolledCourses: [
@@ -116,5 +116,73 @@ describe("migrateTrajectoryState", () => {
     );
 
     expect(state.activeTrajectoryId).toBe("t1");
+  });
+
+  test("points a version 2 trajectory to the curriculum file it was made from", () => {
+    const state = migrateTrajectoryState(
+      {
+        trajectories: [
+          {
+            id: "t1",
+            curriculumPath: "udp/derecho",
+            entry: { year: 2024, term: 1 },
+            enrollments: [
+              {
+                id: "e1",
+                courseId: 177,
+                year: 2024,
+                term: 1,
+                position: 1,
+                status: "APPROVED",
+              },
+              {
+                id: "e2",
+                courseId: 999_999,
+                year: 2024,
+                term: 1,
+                position: 2,
+                status: "PENDING",
+              },
+            ],
+          },
+        ],
+        activeTrajectoryId: "t1",
+      },
+      2,
+    );
+
+    expect(state.trajectories).toEqual([
+      {
+        id: "t1",
+        curriculumPath: "udp/derecho/2023",
+        entry: { year: 2024, term: 1 },
+        enrollments: [
+          {
+            id: "e1",
+            courseId: 1,
+            year: 2024,
+            term: 1,
+            position: 1,
+            status: "APPROVED",
+          },
+        ],
+      },
+    ]);
+  });
+
+  test("keeps a version 2 trajectory whose program has no curriculum file", () => {
+    const trajectory = {
+      id: "t1",
+      curriculumPath: "udp/diseno",
+      entry: { year: 2024, term: 1 },
+      enrollments: [],
+    };
+
+    expect(
+      migrateTrajectoryState(
+        { trajectories: [trajectory], activeTrajectoryId: "t1" },
+        2,
+      ).trajectories,
+    ).toEqual([trajectory]);
   });
 });
