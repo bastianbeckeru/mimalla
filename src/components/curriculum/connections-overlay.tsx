@@ -8,6 +8,7 @@ import {
   getConnections,
 } from "@/builder/connections";
 import {
+  type Box,
   type GridSize,
   getCanvasSize,
   routeConnections,
@@ -28,21 +29,26 @@ function getStroke(connection: Connection) {
 
 // Draws the connections of the focused course: the gesture's course while a
 // card is dragged or resized, else the hovered, focused or selected one. It
-// covers the grid rows of the cards, from `firstRow` on.
+// covers the grid rows of the cards, from `firstRow` on. Connections join
+// `cards` and route around `obstacles`, every card unless given.
 export default function ConnectionsOverlay({
   curriculum,
   cards,
+  obstacles = cards,
   size,
   firstRow,
   gestureCourseId = null,
   selectedCourseId,
+  isShown = () => true,
 }: {
   curriculum: Curriculum;
   cards: ConnectionCard[];
+  obstacles?: Box[];
   size: GridSize;
   firstRow: number;
   gestureCourseId?: number | null;
   selectedCourseId: number | null;
+  isShown?: (connection: Connection) => boolean;
 }) {
   const select = useConnectionFocus((state) => state.select);
   const focusedCourseId = useConnectionFocus(
@@ -57,9 +63,11 @@ export default function ConnectionsOverlay({
   useEffect(() => select(selectedCourseId), [select, selectedCourseId]);
 
   if (focusedCourseId === null) return null;
-  const connections = getConnections(curriculum, cards, focusedCourseId);
+  const connections = getConnections(curriculum, cards, focusedCourseId).filter(
+    isShown,
+  );
   if (connections.length === 0) return null;
-  const paths = routeConnections(connections, cards, size);
+  const paths = routeConnections(connections, obstacles, size);
   const { width, height } = getCanvasSize(size);
 
   return (

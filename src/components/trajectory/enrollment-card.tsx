@@ -1,115 +1,101 @@
+"use client";
+
 import { cn } from "cn";
-import { Check, Clock, Trash, X } from "lucide-react";
-import { MotionDiv } from "@/components/motion";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import type { Course } from "@/types/builder";
-import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
-import { checkContrasts } from "@/utils/colors";
+import { Ellipsis } from "lucide-react";
+import type { ComponentProps } from "react";
+import DraggableCourseCard from "@/components/builder/course-card";
+import type { EnrollmentStatus } from "@/types/trajectory";
 
-const STATUS_TRANSITIONS: Record<EnrollmentStatus, EnrollmentStatus> = {
-  PENDING: "APPROVED",
-  APPROVED: "FAILED",
-  FAILED: "PENDING",
-};
-
-const STATUS_ACTIONS = [
-  { status: "APPROVED", label: "Marcar como aprobado", Icon: Check },
-  { status: "PENDING", label: "Marcar como pendiente", Icon: Clock },
-  { status: "FAILED", label: "Marcar como reprobado", Icon: X },
-] as const;
-
-type EnrollmentCardProps = {
-  enrollment: Enrollment;
-  course: Course | undefined;
-  color: string;
-  isAvailable: boolean;
-  editMode: boolean;
-  isDragging: boolean;
-  onOpen: () => void;
-  onStatusChange: (status: EnrollmentStatus) => void;
-  onDelete: () => void;
+const STATUS_LABELS: Record<EnrollmentStatus, string> = {
+  PENDING: "pendiente",
+  APPROVED: "aprobado",
+  FAILED: "reprobado",
 };
 
 export default function EnrollmentCard({
-  enrollment,
-  course,
-  color,
+  status,
   isAvailable,
-  editMode,
-  isDragging,
-  onOpen,
-  onStatusChange,
-  onDelete,
-}: EnrollmentCardProps) {
-  const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
-    checkContrasts({ elementColor: color });
-
-  function handleClick() {
-    if (isDragging) return;
-
-    if (!editMode) {
-      onOpen();
-      return;
-    }
-
-    if (isAvailable) onStatusChange(STATUS_TRANSITIONS[enrollment.status]);
-  }
-
+  isShaking,
+  isEntering,
+  enterDelay,
+  onOpenPanel,
+  ...props
+}: Omit<
+  ComponentProps<typeof DraggableCourseCard>,
+  "className" | "decoration" | "label" | "onContextMenu" | "onKeyDown"
+> & {
+  status: EnrollmentStatus;
+  isAvailable: boolean;
+  isShaking: boolean;
+  isEntering: boolean;
+  enterDelay: number;
+  onOpenPanel: () => void;
+}) {
   return (
-    <ContextMenu disabled={!editMode}>
-      <ContextMenuTrigger
-        render={
-          <MotionDiv
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-            style={{ backgroundColor: color }}
-            className={cn(
-              "relative flex size-full cursor-pointer select-none items-center justify-center overflow-hidden rounded-md bg-card p-2 text-card-foreground shadow-sm transition-[filter] hover:brightness-110",
-              hasLowBackgroundElementContrast && "border border-foreground/50",
-              hasLowElementTextContrast && "text-background",
-              !isAvailable && "brightness-[25%] hover:brightness-[35%]",
-              editMode && "cursor-grab",
-              isDragging && "shadow-2xl",
-            )}
-            onClick={handleClick}
-          />
+    <DraggableCourseCard
+      {...props}
+      label={`${props.course.name}, ${STATUS_LABELS[status]}`}
+      className={cn(
+        "touch-manipulation select-none [-webkit-touch-callout:none]",
+        !isAvailable && status === "PENDING" && "saturate-[0.15]",
+        isEntering &&
+          "fade-in slide-in-from-bottom-1 animate-in fill-mode-both duration-300 ease-out [--tw-animation-delay:var(--enter-delay)] motion-reduce:animate-none",
+        isShaking && "animate-shake",
+      )}
+      style={{
+        ...props.style,
+        ...(isEntering && { "--enter-delay": `${enterDelay}ms` }),
+      }}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        const isTouch =
+          "pointerType" in event.nativeEvent &&
+          event.nativeEvent.pointerType === "touch";
+        if (!isTouch) onOpenPanel();
+      }}
+      onKeyDown={(event) => {
+        if (
+          event.key === "ContextMenu" ||
+          (event.shiftKey && event.key === "F10")
+        ) {
+          event.preventDefault();
+          onOpenPanel();
         }
+      }}
+      decoration={status !== "PENDING" && <StrikeLine status={status} />}
+    >
+      <button
+        type="button"
+        aria-label={`Opciones de ${props.course.name}`}
+        className="absolute top-1 right-1 hidden size-6 items-center justify-center rounded-md bg-background/80 text-foreground opacity-0 shadow-sm transition-opacity duration-150 ease-out hover:bg-background focus-visible:opacity-100 group-hover/card:opacity-100 md:flex"
+        onClick={() => onOpenPanel()}
       >
-        <span className="text-center font-medium text-xs">
-          {course?.name ?? "Vacío"}
-        </span>
+        <Ellipsis className="size-4" />
+      </button>
+    </DraggableCourseCard>
+  );
+}
 
-        {enrollment.status !== "PENDING" && (
-          <div
-            className={cn(
-              "diagonal-line",
-              enrollment.status === "APPROVED" ? "bg-black" : "bg-red-700",
-            )}
-          />
-        )}
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-52">
-        {STATUS_ACTIONS.map(({ status, label, Icon }) => (
-          <ContextMenuItem
-            key={status}
-            disabled={enrollment.status === status}
-            onClick={() => onStatusChange(status)}
-          >
-            <Icon />
-            {label}
-          </ContextMenuItem>
-        ))}
-        <ContextMenuSeparator />
-        <ContextMenuItem variant="destructive" onClick={onDelete}>
-          <Trash />
-          Eliminar
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+function StrikeLine({ status }: { status: EnrollmentStatus }) {
+  return (
+    <svg
+      aria-hidden
+      className="pointer-events-none absolute inset-0 size-full overflow-hidden rounded-lg"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      <line
+        x1="0"
+        y1="100"
+        x2="100"
+        y2="0"
+        strokeWidth={3}
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        className={
+          status === "FAILED" ? "stroke-red-700" : "stroke-neutral-950"
+        }
+      />
+    </svg>
   );
 }

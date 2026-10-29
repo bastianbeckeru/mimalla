@@ -64,7 +64,7 @@ export default function SettingsDialog({
       }}
     >
       <AdaptiveDialogTrigger
-        render={<SidebarMenuButton tooltip="Configuraciones" />}
+        render={<SidebarMenuButton className="text-sidebar-muted-foreground" />}
       >
         <Settings />
         <span>Configuraciones</span>

@@ -12,8 +12,9 @@ import CourseCard from "@/components/curriculum/course-card";
 export default function DraggableCourseCard({
   dragId,
   takeDropOrigin,
+  className,
   ...props
-}: Omit<ComponentProps<typeof CourseCard>, "className"> & {
+}: ComponentProps<typeof CourseCard> & {
   dragId: string;
   takeDropOrigin: () => { x: number; y: number } | null;
 }) {
@@ -29,7 +30,11 @@ export default function DraggableCourseCard({
       cellRef={cellRef}
       buttonRef={ref}
       surfaceRef={surfaceRef}
-      className={cn("cursor-grab", isDragging && "cursor-grabbing shadow-lg")}
+      className={cn(
+        "cursor-grab",
+        isDragging && "cursor-grabbing shadow-lg",
+        className,
+      )}
     />
   );
 }

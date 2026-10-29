@@ -268,22 +268,32 @@
   .animate-connection-fade {
     animation: connection-fade 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
   }
+
+  /* A card that refuses a change. */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-3px);
+    }
+    40%,
+    80% {
+      transform: translateX(3px);
+    }
+  }
+  .animate-shake {
+    animation: shake 300ms ease-in-out;
+  }
   @media (prefers-reduced-motion: reduce) {
     .animate-connection-draw,
-    .animate-connection-fade {
+    .animate-connection-fade,
+    .animate-shake {
       animation: none;
     }
   }
-}
-
-.diagonal-line {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 150%;
-  height: 4px;
-  transform: rotate(25deg);
-  transform-origin: bottom right;
 }
 
 .rainbow-text {

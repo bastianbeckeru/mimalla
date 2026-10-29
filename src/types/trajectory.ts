@@ -1,5 +1,3 @@
-import type { PeriodKey } from "@/types/curriculum";
-
 export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
 
 export type Enrollment = {
@@ -26,9 +24,4 @@ export type Trajectory = {
 export type TrajectoryProgress = {
   approvedCourseIds: Set<number>;
   approvedCredits: number;
-};
-
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: Enrollment[];
 };

@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AdaptiveDialog,
+  AdaptiveDialogBody,
+  AdaptiveDialogClose,
+  AdaptiveDialogContent,
+  AdaptiveDialogDescription,
+  AdaptiveDialogFooter,
+  AdaptiveDialogHeader,
+  AdaptiveDialogTitle,
+} from "@/components/ui/adaptive-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -18,98 +20,74 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Course } from "@/types/builder";
-import type { PeriodKey } from "@/types/curriculum";
-import { parsePeriodKey, TERM_LABELS } from "@/utils/period-key";
-
-type AddEnrollmentDialogProps = {
-  periodId: PeriodKey | null;
-  onOpenChange: (open: boolean) => void;
-  courses: Course[];
-  onAdd: (periodId: PeriodKey, courseId: number) => void;
-};
+import type { Cell } from "@/utils/trajectory";
 
 export default function AddEnrollmentDialog({
-  periodId,
-  onOpenChange,
+  cell,
+  periodLabel,
   courses,
+  onOpenChange,
   onAdd,
-}: AddEnrollmentDialogProps) {
+}: {
+  cell: Cell | null;
+  periodLabel: string;
+  courses: Course[];
+  onOpenChange: (open: boolean) => void;
+  onAdd: (cell: Cell, course: Course) => void;
+}) {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
-  const period = periodId && parsePeriodKey(periodId);
   const courseOptions = courses.map((c) => ({ value: c.id, label: c.name }));
+  const selectedCourse = courses.find((c) => c.id === selectedCourseId);
 
   return (
-    <Dialog
-      open={periodId !== null}
+    <AdaptiveDialog
+      open={cell !== null}
       onOpenChange={(isOpen) => {
         onOpenChange(isOpen);
         setSelectedCourseId(null);
       }}
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Añadir inscripción</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4 pb-4">
-          {period && (
-            <dl>
-              <div className="flex flex-row gap-2">
-                <dt className="font-medium text-muted-foreground">Año:</dt>
-                <dd className="flex-1 text-foreground">{period.year}</dd>
-              </div>
-              <div className="flex flex-row gap-2">
-                <dt className="font-medium text-muted-foreground">Periodo:</dt>
-                <dd className="flex-1 text-foreground">
-                  {TERM_LABELS[period.term]}
-                </dd>
-              </div>
-            </dl>
-          )}
-
-          <div className="flex flex-row items-center gap-2">
-            <h3 className="font-medium text-muted-foreground">Curso:</h3>
-            <Select
-              items={courseOptions}
-              value={selectedCourseId}
-              onValueChange={(value: number | null) =>
-                setSelectedCourseId(value)
-              }
-            >
-              <SelectTrigger id="courseId" className="w-96">
-                <SelectValue placeholder="Selecciona un curso" />
-              </SelectTrigger>
-              <SelectContent className="w-96">
-                {courseOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <DialogClose render={<Button type="button" variant="ghost" />}>
+      <AdaptiveDialogContent className="sm:max-w-md">
+        <AdaptiveDialogHeader>
+          <AdaptiveDialogTitle>Agregar curso</AdaptiveDialogTitle>
+          <AdaptiveDialogDescription>{periodLabel}</AdaptiveDialogDescription>
+        </AdaptiveDialogHeader>
+        <AdaptiveDialogBody>
+          <Select
+            items={courseOptions}
+            value={selectedCourseId}
+            onValueChange={(value: number | null) => setSelectedCourseId(value)}
+          >
+            <SelectTrigger aria-label="Curso" className="w-full">
+              <SelectValue placeholder="Selecciona un curso" />
+            </SelectTrigger>
+            <SelectContent>
+              {courseOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </AdaptiveDialogBody>
+        <AdaptiveDialogFooter>
+          <AdaptiveDialogClose render={<Button variant="ghost" />}>
             Cancelar
-          </DialogClose>
-          <DialogClose
+          </AdaptiveDialogClose>
+          <AdaptiveDialogClose
             render={
               <Button
-                disabled={!selectedCourseId}
+                disabled={!selectedCourse}
                 onClick={() => {
-                  if (!periodId || !selectedCourseId) return;
-
-                  onAdd(periodId, selectedCourseId);
+                  if (cell && selectedCourse) onAdd(cell, selectedCourse);
                 }}
               />
             }
           >
-            Añadir
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            Agregar
+          </AdaptiveDialogClose>
+        </AdaptiveDialogFooter>
+      </AdaptiveDialogContent>
+    </AdaptiveDialog>
   );
 }
