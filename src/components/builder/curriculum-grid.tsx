@@ -12,20 +12,19 @@ import { useRef, useState } from "react";
 import { apply } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
 import {
-  getCourseHeight,
-  getDefaultCredits,
+  type CourseCardLayout,
+  getCourseCards,
   getMaxDuration,
 } from "@/builder/grid";
-import { findPeriodIndex, getPeriodLabel } from "@/builder/periods";
+import { getPeriodLabel } from "@/builder/periods";
 import AddButton from "@/components/builder/add-button";
-import ConnectionsOverlay from "@/components/builder/connections-overlay";
-import CourseCard from "@/components/builder/course-card";
+import DraggableCourseCard from "@/components/builder/course-card";
 import NewCourseDialog from "@/components/builder/new-course-dialog";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
+import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import type {
   Action,
-  Curriculum,
   Draft,
   Period,
   ResizeAction,
@@ -58,24 +57,6 @@ type Size = { height: number; duration: number };
 type Gesture = { dragId: string; action: SlotAction | ResizeAction };
 type NewCourse = { period: Period; position: number };
 
-function getCards(curriculum: Curriculum) {
-  const defaultCredits = getDefaultCredits(curriculum);
-  return curriculum.courses.flatMap((course) =>
-    course.slots.map((slot, slotIndex) => ({
-      dragId: `${course.id}/${slotIndex}`,
-      course,
-      slot,
-      slotIndex,
-      column: findPeriodIndex(curriculum.periods, slot) + 1,
-      row: slot.position,
-      height: getCourseHeight(course.credits, defaultCredits),
-      duration: course.duration,
-    })),
-  );
-}
-
-type Card = ReturnType<typeof getCards>[number];
-
 function isSameGesture(a: Gesture | null, b: Gesture) {
   return (
     a?.dragId === b.dragId &&
@@ -106,15 +87,15 @@ export default function CurriculumGrid({
 
   // The cards as they stand, and as they would stand if the ongoing drag or
   // resize ended now, so the rest of the grid makes room while it happens.
-  const baseCards = getCards(curriculum);
-  const baseCardsById = new Map(baseCards.map((card) => [card.dragId, card]));
+  const baseCards = getCourseCards(curriculum);
+  const baseCardsById = new Map(baseCards.map((card) => [card.id, card]));
   const shownCurriculum = gesture
     ? apply(draft, gesture.action).curriculum
     : curriculum;
-  const cards = gesture ? getCards(shownCurriculum) : baseCards;
+  const cards = gesture ? getCourseCards(shownCurriculum) : baseCards;
   const draggedId = gesture?.action.type === "moveSlot" ? gesture.dragId : null;
   const gestureCourseId = gesture?.action.courseId ?? null;
-  const landing = cards.find((card) => card.dragId === draggedId);
+  const landing = cards.find((card) => card.id === draggedId);
 
   const rows =
     Math.max(MIN_ROWS, ...cards.map((card) => card.row + card.height - 1)) +
@@ -164,13 +145,13 @@ export default function CurriculumGrid({
   }
 
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
-    const card = baseCards.find((card) => card.dragId === operation.source?.id);
+    const card = baseCards.find((card) => card.id === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
     const cell = card && rect && getCellAt(rect.left, rect.top, card.duration);
     const period = cell && curriculum.periods[cell.column - 1];
     if (!card || !cell || !period) return null;
     return {
-      dragId: card.dragId,
+      dragId: card.id,
       action: {
         type: "moveSlot",
         courseId: card.course.id,
@@ -180,9 +161,9 @@ export default function CurriculumGrid({
     };
   }
 
-  function getResize(card: Card, delta: Size): Gesture {
+  function getResize(card: CourseCardLayout, delta: Size): Gesture {
     return {
-      dragId: card.dragId,
+      dragId: card.id,
       action: {
         type: "resizeCourse",
         courseId: card.course.id,
@@ -268,46 +249,30 @@ export default function CurriculumGrid({
           }}
           onClick={() => dispatch({ type: "addPeriod" })}
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute z-0"
-          style={{
-            gridColumn: `1 / span ${columns}`,
-            gridRow: `${HEADER_ROWS + 1} / span ${rows}`,
-            inset: `-${GRID_GAP}rem`,
-          }}
-        >
-          <ConnectionsOverlay
-            curriculum={shownCurriculum}
-            cards={cards.map((card) => ({
-              id: card.dragId,
-              courseId: card.course.id,
-              column: card.column,
-              row: card.row,
-              duration: card.duration,
-              height: card.height,
-            }))}
-            size={{ rows, columns }}
-            gestureCourseId={gestureCourseId}
-            selectedCourseId={selectedCourseId}
-          />
-        </div>
+        <ConnectionsOverlay
+          curriculum={shownCurriculum}
+          cards={cards}
+          size={{ rows, columns }}
+          firstRow={HEADER_ROWS + 1}
+          gestureCourseId={gestureCourseId}
+          selectedCourseId={selectedCourseId}
+        />
         {cards.map((shownCard) => {
           // dnd-kit lifts the dragged card from where it started, so it keeps
           // that place; the landing outline shows where it ends up instead.
-          const baseCard = baseCardsById.get(shownCard.dragId) ?? shownCard;
-          const card = shownCard.dragId === draggedId ? baseCard : shownCard;
+          const baseCard = baseCardsById.get(shownCard.id) ?? shownCard;
+          const card = shownCard.id === draggedId ? baseCard : shownCard;
           return (
-            <CourseCard
-              key={card.dragId}
-              dragId={card.dragId}
+            <DraggableCourseCard
+              key={card.id}
+              dragId={card.id}
               course={card.course}
               curriculum={shownCurriculum}
               gestureCourseId={gestureCourseId}
               color={getCourseColor(curriculum, card.course)}
               isSelected={card.course.id === selectedCourseId}
               onSelect={() => onSelectCourse(card.course.id)}
-              takeDropOrigin={() => takeDropOrigin(card.dragId)}
+              takeDropOrigin={() => takeDropOrigin(card.id)}
               style={{
                 gridColumn: `${card.column} / span ${card.duration}`,
                 gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
@@ -320,7 +285,7 @@ export default function CurriculumGrid({
                   dispatch(getResize(baseCard, delta).action);
                 }}
               />
-            </CourseCard>
+            </DraggableCourseCard>
           );
         })}
         {landing && (

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { Course, PeriodKey, Slot } from "@/types/curriculum";
+import type { Course, Curriculum, Slot } from "@/types/builder";
+import type { PeriodKey } from "@/types/curriculum";
 import type {
   EnrollmentStatus,
   PeriodWithEnrollments,
@@ -12,28 +13,40 @@ import {
   setEnrollmentStatus,
 } from "@/utils/trajectory";
 
-function slot(
-  courseId: number,
-  programYear: number,
-  term: number,
-  position = 1,
-): Slot {
-  return { id: courseId, courseId, programYear, term, position };
-}
-
 function course(
   id: number,
-  { prerequisiteIds = [] as number[], isElective = false } = {},
+  {
+    prerequisiteIds = [] as number[],
+    isElective = false,
+    slots = [] as Slot[],
+  } = {},
 ): Course {
   return {
     id,
     code: `C${id}`,
     name: `Course ${id}`,
     credits: 6,
+    areaId: null,
+    trackIds: [],
     duration: 1,
     prerequisiteCredits: 0,
     prerequisiteIds,
     isElective,
+    slots,
+  };
+}
+
+function curriculumOf(courses: Course[]): Curriculum {
+  return {
+    programName: "Program",
+    institution: "",
+    effectiveYear: 2020,
+    versionName: "",
+    termSystem: "semester",
+    periods: [],
+    areas: [],
+    tracks: [],
+    courses,
   };
 }
 
@@ -65,16 +78,21 @@ function layoutOf(periods: PeriodWithEnrollments[] | undefined) {
 }
 
 describe("createEnrollments", () => {
-  const slots = [slot(1, 1, 1), slot(2, 1, 3, 2), slot(3, 2, 1), slot(4, 3, 3)];
+  const curriculum = curriculumOf([
+    course(4, { slots: [{ programYear: 3, term: 3, position: 1 }] }),
+    course(1, { slots: [{ programYear: 1, term: 1, position: 1 }] }),
+    course(2, { slots: [{ programYear: 1, term: 3, position: 2 }] }),
+    course(3, { slots: [{ programYear: 2, term: 1, position: 1 }] }),
+  ]);
 
   const periodsOf = (entry: { year: number; term: number }) =>
-    createEnrollments({ entry, slots }).map((e) => ({
+    createEnrollments({ entry, curriculum }).map((e) => ({
       courseId: e.courseId,
       year: e.year,
       term: e.term,
     }));
 
-  test("places each slot in the calendar period of its program year for a first semester entry", () => {
+  test("places each slot, in curriculum order, in the calendar period of its program year for a first semester entry", () => {
     expect(periodsOf({ year: 2024, term: 1 })).toEqual([
       { courseId: 1, year: 2024, term: 1 },
       { courseId: 2, year: 2024, term: 3 },
@@ -95,7 +113,7 @@ describe("createEnrollments", () => {
   test("starts every enrollment as pending, at its slot position, with a unique id", () => {
     const enrollments = createEnrollments({
       entry: { year: 2024, term: 1 },
-      slots,
+      curriculum,
     });
 
     expect(enrollments.map((e) => e.status)).toEqual([

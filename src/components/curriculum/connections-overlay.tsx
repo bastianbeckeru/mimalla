@@ -14,6 +14,7 @@ import {
 } from "@/builder/routing";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
 import type { Curriculum } from "@/types/builder";
+import { GRID_GAP } from "@/utils/curriculum-grid";
 
 const STROKE_WIDTH = 0.1;
 const MISPLACED_DASHES = "0.3 0.2";
@@ -26,18 +27,21 @@ function getStroke(connection: Connection) {
 }
 
 // Draws the connections of the focused course: the gesture's course while a
-// card is dragged or resized, else the hovered, focused or selected one.
+// card is dragged or resized, else the hovered, focused or selected one. It
+// covers the grid rows of the cards, from `firstRow` on.
 export default function ConnectionsOverlay({
   curriculum,
   cards,
   size,
-  gestureCourseId,
+  firstRow,
+  gestureCourseId = null,
   selectedCourseId,
 }: {
   curriculum: Curriculum;
   cards: ConnectionCard[];
   size: GridSize;
-  gestureCourseId: number | null;
+  firstRow: number;
+  gestureCourseId?: number | null;
   selectedCourseId: number | null;
 }) {
   const select = useConnectionFocus((state) => state.select);
@@ -59,37 +63,47 @@ export default function ConnectionsOverlay({
   const { width, height } = getCanvasSize(size);
 
   return (
-    <svg
+    <div
       aria-hidden
-      className="absolute top-0 left-0 overflow-visible"
-      style={{ width: `${width}rem`, height: `${height}rem` }}
-      viewBox={`0 0 ${width} ${height}`}
+      className="pointer-events-none absolute z-0"
+      style={{
+        gridColumn: `1 / span ${size.columns}`,
+        gridRow: `${firstRow} / span ${size.rows}`,
+        inset: `-${GRID_GAP}rem`,
+      }}
     >
-      {connections.map((connection) => {
-        const data = paths.get(connection.id);
-        if (!data) return null;
-        return (
-          <path
-            key={connection.id}
-            d={data}
-            fill="none"
-            strokeWidth={STROKE_WIDTH}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            pathLength={connection.isMisplaced ? undefined : 1}
-            strokeDasharray={
-              connection.isMisplaced ? MISPLACED_DASHES : undefined
-            }
-            className={cn(
-              isDrawingIn &&
-                (connection.isMisplaced
-                  ? "animate-connection-fade"
-                  : "animate-connection-draw"),
-            )}
-            style={{ stroke: getStroke(connection) }}
-          />
-        );
-      })}
-    </svg>
+      <svg
+        aria-hidden
+        className="absolute top-0 left-0 overflow-visible"
+        style={{ width: `${width}rem`, height: `${height}rem` }}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        {connections.map((connection) => {
+          const data = paths.get(connection.id);
+          if (!data) return null;
+          return (
+            <path
+              key={connection.id}
+              d={data}
+              fill="none"
+              strokeWidth={STROKE_WIDTH}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              pathLength={connection.isMisplaced ? undefined : 1}
+              strokeDasharray={
+                connection.isMisplaced ? MISPLACED_DASHES : undefined
+              }
+              className={cn(
+                isDrawingIn &&
+                  (connection.isMisplaced
+                    ? "animate-connection-fade"
+                    : "animate-connection-draw"),
+              )}
+              style={{ stroke: getStroke(connection) }}
+            />
+          );
+        })}
+      </svg>
+    </div>
   );
 }

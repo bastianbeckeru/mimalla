@@ -1,11 +1,5 @@
-import type {
-  Area,
-  Course,
-  ExtendedCourse,
-  PeriodKey,
-  Slot,
-} from "@/types/curriculum";
-import { comparePeriodKeys } from "@/utils/period-key";
+import type { Course } from "@/types/builder";
+import type { ExtendedCourse } from "@/types/curriculum";
 
 export function extendCourses(courses: Course[]) {
   const successorIds = new Map<number, number[]>();
@@ -27,32 +21,30 @@ export function extendCourses(courses: Course[]) {
   );
 }
 
-export function getCourseArea(areas: Area[], course: Course) {
-  const { id, isElective } = course;
-
-  if (isElective) {
-    const electiveAreas = areas.filter((area) => area.courseIds.includes(id));
-
-    const mainArea = areas.find((area) =>
-      electiveAreas.every((eArea) => area.subareaIds.includes(eArea.id)),
-    );
-
-    if (!mainArea && electiveAreas.length === 1) return electiveAreas[0];
-
-    return mainArea;
-  }
-
-  return areas.find((area) => area.courseIds.includes(id));
+export function getApplicableYear(effectiveYears: number[], entryYear: number) {
+  const [earliest = entryYear, ...later] = effectiveYears.toSorted(
+    (a, b) => a - b,
+  );
+  return later.findLast((year) => year <= entryYear) ?? earliest;
 }
 
-export function getPeriods(slots: Slot[]) {
-  const periods = [
-    ...new Set(slots.map((s): PeriodKey => `${s.programYear}-${s.term}`)),
-  ].sort(comparePeriodKeys);
+export function getCurrentYear(effectiveYears: number[]) {
+  return getApplicableYear(effectiveYears, new Date().getFullYear());
+}
 
-  return {
-    periods,
-    nCols: periods.length,
-    nRows: Math.max(1, ...slots.map((s) => s.position)),
-  };
+export function getCurriculumPath(programPath: string, effectiveYear: number) {
+  return `${programPath}/${effectiveYear}`;
+}
+
+export function getProgramPath(curriculumPath: string) {
+  return curriculumPath.split("/").slice(0, 2).join("/");
+}
+
+export function getVersionLabel(
+  effectiveYear: number,
+  effectiveYears: number[],
+) {
+  if (effectiveYear === getCurrentYear(effectiveYears)) return "Vigente";
+  if (effectiveYear > new Date().getFullYear()) return "Próxima";
+  return null;
 }

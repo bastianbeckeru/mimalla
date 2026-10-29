@@ -1,99 +1,105 @@
+"use client";
+
 import { cn } from "cn";
-import { animate, useMotionValue, useTransform } from "motion/react";
-import { memo, useRef } from "react";
-import { MotionDiv } from "@/components/motion";
-import { CardContent } from "@/components/ui/card";
-import { useInteractions } from "@/hooks/use-interactions";
-import type { ExtendedSlot } from "@/types/curriculum";
-import { checkContrasts } from "@/utils/colors";
+import { type CSSProperties, type ReactNode, type Ref, useEffect } from "react";
+import { getTextColor } from "@/builder/colors";
+import { getConnectionRole } from "@/builder/connections";
+import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
+import type { Course, Curriculum } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 
-const ITEM_VARIANTS = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-};
-
-type CourseCardProps = {
-  index: number;
-  slot: ExtendedSlot;
-  isSelected: boolean;
-  isNotRelated: boolean;
-  handleClick: (newSlot: ExtendedSlot) => void;
-  handleSelect: (newSlot: ExtendedSlot | null) => void;
-};
-
-const CourseCard = memo(function CourseCard({
-  index,
-  slot,
+export default function CourseCard({
+  course,
+  curriculum,
+  gestureCourseId = null,
+  color,
   isSelected,
-  isNotRelated,
-  handleClick,
-  handleSelect,
-}: CourseCardProps) {
-  const progress = useMotionValue(0);
-  const scale = useTransform(progress, [0, 1], [1, 0.97]);
-  const animation = useRef<ReturnType<typeof animate> | null>(null);
+  onSelect,
+  style,
+  className,
+  cellRef,
+  buttonRef,
+  surfaceRef,
+  children,
+}: {
+  course: Course;
+  curriculum: Curriculum;
+  gestureCourseId?: number | null;
+  color: HexColor;
+  isSelected: boolean;
+  onSelect: () => void;
+  style: CSSProperties;
+  className?: string;
+  cellRef?: Ref<HTMLDivElement>;
+  buttonRef?: Ref<HTMLButtonElement>;
+  surfaceRef?: Ref<HTMLSpanElement>;
+  children?: ReactNode;
+}) {
+  const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
+  // How this course stands toward the course whose connections are shown.
+  const role = useConnectionFocus((state) =>
+    getConnectionRole(
+      curriculum,
+      gestureCourseId ?? getFocusedCourseId(state),
+      course.id,
+    ),
+  );
 
-  const { course, color, x, y, w, h } = slot;
-
-  const { hasLowBackgroundElementContrast, hasLowElementTextContrast } =
-    checkContrasts({ elementColor: color });
-
-  const handlers = useInteractions({
-    onLongPress: () => completePress(),
-    onHoverStart: () => handleSelect(slot),
-    onHoverEnd: () => handleSelect(null),
-    onClick: () => handleClick(slot),
-  });
-
-  const startPress = () => {
-    if (isSelected) return;
-    animation.current = animate(progress, 1, { duration: 0.7 });
-  };
-
-  const endPress = () => {
-    animation.current?.stop();
-    animate(progress, 0, { duration: 0.15 });
-  };
-
-  const completePress = () => {
-    animate(progress, 0, { duration: 0.2 });
-    handleSelect(slot);
-  };
+  useEffect(() => () => release(course.id), [release, course.id]);
 
   return (
-    <MotionDiv
-      {...handlers}
-      variants={ITEM_VARIANTS}
-      className={cn(
-        "clickeable flex cursor-pointer select-none flex-col gap-6 rounded-md border border-transparent bg-card py-6 text-card-foreground shadow-sm transition-[filter]",
-        hasLowBackgroundElementContrast && "border-foreground/50",
-        hasLowElementTextContrast && "text-background",
-        isSelected && "ring-2 ring-rose-500",
-        isNotRelated && "brightness-[25%]",
-      )}
-      style={{
-        backgroundColor: color,
-        gridColumn: `${x} / span ${w}`,
-        gridRow: `${y} / span ${h}`,
-        scale: isSelected ? 1 : scale,
-      }}
-      onPointerDown={(e) => {
-        startPress();
-        handlers.onPointerDown(e);
-      }}
-      onPointerUp={endPress}
-      onPointerLeave={(e) => {
-        endPress();
-        handlers.onPointerLeave(e);
-      }}
+    <div
+      ref={cellRef}
+      className="group/card relative"
+      data-course-card
+      data-selected={isSelected || undefined}
+      style={{ ...style, color: getTextColor(color) }}
+      onPointerEnter={() => hover(course.id)}
+      onPointerLeave={() => release(course.id, "hoveredCourseId")}
     >
-      <CardContent className="flex h-full items-center justify-center p-2">
-        <h3 className="text-balance text-center font-medium text-xs">
-          {course?.name ?? `Slot ${index + 1}`}
-        </h3>
-      </CardContent>
-    </MotionDiv>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-pressed={isSelected}
+        onFocus={(event) => {
+          if (event.target.matches(":focus-visible"))
+            focusByKeyboard(course.id);
+        }}
+        onBlur={() => release(course.id, "keyboardCourseId")}
+        className={cn(
+          "relative isolate size-full rounded-lg p-2 text-center text-xs transition-[filter] hover:brightness-110",
+          className,
+        )}
+        onClick={onSelect}
+      >
+        {/* The card's painted body, kept apart from the text so it can be
+            clipped to animate a change of size. */}
+        <span
+          ref={surfaceRef}
+          aria-hidden
+          className={cn(
+            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10",
+            role === "misplaced" && "ring-2 ring-warning",
+            isSelected &&
+              "ring-2 ring-ring ring-offset-2 ring-offset-background",
+          )}
+          style={{ backgroundColor: color }}
+        />
+        <span className="flex size-full items-center justify-center overflow-hidden">
+          <span className="line-clamp-3 font-medium">{course.name}</span>
+        </span>
+        {/* Dims the card while the connections shown leave it out. A veil
+            over it, rather than fading it, keeps the connections running
+            beneath from showing through. */}
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-0 rounded-lg bg-background/60 opacity-0 transition-opacity duration-150 ease-out",
+            role === "unrelated" && "opacity-100",
+          )}
+        />
+      </button>
+      {children}
+    </div>
   );
-});
-
-export default CourseCard;
+}

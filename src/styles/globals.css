@@ -82,8 +82,8 @@
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.627 0.194 149.214);
   --warning: oklch(0.666 0.179 58.318);
-  --connection-prerequisite: oklch(0.439 0 0);
-  --connection-successor: oklch(0.708 0 0);
+  --connection-prerequisite: oklch(0.704 0.191 22.216);
+  --connection-successor: oklch(0.792 0.209 151.711);
   --border: oklch(0.97 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -124,8 +124,8 @@
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.723 0.219 149.579);
   --warning: oklch(0.828 0.189 84.429);
-  --connection-prerequisite: oklch(0.87 0 0);
-  --connection-successor: oklch(0.556 0 0);
+  --connection-prerequisite: oklch(0.808 0.114 19.571);
+  --connection-successor: oklch(0.871 0.15 154.449);
   --border: oklch(1 0 0 / 5%);
   --input: oklch(1 0 0 / 10%);
   --ring: oklch(0.556 0 0);
@@ -246,18 +246,7 @@
     animation: shine 4.1s linear infinite;
   }
 
-  /* SVG Line Dash */
-  @keyframes dash {
-    to {
-      stroke-dashoffset: -10;
-    }
-  }
-  .animate-dash {
-    animation: dash 0.5s linear infinite;
-    stroke-dasharray: 5, 5;
-  }
-
-  /* Builder connections: drawn from their origin once, as they appear. Paths
+  /* Curriculum connections: drawn from their origin once, as they appear. Paths
      using it set pathLength="1". */
   @keyframes connection-draw {
     from {

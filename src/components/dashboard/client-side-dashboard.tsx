@@ -24,10 +24,11 @@ import {
   useHasHydrated,
   useTrajectoryStore,
 } from "@/stores/trajectory";
-import type { CatalogInstitution, CurriculumData } from "@/types/curriculum";
+import type { Curriculum } from "@/types/builder";
+import type { CatalogInstitution } from "@/types/curriculum";
 import type { Trajectory } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
-import { fetchProgramData } from "@/utils/curriculum-data";
+import { fetchCurriculum } from "@/utils/curriculum-file";
 import {
   createEnrollments,
   extractCourseIds,
@@ -36,9 +37,9 @@ import {
   trimEmptyPeriods,
 } from "@/utils/trajectory";
 
-type LoadedProgram = {
+type LoadedCurriculum = {
   path: string;
-  data: CurriculumData | null;
+  curriculum: Curriculum | null;
 };
 
 const loader = (
@@ -55,22 +56,22 @@ export default function ClientSideDashboard({
   const removeActiveTrajectory = useTrajectoryStore(
     (state) => state.removeActiveTrajectory,
   );
-  const [program, setProgram] = useState<LoadedProgram | null>(null);
+  const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
 
   const activePath = activeTrajectory?.curriculumPath;
-  const loadedPath = program?.path;
+  const loadedPath = loaded?.path;
 
   useEffect(() => {
     if (!activePath || loadedPath === activePath) return;
 
     let isCurrent = true;
 
-    fetchProgramData(activePath)
-      .then((data) => {
-        if (isCurrent) setProgram({ path: activePath, data });
+    fetchCurriculum(activePath)
+      .then((curriculum) => {
+        if (isCurrent) setLoaded({ path: activePath, curriculum });
       })
       .catch(() => {
-        if (isCurrent) setProgram({ path: activePath, data: null });
+        if (isCurrent) setLoaded({ path: activePath, curriculum: null });
       });
 
     return () => {
@@ -84,14 +85,14 @@ export default function ClientSideDashboard({
     return (
       <NewTrajectoryForm
         catalog={catalog}
-        onImport={(path, data) => setProgram({ path, data })}
+        onImport={(path, curriculum) => setLoaded({ path, curriculum })}
       />
     );
   }
 
-  if (program?.path !== activeTrajectory.curriculumPath) return loader;
+  if (loaded?.path !== activeTrajectory.curriculumPath) return loader;
 
-  if (!program.data) {
+  if (!loaded.curriculum) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
         <p className="text-muted-foreground">No se pudo cargar tu malla.</p>
@@ -106,17 +107,17 @@ export default function ClientSideDashboard({
     <TrajectoryDashboard
       key={activeTrajectory.id}
       trajectory={activeTrajectory}
-      data={program.data}
+      curriculum={loaded.curriculum}
     />
   );
 }
 
 function TrajectoryDashboard({
   trajectory,
-  data,
+  curriculum,
 }: {
   trajectory: Trajectory;
-  data: CurriculumData;
+  curriculum: Curriculum;
 }) {
   const updateActiveEnrollments = useTrajectoryStore(
     (state) => state.updateActiveEnrollments,
@@ -126,7 +127,7 @@ function TrajectoryDashboard({
   );
   const [editMode, setEditMode] = useState(false);
 
-  const courses = extendCourses(data.courses);
+  const courses = extendCourses(curriculum.courses);
   const enrollments = history.present.flatMap((p) => p.enrollments);
   const stats = getTrajectoryStats(enrollments, courses);
 
@@ -167,7 +168,7 @@ function TrajectoryDashboard({
   function resetCurriculum() {
     const officialEnrollments = createEnrollments({
       entry: trajectory.entry,
-      slots: data.curriculum.slots,
+      curriculum,
     });
 
     updateActiveEnrollments(officialEnrollments);
@@ -177,7 +178,11 @@ function TrajectoryDashboard({
 
   return (
     <SidebarProvider>
-      <Sidebar areas={data.areas} stats={stats} onReset={resetCurriculum} />
+      <Sidebar
+        areas={curriculum.areas}
+        stats={stats}
+        onReset={resetCurriculum}
+      />
 
       <SidebarInset className="relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
         <div>
@@ -185,7 +190,7 @@ function TrajectoryDashboard({
             <SidebarTrigger className="absolute left-2 md:hidden" />
 
             <div className="flex items-center justify-center px-2 font-bold">
-              <h1>{data.program.name}</h1>
+              <h1>{curriculum.programName}</h1>
             </div>
 
             <div className="absolute right-2 flex flex-row items-center gap-2">
@@ -230,7 +235,7 @@ function TrajectoryDashboard({
             editMode={editMode}
             history={history}
             entry={trajectory.entry}
-            areas={data.areas}
+            areas={curriculum.areas}
             courses={courses}
             progress={{
               approvedCourseIds: new Set(

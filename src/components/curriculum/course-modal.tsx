@@ -4,7 +4,8 @@ import { Check, GitFork } from "lucide-react";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import type { Course, ExtendedCourse } from "@/types/curriculum";
+import type { Course } from "@/types/builder";
+import type { ExtendedCourse } from "@/types/curriculum";
 import type { TrajectoryProgress } from "@/types/trajectory";
 import { getContrastingShade, parseHexColor } from "@/utils/colors";
 
@@ -62,7 +63,8 @@ export default function CourseModal({
       open={open}
       onOpenChange={onOpenChange}
       title={course.name}
-      description={course.description}
+      description={`Prerrequisitos y cursos que habilita ${course.name}.`}
+      isDescriptionHidden
       headerExtra={
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           {course.code && (

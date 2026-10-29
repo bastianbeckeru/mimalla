@@ -8,7 +8,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import type { Course } from "@/types/curriculum";
+import type { Course } from "@/types/builder";
 import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
 import { checkContrasts } from "@/utils/colors";
 

@@ -1,51 +1,35 @@
 # Known problems
 
-Data problems found in the curriculum JSON files (`src/server/db/curriculums/`) that are not fixed yet, because fixing them needs the official source of each curriculum. None of them breaks the app, but they show wrong or missing information.
+Data problems found in the curriculum files (`src/server/db/curriculums/`) that are not fixed yet, because fixing them needs the official source of each curriculum (#5). None of them breaks the app, but they show wrong or missing information.
 
-## Química y Farmacia (UCH) uses the areas of Derecho
+## Química y Farmacia (UCH) has almost no areas
 
-`uch/quimica-y-farmacia.json` was created from the Derecho template, and its `areas` were never replaced. Of its 14 areas, 10 are law areas ("Derecho Privado", "Derecho Penal", "Clínicas Jurídicas", ...) and 1 is "Formación General Deportiva", and none of these 11 match any of its courses. At most 12 of its 67 courses belong to an area, so most cards use the default color, and the dashboard sidebar lists law areas.
+`uch/quimica-y-farmacia_2022.malla` was converted from a catalog file built on the Derecho template, whose law areas matched none of its courses. Only its three general education areas survived the conversion, so 57 of its 67 courses have no area and use the default color.
 
-**Fix:** replace `areas` with the formation areas of the official Química y Farmacia curriculum.
+**Fix:** add the formation areas of the official Química y Farmacia curriculum.
 
-## Diseño (UDP) belongs to the wrong department
+## Courses without a code
 
-`udp/diseno.json` sets `department` to "Facultad de Psicología" (`FP`). It is likely a leftover of the Psicología template. The department groups programs in the search bar and in the dashboard form, so Diseño appears under Psicología.
+Trajectories will reference courses by code, so the catalog will reject courses without one (ADR 0004).
 
-**Fix:** set the department that the program actually belongs to.
+| File | Courses without a code |
+| --- | --- |
+| `uch/quimica-y-farmacia_2022.malla` | 67 of 67 |
+| `udp/ingenieria-civil-industrial_2026.malla` | 46 of 46 |
+| `udp/ingenieria-civil-en-informatica-y-telecomunicaciones_2020.malla` | 26 of 49 |
+| `udp/psicologia_2020.malla` | 3 of 48 |
+| `udp/ingenieria-civil-en-obras-civiles_2020.malla` | 2 of 48 |
 
-## "Inglés III" requires a course that does not exist
+**Fix:** add the official code of every course.
 
-In `udp/ingenieria-civil-en-informatica-y-telecomunicaciones.json` and `udp/ingenieria-civil-en-obras-civiles.json`, course `26` (CIG1014 Inglés III) lists `21` in `prerequisiteIds`, but neither file has a course with id `21`. The app skips the missing prerequisite, so Inglés III shows fewer prerequisites than it should.
+## Missing or incomplete tracks
 
-**Fix:** add course `21` (probably Inglés II) to `courses`, or point the prerequisite to the right id.
+`udp/derecho_2023.malla`, `udp/ingenieria-civil-en-informatica-y-telecomunicaciones_2020.malla`, `udp/ingenieria-civil-en-obras-civiles_2020.malla` and `udp/ingenieria-civil-plan-comun_2020.malla` have no tracks, so their pages list no degree or title. The conversion of Obstetricia y Neonatología and Psicología kept only the professional title, with every course, because their licenciaturas listed no courses.
 
-## Areas reference courses that do not exist
+**Fix:** rebuild the tracks from the official PDFs.
 
-Many areas list ids in `courseIds` that are not in the file's `courses`, mostly in "Formación General e Inglés", "Formación General Deportiva" and the engineering areas. These are leftovers of the shared templates. They are harmless today, because lookups only start from existing courses, but they make the files harder to review and can hide real mistakes like the one above.
+## "Inglés III" lost a prerequisite
 
-| File | Areas affected | Missing ids |
-| --- | --- | --- |
-| `uch/quimica-y-farmacia.json` | 12 | 67 |
-| `udp/derecho.json` | 3 | 38 |
-| `udp/diseno.json` | 1 | 8 |
-| `udp/ingenieria-civil-en-informatica-y-telecomunicaciones.json` | 4 | 79 |
-| `udp/ingenieria-civil-en-obras-civiles.json` | 4 | 54 |
-| `udp/ingenieria-civil-industrial.json` | 3 | 31 |
-| `udp/ingenieria-civil-plan-comun.json` | 5 | 60 |
-| `udp/obstetricia-y-neonatologia.json` | 1 | 9 |
-| `udp/psicologia.json` | 1 | 8 |
+In the Informática y Telecomunicaciones and Obras Civiles curriculums, Inglés III (CIG1014) required a course that did not exist in the old catalog files, so it was dropped and Inglés III has no prerequisites.
 
-**Fix:** remove from each area the ids that are not courses of that curriculum.
-
-## `isElective` is missing in some files
-
-`isElective` is missing in every course of `uch/quimica-y-farmacia.json` and `udp/ingenieria-civil-plan-comun.json`, and in 35 of the 36 courses of `udp/obstetricia-y-neonatologia.json`. The app treats a missing value as "not elective", so if any of these courses is an elective, it cannot be added more than once to a period and its area falls back to the non-elective rule.
-
-**Fix:** set `isElective` explicitly on every course.
-
-## Programs without statistics
-
-`udp/diseno.json`, `udp/ingenieria-civil-plan-comun.json` and `udp/obstetricia-y-neonatologia.json` have no `stats`, so their pages hide the "Ver estadísticas" button. `udp/ingenieria-civil-plan-comun.json` also has no `plans`, so its page lists no degree or title.
-
-**Fix:** add the SIES statistics and the plans from the official sources.
+**Fix:** add Inglés II as its prerequisite if the official curriculum requires it.

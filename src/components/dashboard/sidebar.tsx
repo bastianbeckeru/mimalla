@@ -17,7 +17,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useTrajectoryStore } from "@/stores/trajectory";
-import type { Area } from "@/types/curriculum";
+import type { Area } from "@/types/builder";
 import { getLuminance, parseHexColor } from "@/utils/colors";
 
 type DashboardSidebarProps = {
@@ -40,14 +40,11 @@ export default function DashboardSidebar({
     (state) => state.removeActiveTrajectory,
   );
   const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
-  const subareaIds = new Set(areas.flatMap((area) => area.subareaIds));
-  const mainAreas = areas
-    .filter((area) => !subareaIds.has(area.id))
-    .sort(
-      (a, b) =>
-        getLuminance(parseHexColor(a.color)) -
-        getLuminance(parseHexColor(b.color)),
-    );
+  const mainAreas = areas.toSorted(
+    (a, b) =>
+      getLuminance(parseHexColor(a.color)) -
+      getLuminance(parseHexColor(b.color)),
+  );
 
   return (
     <Sidebar collapsible="icon">
