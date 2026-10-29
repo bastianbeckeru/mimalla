@@ -1,7 +1,7 @@
 "use client";
 
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCourseColor } from "@/builder/colors";
 import { getCourseCards } from "@/builder/grid";
 import { getPeriodLabel } from "@/builder/periods";
@@ -30,6 +30,22 @@ export default function CurriculumView({
   useHotkey("Escape", () => setSelectedCourseId(null), {
     enabled: selectedCourseId !== null,
   });
+
+  // A click anywhere but on a course card drops the selection. Clicks, unlike
+  // pointer downs, don't fire after a pan, so scrolling the grid keeps it.
+  useEffect(() => {
+    if (selectedCourseId === null) return;
+    function deselect(event: MouseEvent) {
+      if (
+        event.target instanceof Element &&
+        event.target.closest("[data-course-card]")
+      )
+        return;
+      setSelectedCourseId(null);
+    }
+    document.addEventListener("click", deselect);
+    return () => document.removeEventListener("click", deselect);
+  }, [selectedCourseId]);
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">

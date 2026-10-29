@@ -51,6 +51,7 @@ export default function CourseCard({
     <div
       ref={cellRef}
       className="group/card relative"
+      data-course-card
       data-selected={isSelected || undefined}
       style={{ ...style, color: getTextColor(color) }}
       onPointerEnter={() => hover(course.id)}
