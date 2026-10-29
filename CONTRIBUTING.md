@@ -73,12 +73,13 @@ Maintainers update `version` in `package.json` when they publish a release.
 
 ## Adding a curriculum
 
-Curricula are stored as JSON files in `src/server/db/curriculums/<institution-acronym>/<program-slug>.json`. The program list, routes and search are derived from these files, so adding a file is enough.
+Curricula are stored as curriculum files in `src/server/db/curriculums/<institution-acronym>/<program-slug>_<effective-year>.malla`, the same format the builder downloads (ADR 0004). The program list, routes, versions and search are derived from these files.
 
-1. Copy an existing curriculum file from the same institution, or from another one, as a template.
-2. Fill in the institution, department, program and course data. The shape is defined by `CurriculumData` in `src/types/curriculum.ts`.
-3. Check in the app that the curriculum imports and that prerequisites render correctly.
-4. In the pull request, link the official source of the curriculum.
+1. Lay out the curriculum in the builder (`/builder`), or write the file from the official PDF following `public/builder/pdf-to-malla.md`, and download it.
+2. Save it in the folder of its institution. A new version of an existing program is a new file with its effective year.
+3. For a new program, register its department, SIES and DEMRE codes and schedule in `src/server/db/programs.ts`, and its institution if it is new. The institution name must match the one in the file.
+4. Run `bun test`, which loads every curriculum file, and check the program page in the app.
+5. In the pull request, link the official source of the curriculum.
 
 ## License
 
