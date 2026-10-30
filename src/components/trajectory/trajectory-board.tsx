@@ -15,7 +15,9 @@ import { getCourseColor } from "@/builder/colors";
 import AddButton from "@/components/builder/add-button";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
-import CoursePanel from "@/components/trajectory/course-panel";
+import CoursePanel, {
+  type SchemeSource,
+} from "@/components/trajectory/course-panel";
 import EnrollmentCard, {
   STATUS_LABELS,
 } from "@/components/trajectory/enrollment-card";
@@ -28,6 +30,7 @@ import type {
   ChangeNotice,
   Enrollment,
   Entry,
+  GradingScale,
   Placement,
 } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
@@ -137,14 +140,16 @@ export default function TrajectoryBoard({
   enrollments,
   entry,
   curriculum,
+  gradingScale,
   isEditing,
   onChange,
 }: {
   enrollments: Enrollment[];
   entry: Entry;
   curriculum: Curriculum;
+  gradingScale: GradingScale;
   isEditing: boolean;
-  onChange: (enrollments: Enrollment[], notice: ChangeNotice) => void;
+  onChange: (enrollments: Enrollment[], notice?: ChangeNotice) => void;
 }) {
   const isMobile = useIsMobile();
   const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
@@ -256,6 +261,27 @@ export default function TrajectoryBoard({
   function getPeriodLabel(period: PeriodKey) {
     const { label } = getPeriodInfo(period, entry);
     return `${label} (${parsePeriodKey(period).year})`;
+  }
+
+  // The latest other enrollment of the same course with assessments, whose
+  // grading scheme a new attempt can start from.
+  function getSchemeSource(card: PlacedEnrollment): SchemeSource | null {
+    const source = base.cards
+      .filter(
+        (other) =>
+          other.courseId === card.courseId &&
+          other.id !== card.id &&
+          (other.enrollment.assessments?.length ?? 0) > 0,
+      )
+      .sort((a, b) => a.column - b.column)
+      .at(-1);
+    const period = source && base.periods[source.column - 1];
+    return source && period
+      ? {
+          label: getPeriodLabel(period),
+          assessments: source.enrollment.assessments ?? [],
+        }
+      : null;
   }
 
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
@@ -513,6 +539,8 @@ export default function TrajectoryBoard({
         course={panelCard?.course ?? null}
         curriculum={curriculum}
         progress={progress}
+        gradingScale={gradingScale}
+        schemeSource={panelCard && getSchemeSource(panelCard)}
         isAvailable={
           panelCard !== null && isAvailable(panelCard.course, progress)
         }
@@ -532,6 +560,16 @@ export default function TrajectoryBoard({
             getStatusNotice(
               `${panelCard.course.name} ${STATUS_LABELS[status]}`,
               result.revertedCount,
+            ),
+          );
+        }}
+        onGradesChange={(grades) => {
+          if (!panelCard) return;
+          onChange(
+            enrollments.map((enrollment) =>
+              enrollment.id === panelCard.id
+                ? { ...enrollment, ...grades }
+                : enrollment,
             ),
           );
         }}

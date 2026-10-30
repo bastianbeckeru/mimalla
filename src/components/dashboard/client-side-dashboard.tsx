@@ -25,9 +25,16 @@ import {
 } from "@/stores/trajectory";
 import type { Curriculum } from "@/types/builder";
 import type { CatalogInstitution } from "@/types/curriculum";
-import type { ChangeNotice, Enrollment, Trajectory } from "@/types/trajectory";
+import type {
+  ChangeNotice,
+  Enrollment,
+  GradingScale,
+  Trajectory,
+  TrajectoryContent,
+} from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import { fetchCurriculum } from "@/utils/curriculum-file";
+import { getCumulativeAverage } from "@/utils/grades";
 import {
   createEnrollments,
   getTrajectoryStats,
@@ -139,25 +146,27 @@ function TrajectoryDashboard({
   // A new trajectory starts in edit mode so the student can mark what they
   // have already passed; afterwards the dashboard opens for tracking.
   const [isEditing, setIsEditing] = useState(isNew);
-  const updateActiveEnrollments = useTrajectoryStore(
-    (state) => state.updateActiveEnrollments,
+  const updateActiveTrajectory = useTrajectoryStore(
+    (state) => state.updateActiveTrajectory,
   );
   const context = { entry: trajectory.entry, curriculum };
-  const history = useHistory(() =>
-    settleEnrollments(trajectory.enrollments, context),
-  );
+  const history = useHistory<TrajectoryContent>(() => ({
+    enrollments: settleEnrollments(trajectory.enrollments, context),
+    gradingScale: trajectory.gradingScale,
+  }));
   const isMobile = useIsMobile();
   const noticeId = useRef<string | null>(null);
 
-  const enrollments = history.present;
-  const stats = getTrajectoryStats(
-    enrollments,
-    extendCourses(curriculum.courses),
-  );
+  const { enrollments, gradingScale } = history.present;
+  const courses = extendCourses(curriculum.courses);
+  const stats = {
+    ...getTrajectoryStats(enrollments, courses),
+    cumulativeAverage: getCumulativeAverage(enrollments, courses, gradingScale),
+  };
 
   useEffect(() => {
-    updateActiveEnrollments(history.present);
-  }, [history.present, updateActiveEnrollments]);
+    updateActiveTrajectory(history.present);
+  }, [history.present, updateActiveTrajectory]);
 
   useHotkey("Mod+Z", history.undo, { enabled: !isMobile, ignoreInputs: true });
   useHotkey("Mod+Shift+Z", history.redo, {
@@ -165,9 +174,10 @@ function TrajectoryDashboard({
     ignoreInputs: true,
   });
 
-  function commit(next: Enrollment[], notice: ChangeNotice) {
+  // Changes without a notice, such as a grade, are undone from the header.
+  function commitContent(next: TrajectoryContent, notice?: ChangeNotice) {
     history.commit(next);
-    if (!isMobile && !notice.isShownOnDesktop) return;
+    if (!notice || (!isMobile && !notice.isShownOnDesktop)) return;
     if (noticeId.current) toast.close(noticeId.current);
     noticeId.current = toast.add({
       title: notice.title,
@@ -183,6 +193,17 @@ function TrajectoryDashboard({
     });
   }
 
+  function commit(next: Enrollment[], notice?: ChangeNotice) {
+    commitContent({ ...history.present, enrollments: next }, notice);
+  }
+
+  function changeGradingScale(next: GradingScale) {
+    commitContent(
+      { ...history.present, gradingScale: next },
+      { title: "Escala de notas actualizada" },
+    );
+  }
+
   function resetCurriculum() {
     commit(
       settleEnrollments(
@@ -195,7 +216,12 @@ function TrajectoryDashboard({
 
   return (
     <SidebarProvider className="h-full min-h-0">
-      <Sidebar stats={stats} onReset={resetCurriculum} />
+      <Sidebar
+        stats={stats}
+        gradingScale={gradingScale}
+        onGradingScaleChange={changeGradingScale}
+        onReset={resetCurriculum}
+      />
 
       <SidebarInset className="min-w-0 overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
@@ -249,6 +275,7 @@ function TrajectoryDashboard({
             enrollments={enrollments}
             entry={trajectory.entry}
             curriculum={curriculum}
+            gradingScale={gradingScale}
             isEditing={isEditing}
             onChange={commit}
           />

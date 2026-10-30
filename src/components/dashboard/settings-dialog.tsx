@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowLeft, RotateCcw, Settings, Trash } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
+import CommitInput from "@/components/trajectory/commit-input";
 import {
   AdaptiveDialog,
   AdaptiveDialogBody,
@@ -15,6 +16,15 @@ import {
 } from "@/components/ui/adaptive-dialog";
 import { Button } from "@/components/ui/button";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { toast } from "@/components/ui/toast";
+import type { GradingScale } from "@/types/trajectory";
+import { formatGrade, parseGrade } from "@/utils/grades";
+
+const SCALE_FIELDS: { key: keyof GradingScale; label: string }[] = [
+  { key: "min", label: "Mínima" },
+  { key: "passing", label: "Aprobación" },
+  { key: "max", label: "Máxima" },
+];
 
 type Action = {
   icon: ReactNode;
@@ -26,15 +36,20 @@ type Action = {
 };
 
 type SettingsDialogProps = {
+  gradingScale: GradingScale;
+  onGradingScaleChange: (scale: GradingScale) => void;
   onReset: () => void;
   onRemove: () => void;
 };
 
 export default function SettingsDialog({
+  gradingScale,
+  onGradingScaleChange,
   onReset,
   onRemove,
 }: SettingsDialogProps) {
   const [pending, setPending] = useState<Action | null>(null);
+  const scaleId = useId();
 
   const actions: Action[] = [
     {
@@ -101,7 +116,52 @@ export default function SettingsDialog({
                 Administra la malla curricular activa.
               </AdaptiveDialogDescription>
             </AdaptiveDialogHeader>
-            <AdaptiveDialogBody>
+            <AdaptiveDialogBody className="space-y-4">
+              <section className="space-y-2 rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <h3 className="font-medium">Escala de notas</h3>
+                  <p className="text-muted-foreground">
+                    Las notas fuera de la escala no cuentan en los promedios.
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {SCALE_FIELDS.map(({ key, label }) => (
+                    <div key={key} className="space-y-1 text-sm">
+                      <label
+                        htmlFor={`${scaleId}-${key}`}
+                        className="text-muted-foreground"
+                      >
+                        {label}
+                      </label>
+                      <CommitInput
+                        id={`${scaleId}-${key}`}
+                        inputMode="decimal"
+                        value={formatGrade(gradingScale[key])}
+                        onCommit={(text) => {
+                          const grade = parseGrade(text);
+                          const next = { ...gradingScale, [key]: grade };
+                          if (
+                            grade === null ||
+                            Number.isNaN(grade) ||
+                            next.min >= next.max ||
+                            next.passing < next.min ||
+                            next.passing > next.max
+                          ) {
+                            toast.add({
+                              type: "error",
+                              title: "Escala no válida",
+                              description:
+                                "La mínima debe ser menor que la máxima y la aprobación debe quedar entre ambas.",
+                            });
+                            return;
+                          }
+                          onGradingScaleChange(next);
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
               <ul className="divide-y rounded-lg border">
                 {actions.map((action) => (
                   <li

@@ -18,6 +18,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTrajectoryStore } from "@/stores/trajectory";
+import type { GradingScale } from "@/types/trajectory";
+import { formatGrade } from "@/utils/grades";
 
 type DashboardSidebarProps = {
   stats: {
@@ -25,19 +27,30 @@ type DashboardSidebarProps = {
     approvedCourses: number;
     totalCourses: number;
     approvedCredits: number;
+    cumulativeAverage: number | null;
   };
+  gradingScale: GradingScale;
+  onGradingScaleChange: (scale: GradingScale) => void;
   onReset: () => void;
 };
 
 export default function DashboardSidebar({
   stats,
+  gradingScale,
+  onGradingScaleChange,
   onReset,
 }: DashboardSidebarProps) {
   const { toggleSidebar } = useSidebar();
   const removeActiveTrajectory = useTrajectoryStore(
     (state) => state.removeActiveTrajectory,
   );
-  const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
+  const {
+    progress,
+    approvedCourses,
+    totalCourses,
+    approvedCredits,
+    cumulativeAverage,
+  } = stats;
 
   return (
     <Sidebar>
@@ -71,12 +84,29 @@ export default function DashboardSidebar({
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarGroup className="px-4 py-3">
+          <SidebarGroupLabel className="px-0 text-sidebar-muted-foreground">
+            Promedio acumulado
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <p className="font-heading font-semibold text-2xl tabular-nums">
+              {cumulativeAverage === null
+                ? "—"
+                : formatGrade(Math.round(cumulativeAverage * 100) / 100)}
+            </p>
+            <p className="text-sidebar-muted-foreground text-xs">
+              Cursos aprobados y reprobados, ponderados por créditos.
+            </p>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-sidebar-border border-t p-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SettingsDialog
+              gradingScale={gradingScale}
+              onGradingScaleChange={onGradingScaleChange}
               onReset={onReset}
               onRemove={removeActiveTrajectory}
             />

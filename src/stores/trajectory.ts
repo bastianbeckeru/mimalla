@@ -4,8 +4,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { LEGACY_CURRICULUMS } from "@/stores/legacy-curriculums";
 import type { Curriculum } from "@/types/builder";
-import type { Enrollment, Entry, Trajectory } from "@/types/trajectory";
+import type {
+  Enrollment,
+  Entry,
+  Trajectory,
+  TrajectoryContent,
+} from "@/types/trajectory";
 import { getCurriculumPath } from "@/utils/curriculum";
+import { DEFAULT_GRADING_SCALE } from "@/utils/grades";
 import { createEnrollments } from "@/utils/trajectory";
 
 type TrajectoryState = {
@@ -20,8 +26,12 @@ type TrajectoryActions = {
     curriculum: Curriculum;
   }) => void;
   removeActiveTrajectory: () => void;
-  updateActiveEnrollments: (enrollments: Enrollment[]) => void;
+  updateActiveTrajectory: (content: TrajectoryContent) => void;
 };
+
+// Before version 4, trajectories had no grading scale.
+type PersistedTrajectory = Omit<Trajectory, "gradingScale"> &
+  Partial<Pick<Trajectory, "gradingScale">>;
 
 type PersistedStateV1 = {
   curriculums: {
@@ -34,7 +44,10 @@ type PersistedStateV1 = {
   activeCurriculumId: string | null;
 };
 
-function migrateFromV1(state: PersistedStateV1): TrajectoryState {
+function migrateFromV1(state: PersistedStateV1): {
+  trajectories: PersistedTrajectory[];
+  activeTrajectoryId: string | null;
+} {
   return {
     trajectories: state.curriculums.map((curriculum) => ({
       id: curriculum.id,
@@ -54,7 +67,9 @@ function migrateFromV1(state: PersistedStateV1): TrajectoryState {
   };
 }
 
-function migrateToCurriculumFile(trajectory: Trajectory): Trajectory {
+function migrateToCurriculumFile(
+  trajectory: PersistedTrajectory,
+): PersistedTrajectory {
   const legacy = LEGACY_CURRICULUMS[trajectory.curriculumPath];
   if (!legacy) return trajectory;
 
@@ -78,11 +93,17 @@ export function migrateTrajectoryState(
   const state =
     version < 2
       ? migrateFromV1(persistedState as PersistedStateV1)
-      : (persistedState as TrajectoryState);
+      : (persistedState as {
+          trajectories: PersistedTrajectory[];
+          activeTrajectoryId: string | null;
+        });
 
   return {
     ...state,
-    trajectories: state.trajectories.map(migrateToCurriculumFile),
+    trajectories: state.trajectories.map((trajectory) => ({
+      gradingScale: DEFAULT_GRADING_SCALE,
+      ...migrateToCurriculumFile(trajectory),
+    })),
   };
 }
 
@@ -98,6 +119,7 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
             id: nanoid(),
             curriculumPath,
             entry,
+            gradingScale: DEFAULT_GRADING_SCALE,
             enrollments: createEnrollments({ entry, curriculum }),
           };
 
@@ -119,16 +141,16 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
           };
         }),
 
-      updateActiveEnrollments: (enrollments) =>
+      updateActiveTrajectory: (content) =>
         set((state) => ({
           trajectories: state.trajectories.map((t) =>
-            t.id === state.activeTrajectoryId ? { ...t, enrollments } : t,
+            t.id === state.activeTrajectoryId ? { ...t, ...content } : t,
           ),
         })),
     }),
     {
       name: "curriculum-storage",
-      version: 3,
+      version: 4,
       migrate: migrateTrajectoryState,
     },
   ),
