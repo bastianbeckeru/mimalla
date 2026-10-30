@@ -36,6 +36,7 @@ export default function ConnectionsOverlay({
   firstRow,
   gestureCourseId = null,
   selectedCourseId,
+  isShown = () => true,
 }: {
   curriculum: Curriculum;
   cards: ConnectionCard[];
@@ -43,6 +44,7 @@ export default function ConnectionsOverlay({
   firstRow: number;
   gestureCourseId?: number | null;
   selectedCourseId: number | null;
+  isShown?: (connection: Connection) => boolean;
 }) {
   const select = useConnectionFocus((state) => state.select);
   const focusedCourseId = useConnectionFocus(
@@ -57,7 +59,9 @@ export default function ConnectionsOverlay({
   useEffect(() => select(selectedCourseId), [select, selectedCourseId]);
 
   if (focusedCourseId === null) return null;
-  const connections = getConnections(curriculum, cards, focusedCourseId);
+  const connections = getConnections(curriculum, cards, focusedCourseId).filter(
+    isShown,
+  );
   if (connections.length === 0) return null;
   const paths = routeConnections(connections, cards, size);
   const { width, height } = getCanvasSize(size);

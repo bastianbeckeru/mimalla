@@ -11,13 +11,19 @@ import CourseCard from "@/components/curriculum/course-card";
 
 export default function DraggableCourseCard({
   dragId,
+  isDragDisabled = false,
   takeDropOrigin,
+  className,
   ...props
-}: Omit<ComponentProps<typeof CourseCard>, "className"> & {
+}: ComponentProps<typeof CourseCard> & {
   dragId: string;
+  isDragDisabled?: boolean;
   takeDropOrigin: () => { x: number; y: number } | null;
 }) {
-  const { ref, isDragging } = useDraggable({ id: dragId });
+  const { ref, isDragging } = useDraggable({
+    id: dragId,
+    disabled: isDragDisabled,
+  });
   const cellRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLSpanElement>(null);
   useLayoutFlip(cellRef, takeDropOrigin);
@@ -29,7 +35,11 @@ export default function DraggableCourseCard({
       cellRef={cellRef}
       buttonRef={ref}
       surfaceRef={surfaceRef}
-      className={cn("cursor-grab", isDragging && "cursor-grabbing shadow-lg")}
+      className={cn(
+        !isDragDisabled && "cursor-grab",
+        isDragging && "cursor-grabbing shadow-lg",
+        className,
+      )}
     />
   );
 }

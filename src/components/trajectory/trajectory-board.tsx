@@ -1,326 +1,548 @@
 "use client";
 
 import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  type DropResult,
-} from "@hello-pangea/dnd";
+  type DragEndEvent,
+  type DragMoveEvent,
+  Feedback,
+  KeyboardSensor,
+  PointerActivationConstraints,
+  PointerSensor,
+} from "@dnd-kit/dom";
+import { DragDropProvider } from "@dnd-kit/react";
 import { cn } from "cn";
-import { Plus, Save, Undo2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCourseColor } from "@/builder/colors";
-import CourseModal from "@/components/curriculum/course-modal";
-import { MotionDiv } from "@/components/motion";
+import AddButton from "@/components/builder/add-button";
+import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
-import AddPeriodDialog from "@/components/trajectory/add-period-dialog";
-import EnrollmentCard from "@/components/trajectory/enrollment-card";
-import PeriodContainer from "@/components/trajectory/period-container";
-import { Button, buttonVariants } from "@/components/ui/button";
+import CoursePanel from "@/components/trajectory/course-panel";
+import EnrollmentCard, {
+  STATUS_LABELS,
+} from "@/components/trajectory/enrollment-card";
 import { toast } from "@/components/ui/toast";
-import type { HistoryControls } from "@/hooks/use-history";
-import type { Area } from "@/types/builder";
-import type { ExtendedCourse, PeriodKey } from "@/types/curriculum";
+import { useGridGesture } from "@/hooks/use-grid-gesture";
+import { useIsMobile } from "@/hooks/use-mobile";
+import type { Course, Curriculum } from "@/types/builder";
+import type { PeriodKey } from "@/types/curriculum";
 import type {
+  ChangeNotice,
+  Enrollment,
   Entry,
-  PeriodWithEnrollments,
-  TrajectoryProgress,
+  Placement,
 } from "@/types/trajectory";
-import { DEFAULT_COURSE_COLOR } from "@/utils/colors";
+import { extendCourses } from "@/utils/curriculum";
+import {
+  GRID_CELL_HEIGHT,
+  GRID_CELL_WIDTH,
+  GRID_GAP,
+  getEmptyCells,
+  getRowCount,
+  HEADER_ROWS,
+} from "@/utils/curriculum-grid";
+import { parsePeriodKey } from "@/utils/period-key";
 import {
   addEnrollment,
-  addPeriod,
   type EditError,
   getAddableCourses,
+  getNextPeriod,
+  getPeriodInfo,
+  getProgress,
   isAvailable,
+  layOutTrajectory,
   MAX_ENROLLMENTS_PER_PERIOD,
   moveEnrollment,
+  type PlacedEnrollment,
   removeEnrollment,
   setEnrollmentStatus,
+  toggleEnrollmentStatus,
+  toLayoutCurriculum,
 } from "@/utils/trajectory";
 
-const PERIOD_FULL_TOAST = {
-  title: "Límite de cursos",
-  description: `No puedes añadir más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos por periodo.`,
-};
+const DRAG_ACTIVATION_DISTANCE = 5;
+const TOUCH_HOLD_MS = 300;
+const TOUCH_HOLD_TOLERANCE = 8;
+const ROOT_FONT_SIZE = 16;
+const DRAG_CLICK_MS = 300;
+const SHAKE_MS = 300;
+const HINT_MS = 1500;
+const ENTER_STAGGER_MS = 30;
+const ENTER_MS = 300;
 
-const ADD_ERROR_TOASTS: Partial<
-  Record<EditError, { title: string; description: string }>
-> = {
-  PERIOD_FULL: PERIOD_FULL_TOAST,
-  DUPLICATE_COURSE: {
-    title: "Curso duplicado",
-    description: "No puedes añadir un curso que ya está en el periodo.",
-  },
-};
+const sensors = [
+  PointerSensor.configure({
+    activationConstraints: (event) =>
+      event.pointerType === "touch"
+        ? [
+            new PointerActivationConstraints.Delay({
+              value: TOUCH_HOLD_MS,
+              tolerance: TOUCH_HOLD_TOLERANCE,
+            }),
+          ]
+        : [
+            new PointerActivationConstraints.Distance({
+              value: DRAG_ACTIVATION_DISTANCE,
+            }),
+          ],
+  }),
+  KeyboardSensor.configure({
+    offset: {
+      x: (GRID_CELL_WIDTH + GRID_GAP) * ROOT_FONT_SIZE,
+      y: (GRID_CELL_HEIGHT + GRID_GAP) * ROOT_FONT_SIZE,
+    },
+    keyboardCodes: {
+      start: ["Space"],
+      cancel: ["Escape", "Tab"],
+      end: ["Space"],
+      up: ["ArrowUp"],
+      down: ["ArrowDown"],
+      left: ["ArrowLeft"],
+      right: ["ArrowRight"],
+    },
+  }),
+];
 
-const MOVE_ERROR_DESCRIPTIONS: Record<EditError, string> = {
-  PERIOD_FULL: `No puedes mover un curso a un periodo con ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
+const EDIT_ERROR_DESCRIPTIONS: Record<EditError, string> = {
+  PERIOD_FULL: `Un periodo no puede tener más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
   DUPLICATE_COURSE: "Este periodo ya tiene este curso.",
-  SUCCESSOR_IN_PERIOD: "Este periodo tiene un curso sucesor.",
-  PREREQUISITE_IN_PERIOD: "Este periodo tiene un curso prerequisito.",
-  SUCCESSOR_ON_THE_WAY: "Hay un curso sucesor en el camino.",
-  PREREQUISITE_ON_THE_WAY: "Hay un curso prerequisito en el camino.",
+  SUCCESSOR_IN_PERIOD: "Este periodo tiene un curso que lo requiere.",
+  PREREQUISITE_IN_PERIOD: "Este periodo tiene uno de sus prerrequisitos.",
+  SUCCESSOR_ON_THE_WAY: "Hay un curso que lo requiere en el camino.",
+  PREREQUISITE_ON_THE_WAY: "Hay uno de sus prerrequisitos en el camino.",
 };
 
-type TrajectoryBoardProps = {
-  editMode: boolean;
-  history: HistoryControls<PeriodWithEnrollments[]>;
-  entry: Entry;
-  areas: Area[];
-  courses: Map<number, ExtendedCourse>;
-  progress: TrajectoryProgress;
-  onSave: () => void;
-};
+type Gesture = { dragId: string; placement: Placement };
+type Hint = { courseId: number; missingIds: number[] };
 
-type OpenedCourse = {
-  course: ExtendedCourse;
-  color: string;
-};
+function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
+  if (revertedCount === 0) return { title };
+  return {
+    title,
+    description:
+      revertedCount === 1
+        ? "1 curso que lo requería volvió a pendiente."
+        : `${revertedCount} cursos que lo requerían volvieron a pendiente.`,
+    isShownOnDesktop: true,
+  };
+}
+
+function showEditError(title: string, error: EditError) {
+  toast.add({
+    type: "error",
+    title,
+    description: EDIT_ERROR_DESCRIPTIONS[error],
+  });
+}
 
 export default function TrajectoryBoard({
-  editMode,
-  history,
+  enrollments,
   entry,
-  areas,
-  courses,
-  progress,
-  onSave,
-}: TrajectoryBoardProps) {
-  const periods = history.present;
-  const [openedCourse, setOpenedCourse] = useState<OpenedCourse | null>(null);
-  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
-  const [isAddPeriodOpen, setIsAddPeriodOpen] = useState(false);
-  const [addEnrollmentPeriodId, setAddEnrollmentPeriodId] =
-    useState<PeriodKey | null>(null);
+  curriculum,
+  isEditing,
+  onChange,
+}: {
+  enrollments: Enrollment[];
+  entry: Entry;
+  curriculum: Curriculum;
+  isEditing: boolean;
+  onChange: (enrollments: Enrollment[], notice: ChangeNotice) => void;
+}) {
+  const isMobile = useIsMobile();
+  const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
+    useGridGesture();
+  const lastDragEndAt = useRef(Number.NEGATIVE_INFINITY);
+  const isDragging = useRef(false);
+  const [gesture, setGesture] = useState<Gesture | null>(null);
+  const [panelId, setPanelId] = useState<string | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const selectedId = isPanelOpen ? panelId : null;
+  const [addPlacement, setAddPlacement] = useState<Placement | null>(null);
+  const [shakingId, setShakingId] = useState<string | null>(null);
+  const [hint, setHint] = useState<Hint | null>(null);
+  const [isEntering, setIsEntering] = useState(true);
 
-  function handleAddEnrollment(periodId: PeriodKey, courseId: number) {
-    const course = courses.get(courseId);
-    if (!course) return;
+  const context = { entry, curriculum };
+  const courses = extendCourses(curriculum.courses);
+  const progress = getProgress(enrollments, courses);
 
-    const result = addEnrollment(periods, periodId, course);
-    if (result.error) {
-      const errorToast = ADD_ERROR_TOASTS[result.error];
-      if (errorToast) {
-        toast.add({ type: "error", ...errorToast });
-      }
+  const base = layOutTrajectory(enrollments, context);
+  const nextPeriod = getNextPeriod(base.periods);
+  const gesturePeriods = nextPeriod
+    ? [...base.periods, nextPeriod]
+    : base.periods;
+  const preview = gesture
+    ? moveEnrollment(enrollments, gesture.dragId, gesture.placement, context)
+    : null;
+  const shown = gesture
+    ? layOutTrajectory(
+        preview?.enrollments ?? enrollments,
+        context,
+        gesturePeriods,
+      )
+    : base;
+  const baseCardsById = new Map(base.cards.map((card) => [card.id, card]));
+  const draggedCard = gesture ? baseCardsById.get(gesture.dragId) : undefined;
+  const landing = gesture
+    ? preview?.error
+      ? draggedCard && {
+          column: shown.periods.indexOf(gesture.placement.period) + 1,
+          row: gesture.placement.row,
+          duration: draggedCard.duration,
+          height: draggedCard.height,
+        }
+      : shown.cards.find((card) => card.id === gesture.dragId)
+    : undefined;
+
+  const columns = shown.periods.length;
+  const rows = getRowCount(shown.cards);
+
+  const selected = shown.cards.find((card) => card.id === selectedId) ?? null;
+  const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
+  const startsNoConnection = new Set(
+    shown.cards
+      .filter(
+        (card) => card.enrollment.status === "FAILED" && card.id !== selectedId,
+      )
+      .map((card) => card.id),
+  );
+  const layoutCurriculum = toLayoutCurriculum(curriculum, shown, shown.cards);
+  const gestureCourseId = draggedCard?.courseId ?? hint?.courseId ?? null;
+
+  useEffect(() => {
+    const timeout = setTimeout(
+      () => setIsEntering(false),
+      ENTER_STAGGER_MS * base.periods.length + ENTER_MS,
+    );
+    return () => clearTimeout(timeout);
+  }, [base.periods.length]);
+
+  useEffect(() => {
+    if (shakingId === null) return;
+    const timeout = setTimeout(() => setShakingId(null), SHAKE_MS);
+    return () => clearTimeout(timeout);
+  }, [shakingId]);
+
+  useEffect(() => {
+    if (hint === null) return;
+    const timeout = setTimeout(() => setHint(null), HINT_MS);
+    return () => clearTimeout(timeout);
+  }, [hint]);
+
+  const emptyCells =
+    isMobile || !isEditing
+      ? []
+      : getEmptyCells(shown.cards, { rows, columns }).flatMap((cell) => {
+          const period = shown.periods[cell.column - 1];
+          return period ? [{ ...cell, period }] : [];
+        });
+  const periodEnds =
+    isMobile && isEditing
+      ? shown.periods.map((period, index) => ({
+          period,
+          column: index + 1,
+          row:
+            Math.max(
+              0,
+              ...shown.cards
+                .filter(
+                  (card) =>
+                    card.column <= index + 1 &&
+                    index + 1 < card.column + card.duration,
+                )
+                .map((card) => card.row + card.height - 1),
+            ) + 1,
+        }))
+      : [];
+
+  function getPeriodLabel(period: PeriodKey) {
+    const { label } = getPeriodInfo(period, entry);
+    return `${label} (${parsePeriodKey(period).year})`;
+  }
+
+  function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
+    const card = base.cards.find((card) => card.id === operation.source?.id);
+    const rect = operation.shape?.current.boundingRectangle;
+    const cell =
+      card &&
+      rect &&
+      getCellUnder(rect, {
+        columns: gesturePeriods.length,
+        duration: card.duration,
+      });
+    const period = cell && gesturePeriods[cell.column - 1];
+    return card && cell && period
+      ? { dragId: card.id, placement: { period, row: cell.row } }
+      : null;
+  }
+
+  function isSameGesture(next: Gesture) {
+    return (
+      gesture?.dragId === next.dragId &&
+      gesture.placement.period === next.placement.period &&
+      gesture.placement.row === next.placement.row
+    );
+  }
+
+  function openPanel(card: PlacedEnrollment) {
+    setPanelId(card.id);
+    setIsPanelOpen(true);
+  }
+
+  function toggleStatus(card: PlacedEnrollment) {
+    if (
+      isDragging.current ||
+      performance.now() - lastDragEndAt.current < DRAG_CLICK_MS
+    )
+      return;
+    const result = toggleEnrollmentStatus(enrollments, card.id, courses);
+    if (result.missingPrerequisiteIds) {
+      setShakingId(card.id);
+      setHint({
+        courseId: card.courseId,
+        missingIds: result.missingPrerequisiteIds,
+      });
+      return;
+    }
+    onChange(
+      result.enrollments,
+      getStatusNotice(
+        `${card.course.name} ${STATUS_LABELS[result.status]}`,
+        result.revertedCount,
+      ),
+    );
+  }
+
+  function handleDragEnd({ operation, canceled }: DragEndEvent) {
+    setGesture(null);
+    isDragging.current = false;
+    lastDragEndAt.current = performance.now();
+    const card = base.cards.find((card) => card.id === operation.source?.id);
+    if (!card) return;
+
+    const { activatorEvent, transform } = operation;
+    const isHoldWithoutMoving =
+      activatorEvent instanceof PointerEvent &&
+      activatorEvent.pointerType === "touch" &&
+      Math.hypot(transform.x, transform.y) < TOUCH_HOLD_TOLERANCE;
+    if (isHoldWithoutMoving && !canceled) {
+      openPanel(card);
       return;
     }
 
-    history.commit(result.periods);
-  }
-
-  function handleDragEnd({ source, destination }: DropResult) {
-    if (!destination) return;
+    const rect = operation.shape?.current.boundingRectangle;
+    if (rect) keepDropOrigin(card.id, rect);
+    const drop = getMove(operation);
+    if (canceled || !drop) return;
     if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
+      drop.placement.period === base.periods[card.column - 1] &&
+      drop.placement.row === card.row
     )
       return;
 
     const result = moveEnrollment(
-      periods,
-      { periodId: source.droppableId, index: source.index },
-      { periodId: destination.droppableId, index: destination.index },
-      courses,
+      enrollments,
+      card.id,
+      drop.placement,
+      context,
     );
     if (result.error) {
-      const title =
-        result.error === "PERIOD_FULL"
-          ? PERIOD_FULL_TOAST.title
-          : "Movimiento inválido";
-      toast.add({
-        type: "error",
-        title,
-        description: MOVE_ERROR_DESCRIPTIONS[result.error],
-      });
+      showEditError("No se puede mover el curso", result.error);
       return;
     }
+    onChange(result.enrollments, { title: `${card.course.name} movido` });
+  }
 
-    history.commit(result.periods);
+  function handleAdd(placement: Placement, course: Course) {
+    const result = addEnrollment(enrollments, course, placement, context);
+    if (result.error) {
+      showEditError("No se puede agregar el curso", result.error);
+      return;
+    }
+    onChange(result.enrollments, { title: `${course.name} agregado` });
   }
 
   return (
-    <>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <MotionDiv
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.05 } },
-          }}
-          initial="hidden"
-          animate="visible"
-          className="flex h-max min-h-fit flex-row space-x-2 p-4"
-        >
-          {periods.map((period) => (
-            <Droppable droppableId={period.id} key={period.id}>
-              {(provided) => (
-                <PeriodContainer
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  id={period.id}
-                  entry={entry}
-                >
-                  {period.enrollments.map((enrollment, index) => {
-                    const course = courses.get(enrollment.courseId);
-                    const color = course
-                      ? getCourseColor({ areas }, course)
-                      : DEFAULT_COURSE_COLOR;
-
-                    return (
-                      <Draggable
-                        key={enrollment.id}
-                        index={index}
-                        draggableId={enrollment.id}
-                        isDragDisabled={!editMode}
-                      >
-                        {(provided, snapshot) => (
-                          <li
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            className="mb-2 h-16 w-32 overflow-hidden rounded-md"
-                          >
-                            <EnrollmentCard
-                              enrollment={enrollment}
-                              course={course}
-                              color={color}
-                              isAvailable={
-                                !course || isAvailable(course, progress)
-                              }
-                              editMode={editMode}
-                              isDragging={snapshot.isDragging}
-                              onOpen={() => {
-                                if (!course) return;
-
-                                setOpenedCourse({ course, color });
-                                setIsCourseModalOpen(true);
-                              }}
-                              onStatusChange={(status) =>
-                                history.commit(
-                                  setEnrollmentStatus(
-                                    periods,
-                                    enrollment.id,
-                                    status,
-                                    courses,
-                                  ),
-                                )
-                              }
-                              onDelete={() =>
-                                history.commit(
-                                  removeEnrollment(periods, enrollment.id),
-                                )
-                              }
-                            />
-                          </li>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-
-                  {editMode && (
-                    <button
-                      type="button"
-                      className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        "flex h-16 w-full rounded-md border text-muted-foreground",
-                      )}
-                      onClick={() => setAddEnrollmentPeriodId(period.id)}
-                    >
-                      <Plus />
-                    </button>
-                  )}
-                </PeriodContainer>
-              )}
-            </Droppable>
-          ))}
-
-          {editMode && (
-            <button
-              type="button"
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "flex h-auto w-32 rounded-md border text-muted-foreground",
-              )}
-              onClick={() => setIsAddPeriodOpen(true)}
-            >
-              <Plus />
-            </button>
-          )}
-        </MotionDiv>
-
-        {editMode && (
-          <div className="absolute right-0 bottom-0 mb-1 w-full p-2 md:right-3 md:bottom-3 md:mb-0 md:size-fit md:p-0">
-            <div className="flex size-full items-center justify-between rounded-md bg-muted/75 p-2 md:p-0">
-              <Button
-                aria-label="Save Changes"
-                size="sm"
-                variant="outline"
-                className="bg-accent text-accent-foreground disabled:bg-transparent md:hidden"
-                disabled={!history.canUndo}
-                onClick={onSave}
-              >
-                <Save />
-                <span className="sr-only">Guardar</span>
-              </Button>
-
-              <div className="flex flex-row items-center rounded-md">
-                <Button
-                  aria-label="Undo Changes"
-                  size="icon"
-                  variant="ghost"
-                  className="w-10 rounded-r-none md:w-8"
-                  disabled={!history.canUndo}
-                  onClick={history.undo}
-                >
-                  <Undo2 />
-                </Button>
-                <Button
-                  aria-label="Redo Changes"
-                  size="icon"
-                  variant="ghost"
-                  className="w-10 rounded-l-none md:w-8"
-                  disabled={!history.canRedo}
-                  onClick={history.redo}
-                >
-                  <Undo2 className="-scale-x-100" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </DragDropContext>
-
-      <CourseModal
-        open={isCourseModalOpen}
-        onOpenChange={setIsCourseModalOpen}
-        course={openedCourse?.course ?? null}
-        color={openedCourse?.color ?? DEFAULT_COURSE_COLOR}
-        courses={courses}
-        progress={progress}
-      />
-
-      <AddEnrollmentDialog
-        periodId={addEnrollmentPeriodId}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) setAddEnrollmentPeriodId(null);
+    <DragDropProvider
+      sensors={sensors}
+      plugins={(defaults) => [
+        ...defaults,
+        Feedback.configure({ dropAnimation: null }),
+      ]}
+      onDragStart={() => {
+        isDragging.current = true;
+        setHint(null);
+      }}
+      onDragMove={({ operation }) => {
+        const next = getMove(operation);
+        if (next && !isSameGesture(next)) setGesture(next);
+      }}
+      onDragEnd={handleDragEnd}
+    >
+      <div
+        className="relative grid w-max"
+        style={{
+          gridTemplateColumns: `repeat(${columns + 1}, ${GRID_CELL_WIDTH}rem)`,
+          gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem)`,
+          gap: `${GRID_GAP}rem`,
         }}
-        courses={getAddableCourses(
-          courses,
-          periods.flatMap((p) => p.enrollments),
+      >
+        {shown.periods.map((period, index) => {
+          const { label, isCurrent } = getPeriodInfo(period, entry);
+          return (
+            <h2
+              key={period}
+              className={cn(
+                "truncate px-2 py-1 font-semibold text-muted-foreground text-xs",
+                isCurrent && "text-foreground",
+              )}
+              style={{ gridColumn: index + 1, gridRow: 1 }}
+            >
+              {label}
+              <span className="ml-1.5 font-normal tabular-nums opacity-70">
+                {parsePeriodKey(period).year}
+              </span>
+            </h2>
+          );
+        })}
+        <div
+          ref={firstCellRef}
+          aria-hidden
+          className="pointer-events-none"
+          style={{ gridColumn: 1, gridRow: HEADER_ROWS + 1 }}
+        />
+        {emptyCells.map(({ period, column, row }) => (
+          <AddButton
+            key={`${column}/${row}`}
+            label={`Agregar curso en ${getPeriodLabel(period)}, fila ${row}`}
+            revealOnHover
+            style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
+            onClick={() => setAddPlacement({ period, row })}
+          />
+        ))}
+        {periodEnds.map(({ period, column, row }) => (
+          <AddButton
+            key={period}
+            label={`Agregar curso en ${getPeriodLabel(period)}`}
+            style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
+            onClick={() => setAddPlacement({ period, row })}
+          />
+        ))}
+        {isEditing && nextPeriod && (
+          <AddButton
+            label="Agregar periodo"
+            style={{
+              gridColumn: columns + 1,
+              gridRow: isMobile
+                ? HEADER_ROWS + 1
+                : `${HEADER_ROWS + 1} / span ${rows}`,
+            }}
+            onClick={() => setAddPlacement({ period: nextPeriod, row: 1 })}
+          />
         )}
-        onAdd={handleAddEnrollment}
+        {!isEntering && (
+          <ConnectionsOverlay
+            curriculum={layoutCurriculum}
+            cards={shown.cards}
+            size={{ rows, columns }}
+            firstRow={HEADER_ROWS + 1}
+            gestureCourseId={gestureCourseId}
+            selectedCourseId={selected?.courseId ?? null}
+            isShown={(connection) =>
+              hint
+                ? connection.kind === "prerequisite" &&
+                  hint.missingIds.includes(connection.from.courseId)
+                : !startsNoConnection.has(connection.from.id)
+            }
+          />
+        )}
+        {shown.cards.map((shownCard) => {
+          const baseCard = baseCardsById.get(shownCard.id) ?? shownCard;
+          const card = shownCard.id === gesture?.dragId ? baseCard : shownCard;
+          return (
+            <EnrollmentCard
+              key={card.id}
+              dragId={card.id}
+              course={card.course}
+              curriculum={layoutCurriculum}
+              gestureCourseId={gestureCourseId}
+              color={getCourseColor(curriculum, card.course)}
+              status={card.enrollment.status}
+              isAvailable={isAvailable(card.course, progress)}
+              isEditing={isEditing}
+              isSelected={card.id === selectedId}
+              isShaking={card.id === shakingId}
+              isEntering={isEntering}
+              enterDelay={(card.column - 1) * ENTER_STAGGER_MS}
+              onSelect={() =>
+                isEditing ? toggleStatus(card) : openPanel(card)
+              }
+              onOpenPanel={() => openPanel(card)}
+              takeDropOrigin={() => takeDropOrigin(card.id)}
+              style={{
+                gridColumn: `${card.column} / span ${card.duration}`,
+                gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
+              }}
+            />
+          );
+        })}
+        {landing && (
+          <div
+            aria-hidden
+            className={cn(
+              "pointer-events-none z-10 rounded-lg",
+              preview?.error ? "bg-destructive/15" : "bg-primary/10",
+            )}
+            style={{
+              gridColumn: `${landing.column} / span ${landing.duration}`,
+              gridRow: `${HEADER_ROWS + landing.row} / span ${landing.height}`,
+            }}
+          />
+        )}
+      </div>
+      <AddEnrollmentDialog
+        placement={addPlacement}
+        periodLabel={addPlacement ? getPeriodLabel(addPlacement.period) : ""}
+        courses={getAddableCourses(courses, enrollments)}
+        onOpenChange={(open) => {
+          if (!open) setAddPlacement(null);
+        }}
+        onAdd={handleAdd}
       />
-
-      <AddPeriodDialog
-        open={isAddPeriodOpen}
-        onOpenChange={setIsAddPeriodOpen}
-        onAdd={(year, term) =>
-          history.commit(addPeriod(periods, { year, term }))
+      <CoursePanel
+        open={isPanelOpen && panelCard !== null}
+        enrollment={panelCard?.enrollment ?? null}
+        course={panelCard?.course ?? null}
+        curriculum={curriculum}
+        progress={progress}
+        isAvailable={
+          panelCard !== null && isAvailable(panelCard.course, progress)
         }
-        periods={periods}
+        isEditing={isEditing}
+        onOpenChange={setIsPanelOpen}
+        onSetStatus={(status) => {
+          if (!panelCard) return;
+          const result = setEnrollmentStatus(
+            enrollments,
+            panelCard.id,
+            status,
+            courses,
+          );
+          setIsPanelOpen(false);
+          onChange(
+            result.enrollments,
+            getStatusNotice(
+              `${panelCard.course.name} ${STATUS_LABELS[status]}`,
+              result.revertedCount,
+            ),
+          );
+        }}
+        onRemove={() => {
+          if (!panelCard) return;
+          setIsPanelOpen(false);
+          onChange(removeEnrollment(enrollments, panelCard.id), {
+            title: `${panelCard.course.name} quitado`,
+          });
+        }}
       />
-    </>
+    </DragDropProvider>
   );
 }

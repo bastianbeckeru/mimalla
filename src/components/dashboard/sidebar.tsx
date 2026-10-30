@@ -1,7 +1,9 @@
 "use client";
 
+import { PanelLeft } from "lucide-react";
 import SettingsDialog from "@/components/dashboard/settings-dialog";
 import Logo from "@/components/logo";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   Sidebar,
@@ -12,16 +14,12 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useTrajectoryStore } from "@/stores/trajectory";
-import type { Area } from "@/types/builder";
-import { getLuminance, parseHexColor } from "@/utils/colors";
 
 type DashboardSidebarProps = {
-  areas: Area[];
   stats: {
     progress: number;
     approvedCourses: number;
@@ -32,75 +30,50 @@ type DashboardSidebarProps = {
 };
 
 export default function DashboardSidebar({
-  areas,
   stats,
   onReset,
 }: DashboardSidebarProps) {
+  const { toggleSidebar } = useSidebar();
   const removeActiveTrajectory = useTrajectoryStore(
     (state) => state.removeActiveTrajectory,
   );
   const { progress, approvedCourses, totalCourses, approvedCredits } = stats;
-  const mainAreas = areas.toSorted(
-    (a, b) =>
-      getLuminance(parseHexColor(a.color)) -
-      getLuminance(parseHexColor(b.color)),
-  );
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="flex h-14 justify-center border-b">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              render={<Logo alwaysShow />}
-              className="group-data-[collapsible=icon]:!p-1 [&>svg]:size-6"
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+    <Sidebar>
+      <SidebarHeader className="p-0">
+        <div className="flex h-14 items-center justify-between border-sidebar-border border-b px-4">
+          <Logo alwaysShow className="[&_span]:text-base [&_svg]:size-6" />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Ocultar barra lateral"
+            className="text-sidebar-muted-foreground"
+            onClick={toggleSidebar}
+          >
+            <PanelLeft />
+          </Button>
+        </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2 text-sm">
-        <SidebarGroup>
-          <SidebarGroupLabel>Progreso</SidebarGroupLabel>
-          <SidebarGroupContent className="space-y-2">
+      <SidebarContent>
+        <SidebarGroup className="px-4 py-3">
+          <SidebarGroupLabel className="px-0 text-sidebar-muted-foreground">
+            Progreso
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="space-y-2 text-sm">
             <Progress value={progress} />
-            <div className="flex flex-row justify-between space-x-2">
+            <div className="flex justify-between gap-2 text-sidebar-muted-foreground tabular-nums">
               <p>
-                {approvedCourses}/{totalCourses}
+                {approvedCourses}/{totalCourses} cursos
               </p>
-              <p>
-                {approvedCredits}
-                {" créditos"}
-              </p>
+              <p>{approvedCredits} créditos</p>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <SidebarSeparator />
-        {mainAreas.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Áreas de Formación</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <ul>
-                {mainAreas.map((area) => (
-                  <li
-                    key={area.id}
-                    className="flex w-full flex-row items-center space-x-2"
-                  >
-                    <div
-                      className="size-4 shrink-0 rounded-xs shadow-inner"
-                      style={{ backgroundColor: area.color }}
-                    />
-                    <span className="line-clamp-1">{area.name}</span>
-                  </li>
-                ))}
-              </ul>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-sidebar-border border-t p-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SettingsDialog

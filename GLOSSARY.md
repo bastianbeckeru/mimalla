@@ -118,12 +118,51 @@ _Avoid_: Régimen, calendar
 A first or second semester term. Winter and summer terms are not semesters and do not count toward the semester number.
 
 **Enrollment**:
-A course placed in a period of a trajectory, with its status. The same elective can have several enrollments.
+A course placed in a period of a trajectory, with its status and its grading scheme. The same elective can have several enrollments, and a failed course retaken later gets a new enrollment.
 _Avoid_: Enrolled course, inscripción
 
 **Status**:
-Where an enrollment stands: pending, approved or failed.
+Where an enrollment stands: pending, approved or failed. The student sets it; a course grade only suggests it.
 
 **Available**:
 Said of a course whose prerequisites are all approved and whose required credits are reached.
 _Avoid_: Unlocked, enabled
+
+## Grades
+
+**Grade**:
+A mark the student obtained in an assessment, on the trajectory's grading scale. Shown in the UI as "nota".
+_Avoid_: Score, mark, calificación (in code)
+
+**Grading scale**:
+The lowest and highest grades of a trajectory and the passing grade, 1.0 to 7.0 passing at 4.0 by default.
+_Avoid_: Grade range
+
+**Assessment**:
+Something that counts toward an enrollment's course grade, with a weight within its parent. It is either a single test that takes a grade, such as an exam, or a group of assessments whose grade is the weighted average of their grades, possibly dropping the lowest ones, such as all the controles. Shown in the UI as "evaluación".
+_Avoid_: Evaluation, test, item
+
+**Weight**:
+The share of its parent's grade an assessment counts for, as a percentage. When a group sets no weights, its assessments count equally.
+_Avoid_: Ponderación (in code), percentage
+
+**Grading scheme**:
+The tree of assessments of one enrollment, at most three levels deep.
+_Avoid_: Syllabus, rubric, evaluation plan
+
+**Course grade**:
+The grade of an enrollment, rounded to one decimal. The student can enter it directly, such as for a course whose assessments they no longer remember, and then it prevails; otherwise it is computed from the grading scheme once every assessment has a grade.
+_Avoid_: Final grade, nota final (in code)
+
+**Partial average**:
+The weighted average of the assessments of an enrollment that already have a grade, while others are still missing.
+_Avoid_: Current grade, running average
+
+**Required grade**:
+The grade the student needs in every assessment still missing to reach the passing grade.
+_Avoid_: Target grade, needed grade
+
+**Cumulative average**:
+The average of the course grades of every approved and failed enrollment of a trajectory, weighted by credits. Each attempt at a course counts.
+_Avoid_: GPA, PPA, global average
+

@@ -1,7 +1,14 @@
 "use client";
 
 import { cn } from "cn";
-import { type CSSProperties, type ReactNode, type Ref, useEffect } from "react";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+  useEffect,
+} from "react";
 import { getTextColor } from "@/builder/colors";
 import { getConnectionRole } from "@/builder/connections";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
@@ -15,11 +22,15 @@ export default function CourseCard({
   color,
   isSelected,
   onSelect,
+  onContextMenu,
+  onKeyDown,
+  label,
   style,
   className,
   cellRef,
   buttonRef,
   surfaceRef,
+  decoration,
   children,
 }: {
   course: Course;
@@ -28,11 +39,15 @@ export default function CourseCard({
   color: HexColor;
   isSelected: boolean;
   onSelect: () => void;
+  onContextMenu?: (event: MouseEvent<HTMLButtonElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  label?: string;
   style: CSSProperties;
   className?: string;
   cellRef?: Ref<HTMLDivElement>;
   buttonRef?: Ref<HTMLButtonElement>;
   surfaceRef?: Ref<HTMLSpanElement>;
+  decoration?: ReactNode;
   children?: ReactNode;
 }) {
   const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
@@ -61,6 +76,7 @@ export default function CourseCard({
         ref={buttonRef}
         type="button"
         aria-pressed={isSelected}
+        aria-label={label}
         onFocus={(event) => {
           if (event.target.matches(":focus-visible"))
             focusByKeyboard(course.id);
@@ -71,6 +87,8 @@ export default function CourseCard({
           className,
         )}
         onClick={onSelect}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
       >
         {/* The card's painted body, kept apart from the text so it can be
             clipped to animate a change of size. */}
@@ -88,6 +106,7 @@ export default function CourseCard({
         <span className="flex size-full items-center justify-center overflow-hidden">
           <span className="line-clamp-3 font-medium">{course.name}</span>
         </span>
+        {decoration}
         {/* Dims the card while the connections shown leave it out. A veil
             over it, rather than fading it, keeps the connections running
             beneath from showing through. */}

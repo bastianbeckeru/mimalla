@@ -28,7 +28,13 @@ export type TrajectoryProgress = {
   approvedCredits: number;
 };
 
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: Enrollment[];
+export type Placement = {
+  period: PeriodKey;
+  row: number;
+};
+
+export type ChangeNotice = {
+  title: string;
+  description?: string;
+  isShownOnDesktop?: boolean;
 };
