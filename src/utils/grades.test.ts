@@ -2,11 +2,15 @@ import { describe, expect, test } from "bun:test";
 import type { Assessment, Enrollment } from "@/types/trajectory";
 import {
   DEFAULT_GRADING_SCALE,
+  formatGrade,
+  getAssessmentGrade,
   getComputedGrade,
   getCourseGrade,
+  getCumulativeAverage,
   getPartialAverage,
   getRequiredGrade,
   getSchemeDepth,
+  parseGrade,
   roundGrade,
 } from "@/utils/grades";
 
@@ -224,5 +228,72 @@ describe("getSchemeDepth", () => {
   test("counts the levels below the course", () => {
     expect(getSchemeDepth([])).toBe(0);
     expect(getSchemeDepth([single(4), group([group([single(4)])])])).toBe(3);
+  });
+});
+
+describe("getCumulativeAverage", () => {
+  const courses = new Map([
+    [1, { credits: 10 }],
+    [2, { credits: 5 }],
+  ]);
+
+  test("weighs course grades by credits, counting every finished attempt", () => {
+    const enrollments = [
+      enrollment({ id: "e1", courseId: 1, status: "FAILED", courseGrade: 3 }),
+      enrollment({ id: "e2", courseId: 1, status: "APPROVED", courseGrade: 5 }),
+      enrollment({ id: "e3", courseId: 2, status: "APPROVED", courseGrade: 6 }),
+    ];
+
+    expect(getCumulativeAverage(enrollments, courses, scale)).toBe(
+      (3 * 10 + 5 * 10 + 6 * 5) / 25,
+    );
+  });
+
+  test("leaves out pending enrollments and those without a course grade", () => {
+    const enrollments = [
+      enrollment({ id: "e1", courseId: 1, status: "PENDING", courseGrade: 7 }),
+      enrollment({ id: "e2", courseId: 1, status: "APPROVED" }),
+      enrollment({ id: "e3", courseId: 2, status: "APPROVED", courseGrade: 6 }),
+    ];
+
+    expect(getCumulativeAverage(enrollments, courses, scale)).toBe(6);
+  });
+
+  test("is missing without finished course grades", () => {
+    expect(getCumulativeAverage([], courses, scale)).toBeNull();
+  });
+});
+
+describe("parseGrade", () => {
+  test("reads a decimal comma or point", () => {
+    expect(parseGrade("5,5")).toBe(5.5);
+    expect(parseGrade(" 4.25 ")).toBe(4.25);
+  });
+
+  test("keeps two decimals", () => {
+    expect(parseGrade("4,567")).toBe(4.57);
+  });
+
+  test("tells an empty text from one that is not a number", () => {
+    expect(parseGrade("")).toBeNull();
+    expect(parseGrade("abc")).toBeNaN();
+  });
+});
+
+describe("formatGrade", () => {
+  test("writes at least one decimal with a comma", () => {
+    expect(formatGrade(5)).toBe("5,0");
+    expect(formatGrade(4.25)).toBe("4,25");
+  });
+});
+
+describe("getAssessmentGrade", () => {
+  test("tells a group's partial grade apart from its complete one", () => {
+    expect(getAssessmentGrade(group([single(5), single(null)]), scale)).toEqual(
+      { grade: 5, isPartial: true },
+    );
+    expect(
+      getAssessmentGrade(group([single(2), single(6)], null, 1), scale),
+    ).toEqual({ grade: 6, isPartial: false });
   });
 });

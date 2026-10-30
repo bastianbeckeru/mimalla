@@ -58,6 +58,12 @@ export type Trajectory = {
   enrollments: Enrollment[];
 };
 
+// What the student changes in a trajectory, and what undo brings back.
+export type TrajectoryContent = Pick<
+  Trajectory,
+  "enrollments" | "gradingScale"
+>;
+
 export type TrajectoryProgress = {
   approvedCourseIds: Set<number>;
   approvedCredits: number;

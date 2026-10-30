@@ -89,6 +89,17 @@ export function getRequiredGrade(
   }
 }
 
+// An assessment's grade so far: complete once it has every grade, partial
+// while a group still misses some.
+export function getAssessmentGrade(
+  assessment: Assessment,
+  scale: GradingScale,
+): { grade: number; isPartial: boolean } | null {
+  const partial = getAssessmentPartial(assessment, getValidGrade(scale));
+  if (partial.average === null) return null;
+  return { grade: partial.average, isPartial: partial.coverage < 1 };
+}
+
 function getValidGrade(scale: GradingScale): GradeOf {
   return ({ grade }) =>
     grade !== null && isValidGrade(grade, scale) ? grade : null;
@@ -109,7 +120,7 @@ function getCounted(assessments: Assessment[]) {
 }
 
 // Assessments without a weight share equally what the weighted ones leave.
-function getWeights(assessments: Assessment[]) {
+export function getWeights(assessments: Assessment[]) {
   const weighted = assessments.reduce(
     (sum, { weight }) => sum + (weight ?? 0),
     0,
@@ -205,4 +216,41 @@ function getAssessmentPartial(assessment: Assessment, gradeOf: GradeOf) {
   return grade === null
     ? getPartial(assessment.assessments, gradeOf)
     : { coverage: 1, average: grade };
+}
+
+// Every attempt that ended, approved or failed, counts by its credits.
+export function getCumulativeAverage(
+  enrollments: Enrollment[],
+  courses: Map<number, { credits: number }>,
+  scale: GradingScale,
+) {
+  let credits = 0;
+  let sum = 0;
+  for (const enrollment of enrollments) {
+    if (enrollment.status === "PENDING") continue;
+    const grade = getCourseGrade(enrollment, scale);
+    const course = courses.get(enrollment.courseId);
+    if (grade === null || !course) continue;
+    credits += course.credits;
+    sum += grade * course.credits;
+  }
+  return credits > 0 ? sum / credits : null;
+}
+
+const gradeFormat = new Intl.NumberFormat("es-CL", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+});
+
+export function formatGrade(grade: number) {
+  return gradeFormat.format(grade);
+}
+
+// Reads a grade written with a decimal comma or point, keeping two decimals.
+// Returns null for an empty text and NaN for one that is not a number.
+export function parseGrade(text: string) {
+  const trimmed = text.trim().replace(",", ".");
+  if (trimmed === "") return null;
+  const grade = Number(trimmed);
+  return Number.isFinite(grade) ? Math.round(grade * 100) / 100 : Number.NaN;
 }

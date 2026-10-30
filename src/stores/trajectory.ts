@@ -4,7 +4,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { LEGACY_CURRICULUMS } from "@/stores/legacy-curriculums";
 import type { Curriculum } from "@/types/builder";
-import type { Enrollment, Entry, Trajectory } from "@/types/trajectory";
+import type {
+  Enrollment,
+  Entry,
+  Trajectory,
+  TrajectoryContent,
+} from "@/types/trajectory";
 import { getCurriculumPath } from "@/utils/curriculum";
 import { DEFAULT_GRADING_SCALE } from "@/utils/grades";
 import { createEnrollments } from "@/utils/trajectory";
@@ -21,7 +26,7 @@ type TrajectoryActions = {
     curriculum: Curriculum;
   }) => void;
   removeActiveTrajectory: () => void;
-  updateActiveEnrollments: (enrollments: Enrollment[]) => void;
+  updateActiveTrajectory: (content: TrajectoryContent) => void;
 };
 
 // Before version 4, trajectories had no grading scale.
@@ -136,10 +141,10 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
           };
         }),
 
-      updateActiveEnrollments: (enrollments) =>
+      updateActiveTrajectory: (content) =>
         set((state) => ({
           trajectories: state.trajectories.map((t) =>
-            t.id === state.activeTrajectoryId ? { ...t, enrollments } : t,
+            t.id === state.activeTrajectoryId ? { ...t, ...content } : t,
           ),
         })),
     }),
