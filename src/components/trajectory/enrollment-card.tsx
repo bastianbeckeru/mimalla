@@ -6,7 +6,7 @@ import type { ComponentProps } from "react";
 import DraggableCourseCard from "@/components/builder/course-card";
 import type { EnrollmentStatus } from "@/types/trajectory";
 
-const STATUS_LABELS: Record<EnrollmentStatus, string> = {
+export const STATUS_LABELS: Record<EnrollmentStatus, string> = {
   PENDING: "pendiente",
   APPROVED: "aprobado",
   FAILED: "reprobado",
@@ -15,6 +15,7 @@ const STATUS_LABELS: Record<EnrollmentStatus, string> = {
 export default function EnrollmentCard({
   status,
   isAvailable,
+  isEditing,
   isShaking,
   isEntering,
   enterDelay,
@@ -22,10 +23,16 @@ export default function EnrollmentCard({
   ...props
 }: Omit<
   ComponentProps<typeof DraggableCourseCard>,
-  "className" | "decoration" | "label" | "onContextMenu" | "onKeyDown"
+  | "className"
+  | "decoration"
+  | "isDragDisabled"
+  | "label"
+  | "onContextMenu"
+  | "onKeyDown"
 > & {
   status: EnrollmentStatus;
   isAvailable: boolean;
+  isEditing: boolean;
   isShaking: boolean;
   isEntering: boolean;
   enterDelay: number;
@@ -34,6 +41,7 @@ export default function EnrollmentCard({
   return (
     <DraggableCourseCard
       {...props}
+      isDragDisabled={!isEditing}
       label={`${props.course.name}, ${STATUS_LABELS[status]}`}
       className={cn(
         "touch-manipulation select-none [-webkit-touch-callout:none]",
@@ -64,14 +72,16 @@ export default function EnrollmentCard({
       }}
       decoration={status !== "PENDING" && <StrikeLine status={status} />}
     >
-      <button
-        type="button"
-        aria-label={`Opciones de ${props.course.name}`}
-        className="absolute top-1 right-1 hidden size-6 items-center justify-center rounded-md bg-background/80 text-foreground opacity-0 shadow-sm transition-opacity duration-150 ease-out hover:bg-background focus-visible:opacity-100 group-hover/card:opacity-100 md:flex"
-        onClick={() => onOpenPanel()}
-      >
-        <Ellipsis className="size-4" />
-      </button>
+      {isEditing && (
+        <button
+          type="button"
+          aria-label={`Opciones de ${props.course.name}`}
+          className="absolute top-1 right-1 hidden size-6 items-center justify-center rounded-md bg-background/80 text-foreground opacity-0 shadow-sm transition-opacity duration-150 ease-out hover:bg-background focus-visible:opacity-100 group-hover/card:opacity-100 md:flex"
+          onClick={() => onOpenPanel()}
+        >
+          <Ellipsis className="size-4" />
+        </button>
+      )}
     </DraggableCourseCard>
   );
 }

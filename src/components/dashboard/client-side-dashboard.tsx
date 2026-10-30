@@ -1,7 +1,7 @@
 "use client";
 
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { Loader2, Redo2, Undo2 } from "lucide-react";
+import { Check, Loader2, Pencil, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AreasLegend from "@/components/curriculum/areas-legend";
 import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
@@ -56,6 +56,7 @@ export default function ClientSideDashboard({
     (state) => state.removeActiveTrajectory,
   );
   const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
+  const [importedId, setImportedId] = useState<string | null>(null);
 
   const activePath = activeTrajectory?.curriculumPath;
   const loadedPath = loaded?.path;
@@ -84,7 +85,10 @@ export default function ClientSideDashboard({
     return (
       <NewTrajectoryForm
         catalog={catalog}
-        onImport={(path, curriculum) => setLoaded({ path, curriculum })}
+        onImport={(path, curriculum) => {
+          setLoaded({ path, curriculum });
+          setImportedId(useTrajectoryStore.getState().activeTrajectoryId);
+        }}
       />
     );
   }
@@ -107,6 +111,7 @@ export default function ClientSideDashboard({
       key={activeTrajectory.id}
       trajectory={activeTrajectory}
       curriculum={loaded.curriculum}
+      isNew={activeTrajectory.id === importedId}
     />
   );
 }
@@ -125,10 +130,15 @@ function SidebarOpener() {
 function TrajectoryDashboard({
   trajectory,
   curriculum,
+  isNew,
 }: {
   trajectory: Trajectory;
   curriculum: Curriculum;
+  isNew: boolean;
 }) {
+  // A new trajectory starts in edit mode so the student can mark what they
+  // have already passed; afterwards the dashboard opens for tracking.
+  const [isEditing, setIsEditing] = useState(isNew);
   const updateActiveEnrollments = useTrajectoryStore(
     (state) => state.updateActiveEnrollments,
   );
@@ -216,6 +226,15 @@ function TrajectoryDashboard({
             >
               <Redo2 />
             </Button>
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              size="sm"
+              className="ml-1"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? <Check /> : <Pencil />}
+              {isEditing ? "Listo" : "Editar malla"}
+            </Button>
           </div>
         </header>
         <Progress
@@ -230,6 +249,7 @@ function TrajectoryDashboard({
             enrollments={enrollments}
             entry={trajectory.entry}
             curriculum={curriculum}
+            isEditing={isEditing}
             onChange={commit}
           />
         </section>

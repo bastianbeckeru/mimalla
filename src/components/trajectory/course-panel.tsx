@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Trash2, X } from "lucide-react";
+import { Check, RotateCcw, Trash2, X } from "lucide-react";
 import { getCourseColor } from "@/builder/colors";
 import {
   AdaptiveDialog,
@@ -13,7 +13,11 @@ import {
 } from "@/components/ui/adaptive-dialog";
 import { Button } from "@/components/ui/button";
 import type { Course, Curriculum } from "@/types/builder";
-import type { Enrollment, TrajectoryProgress } from "@/types/trajectory";
+import type {
+  Enrollment,
+  EnrollmentStatus,
+  TrajectoryProgress,
+} from "@/types/trajectory";
 
 export default function CoursePanel({
   open,
@@ -21,8 +25,10 @@ export default function CoursePanel({
   course,
   curriculum,
   progress,
+  isAvailable,
+  isEditing,
   onOpenChange,
-  onFail,
+  onSetStatus,
   onRemove,
 }: {
   open: boolean;
@@ -30,8 +36,10 @@ export default function CoursePanel({
   course: Course | null;
   curriculum: Curriculum;
   progress: TrajectoryProgress;
+  isAvailable: boolean;
+  isEditing: boolean;
   onOpenChange: (open: boolean) => void;
-  onFail: () => void;
+  onSetStatus: (status: EnrollmentStatus) => void;
   onRemove: () => void;
 }) {
   const area = curriculum.areas.find(({ id }) => id === course?.areaId);
@@ -97,18 +105,36 @@ export default function CoursePanel({
               </dl>
             </AdaptiveDialogBody>
             <AdaptiveDialogFooter>
-              <Button
-                variant="outline"
-                disabled={enrollment.status === "FAILED"}
-                onClick={onFail}
-              >
-                <X />
-                Marcar como reprobado
-              </Button>
-              <Button variant="destructive" onClick={onRemove}>
-                <Trash2 />
-                Quitar curso
-              </Button>
+              {enrollment.status !== "PENDING" && (
+                <Button
+                  variant="outline"
+                  onClick={() => onSetStatus("PENDING")}
+                >
+                  <RotateCcw />
+                  Volver a pendiente
+                </Button>
+              )}
+              {enrollment.status !== "FAILED" && (
+                <Button variant="outline" onClick={() => onSetStatus("FAILED")}>
+                  <X />
+                  Marcar como reprobado
+                </Button>
+              )}
+              {enrollment.status !== "APPROVED" && (
+                <Button
+                  disabled={!isAvailable}
+                  onClick={() => onSetStatus("APPROVED")}
+                >
+                  <Check />
+                  Marcar como aprobado
+                </Button>
+              )}
+              {isEditing && (
+                <Button variant="destructive" onClick={onRemove}>
+                  <Trash2 />
+                  Quitar curso
+                </Button>
+              )}
             </AdaptiveDialogFooter>
           </>
         )}

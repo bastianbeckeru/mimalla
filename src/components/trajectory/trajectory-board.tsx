@@ -16,7 +16,9 @@ import AddButton from "@/components/builder/add-button";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
 import CoursePanel from "@/components/trajectory/course-panel";
-import EnrollmentCard from "@/components/trajectory/enrollment-card";
+import EnrollmentCard, {
+  STATUS_LABELS,
+} from "@/components/trajectory/enrollment-card";
 import { toast } from "@/components/ui/toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Course, Curriculum } from "@/types/builder";
@@ -134,11 +136,13 @@ export default function TrajectoryBoard({
   enrollments,
   entry,
   curriculum,
+  isEditing,
   onChange,
 }: {
   enrollments: Enrollment[];
   entry: Entry;
   curriculum: Curriculum;
+  isEditing: boolean;
   onChange: (enrollments: Enrollment[], notice: ChangeNotice) => void;
 }) {
   const isMobile = useIsMobile();
@@ -239,34 +243,36 @@ export default function TrajectoryBoard({
       ).flat(),
     ),
   );
-  const emptyCells = isMobile
-    ? []
-    : Array.from({ length: rows }, (_, rowIndex) =>
-        shown.periods.map((period, columnIndex) => ({
+  const emptyCells =
+    isMobile || !isEditing
+      ? []
+      : Array.from({ length: rows }, (_, rowIndex) =>
+          shown.periods.map((period, columnIndex) => ({
+            period,
+            column: columnIndex + 1,
+            row: rowIndex + 1,
+          })),
+        )
+          .flat()
+          .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
+  const periodEnds =
+    isMobile && isEditing
+      ? shown.periods.map((period, index) => ({
           period,
-          column: columnIndex + 1,
-          row: rowIndex + 1,
-        })),
-      )
-        .flat()
-        .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
-  const periodEnds = isMobile
-    ? shown.periods.map((period, index) => ({
-        period,
-        column: index + 1,
-        row:
-          Math.max(
-            0,
-            ...shown.cards
-              .filter(
-                (card) =>
-                  card.column <= index + 1 &&
-                  index + 1 < card.column + card.duration,
-              )
-              .map((card) => card.row + card.height - 1),
-          ) + 1,
-      }))
-    : [];
+          column: index + 1,
+          row:
+            Math.max(
+              0,
+              ...shown.cards
+                .filter(
+                  (card) =>
+                    card.column <= index + 1 &&
+                    index + 1 < card.column + card.duration,
+                )
+                .map((card) => card.row + card.height - 1),
+            ) + 1,
+        }))
+      : [];
 
   function getPeriodLabel(period: PeriodKey) {
     const { label } = getPeriodInfo(period, entry);
@@ -334,7 +340,7 @@ export default function TrajectoryBoard({
     onChange(
       result.enrollments,
       getStatusNotice(
-        `${card.course.name} ${result.status === "APPROVED" ? "aprobado" : "pendiente"}`,
+        `${card.course.name} ${STATUS_LABELS[result.status]}`,
         result.revertedCount,
       ),
     );
@@ -463,7 +469,7 @@ export default function TrajectoryBoard({
             onClick={() => setAddPlacement({ period, row })}
           />
         ))}
-        {nextPeriod && (
+        {isEditing && nextPeriod && (
           <AddButton
             label="Agregar periodo"
             style={{
@@ -504,11 +510,14 @@ export default function TrajectoryBoard({
               color={getCourseColor(curriculum, card.course)}
               status={card.enrollment.status}
               isAvailable={isAvailable(card.course, progress)}
+              isEditing={isEditing}
               isSelected={card.id === selectedId}
               isShaking={card.id === shakingId}
               isEntering={isEntering}
               enterDelay={(card.column - 1) * ENTER_STAGGER_MS}
-              onSelect={() => toggleStatus(card)}
+              onSelect={() =>
+                isEditing ? toggleStatus(card) : openPanel(card)
+              }
               onOpenPanel={() => openPanel(card)}
               takeDropOrigin={() => takeDropOrigin(card.id)}
               style={{
@@ -547,20 +556,24 @@ export default function TrajectoryBoard({
         course={panelCard?.course ?? null}
         curriculum={curriculum}
         progress={progress}
+        isAvailable={
+          panelCard !== null && isAvailable(panelCard.course, progress)
+        }
+        isEditing={isEditing}
         onOpenChange={setIsPanelOpen}
-        onFail={() => {
+        onSetStatus={(status) => {
           if (!panelCard) return;
           const result = setEnrollmentStatus(
             enrollments,
             panelCard.id,
-            "FAILED",
+            status,
             courses,
           );
           setIsPanelOpen(false);
           onChange(
             result.enrollments,
             getStatusNotice(
-              `${panelCard.course.name} reprobado`,
+              `${panelCard.course.name} ${STATUS_LABELS[status]}`,
               result.revertedCount,
             ),
           );
