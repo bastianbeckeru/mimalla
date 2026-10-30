@@ -20,6 +20,7 @@ import EnrollmentCard, {
   STATUS_LABELS,
 } from "@/components/trajectory/enrollment-card";
 import { toast } from "@/components/ui/toast";
+import { useGridGesture } from "@/hooks/use-grid-gesture";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Course, Curriculum } from "@/types/builder";
 import type { PeriodKey } from "@/types/curriculum";
@@ -34,6 +35,9 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
+  getEmptyCells,
+  getRowCount,
+  HEADER_ROWS,
 } from "@/utils/curriculum-grid";
 import { parsePeriodKey } from "@/utils/period-key";
 import {
@@ -54,9 +58,6 @@ import {
   toLayoutCurriculum,
 } from "@/utils/trajectory";
 
-const MIN_ROWS = 6;
-const HEADER_ROWS = 1;
-const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
 const TOUCH_HOLD_MS = 300;
 const TOUCH_HOLD_TOLERANCE = 8;
@@ -146,10 +147,8 @@ export default function TrajectoryBoard({
   onChange: (enrollments: Enrollment[], notice: ChangeNotice) => void;
 }) {
   const isMobile = useIsMobile();
-  const firstCellRef = useRef<HTMLDivElement>(null);
-  const dropOrigin = useRef<{ dragId: string; x: number; y: number } | null>(
-    null,
-  );
+  const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
+    useGridGesture();
   const lastDragEndAt = useRef(Number.NEGATIVE_INFINITY);
   const isDragging = useRef(false);
   const [gesture, setGesture] = useState<Gesture | null>(null);
@@ -194,11 +193,7 @@ export default function TrajectoryBoard({
     : undefined;
 
   const columns = shown.periods.length;
-  const rows =
-    Math.max(
-      MIN_ROWS,
-      ...shown.cards.map((card) => card.row + card.height - 1),
-    ) + SPARE_ROWS;
+  const rows = getRowCount(shown.cards);
 
   const selected = shown.cards.find((card) => card.id === selectedId) ?? null;
   const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
@@ -232,29 +227,13 @@ export default function TrajectoryBoard({
     return () => clearTimeout(timeout);
   }, [hint]);
 
-  const occupied = new Set(
-    shown.cards.flatMap((card) =>
-      Array.from({ length: card.height }, (_, rowOffset) =>
-        Array.from(
-          { length: card.duration },
-          (_, columnOffset) =>
-            `${card.column + columnOffset}/${card.row + rowOffset}`,
-        ),
-      ).flat(),
-    ),
-  );
   const emptyCells =
     isMobile || !isEditing
       ? []
-      : Array.from({ length: rows }, (_, rowIndex) =>
-          shown.periods.map((period, columnIndex) => ({
-            period,
-            column: columnIndex + 1,
-            row: rowIndex + 1,
-          })),
-        )
-          .flat()
-          .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
+      : getEmptyCells(shown.cards, { rows, columns }).flatMap((cell) => {
+          const period = shown.periods[cell.column - 1];
+          return period ? [{ ...cell, period }] : [];
+        });
   const periodEnds =
     isMobile && isEditing
       ? shown.periods.map((period, index) => ({
@@ -279,34 +258,20 @@ export default function TrajectoryBoard({
     return `${label} (${parsePeriodKey(period).year})`;
   }
 
-  function getPlacementAt(
-    left: number,
-    top: number,
-    duration: number,
-  ): Placement | null {
-    const firstCell = firstCellRef.current?.getBoundingClientRect();
-    if (!firstCell) return null;
-    const rootFontSize = Number.parseFloat(
-      getComputedStyle(document.documentElement).fontSize,
-    );
-    const gap = GRID_GAP * rootFontSize;
-    const column = Math.round(
-      (left - firstCell.left) / (firstCell.width + gap),
-    );
-    const row = Math.round((top - firstCell.top) / (firstCell.height + gap));
-    const period =
-      gesturePeriods[
-        Math.min(Math.max(column, 0), gesturePeriods.length - duration)
-      ];
-    return period ? { period, row: Math.max(row, 0) + 1 } : null;
-  }
-
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
     const card = base.cards.find((card) => card.id === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
-    const placement =
-      card && rect && getPlacementAt(rect.left, rect.top, card.duration);
-    return card && placement ? { dragId: card.id, placement } : null;
+    const cell =
+      card &&
+      rect &&
+      getCellUnder(rect, {
+        columns: gesturePeriods.length,
+        duration: card.duration,
+      });
+    const period = cell && gesturePeriods[cell.column - 1];
+    return card && cell && period
+      ? { dragId: card.id, placement: { period, row: cell.row } }
+      : null;
   }
 
   function isSameGesture(next: Gesture) {
@@ -364,8 +329,7 @@ export default function TrajectoryBoard({
     }
 
     const rect = operation.shape?.current.boundingRectangle;
-    if (rect)
-      dropOrigin.current = { dragId: card.id, x: rect.left, y: rect.top };
+    if (rect) keepDropOrigin(card.id, rect);
     const drop = getMove(operation);
     if (canceled || !drop) return;
     if (
@@ -394,13 +358,6 @@ export default function TrajectoryBoard({
       return;
     }
     onChange(result.enrollments, { title: `${course.name} agregado` });
-  }
-
-  function takeDropOrigin(dragId: string) {
-    if (dropOrigin.current?.dragId !== dragId) return null;
-    const { x, y } = dropOrigin.current;
-    dropOrigin.current = null;
-    return { x, y };
   }
 
   return (

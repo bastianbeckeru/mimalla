@@ -8,7 +8,7 @@ import {
   PointerSensor,
 } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { apply } from "@/builder/apply";
 import { getCourseColor } from "@/builder/colors";
 import {
@@ -23,6 +23,7 @@ import NewCourseDialog from "@/components/builder/new-course-dialog";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
+import { useGridGesture } from "@/hooks/use-grid-gesture";
 import type {
   Action,
   Draft,
@@ -34,11 +35,11 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
+  getEmptyCells,
+  getRowCount,
+  HEADER_ROWS,
 } from "@/utils/curriculum-grid";
 
-const MIN_ROWS = 6;
-const HEADER_ROWS = 1;
-const SPARE_ROWS = 1;
 const DRAG_ACTIVATION_DISTANCE = 5;
 
 const sensors = [
@@ -52,7 +53,6 @@ const sensors = [
   KeyboardSensor,
 ];
 
-type Cell = { column: number; row: number };
 type Size = { height: number; duration: number };
 type Gesture = { dragId: string; action: SlotAction | ResizeAction };
 type NewCourse = { period: Period; position: number };
@@ -75,11 +75,9 @@ export default function CurriculumGrid({
   selectedCourseId: number | null;
   onSelectCourse: (courseId: number) => void;
 }) {
-  const firstCellRef = useRef<HTMLDivElement>(null);
+  const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
+    useGridGesture();
   const [gesture, setGesture] = useState<Gesture | null>(null);
-  const dropOrigin = useRef<{ dragId: string; x: number; y: number } | null>(
-    null,
-  );
   const [newCourse, setNewCourse] = useState<NewCourse | null>(null);
   const [isNewCourseOpen, setIsNewCourseOpen] = useState(false);
   const { curriculum } = draft;
@@ -97,57 +95,22 @@ export default function CurriculumGrid({
   const gestureCourseId = gesture?.action.courseId ?? null;
   const landing = cards.find((card) => card.id === draggedId);
 
-  const rows =
-    Math.max(MIN_ROWS, ...cards.map((card) => card.row + card.height - 1)) +
-    SPARE_ROWS;
-
-  const occupied = new Set(
-    cards.flatMap((card) =>
-      Array.from({ length: card.height }, (_, rowOffset) =>
-        Array.from(
-          { length: card.duration },
-          (_, columnOffset) =>
-            `${card.column + columnOffset}/${card.row + rowOffset}`,
-        ),
-      ).flat(),
-    ),
-  );
-  const emptyCells = Array.from({ length: rows }, (_, rowIndex) =>
-    curriculum.periods.map((period, columnIndex) => ({
-      period,
-      column: columnIndex + 1,
-      row: rowIndex + 1,
-    })),
-  )
-    .flat()
-    .filter(({ column, row }) => !occupied.has(`${column}/${row}`));
+  const rows = getRowCount(cards);
+  const emptyCells = getEmptyCells(cards, { rows, columns }).flatMap((cell) => {
+    const period = curriculum.periods[cell.column - 1];
+    return period ? [{ ...cell, period }] : [];
+  });
 
   function openNewCourse(course: NewCourse) {
     setNewCourse(course);
     setIsNewCourseOpen(true);
   }
 
-  function getCellAt(left: number, top: number, duration: number): Cell | null {
-    const firstCell = firstCellRef.current?.getBoundingClientRect();
-    if (!firstCell) return null;
-    const rootFontSize = Number.parseFloat(
-      getComputedStyle(document.documentElement).fontSize,
-    );
-    const gap = GRID_GAP * rootFontSize;
-    const column = Math.round(
-      (left - firstCell.left) / (firstCell.width + gap),
-    );
-    const row = Math.round((top - firstCell.top) / (firstCell.height + gap));
-    return {
-      column: Math.min(Math.max(column, 0), columns - duration) + 1,
-      row: Math.max(row, 0) + 1,
-    };
-  }
-
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
     const card = baseCards.find((card) => card.id === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
-    const cell = card && rect && getCellAt(rect.left, rect.top, card.duration);
+    const cell =
+      card && rect && getCellUnder(rect, { columns, duration: card.duration });
     const period = cell && curriculum.periods[cell.column - 1];
     if (!card || !cell || !period) return null;
     return {
@@ -177,13 +140,6 @@ export default function CurriculumGrid({
     };
   }
 
-  function takeDropOrigin(dragId: string) {
-    if (dropOrigin.current?.dragId !== dragId) return null;
-    const { x, y } = dropOrigin.current;
-    dropOrigin.current = null;
-    return { x, y };
-  }
-
   function updateGesture(next: Gesture | null) {
     if (next && !isSameGesture(gesture, next)) setGesture(next);
   }
@@ -200,11 +156,7 @@ export default function CurriculumGrid({
         setGesture(null);
         const rect = operation.shape?.current.boundingRectangle;
         if (rect && typeof operation.source?.id === "string")
-          dropOrigin.current = {
-            dragId: operation.source.id,
-            x: rect.left,
-            y: rect.top,
-          };
+          keepDropOrigin(operation.source.id, rect);
         const drop = getMove(operation);
         if (!canceled && drop) dispatch(drop.action);
       }}
