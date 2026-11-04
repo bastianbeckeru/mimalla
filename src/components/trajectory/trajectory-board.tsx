@@ -20,7 +20,7 @@ import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
 import ClosePeriodDialog from "@/components/trajectory/close-period-dialog";
 import CoursePanel, {
   FULL_SNAP_POINT,
-  getPanelHeight,
+  getPeekHeight,
   type PanelSnapPoint,
   PEEK_SNAP_POINT,
   type SchemeSource,
@@ -153,6 +153,10 @@ function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
         : `${revertedCount} cursos que lo requerían volvieron a pendiente.`,
     isShownOnDesktop: true,
   };
+}
+
+function hasLeftStart({ x, y }: { x: number; y: number }) {
+  return Math.hypot(x, y) >= TOUCH_HOLD_TOLERANCE;
 }
 
 function showEditError(title: string, error: EditError) {
@@ -337,7 +341,7 @@ export default function TrajectoryBoard({
     const visibleHeight = isMobile
       ? Math.min(
           section.clientHeight,
-          window.innerHeight - getPanelHeight(snapPoint) - sectionRect.top,
+          window.innerHeight - getPeekHeight() - sectionRect.top,
         )
       : section.clientHeight;
 
@@ -596,7 +600,7 @@ export default function TrajectoryBoard({
     const isHoldWithoutMoving =
       activatorEvent instanceof PointerEvent &&
       activatorEvent.pointerType === "touch" &&
-      Math.hypot(transform.x, transform.y) < TOUCH_HOLD_TOLERANCE;
+      !hasLeftStart(transform);
     if (isHoldWithoutMoving && !canceled) {
       openPanel(card);
       return;
@@ -645,9 +649,9 @@ export default function TrajectoryBoard({
         isDragging.current = true;
         setDraggingId(String(operation.source?.id));
         useConnectionFocus.getState().setSuspended(true);
-        if (isMobile && isPanelOpen) setSnapPoint(PEEK_SNAP_POINT);
       }}
       onDragMove={({ operation }) => {
+        if (hasLeftStart(operation.transform)) setIsPanelOpen(false);
         const next = getMove(operation);
         if (next && !isSameGesture(next)) setGesture(next);
       }}
@@ -659,7 +663,9 @@ export default function TrajectoryBoard({
           aria-label="Mi malla"
           className="min-h-0 min-w-0 flex-1 overflow-auto px-4 pt-4 pb-2 lg:px-8"
           style={
-            isMobile && isPanelOpen ? { paddingBottom: "62dvh" } : undefined
+            isMobile && (isPanelOpen || draggingId !== null)
+              ? { paddingBottom: PEEK_SNAP_POINT }
+              : undefined
           }
         >
           <div

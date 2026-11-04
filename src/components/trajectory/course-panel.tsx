@@ -72,13 +72,10 @@ type GradesChange = Partial<Pick<Enrollment, "assessments" | "courseGrade">>;
 const PEEK_HEIGHT_REM = 8;
 
 export const PEEK_SNAP_POINT = `${PEEK_HEIGHT_REM}rem`;
-const HALF_SNAP_POINT = 0.6;
 export const FULL_SNAP_POINT = 1;
-const SNAP_POINTS = [PEEK_SNAP_POINT, HALF_SNAP_POINT, FULL_SNAP_POINT];
+const SNAP_POINTS = [PEEK_SNAP_POINT, FULL_SNAP_POINT];
 
-export function getPanelHeight(snapPoint: PanelSnapPoint) {
-  if (typeof snapPoint === "number") return snapPoint * window.innerHeight;
-  if (snapPoint === null) return 0;
+export function getPeekHeight() {
   const rootFontSize = Number.parseFloat(
     getComputedStyle(document.documentElement).fontSize,
   );
@@ -230,7 +227,7 @@ function CourseDrawer({
               "fixed inset-0 z-40 bg-black/30 opacity-0 transition-opacity duration-300 ease-out",
               isFull ? "opacity-100" : "pointer-events-none",
             )}
-            onClick={() => onSnapPointChange(HALF_SNAP_POINT)}
+            onClick={() => onSnapPointChange(PEEK_SNAP_POINT)}
           />,
           document.body,
         )}
