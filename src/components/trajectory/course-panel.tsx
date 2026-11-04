@@ -69,7 +69,7 @@ export type PanelSnapPoint = number | string | null;
 
 type GradesChange = Partial<Pick<Enrollment, "assessments" | "courseGrade">>;
 
-const PEEK_HEIGHT_REM = 10.5;
+const PEEK_HEIGHT_REM = 8;
 
 export const PEEK_SNAP_POINT = `${PEEK_HEIGHT_REM}rem`;
 const HALF_SNAP_POINT = 0.6;

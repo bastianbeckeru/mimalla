@@ -114,8 +114,7 @@ export default function CourseCard({
             "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10 transition-colors duration-150 ease-out",
             role === "misplaced" && "ring-2 ring-warning",
             surfaceClassName,
-            isSelected &&
-              "ring-2 ring-ring ring-offset-2 ring-offset-background",
+            isSelected && "ring-2 ring-ring",
           )}
           style={{
             backgroundColor: isMuted

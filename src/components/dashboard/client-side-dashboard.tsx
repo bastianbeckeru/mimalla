@@ -195,10 +195,7 @@ function TrajectoryDashboard({
   }
 
   function changeGradingScale(next: GradingScale) {
-    commitContent(
-      { ...history.present, gradingScale: next },
-      { title: "Escala de notas actualizada" },
-    );
+    commitContent({ ...history.present, gradingScale: next });
   }
 
   function resetCurriculum() {

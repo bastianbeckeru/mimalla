@@ -540,9 +540,7 @@ export default function TrajectoryBoard({
       return;
     }
     setIsMoveOpen(false);
-    onChange(result.enrollments, {
-      title: `${card.course.name} movido a ${getPeriodLabel(period)}`,
-    });
+    onChange(result.enrollments);
   }
 
   function retake(card: PlacedEnrollment) {
@@ -624,7 +622,7 @@ export default function TrajectoryBoard({
       showEditError("No se puede mover el curso", result.error);
       return;
     }
-    onChange(result.enrollments, { title: `${card.course.name} movido` });
+    onChange(result.enrollments);
   }
 
   function handleAdd(placement: Placement, course: Course) {
@@ -858,10 +856,12 @@ export default function TrajectoryBoard({
             );
             onChange(
               result.enrollments,
-              getStatusNotice(
-                `${panelCard.course.name} ${STATUS_LABELS[status]}`,
-                result.revertedCount,
-              ),
+              result.revertedCount > 0
+                ? getStatusNotice(
+                    `${panelCard.course.name} ${STATUS_LABELS[status]}`,
+                    result.revertedCount,
+                  )
+                : undefined,
             );
           }}
           onGradesChange={(grades) => {
