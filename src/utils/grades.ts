@@ -1,6 +1,7 @@
 import type {
   Assessment,
   Enrollment,
+  EnrollmentStatus,
   GradingScale,
   RequiredGrade,
 } from "@/types/trajectory";
@@ -262,4 +263,13 @@ export function parseGrade(text: string) {
   if (trimmed === "") return null;
   const grade = Number(trimmed);
   return Number.isFinite(grade) ? Math.round(grade * 100) / 100 : Number.NaN;
+}
+
+export function getSuggestedStatus(
+  enrollment: Enrollment,
+  scale: GradingScale,
+): EnrollmentStatus | null {
+  const courseGrade = getCourseGrade(enrollment, scale);
+  if (courseGrade === null || enrollment.status !== "PENDING") return null;
+  return courseGrade >= scale.passing ? "APPROVED" : "FAILED";
 }

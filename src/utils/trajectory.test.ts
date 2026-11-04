@@ -4,12 +4,16 @@ import type { PeriodKey } from "@/types/curriculum";
 import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import {
+  approveThroughPeriod,
   createEnrollments,
+  getMoveConflict,
+  getPeriodEndRow,
   layOutTrajectory,
   MAX_ENROLLMENTS_PER_PERIOD,
   moveEnrollment,
+  retakeEnrollment,
   setEnrollmentStatus,
-  toggleEnrollmentStatus,
+  setEnrollmentStatuses,
 } from "@/utils/trajectory";
 
 function course(
@@ -380,29 +384,6 @@ describe("setEnrollmentStatus", () => {
   });
 });
 
-describe("toggleEnrollmentStatus", () => {
-  const courses = extendCourses([
-    course(1),
-    course(2, { prerequisiteIds: [1] }),
-  ]);
-
-  test("refuses to approve a course whose prerequisites are not approved", () => {
-    const enrollments = trajectory({ "2024-1": [1], "2024-3": [2] });
-
-    expect(toggleEnrollmentStatus(enrollments, "2024-3/2", courses)).toEqual({
-      missingPrerequisiteIds: [1],
-    });
-  });
-
-  test("returns a failed enrollment to pending", () => {
-    const enrollments = trajectory({ "2024-1": [1] }, { 1: "FAILED" });
-
-    expect(
-      toggleEnrollmentStatus(enrollments, "2024-1/1", courses).status,
-    ).toBe("PENDING");
-  });
-});
-
 describe("layOutTrajectory", () => {
   const curriculum = curriculumOf([
     course(1),
@@ -482,5 +463,203 @@ describe("layOutTrajectory", () => {
 
     expect(periods).toEqual(["2024-1", "2024-3", "2025-1"]);
     expect(cards.map((card) => card.column)).toEqual([1]);
+  });
+});
+
+describe("getMoveConflict", () => {
+  const context = {
+    entry,
+    curriculum: curriculumOf([
+      course(1),
+      course(2, { prerequisiteIds: [1] }),
+      course(3, { prerequisiteIds: [2] }),
+      course(9, { isElective: true }),
+    ]),
+  };
+  const enrollments = trajectory({
+    "2024-1": [1, 9],
+    "2024-3": [2],
+    "2025-1": [3],
+    "2025-3": [],
+  });
+
+  test("names the prerequisite that stops a move backward", () => {
+    expect(getMoveConflict(enrollments, "2025-1/3", "2024-3", context)).toEqual(
+      {
+        error: "PREREQUISITE_IN_PERIOD",
+        blockerIds: ["2024-3/2"],
+      },
+    );
+  });
+
+  test("names the successor on the way of a move forward", () => {
+    expect(getMoveConflict(enrollments, "2024-3/2", "2025-3", context)).toEqual(
+      {
+        error: "SUCCESSOR_ON_THE_WAY",
+        blockerIds: ["2025-1/3"],
+      },
+    );
+  });
+
+  test("finds none for a period the course can reach", () => {
+    expect(
+      getMoveConflict(enrollments, "2025-1/3", "2025-3", context),
+    ).toBeNull();
+  });
+
+  test("finds none for an elective", () => {
+    expect(
+      getMoveConflict(enrollments, "2024-1/9", "2025-3", context),
+    ).toBeNull();
+  });
+
+  test("names no blocker when the period is full", () => {
+    const crowded = trajectory({
+      "2024-1": [9],
+      "2024-3": Array.from({ length: 10 }, () => 9),
+    });
+    expect(getMoveConflict(crowded, "2024-1/9", "2024-3", context)).toEqual({
+      error: "PERIOD_FULL",
+      blockerIds: [],
+    });
+  });
+});
+
+describe("getPeriodEndRow", () => {
+  const context = { entry, curriculum: curriculumOf([course(1), course(2)]) };
+
+  test("is the first row below the cards of a period", () => {
+    const { cards } = layOutTrajectory(
+      trajectory({ "2024-1": [1, 2] }),
+      context,
+    );
+    expect(getPeriodEndRow(cards, 1)).toBe(3);
+  });
+
+  test("is the first row of an empty period", () => {
+    expect(getPeriodEndRow([], 4)).toBe(1);
+  });
+});
+
+describe("retakeEnrollment", () => {
+  const context = {
+    entry,
+    curriculum: curriculumOf([course(1), course(2)]),
+  };
+
+  test("adds a pending enrollment in the next semester", () => {
+    const enrollments = trajectory(
+      { "2024-1": [1], "2024-3": [2] },
+      { 1: "FAILED" },
+    );
+    const result = retakeEnrollment(enrollments, "2024-1/1", context);
+
+    expect(result?.period).toBe("2024-3");
+    expect(layoutOf(result?.enrollments)).toEqual({
+      "2024-1": [1],
+      "2024-3": [2, 1],
+    });
+    expect(result?.enrollments.at(-1)?.status).toBe("PENDING");
+  });
+
+  test("adds the period after the last one when none follows", () => {
+    const enrollments = trajectory({ "2024-1": [1] }, { 1: "FAILED" });
+
+    expect(retakeEnrollment(enrollments, "2024-1/1", context)?.period).toBe(
+      "2024-3",
+    );
+  });
+
+  test("skips a period that is full", () => {
+    const crowded = {
+      entry,
+      curriculum: curriculumOf([course(1), course(9, { isElective: true })]),
+    };
+    const enrollments = trajectory(
+      {
+        "2024-1": [1],
+        "2024-3": Array.from({ length: 10 }, () => 9),
+      },
+      { 1: "FAILED" },
+    );
+
+    expect(retakeEnrollment(enrollments, "2024-1/1", crowded)?.period).toBe(
+      "2025-1",
+    );
+  });
+});
+
+describe("approveThroughPeriod", () => {
+  const context = {
+    entry,
+    curriculum: curriculumOf([
+      course(1),
+      course(2, { prerequisiteIds: [1] }),
+      course(3, { prerequisiteIds: [2] }),
+      course(4, { prerequisiteIds: [5] }),
+      course(5),
+    ]),
+  };
+
+  test("approves in order up to the period and leaves the rest pending", () => {
+    const enrollments = trajectory({
+      "2024-1": [1],
+      "2024-3": [2],
+      "2025-1": [3],
+    });
+    const result = approveThroughPeriod(enrollments, "2024-3", context);
+
+    expect(result.approvedCount).toBe(2);
+    expect(result.enrollments.map((e) => e.status)).toEqual([
+      "APPROVED",
+      "APPROVED",
+      "PENDING",
+    ]);
+  });
+
+  test("leaves a course without its prerequisites pending", () => {
+    const enrollments = trajectory({ "2024-1": [4], "2025-1": [5] });
+    const result = approveThroughPeriod(enrollments, "2024-1", context);
+
+    expect(result.approvedCount).toBe(0);
+  });
+
+  test("keeps a failed enrollment failed", () => {
+    const enrollments = trajectory({ "2024-1": [1] }, { 1: "FAILED" });
+
+    expect(
+      approveThroughPeriod(enrollments, "2024-1", context).enrollments[0]
+        ?.status,
+    ).toBe("FAILED");
+  });
+});
+
+describe("setEnrollmentStatuses", () => {
+  const courses = extendCourses([
+    course(1),
+    course(2, { prerequisiteIds: [1] }),
+    course(3),
+  ]);
+
+  test("applies every status and adds up the reverted successors", () => {
+    const enrollments = trajectory(
+      { "2024-1": [1, 3], "2024-3": [2] },
+      { 1: "APPROVED", 2: "APPROVED" },
+    );
+    const result = setEnrollmentStatuses(
+      enrollments,
+      new Map([
+        ["2024-1/1", "FAILED"],
+        ["2024-1/3", "APPROVED"],
+      ]),
+      courses,
+    );
+
+    expect(result.enrollments.map((e) => e.status)).toEqual([
+      "FAILED",
+      "APPROVED",
+      "PENDING",
+    ]);
+    expect(result.revertedCount).toBe(1);
   });
 });

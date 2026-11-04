@@ -14,60 +14,51 @@ export const STATUS_LABELS: Record<EnrollmentStatus, string> = {
 export default function EnrollmentCard({
   status,
   isAvailable,
-  isEditing,
-  isShaking,
+  isBlocker,
   isEntering,
   enterDelay,
-  onOpenPanel,
   ...props
 }: Omit<
   ComponentProps<typeof DraggableCourseCard>,
   | "className"
   | "decoration"
-  | "isDragDisabled"
+  | "isMuted"
   | "label"
   | "onContextMenu"
-  | "onKeyDown"
+  | "relationStyle"
+  | "surfaceClassName"
 > & {
   status: EnrollmentStatus;
   isAvailable: boolean;
-  isEditing: boolean;
-  isShaking: boolean;
+  isBlocker: boolean;
   isEntering: boolean;
   enterDelay: number;
-  onOpenPanel: () => void;
 }) {
+  const isBlocked = !isAvailable && status === "PENDING";
+
   return (
     <DraggableCourseCard
       {...props}
-      isDragDisabled={!isEditing}
-      label={`${props.course.name}, ${STATUS_LABELS[status]}`}
+      relationStyle="ring"
+      isMuted={isBlocked}
+      surfaceClassName={isBlocker ? "ring-2 ring-destructive" : undefined}
+      label={`${props.course.name}, ${isBlocked ? "bloqueado" : STATUS_LABELS[status]}`}
       className={cn(
         "touch-manipulation select-none [-webkit-touch-callout:none]",
-        !isAvailable && status === "PENDING" && "saturate-[0.15]",
+        isBlocked && "saturate-[0.15]",
         isEntering &&
           "fade-in slide-in-from-bottom-1 animate-in fill-mode-both duration-300 ease-out [--tw-animation-delay:var(--enter-delay)] motion-reduce:animate-none",
-        isShaking && "animate-shake",
       )}
       style={{
         ...props.style,
+        ...(isBlocker && { zIndex: 20 }),
         ...(isEntering && { "--enter-delay": `${enterDelay}ms` }),
       }}
       onContextMenu={(event) => {
-        event.preventDefault();
         const isTouch =
           "pointerType" in event.nativeEvent &&
           event.nativeEvent.pointerType === "touch";
-        if (!isTouch) onOpenPanel();
-      }}
-      onKeyDown={(event) => {
-        if (
-          event.key === "ContextMenu" ||
-          (event.shiftKey && event.key === "F10")
-        ) {
-          event.preventDefault();
-          onOpenPanel();
-        }
+        if (isTouch) event.preventDefault();
       }}
       decoration={status !== "PENDING" && <StrikeLine status={status} />}
     />

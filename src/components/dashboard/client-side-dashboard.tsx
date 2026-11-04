@@ -1,7 +1,7 @@
 "use client";
 
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { Check, Loader2, Pencil, Redo2, Undo2 } from "lucide-react";
+import { Loader2, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import AreasLegend from "@/components/curriculum/areas-legend";
 import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
@@ -143,9 +143,6 @@ function TrajectoryDashboard({
   curriculum: Curriculum;
   isNew: boolean;
 }) {
-  // A new trajectory starts in edit mode so the student can mark what they
-  // have already passed; afterwards the dashboard opens for tracking.
-  const [isEditing, setIsEditing] = useState(isNew);
   const updateActiveTrajectory = useTrajectoryStore(
     (state) => state.updateActiveTrajectory,
   );
@@ -252,34 +249,20 @@ function TrajectoryDashboard({
             >
               <Redo2 />
             </Button>
-            <Button
-              variant={isEditing ? "default" : "outline"}
-              size="sm"
-              className="ml-1"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? <Check /> : <Pencil />}
-              {isEditing ? "Listo" : "Editar malla"}
-            </Button>
           </div>
         </header>
         <Progress
           value={stats.progress}
           className="*:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none md:hidden"
         />
-        <section
-          aria-label="Mi malla"
-          className="min-h-0 flex-1 overflow-auto px-4 pt-4 pb-2 lg:px-8"
-        >
-          <TrajectoryBoard
-            enrollments={enrollments}
-            entry={trajectory.entry}
-            curriculum={curriculum}
-            gradingScale={gradingScale}
-            isEditing={isEditing}
-            onChange={commit}
-          />
-        </section>
+        <TrajectoryBoard
+          enrollments={enrollments}
+          entry={trajectory.entry}
+          curriculum={curriculum}
+          gradingScale={gradingScale}
+          isNew={isNew}
+          onChange={commit}
+        />
         {curriculum.areas.length > 0 && (
           <footer className="flex shrink-0 border-t px-4 py-3 lg:px-8">
             <AreasLegend areas={curriculum.areas} />

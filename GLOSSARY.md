@@ -128,6 +128,12 @@ Where an enrollment stands: pending, approved or failed. The student sets it; a 
 Said of a course whose prerequisites are all approved and whose required credits are reached.
 _Avoid_: Unlocked, enabled
 
+**Blocked**:
+Said of a pending enrollment whose course is not available. It stays dimmed on the trajectory, the only thing dimming means there. Shown in the UI as "bloqueado".
+
+**Closing a period**:
+Setting at once the status of the pending enrollments of a period that has started, starting from what their course grades suggest.
+
 ## Grades
 
 **Grade**:

@@ -10,6 +10,7 @@ import {
   getPartialAverage,
   getRequiredGrade,
   getSchemeDepth,
+  getSuggestedStatus,
   hasRecordedGrades,
   parseGrade,
   roundGrade,
@@ -330,5 +331,39 @@ describe("hasRecordedGrades", () => {
 
   test("is true for an entered course grade", () => {
     expect(hasRecordedGrades({ ...enrollment, courseGrade: 5 })).toBe(true);
+  });
+});
+
+describe("getSuggestedStatus", () => {
+  const scale = { min: 1, max: 7, passing: 4 };
+  const enrollment = {
+    id: "1",
+    courseId: 1,
+    year: 2024,
+    term: 1,
+    position: 1,
+    status: "PENDING",
+  } as const;
+
+  test("follows the course grade of a pending enrollment", () => {
+    expect(getSuggestedStatus({ ...enrollment, courseGrade: 5 }, scale)).toBe(
+      "APPROVED",
+    );
+    expect(getSuggestedStatus({ ...enrollment, courseGrade: 3 }, scale)).toBe(
+      "FAILED",
+    );
+  });
+
+  test("is none without a course grade", () => {
+    expect(getSuggestedStatus(enrollment, scale)).toBeNull();
+  });
+
+  test("is none once the student set the status", () => {
+    expect(
+      getSuggestedStatus(
+        { ...enrollment, status: "APPROVED", courseGrade: 3 },
+        scale,
+      ),
+    ).toBeNull();
   });
 });

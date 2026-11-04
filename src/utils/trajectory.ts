@@ -38,6 +38,8 @@ type EditResult =
   | { enrollments: Enrollment[]; error?: never }
   | { enrollments?: never; error: EditError };
 
+export type MoveConflict = { error: EditError; blockerIds: string[] };
+
 export function createEnrollments({
   entry,
   curriculum,
@@ -295,30 +297,13 @@ export function moveEnrollment(
   placement: Placement,
   context: TrajectoryContext,
 ): EditResult {
-  const { periods, cards } = layOutTrajectory(enrollments, context, [
+  const conflict = getMoveConflict(
+    enrollments,
+    enrollmentId,
     placement.period,
-  ]);
-  const moved = cards.find((card) => card.id === enrollmentId);
-  if (!moved) return { enrollments };
-
-  const column = periods.indexOf(placement.period) + 1;
-  const end = column + moved.duration - 1;
-  const others = cards.filter((card) => card !== moved);
-
-  const isEnteringFullPeriod =
-    column !== moved.column &&
-    [...Array(moved.duration).keys()].some((offset) => {
-      const target = column + offset;
-      return (
-        !spansAny(moved, target, target) &&
-        isAnyPeriodFull(others, target, target)
-      );
-    });
-  if (isEnteringFullPeriod) return { error: "PERIOD_FULL" };
-
-  const course = extendCourses(context.curriculum.courses).get(moved.courseId);
-  const error = course && getMoveError(others, moved, column, end, course);
-  if (error) return { error };
+    context,
+  );
+  if (conflict) return { error: conflict.error };
 
   return {
     enrollments: settleEnrollments(
@@ -331,21 +316,54 @@ export function moveEnrollment(
   };
 }
 
-function getMoveError(
+export function getMoveConflict(
+  enrollments: Enrollment[],
+  enrollmentId: string,
+  period: PeriodKey,
+  context: TrajectoryContext,
+): MoveConflict | null {
+  const { periods, cards } = layOutTrajectory(enrollments, context, [period]);
+  const moved = cards.find((card) => card.id === enrollmentId);
+  if (!moved) return null;
+
+  const column = periods.indexOf(period) + 1;
+  const end = column + moved.duration - 1;
+  const others = cards.filter((card) => card !== moved);
+
+  const isEnteringFullPeriod =
+    column !== moved.column &&
+    [...Array(moved.duration).keys()].some((offset) => {
+      const target = column + offset;
+      return (
+        !spansAny(moved, target, target) &&
+        isAnyPeriodFull(others, target, target)
+      );
+    });
+  if (isEnteringFullPeriod) return { error: "PERIOD_FULL", blockerIds: [] };
+
+  const course = extendCourses(context.curriculum.courses).get(moved.courseId);
+  return course
+    ? findRelatedConflict(others, moved, column, end, course)
+    : null;
+}
+
+function toConflict(error: EditError, blockers: PlacedEnrollment[]) {
+  return { error, blockerIds: blockers.map((card) => card.id) };
+}
+
+function findRelatedConflict(
   others: PlacedEnrollment[],
   moved: PlacedEnrollment,
   column: number,
   end: number,
   course: ExtendedCourse,
-): EditError | null {
+): MoveConflict | null {
   if (course.isElective || column === moved.column) return null;
 
-  if (
-    others.some(
-      (card) => card.courseId === course.id && spansAny(card, column, end),
-    )
-  )
-    return "DUPLICATE_COURSE";
+  const duplicates = others.filter(
+    (card) => card.courseId === course.id && spansAny(card, column, end),
+  );
+  if (duplicates.length > 0) return toConflict("DUPLICATE_COURSE", duplicates);
 
   const isMovingForward = column > moved.column;
   const relatedIds = isMovingForward
@@ -353,16 +371,124 @@ function getMoveError(
     : course.prerequisiteIds;
   const related = others.filter((card) => relatedIds.includes(card.courseId));
 
-  if (related.some((card) => spansAny(card, column, end)))
-    return isMovingForward ? "SUCCESSOR_IN_PERIOD" : "PREREQUISITE_IN_PERIOD";
+  const inPeriod = related.filter((card) => spansAny(card, column, end));
+  if (inPeriod.length > 0)
+    return toConflict(
+      isMovingForward ? "SUCCESSOR_IN_PERIOD" : "PREREQUISITE_IN_PERIOD",
+      inPeriod,
+    );
 
   const [from, to] = isMovingForward
     ? [moved.column, column - 1]
     : [end + 1, moved.column - 1];
-  if (related.some((card) => spansAny(card, from, to)))
-    return isMovingForward ? "SUCCESSOR_ON_THE_WAY" : "PREREQUISITE_ON_THE_WAY";
+  const onTheWay = related.filter((card) => spansAny(card, from, to));
+  if (onTheWay.length > 0)
+    return toConflict(
+      isMovingForward ? "SUCCESSOR_ON_THE_WAY" : "PREREQUISITE_ON_THE_WAY",
+      onTheWay,
+    );
 
   return null;
+}
+
+export function getPeriodEndRow(cards: PlacedEnrollment[], column: number) {
+  return (
+    Math.max(
+      0,
+      ...cards
+        .filter((card) => spansAny(card, column, column))
+        .map((card) => card.row + card.height - 1),
+    ) + 1
+  );
+}
+
+export function retakeEnrollment(
+  enrollments: Enrollment[],
+  enrollmentId: string,
+  context: TrajectoryContext,
+) {
+  const { periods, cards } = layOutTrajectory(enrollments, context);
+  const failed = cards.find((card) => card.id === enrollmentId);
+  if (!failed) return null;
+
+  const nextPeriod = getNextPeriod(periods);
+  const candidates = [
+    ...periods
+      .slice(getEnd(failed))
+      .filter((period) => isSemester(parsePeriodKey(period).term)),
+    ...(nextPeriod ? [nextPeriod] : []),
+  ];
+  for (const period of candidates) {
+    const result = addEnrollment(
+      enrollments,
+      failed.course,
+      {
+        period,
+        row: getPeriodEndRow(cards, periods.indexOf(period) + 1),
+      },
+      context,
+    );
+    if (result.enrollments) return { enrollments: result.enrollments, period };
+  }
+  return null;
+}
+
+export function approveThroughPeriod(
+  enrollments: Enrollment[],
+  period: PeriodKey,
+  context: TrajectoryContext,
+) {
+  const { periods, cards } = layOutTrajectory(enrollments, context);
+  const lastColumn = periods.indexOf(period) + 1;
+  const courses = extendCourses(context.curriculum.courses);
+  const candidates = cards
+    .filter(
+      (card) =>
+        card.enrollment.status === "PENDING" && getEnd(card) <= lastColumn,
+    )
+    .toSorted((a, b) => a.column - b.column);
+
+  const approvedIds = new Set<string>();
+  const approve = () =>
+    enrollments.map((e) =>
+      approvedIds.has(e.id) ? { ...e, status: "APPROVED" as const } : e,
+    );
+  for (let wasApproved = true; wasApproved; ) {
+    wasApproved = false;
+    for (const card of candidates) {
+      if (
+        !approvedIds.has(card.id) &&
+        isAvailable(card.course, getProgress(approve(), courses))
+      ) {
+        approvedIds.add(card.id);
+        wasApproved = true;
+      }
+    }
+  }
+
+  return { enrollments: approve(), approvedCount: approvedIds.size };
+}
+
+export function setEnrollmentStatuses(
+  enrollments: Enrollment[],
+  statuses: Map<string, EnrollmentStatus>,
+  courses: Map<number, ExtendedCourse>,
+) {
+  return [...statuses].reduce(
+    (result, [enrollmentId, status]) => {
+      const next = setEnrollmentStatus(
+        result.enrollments,
+        enrollmentId,
+        status,
+        courses,
+      );
+      return {
+        enrollments: next.enrollments,
+        revertedCount: result.revertedCount + next.revertedCount,
+      };
+    },
+    { enrollments, revertedCount: 0 },
+  );
 }
 
 export function extractCourseIds(
@@ -415,18 +541,22 @@ export function getTrajectoryStats(
 export function getPeriodInfo(id: PeriodKey, entry: Entry) {
   const { year, term } = parsePeriodKey(id);
   const currentDate = new Date();
+  const currentPeriod = `${currentDate.getFullYear()}-${
+    currentDate.getMonth() < 7 ? 1 : 3
+  }`;
 
-  const isCurrent =
-    year === currentDate.getFullYear() &&
-    term === (currentDate.getMonth() < 7 ? 1 : 3);
+  const isCurrent = comparePeriodKeys(id, currentPeriod) === 0;
+  const hasStarted = comparePeriodKeys(id, currentPeriod) <= 0;
 
-  if (!isSemester(term)) return { label: TERM_LABELS[term], isCurrent };
+  if (!isSemester(term))
+    return { label: TERM_LABELS[term], isCurrent, hasStarted };
 
   const number = getSemesterIndex({ year, term }) - getSemesterIndex(entry) + 1;
 
   return {
     label: number > 0 ? `Semestre ${arabicToRoman(number)}` : "Semestre",
     isCurrent,
+    hasStarted,
   };
 }
 
@@ -448,46 +578,6 @@ export function getAddableCourses(
   return [...courses.values()].filter(
     (c) => c.isElective || !takenCourseIds.has(c.id),
   );
-}
-
-type ToggleResult =
-  | {
-      enrollments: Enrollment[];
-      status: EnrollmentStatus;
-      revertedCount: number;
-      missingPrerequisiteIds?: never;
-    }
-  | {
-      enrollments?: never;
-      status?: never;
-      revertedCount?: never;
-      missingPrerequisiteIds: number[];
-    };
-
-export function toggleEnrollmentStatus(
-  enrollments: Enrollment[],
-  enrollmentId: string,
-  courses: Map<number, ExtendedCourse>,
-): ToggleResult {
-  const target = enrollments.find((e) => e.id === enrollmentId);
-  const course = target && courses.get(target.courseId);
-  if (!target || !course)
-    return { enrollments, status: "PENDING", revertedCount: 0 };
-
-  const status: EnrollmentStatus =
-    target.status === "PENDING" ? "APPROVED" : "PENDING";
-  const progress = getProgress(enrollments, courses);
-  if (status === "APPROVED" && !isAvailable(course, progress))
-    return {
-      missingPrerequisiteIds: course.prerequisiteIds.filter(
-        (id) => !progress.approvedCourseIds.has(id),
-      ),
-    };
-
-  return {
-    status,
-    ...setEnrollmentStatus(enrollments, enrollmentId, status, courses),
-  };
 }
 
 export function setEnrollmentStatus(

@@ -18,11 +18,6 @@ export function useImportTrajectory() {
     try {
       const curriculum = await fetchCurriculum(curriculumPath);
       addTrajectory({ curriculumPath, entry, curriculum });
-      toast.add({
-        type: "success",
-        title: "Malla importada",
-        description: `${curriculum.programName} ${effectiveYear}`,
-      });
       return { curriculumPath, curriculum };
     } catch {
       toast.add({
