@@ -56,6 +56,15 @@ export function getCourseGrade(enrollment: Enrollment, scale: GradingScale) {
   return getComputedGrade(assessments, scale);
 }
 
+export function hasRecordedGrades(enrollment: Enrollment) {
+  return (
+    enrollment.courseGrade !== undefined ||
+    getSingles(enrollment.assessments ?? []).some(
+      (single) => single.grade !== null,
+    )
+  );
+}
+
 export function getPartialAverage(
   assessments: Assessment[],
   scale: GradingScale,

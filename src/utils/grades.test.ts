@@ -10,6 +10,7 @@ import {
   getPartialAverage,
   getRequiredGrade,
   getSchemeDepth,
+  hasRecordedGrades,
   parseGrade,
   roundGrade,
 } from "@/utils/grades";
@@ -295,5 +296,39 @@ describe("getAssessmentGrade", () => {
     expect(
       getAssessmentGrade(group([single(2), single(6)], null, 1), scale),
     ).toEqual({ grade: 6, isPartial: false });
+  });
+});
+
+describe("hasRecordedGrades", () => {
+  const enrollment = {
+    id: "e",
+    year: 2026,
+    term: 1,
+    position: 0,
+    status: "PENDING",
+    courseId: 1,
+  } satisfies Enrollment;
+
+  test("is false without a scheme or a course grade", () => {
+    expect(hasRecordedGrades(enrollment)).toBe(false);
+  });
+
+  test("is false for a scheme still without grades", () => {
+    expect(
+      hasRecordedGrades({ ...enrollment, assessments: [single(null)] }),
+    ).toBe(false);
+  });
+
+  test("is true for a grade anywhere in the scheme", () => {
+    expect(
+      hasRecordedGrades({
+        ...enrollment,
+        assessments: [single(null), group([single(5)])],
+      }),
+    ).toBe(true);
+  });
+
+  test("is true for an entered course grade", () => {
+    expect(hasRecordedGrades({ ...enrollment, courseGrade: 5 })).toBe(true);
   });
 });

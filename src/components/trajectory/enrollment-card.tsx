@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "cn";
-import { Ellipsis } from "lucide-react";
 import type { ComponentProps } from "react";
 import DraggableCourseCard from "@/components/builder/course-card";
 import type { EnrollmentStatus } from "@/types/trajectory";
@@ -71,18 +70,7 @@ export default function EnrollmentCard({
         }
       }}
       decoration={status !== "PENDING" && <StrikeLine status={status} />}
-    >
-      {isEditing && (
-        <button
-          type="button"
-          aria-label={`Opciones de ${props.course.name}`}
-          className="absolute top-1 right-1 hidden size-6 items-center justify-center rounded-md bg-background/80 text-foreground opacity-0 shadow-sm transition-opacity duration-150 ease-out hover:bg-background focus-visible:opacity-100 group-hover/card:opacity-100 md:flex"
-          onClick={() => onOpenPanel()}
-        >
-          <Ellipsis className="size-4" />
-        </button>
-      )}
-    </DraggableCourseCard>
+    />
   );
 }
 

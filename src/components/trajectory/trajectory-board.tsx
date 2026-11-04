@@ -545,7 +545,16 @@ export default function TrajectoryBoard({
           panelCard !== null && isAvailable(panelCard.course, progress)
         }
         isEditing={isEditing}
+        canOpenCourse={(courseId) =>
+          base.cards.some((card) => card.courseId === courseId)
+        }
         onOpenChange={setIsPanelOpen}
+        onOpenCourse={(courseId) => {
+          const card = base.cards
+            .filter((card) => card.courseId === courseId)
+            .at(-1);
+          if (card) openPanel(card);
+        }}
         onSetStatus={(status) => {
           if (!panelCard) return;
           const result = setEnrollmentStatus(
@@ -554,7 +563,6 @@ export default function TrajectoryBoard({
             status,
             courses,
           );
-          setIsPanelOpen(false);
           onChange(
             result.enrollments,
             getStatusNotice(

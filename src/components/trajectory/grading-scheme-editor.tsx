@@ -11,6 +11,8 @@ import { cn } from "cn";
 import {
   ArrowDown,
   ArrowUp,
+  ChevronRight,
+  Copy,
   Ellipsis,
   FolderPlus,
   GripVertical,
@@ -43,12 +45,14 @@ import {
   getWeights,
   isValidGrade,
   parseGrade,
+  roundGrade,
 } from "@/utils/grades";
 import {
   canPlace,
   flattenScheme,
   getDropProjection,
   getSiblings,
+  getVisibleRows,
   getWeightIssue,
   indentAssessment,
   insertAssessment,
@@ -65,6 +69,14 @@ const INDENT_PX = 20;
 const DRAG_ACTIVATION_DISTANCE = 4;
 const BATCH_SIZES = [2, 3, 4, 5, 6, 7, 8];
 const DROPPED_COUNTS = [0, 1, 2, 3];
+const INDICATOR_LEFT_PX = 20;
+
+const FIELD =
+  "h-7 border-transparent bg-transparent shadow-none disabled:bg-transparent dark:bg-transparent dark:disabled:bg-transparent";
+const NUMBER_FIELD =
+  "tabular-nums group-hover/row:border-input pointer-coarse:border-input";
+const REVEAL_ON_ROW =
+  "pointer-fine:opacity-0 pointer-fine:focus-visible:opacity-100 pointer-fine:group-focus-within/row:opacity-100 pointer-fine:group-hover/row:opacity-100 pointer-fine:data-popup-open:opacity-100";
 
 const sensors = [
   PointerSensor.configure({
@@ -100,10 +112,14 @@ function formatWeight(weight: number) {
 export default function GradingSchemeEditor({
   assessments,
   scale,
+  isReadOnly = false,
+  copySource,
   onChange,
 }: {
   assessments: Assessment[];
   scale: GradingScale;
+  isReadOnly?: boolean;
+  copySource?: { label: string; onCopy: () => void };
   onChange: (assessments: Assessment[]) => void;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
@@ -112,10 +128,32 @@ export default function GradingSchemeEditor({
   const [drop, setDrop] = useState<
     (SchemePlacement & { activeId: string; indicator: Indicator }) | null
   >(null);
+  const [collapsedIds, setCollapsedIds] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
   const rows = flattenScheme(assessments);
+  const visibleRows = getVisibleRows(rows, collapsedIds);
   const rootIssue = getWeightIssue(assessments);
+  const hasInvalidGrade = rows.some(
+    ({ assessment }) =>
+      assessment.kind === "SINGLE" &&
+      assessment.grade !== null &&
+      !isValidGrade(assessment.grade, scale),
+  );
+  const hasEmptyGroup = rows.some(({ assessment }) =>
+    flattenScheme([assessment]).every((row) => row.assessment.kind === "GROUP"),
+  );
+
+  function expand(id: string) {
+    setCollapsedIds((current) => {
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  }
 
   function add(assessment: Assessment, parentId: string | null) {
+    if (parentId) expand(parentId);
     const index = getSiblings(assessments, parentId).length;
     onChange(insertAssessment(assessments, assessment, { parentId, index }));
     setFocusId(assessment.id);
@@ -137,17 +175,21 @@ export default function GradingSchemeEditor({
       ).map(({ assessment }) => assessment.id),
     );
     const rest = rows.filter((row) => !lifted.has(row.assessment.id));
-    const rects = rest.map((row) =>
+    const visibleRest = visibleRows.filter(
+      (row) => !lifted.has(row.assessment.id),
+    );
+    const rects = visibleRest.map((row) =>
       rowRefs.current.get(row.assessment.id)?.getBoundingClientRect(),
     );
     const y = operation.position.current.y;
     const gapIndex = rects.filter(
       (rect) => rect && rect.top + rect.height / 2 < y,
     ).length;
+    const nextRow = visibleRest[gapIndex];
     const projection = getDropProjection(
       rows,
       activeId,
-      gapIndex,
+      nextRow ? rest.indexOf(nextRow) : rest.length,
       Math.round(operation.transform.x / INDENT_PX),
     );
     if (!projection) return null;
@@ -166,8 +208,77 @@ export default function GradingSchemeEditor({
     };
   }
 
+  const addButtons = (isEmpty: boolean, hasSource: boolean) => (
+    <>
+      <Button
+        variant={!isEmpty ? "ghost" : hasSource ? "outline" : "default"}
+        size="sm"
+        className={cn(!isEmpty && "text-muted-foreground")}
+        onClick={() => add(createSingle(), null)}
+      >
+        <Plus />
+        Evaluación
+      </Button>
+      <Button
+        variant={isEmpty ? "outline" : "ghost"}
+        size="sm"
+        className={cn(!isEmpty && "text-muted-foreground")}
+        onClick={() => add(createGroup(), null)}
+      >
+        <FolderPlus />
+        Grupo
+      </Button>
+    </>
+  );
+
+  if (rows.length === 0 && isReadOnly)
+    return (
+      <p className="p-6 text-muted-foreground text-sm">
+        Aún no hay evaluaciones.
+      </p>
+    );
+
+  if (rows.length === 0)
+    return (
+      <div className="space-y-3 p-6">
+        <div className="space-y-1 text-sm">
+          <p className="font-medium">
+            {copySource ? "Retomas este curso" : "Aún no hay evaluaciones"}
+          </p>
+          <p className="text-muted-foreground">
+            {copySource
+              ? `Usa el mismo esquema de ${copySource.label} o parte desde cero.`
+              : "Agrégalas con su peso y calcularemos tu nota a medida que las completes."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {copySource && (
+            <Button size="sm" onClick={copySource.onCopy}>
+              <Copy />
+              Copiar de {copySource.label}
+            </Button>
+          )}
+          {addButtons(true, copySource !== undefined)}
+        </div>
+      </div>
+    );
+
   return (
-    <div className="space-y-2">
+    <div className="py-3 pr-3 pl-1">
+      <div className="flex h-6 items-center pr-1 text-muted-foreground text-xs">
+        <span className="min-w-0 flex-1 pl-5">Evaluaciones</span>
+        <span className="w-15 shrink-0 pr-2 text-right">Peso</span>
+        <span className="w-13 shrink-0 pr-2 text-right">Nota</span>
+        <span aria-hidden className="w-7 shrink-0" />
+      </div>
+      {rootIssue !== null && <WeightIssue sum={rootIssue} />}
+      {hasInvalidGrade && (
+        <p className="flex items-center gap-1.5 py-1 pl-5 text-destructive text-sm">
+          <TriangleAlert className="size-3.5 shrink-0" />
+          Las notas fuera de {formatGrade(scale.min)} a {formatGrade(scale.max)}{" "}
+          no se cuentan.
+        </p>
+      )}
       <DragDropProvider
         sensors={sensors}
         plugins={(defaults) => [
@@ -179,6 +290,7 @@ export default function GradingSchemeEditor({
           const projection = getProjection(operation);
           setDrop(null);
           if (canceled || !projection) return;
+          if (projection.parentId) expand(projection.parentId);
           apply(
             moveAssessment(assessments, projection.activeId, {
               parentId: projection.parentId,
@@ -188,18 +300,29 @@ export default function GradingSchemeEditor({
         }}
       >
         <div ref={listRef} className="relative">
-          {rows.map((row) => (
+          {visibleRows.map((row) => (
             <AssessmentRow
               key={row.assessment.id}
               row={row}
               assessments={assessments}
               scale={scale}
               isLifted={drop?.activeId === row.assessment.id}
+              isCollapsed={collapsedIds.has(row.assessment.id)}
+              isReadOnly={isReadOnly}
               autoFocus={focusId === row.assessment.id}
+              onAutoFocused={() => setFocusId(null)}
               rowRef={(element) => {
                 if (element) rowRefs.current.set(row.assessment.id, element);
                 else rowRefs.current.delete(row.assessment.id);
               }}
+              onToggleCollapsed={() =>
+                setCollapsedIds((current) => {
+                  const next = new Set(current);
+                  if (!next.delete(row.assessment.id))
+                    next.add(row.assessment.id);
+                  return next;
+                })
+              }
               onUpdate={(update) =>
                 onChange(
                   updateAssessment(assessments, row.assessment.id, update),
@@ -214,6 +337,7 @@ export default function GradingSchemeEditor({
                 const batch = Array.from({ length: count }, (_, offset) =>
                   createSingle(`${prefix}${start + offset}`),
                 );
+                expand(row.assessment.id);
                 onChange(
                   batch.reduce(
                     (scheme, assessment) =>
@@ -237,37 +361,22 @@ export default function GradingSchemeEditor({
               className="pointer-events-none absolute right-0 h-0.5 rounded-full bg-primary"
               style={{
                 top: drop.indicator.top - 1,
-                left: drop.indicator.depth * INDENT_PX + 4,
+                left: drop.indicator.depth * INDENT_PX + INDICATOR_LEFT_PX,
               }}
             />
           )}
         </div>
       </DragDropProvider>
-      {rows.length === 0 && (
-        <p className="text-muted-foreground text-sm">
-          Agrega las evaluaciones del curso con su peso para calcular tu nota
-          final.
+      {hasEmptyGroup && (
+        <p className="py-1 pl-5 text-muted-foreground text-xs">
+          Los grupos sin evaluaciones no cuentan para la nota.
         </p>
       )}
-      {rootIssue !== null && <WeightIssue sum={rootIssue} />}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => add(createSingle(), null)}
-        >
-          <Plus />
-          Evaluación
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => add(createGroup(), null)}
-        >
-          <FolderPlus />
-          Grupo
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex flex-wrap gap-0.5 pt-1.5 pl-3">
+          {addButtons(false, false)}
+        </div>
+      )}
     </div>
   );
 }
@@ -277,8 +386,12 @@ function AssessmentRow({
   assessments,
   scale,
   isLifted,
+  isCollapsed,
+  isReadOnly,
   autoFocus,
+  onAutoFocused,
   rowRef,
+  onToggleCollapsed,
   onUpdate,
   onAdd,
   onAddBatch,
@@ -289,8 +402,12 @@ function AssessmentRow({
   assessments: Assessment[];
   scale: GradingScale;
   isLifted: boolean;
+  isCollapsed: boolean;
+  isReadOnly: boolean;
   autoFocus: boolean;
+  onAutoFocused: () => void;
   rowRef: (element: HTMLElement | null) => void;
+  onToggleCollapsed: () => void;
   onUpdate: (update: (assessment: Assessment) => Assessment) => void;
   onAdd: (assessment: Assessment) => void;
   onAddBatch: (count: number) => void;
@@ -299,7 +416,11 @@ function AssessmentRow({
 }) {
   const { assessment, depth, parentId } = row;
   const handleRef = useRef<HTMLButtonElement>(null);
-  const { ref } = useDraggable({ id: assessment.id, handle: handleRef });
+  const { ref } = useDraggable({
+    id: assessment.id,
+    handle: handleRef,
+    disabled: isReadOnly,
+  });
   const siblings = getSiblings(assessments, parentId);
   const sharedWeight = getWeights(siblings)[siblings.indexOf(assessment)] ?? 0;
   const grade = getAssessmentGrade(assessment, scale);
@@ -313,6 +434,19 @@ function AssessmentRow({
     assessment.kind === "GROUP" &&
     canPlace(assessments, createGroup(), assessment.id);
 
+  const droppedCount =
+    assessment.kind === "GROUP" ? assessment.droppedCount : 0;
+  const collapsedCount =
+    assessment.kind === "GROUP" && isCollapsed
+      ? assessment.assessments.length
+      : null;
+  const dropNote =
+    droppedCount === 1
+      ? "descarta la peor"
+      : droppedCount > 1
+        ? `descarta las ${droppedCount} peores`
+        : null;
+
   return (
     <div
       ref={(element) => {
@@ -320,54 +454,105 @@ function AssessmentRow({
         rowRef(element);
       }}
       className={cn(
-        "flex items-center gap-1 rounded-md bg-background py-0.5 pr-0.5",
-        isLifted && "opacity-60 shadow-md",
+        "group/row flex h-9 items-center rounded-md pr-1 transition-colors hover:bg-muted/50",
+        isLifted && "bg-background opacity-60 shadow-md",
       )}
-      style={{ paddingLeft: depth * INDENT_PX }}
     >
-      <button
-        ref={handleRef}
-        type="button"
-        aria-label={`Mover ${assessment.name}`}
-        className="flex size-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground hover:bg-muted active:cursor-grabbing"
+      {isReadOnly ? (
+        <span aria-hidden className="w-5 shrink-0" />
+      ) : (
+        <button
+          ref={handleRef}
+          type="button"
+          aria-label={`Mover ${assessment.name}`}
+          className={cn(
+            "flex h-7 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-opacity active:cursor-grabbing",
+            REVEAL_ON_ROW,
+          )}
+        >
+          <GripVertical className="size-3.5" />
+        </button>
+      )}
+      <div
+        className="flex min-w-0 flex-1 items-center gap-1"
+        style={{ paddingLeft: depth * INDENT_PX }}
       >
-        <GripVertical className="size-4" />
-      </button>
-      <CommitInput
-        aria-label="Nombre"
-        autoFocus={autoFocus}
-        value={assessment.name}
-        className={cn(
-          "h-8 min-w-0 flex-1 border-transparent bg-transparent px-1.5 shadow-none hover:border-input dark:bg-transparent",
-          assessment.kind === "GROUP" && "font-medium",
+        {assessment.kind === "GROUP" ? (
+          <button
+            type="button"
+            aria-expanded={!isCollapsed}
+            aria-label={`${isCollapsed ? "Expandir" : "Colapsar"} ${assessment.name}`}
+            className="flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+            onClick={onToggleCollapsed}
+          >
+            <ChevronRight
+              className={cn(
+                "size-3.5 transition-transform duration-150 ease-out motion-reduce:transition-none",
+                !isCollapsed && "rotate-90",
+              )}
+            />
+          </button>
+        ) : (
+          <span aria-hidden className="size-5 shrink-0" />
         )}
-        onFocus={(event) => {
-          if (autoFocus) event.currentTarget.select();
-        }}
-        onCommit={(name) =>
-          onUpdate((current) => ({
-            ...current,
-            name: name.trim() || current.name,
-          }))
-        }
-      />
-      {childIssue !== null && <WeightIssue sum={childIssue} isCompact />}
-      <div className="relative w-16 shrink-0">
+        <CommitInput
+          aria-label="Nombre"
+          autoFocus={autoFocus}
+          disabled={isReadOnly}
+          title={assessment.name}
+          value={assessment.name}
+          className={cn(
+            FIELD,
+            "truncate px-1 group-hover/row:border-input",
+            collapsedCount !== null
+              ? "field-sizing-content w-auto min-w-8 max-w-full"
+              : dropNote
+                ? "sm:field-sizing-content min-w-0 flex-1 sm:w-auto sm:min-w-8 sm:max-w-full sm:flex-none"
+                : "min-w-0 flex-1",
+            assessment.kind === "GROUP" && "font-medium",
+          )}
+          onFocus={(event) => {
+            if (!autoFocus) return;
+            event.currentTarget.select();
+            onAutoFocused();
+          }}
+          onCommit={(name) =>
+            onUpdate((current) => ({
+              ...current,
+              name: name.trim() || current.name,
+            }))
+          }
+        />
+        {collapsedCount !== null && (
+          <span className="shrink-0 text-muted-foreground text-xs">
+            {collapsedCount}
+          </span>
+        )}
+        {dropNote && (
+          <span className="hidden shrink-0 text-muted-foreground text-xs sm:inline">
+            {collapsedCount !== null && "· "}
+            {dropNote}
+          </span>
+        )}
+        {childIssue !== null && <WeightIssue sum={childIssue} isCompact />}
+      </div>
+      <div className="relative w-15 shrink-0">
         <CommitInput
           aria-label={`Peso de ${assessment.name}`}
+          disabled={isReadOnly}
           inputMode="decimal"
           value={
             assessment.weight === null ? "" : formatWeight(assessment.weight)
           }
           placeholder={formatWeight(sharedWeight)}
-          className="h-8 pr-5 text-right tabular-nums"
+          className={cn(FIELD, NUMBER_FIELD, "pr-5 pl-1 text-right")}
           onCommit={(text) => {
             const weight = parseGrade(text);
             if (Number.isNaN(weight) || (weight !== null && weight < 0)) return;
             onUpdate((current) => ({ ...current, weight }));
           }}
         />
-        <span className="pointer-events-none absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground text-xs">
+        <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground text-xs">
           %
         </span>
       </div>
@@ -377,10 +562,15 @@ function AssessmentRow({
           aria-invalid={
             assessment.grade !== null && !isValidGrade(assessment.grade, scale)
           }
+          disabled={isReadOnly}
           inputMode="decimal"
           placeholder="—"
           value={assessment.grade === null ? "" : formatGrade(assessment.grade)}
-          className="h-8 w-14 shrink-0 text-right tabular-nums"
+          className={cn(
+            FIELD,
+            NUMBER_FIELD,
+            "pointer-coarse:ml-1 pointer-coarse:w-12 w-13 shrink-0 px-2 text-right",
+          )}
           onCommit={(text) => {
             const grade = parseGrade(text);
             if (Number.isNaN(grade)) return;
@@ -390,131 +580,142 @@ function AssessmentRow({
       ) : (
         <span
           className={cn(
-            "w-14 shrink-0 px-2.5 text-right font-medium text-sm tabular-nums",
+            "w-13 shrink-0 px-2 text-right font-medium text-sm tabular-nums",
             grade?.isPartial && "text-muted-foreground italic",
+            !grade && "text-muted-foreground",
+            isReadOnly && "opacity-50",
           )}
           title={grade?.isPartial ? "Promedio parcial" : "Promedio del grupo"}
         >
-          {grade ? formatGrade(Math.round(grade.grade * 100) / 100) : "—"}
+          {grade ? formatGrade(roundGrade(grade.grade)) : "—"}
         </span>
       )}
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Opciones de ${assessment.name}`}
-              className="shrink-0 text-muted-foreground"
-            />
-          }
-        >
-          <Ellipsis />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          {assessment.kind === "GROUP" && (
-            <>
-              <DropdownMenuItem
-                disabled={!canAddSingle}
-                onClick={() => onAdd(createSingle())}
-              >
-                <Plus />
-                Agregar evaluación
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger disabled={!canAddSingle}>
+      {isReadOnly ? (
+        <span aria-hidden className="w-7 shrink-0" />
+      ) : (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Opciones de ${assessment.name}`}
+                className={cn(
+                  "shrink-0 text-muted-foreground transition-opacity",
+                  REVEAL_ON_ROW,
+                )}
+              />
+            }
+          >
+            <Ellipsis />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {assessment.kind === "GROUP" && (
+              <>
+                <DropdownMenuItem
+                  disabled={!canAddSingle}
+                  onClick={() => onAdd(createSingle())}
+                >
                   <Plus />
-                  Agregar varias
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  {BATCH_SIZES.map((count) => (
-                    <DropdownMenuItem
-                      key={count}
-                      onClick={() => onAddBatch(count)}
-                    >
-                      {count} evaluaciones
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuItem
-                disabled={!canAddGroup}
-                onClick={() => onAdd(createGroup())}
-              >
-                <FolderPlus />
-                Agregar grupo
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  Descartar las peores notas
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup
-                    value={assessment.droppedCount}
-                    onValueChange={(droppedCount: number) =>
-                      onUpdate((current) =>
-                        current.kind === "GROUP"
-                          ? { ...current, droppedCount }
-                          : current,
-                      )
-                    }
-                  >
-                    {DROPPED_COUNTS.map((count) => (
-                      <DropdownMenuRadioItem key={count} value={count}>
-                        {count === 0
-                          ? "Ninguna"
-                          : count === 1
-                            ? "La peor"
-                            : `Las ${count} peores`}
-                      </DropdownMenuRadioItem>
+                  Agregar evaluación
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger disabled={!canAddSingle}>
+                    <Plus />
+                    Agregar varias
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {BATCH_SIZES.map((count) => (
+                      <DropdownMenuItem
+                        key={count}
+                        onClick={() => onAddBatch(count)}
+                      >
+                        {count} evaluaciones
+                      </DropdownMenuItem>
                     ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-            </>
-          )}
-          <DropdownMenuItem
-            disabled={index === 0}
-            onClick={() =>
-              onMove(moveAssessmentBy(assessments, assessment.id, -1))
-            }
-          >
-            <ArrowUp />
-            Subir
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={index === siblings.length - 1}
-            onClick={() =>
-              onMove(moveAssessmentBy(assessments, assessment.id, 1))
-            }
-          >
-            <ArrowDown />
-            Bajar
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={indentAssessment(assessments, assessment.id) === null}
-            onClick={() => onMove(indentAssessment(assessments, assessment.id))}
-          >
-            <IndentIncrease />
-            Meter en el grupo de arriba
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={parentId === null}
-            onClick={() =>
-              onMove(outdentAssessment(assessments, assessment.id))
-            }
-          >
-            <IndentDecrease />
-            Sacar del grupo
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={onRemove}>
-            <Trash2 />
-            Eliminar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem
+                  disabled={!canAddGroup}
+                  onClick={() => onAdd(createGroup())}
+                >
+                  <FolderPlus />
+                  Agregar grupo
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    Descartar las peores notas
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioGroup
+                      value={assessment.droppedCount}
+                      onValueChange={(droppedCount: number) =>
+                        onUpdate((current) =>
+                          current.kind === "GROUP"
+                            ? { ...current, droppedCount }
+                            : current,
+                        )
+                      }
+                    >
+                      {DROPPED_COUNTS.map((count) => (
+                        <DropdownMenuRadioItem key={count} value={count}>
+                          {count === 0
+                            ? "Ninguna"
+                            : count === 1
+                              ? "La peor"
+                              : `Las ${count} peores`}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuItem
+              disabled={index === 0}
+              onClick={() =>
+                onMove(moveAssessmentBy(assessments, assessment.id, -1))
+              }
+            >
+              <ArrowUp />
+              Subir
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={index === siblings.length - 1}
+              onClick={() =>
+                onMove(moveAssessmentBy(assessments, assessment.id, 1))
+              }
+            >
+              <ArrowDown />
+              Bajar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={indentAssessment(assessments, assessment.id) === null}
+              onClick={() =>
+                onMove(indentAssessment(assessments, assessment.id))
+              }
+            >
+              <IndentIncrease />
+              Meter en el grupo de arriba
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={parentId === null}
+              onClick={() =>
+                onMove(outdentAssessment(assessments, assessment.id))
+              }
+            >
+              <IndentDecrease />
+              Sacar del grupo
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={onRemove}>
+              <Trash2 />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }
@@ -524,12 +725,12 @@ function WeightIssue({ sum, isCompact }: { sum: number; isCompact?: boolean }) {
   if (isCompact)
     return (
       <span title={text} className="shrink-0 text-warning">
-        <TriangleAlert aria-label={text} className="size-4" />
+        <TriangleAlert aria-label={text} className="size-3.5" />
       </span>
     );
   return (
-    <p className="flex items-center gap-1.5 text-sm text-warning">
-      <TriangleAlert className="size-4 shrink-0" />
+    <p className="flex items-center gap-1.5 py-1 pl-5 text-sm text-warning">
+      <TriangleAlert className="size-3.5 shrink-0" />
       {text}
     </p>
   );
