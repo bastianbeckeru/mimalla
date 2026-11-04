@@ -19,6 +19,10 @@ export default function CourseCard({
   course,
   curriculum,
   gestureCourseId = null,
+  ignoredFocusCourseId = null,
+  relationStyle = "veil",
+  isMuted = false,
+  surfaceClassName,
   color,
   isSelected,
   onSelect,
@@ -36,6 +40,10 @@ export default function CourseCard({
   course: Course;
   curriculum: Curriculum;
   gestureCourseId?: number | null;
+  ignoredFocusCourseId?: number | null;
+  relationStyle?: "veil" | "ring";
+  isMuted?: boolean;
+  surfaceClassName?: string;
   color: HexColor;
   isSelected: boolean;
   onSelect: () => void;
@@ -52,13 +60,12 @@ export default function CourseCard({
 }) {
   const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
   // How this course stands toward the course whose connections are shown.
-  const role = useConnectionFocus((state) =>
-    getConnectionRole(
-      curriculum,
-      gestureCourseId ?? getFocusedCourseId(state),
-      course.id,
-    ),
-  );
+  const role = useConnectionFocus((state) => {
+    const focusedCourseId = gestureCourseId ?? getFocusedCourseId(state);
+    return focusedCourseId === ignoredFocusCourseId
+      ? null
+      : getConnectionRole(curriculum, focusedCourseId, course.id);
+  });
 
   useEffect(() => () => release(course.id), [release, course.id]);
 
@@ -69,7 +76,9 @@ export default function CourseCard({
       data-course-card
       data-selected={isSelected || undefined}
       style={{ ...style, color: getTextColor(color) }}
-      onPointerEnter={() => hover(course.id)}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "touch") hover(course.id);
+      }}
       onPointerLeave={() => release(course.id, "hoveredCourseId")}
     >
       <button
@@ -98,6 +107,13 @@ export default function CourseCard({
           className={cn(
             "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10",
             role === "misplaced" && "ring-2 ring-warning",
+            relationStyle === "ring" &&
+              role === "prerequisite" &&
+              "ring-(--connection-prerequisite) ring-2",
+            relationStyle === "ring" &&
+              role === "successor" &&
+              "ring-(--connection-successor) ring-2",
+            surfaceClassName,
             isSelected &&
               "ring-2 ring-ring ring-offset-2 ring-offset-background",
           )}
@@ -107,14 +123,15 @@ export default function CourseCard({
           <span className="line-clamp-3 font-medium">{course.name}</span>
         </span>
         {decoration}
-        {/* Dims the card while the connections shown leave it out. A veil
-            over it, rather than fading it, keeps the connections running
-            beneath from showing through. */}
+        {/* Dims the card when muted, or while the connections shown leave it
+            out. A veil over it, rather than fading it, keeps the connections
+            running beneath from showing through. */}
         <span
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-0 rounded-lg bg-background/60 opacity-0 transition-opacity duration-150 ease-out",
-            role === "unrelated" && "opacity-100",
+            relationStyle === "veil" && role === "unrelated" && "opacity-100",
+            isMuted && "bg-background/45 opacity-100",
           )}
         />
       </button>

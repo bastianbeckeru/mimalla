@@ -111,10 +111,15 @@ describe("the role of a course toward the focused one", () => {
 
   test("tells the focused course, its connections and the rest apart", () => {
     expect([1, 2, 3].map((id) => getConnectionRole(chain, 2, id))).toEqual([
-      "related",
+      "prerequisite",
       "focused",
       "unrelated",
     ]);
+  });
+
+  test("tells a prerequisite from a successor", () => {
+    expect(getConnectionRole(chain, 1, 2)).toBe("successor");
+    expect(getConnectionRole(chain, 2, 1)).toBe("prerequisite");
   });
 
   test("is misplaced from either end of a misplaced prerequisite", () => {

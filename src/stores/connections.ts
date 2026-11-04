@@ -11,12 +11,14 @@ type ConnectionFocusState = {
   selectedCourseId: number | null;
   // Whether connections that appear now draw themselves in.
   isDrawingIn: boolean;
+  isSuspended: boolean;
 };
 
 type ConnectionFocusStore = ConnectionFocusState & {
   hover: (courseId: number) => void;
   focusByKeyboard: (courseId: number) => void;
   select: (courseId: number | null) => void;
+  setSuspended: (isSuspended: boolean) => void;
   // Stops a course being hovered or focused, if it still is.
   release: (
     courseId: number,
@@ -25,8 +27,9 @@ type ConnectionFocusStore = ConnectionFocusState & {
 };
 
 // The course whose connections are shown: the one under the pointer, else the
-// one focused by keyboard, else the selected one.
+// one focused by keyboard, else the selected one. None while suspended.
 export function getFocusedCourseId(state: ConnectionFocusState) {
+  if (state.isSuspended) return null;
   return (
     state.hoveredCourseId ?? state.keyboardCourseId ?? state.selectedCourseId
   );
@@ -54,9 +57,11 @@ export const useConnectionFocus = create<ConnectionFocusStore>()((set, get) => {
     keyboardCourseId: null,
     selectedCourseId: null,
     isDrawingIn: false,
+    isSuspended: false,
     hover: (courseId) => update({ hoveredCourseId: courseId }),
     focusByKeyboard: (courseId) => update({ keyboardCourseId: courseId }),
     select: (courseId) => update({ selectedCourseId: courseId }),
+    setSuspended: (isSuspended) => update({ isSuspended }),
     release: (courseId, source) => {
       const state = get();
       const changes: Partial<ConnectionFocusState> = {};
