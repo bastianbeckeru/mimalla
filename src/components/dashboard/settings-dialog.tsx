@@ -1,194 +1,105 @@
 "use client";
 
-import { ArrowLeft, RotateCcw, Settings, Trash } from "lucide-react";
-import { type ReactNode, useId, useState } from "react";
-import CommitInput from "@/components/trajectory/commit-input";
+import { Settings } from "lucide-react";
+import { useState } from "react";
 import {
-  AdaptiveDialog,
-  AdaptiveDialogBody,
-  AdaptiveDialogClose,
-  AdaptiveDialogContent,
-  AdaptiveDialogDescription,
-  AdaptiveDialogFooter,
-  AdaptiveDialogHeader,
-  AdaptiveDialogTitle,
-  AdaptiveDialogTrigger,
-} from "@/components/ui/adaptive-dialog";
+  type CurriculumSettings,
+  SETTINGS_SECTIONS,
+  SettingsSection,
+  type SettingsSectionId,
+} from "@/components/dashboard/settings-sections";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { toast } from "@/components/ui/toast";
-import type { GradingScale } from "@/types/trajectory";
-import { formatGrade, parseGrade } from "@/utils/grades";
-
-const SCALE_FIELDS: { key: keyof GradingScale; label: string }[] = [
-  { key: "min", label: "Mínima" },
-  { key: "passing", label: "Aprobación" },
-  { key: "max", label: "Máxima" },
-];
-
-type Action = {
-  icon: ReactNode;
-  label: string;
-  description: string;
-  confirmTitle: string;
-  confirmDescription: string;
-  onConfirm: () => void;
-};
-
-type SettingsDialogProps = {
-  gradingScale: GradingScale;
-  onGradingScaleChange: (scale: GradingScale) => void;
-  onReset: () => void;
-  onRemove: () => void;
-};
 
 export default function SettingsDialog({
-  gradingScale,
-  onGradingScaleChange,
-  onReset,
-  onRemove,
-}: SettingsDialogProps) {
-  const [pending, setPending] = useState<Action | null>(null);
-  const scaleId = useId();
+  settings,
+}: {
+  settings: CurriculumSettings;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] =
+    useState<SettingsSectionId>("curriculum");
 
-  const actions: Action[] = [
-    {
-      icon: <RotateCcw />,
-      label: "Reiniciar malla",
-      description: "Vuelve a la malla oficial y descarta tu progreso.",
-      confirmTitle: "¿Deseas reiniciar esta malla curricular?",
-      confirmDescription:
-        "Volverá a la malla oficial y perderás tu progreso y cambios.",
-      onConfirm: onReset,
-    },
-    {
-      icon: <Trash />,
-      label: "Eliminar malla",
-      description: "Borra esta malla y todos sus datos.",
-      confirmTitle: "¿Deseas eliminar esta malla curricular?",
-      confirmDescription:
-        "Esta acción es irreversible, todos los datos se perderán.",
-      onConfirm: onRemove,
-    },
-  ];
+  const activeLabel = SETTINGS_SECTIONS.find(
+    ({ id }) => id === activeSection,
+  )?.label;
 
   return (
-    <AdaptiveDialog
-      onOpenChange={(open) => {
-        if (open) setPending(null);
-      }}
-    >
-      <AdaptiveDialogTrigger
-        render={<SidebarMenuButton className="text-sidebar-muted-foreground" />}
+    <>
+      <SidebarMenuButton
+        className="text-sidebar-muted-foreground"
+        onClick={() => {
+          setActiveSection("curriculum");
+          setIsOpen(true);
+        }}
       >
         <Settings />
         <span>Configuraciones</span>
-      </AdaptiveDialogTrigger>
-      <AdaptiveDialogContent className="sm:max-w-[425px]">
-        {pending ? (
-          <>
-            <AdaptiveDialogHeader>
-              <AdaptiveDialogTitle>{pending.confirmTitle}</AdaptiveDialogTitle>
-              <AdaptiveDialogDescription>
-                {pending.confirmDescription}
-              </AdaptiveDialogDescription>
-            </AdaptiveDialogHeader>
-            <AdaptiveDialogFooter>
-              <Button variant="ghost" onClick={() => setPending(null)}>
-                <ArrowLeft />
-                Volver
-              </Button>
-              <AdaptiveDialogClose
-                render={
-                  <Button variant="destructive" onClick={pending.onConfirm} />
-                }
+      </SidebarMenuButton>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[800px]">
+          <div className="flex h-[580px] max-h-[calc(100dvh-2rem)] min-w-0">
+            <nav
+              aria-label="Secciones de configuraciones"
+              className="flex w-51 shrink-0 flex-col gap-1 border-r p-2"
+            >
+              {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
+                <Button
+                  key={id}
+                  variant="ghost"
+                  aria-current={id === activeSection ? "page" : undefined}
+                  className="h-9 justify-start text-muted-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
+                  onClick={() => setActiveSection(id)}
+                >
+                  <Icon />
+                  {label}
+                </Button>
+              ))}
+            </nav>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <header className="flex h-13 shrink-0 items-center border-b px-6">
+                <DialogTitle className="flex items-center gap-1.5 font-medium font-sans text-sm">
+                  <span className="font-normal text-muted-foreground">
+                    Configuraciones
+                  </span>
+                  <span aria-hidden className="text-muted-foreground">
+                    /
+                  </span>
+                  {activeLabel}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Ajusta esta malla y la apariencia, o busca ayuda.
+                </DialogDescription>
+              </header>
+              <div
+                key={activeSection}
+                className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6"
               >
-                {pending.icon}
-                {pending.label}
-              </AdaptiveDialogClose>
-            </AdaptiveDialogFooter>
-          </>
-        ) : (
-          <>
-            <AdaptiveDialogHeader>
-              <AdaptiveDialogTitle>Configuraciones</AdaptiveDialogTitle>
-              <AdaptiveDialogDescription>
-                Administra la malla curricular activa.
-              </AdaptiveDialogDescription>
-            </AdaptiveDialogHeader>
-            <AdaptiveDialogBody className="space-y-4">
-              <section className="space-y-2 rounded-lg border p-3">
-                <div className="space-y-0.5">
-                  <h3 className="font-medium">Escala de notas</h3>
-                  <p className="text-muted-foreground">
-                    Las notas fuera de la escala no cuentan en los promedios.
-                  </p>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {SCALE_FIELDS.map(({ key, label }) => (
-                    <div key={key} className="space-y-1 text-sm">
-                      <label
-                        htmlFor={`${scaleId}-${key}`}
-                        className="text-muted-foreground"
-                      >
-                        {label}
-                      </label>
-                      <CommitInput
-                        id={`${scaleId}-${key}`}
-                        inputMode="decimal"
-                        value={formatGrade(gradingScale[key])}
-                        onCommit={(text) => {
-                          const grade = parseGrade(text);
-                          const next = { ...gradingScale, [key]: grade };
-                          if (
-                            grade === null ||
-                            Number.isNaN(grade) ||
-                            next.min >= next.max ||
-                            next.passing < next.min ||
-                            next.passing > next.max
-                          ) {
-                            toast.add({
-                              type: "error",
-                              title: "Escala no válida",
-                              description:
-                                "La mínima debe ser menor que la máxima y la aprobación debe quedar entre ambas.",
-                            });
-                            return;
-                          }
-                          onGradingScaleChange(next);
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-              <ul className="divide-y rounded-lg border">
-                {actions.map((action) => (
-                  <li
-                    key={action.label}
-                    className="flex items-center justify-between gap-4 p-3"
-                  >
-                    <div className="space-y-0.5">
-                      <p className="font-medium">{action.label}</p>
-                      <p className="text-muted-foreground">
-                        {action.description}
-                      </p>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      aria-label={action.label}
-                      onClick={() => setPending(action)}
-                    >
-                      {action.icon}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </AdaptiveDialogBody>
-          </>
-        )}
-      </AdaptiveDialogContent>
-    </AdaptiveDialog>
+                <SettingsSection
+                  section={activeSection}
+                  settings={{
+                    ...settings,
+                    onReset: () => {
+                      setIsOpen(false);
+                      settings.onReset();
+                    },
+                    onRemove: () => {
+                      setIsOpen(false);
+                      settings.onRemove();
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

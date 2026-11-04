@@ -2,7 +2,7 @@
 
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Redo2, Undo2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import AreasLegend from "@/components/curriculum/areas-legend";
 import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
 import Sidebar from "@/components/dashboard/sidebar";
@@ -35,6 +35,7 @@ import type {
 import { extendCourses } from "@/utils/curriculum";
 import { fetchCurriculum } from "@/utils/curriculum-file";
 import { getCumulativeAverage } from "@/utils/grades";
+import { parseSidebarWidth } from "@/utils/sidebar-width";
 import {
   createEnrollments,
   getTrajectoryStats,
@@ -51,6 +52,7 @@ const loader = (
 );
 
 const NOTICE_MS = 4000;
+const SIDEBAR_WIDTH_KEY = "dashboard-sidebar-width";
 
 export default function ClientSideDashboard({
   catalog,
@@ -123,12 +125,13 @@ export default function ClientSideDashboard({
   );
 }
 
-function SidebarOpener() {
+function SidebarToggle() {
   const { open, isMobile } = useSidebar();
-  if (open && !isMobile) return null;
   return (
     <SidebarTrigger
-      aria-label="Mostrar barra lateral"
+      aria-label={
+        open && !isMobile ? "Ocultar barra lateral" : "Mostrar barra lateral"
+      }
       className="text-muted-foreground"
     />
   );
@@ -153,6 +156,9 @@ function TrajectoryDashboard({
   }));
   const isMobile = useIsMobile();
   const noticeId = useRef<string | null>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(() =>
+    parseSidebarWidth(localStorage.getItem(SIDEBAR_WIDTH_KEY)),
+  );
 
   const { enrollments, gradingScale } = history.present;
   const courses = extendCourses(curriculum.courses);
@@ -198,6 +204,11 @@ function TrajectoryDashboard({
     commitContent({ ...history.present, gradingScale: next });
   }
 
+  function changeSidebarWidth(width: number) {
+    setSidebarWidth(width);
+    localStorage.setItem(SIDEBAR_WIDTH_KEY, String(width));
+  }
+
   function resetCurriculum() {
     commit(
       settleEnrollments(
@@ -209,9 +220,15 @@ function TrajectoryDashboard({
   }
 
   return (
-    <SidebarProvider className="h-full min-h-0">
+    <SidebarProvider
+      className="h-full min-h-0 data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none"
+      style={{ "--sidebar-width": `${sidebarWidth}px` } as CSSProperties}
+    >
       <Sidebar
+        programName={curriculum.programName}
         stats={stats}
+        width={sidebarWidth}
+        onWidthChange={changeSidebarWidth}
         gradingScale={gradingScale}
         onGradingScaleChange={changeGradingScale}
         onReset={resetCurriculum}
@@ -219,7 +236,7 @@ function TrajectoryDashboard({
 
       <SidebarInset className="min-w-0 overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarOpener />
+          <SidebarToggle />
           <h1 className="min-w-0 truncate px-2 font-heading font-semibold text-base">
             {curriculum.programName}
           </h1>

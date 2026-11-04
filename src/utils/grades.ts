@@ -24,6 +24,15 @@ export function isValidGrade(grade: number, scale: GradingScale) {
   return grade >= scale.min && grade <= scale.max;
 }
 
+export function isValidGradingScale(scale: GradingScale) {
+  return (
+    Object.values(scale).every(Number.isFinite) &&
+    scale.min < scale.max &&
+    scale.passing >= scale.min &&
+    scale.passing <= scale.max
+  );
+}
+
 // Rounds half up to one decimal, so 3.95 passes at 4.0.
 export function roundGrade(grade: number) {
   return Math.round(grade * 10 + 1e-9) / 10;

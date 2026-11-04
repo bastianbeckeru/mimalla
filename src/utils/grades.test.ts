@@ -12,6 +12,7 @@ import {
   getSchemeDepth,
   getSuggestedStatus,
   hasRecordedGrades,
+  isValidGradingScale,
   parseGrade,
   roundGrade,
 } from "@/utils/grades";
@@ -365,5 +366,28 @@ describe("getSuggestedStatus", () => {
         scale,
       ),
     ).toBeNull();
+  });
+});
+
+describe("isValidGradingScale", () => {
+  test("accepts passing anywhere between min and max", () => {
+    expect(isValidGradingScale({ min: 1, passing: 4, max: 7 })).toBe(true);
+    expect(isValidGradingScale({ min: 1, passing: 1, max: 7 })).toBe(true);
+    expect(isValidGradingScale({ min: 1, passing: 7, max: 7 })).toBe(true);
+  });
+
+  test("rejects a min that is not below the max", () => {
+    expect(isValidGradingScale({ min: 7, passing: 7, max: 7 })).toBe(false);
+  });
+
+  test("rejects passing outside the scale", () => {
+    expect(isValidGradingScale({ min: 1, passing: 8, max: 7 })).toBe(false);
+    expect(isValidGradingScale({ min: 2, passing: 1, max: 7 })).toBe(false);
+  });
+
+  test("rejects a grade that is not a number", () => {
+    expect(isValidGradingScale({ min: Number.NaN, passing: 4, max: 7 })).toBe(
+      false,
+    );
   });
 });
