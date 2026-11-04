@@ -15,12 +15,15 @@ import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
 import type { Course, Curriculum } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
 
+const MUTED_COLOR_PERCENT = 30;
+const MUTED_TEXT_COLOR =
+  "color-mix(in oklab, var(--foreground) 70%, var(--background))";
+
 export default function CourseCard({
   course,
   curriculum,
   gestureCourseId = null,
-  ignoredFocusCourseId = null,
-  relationStyle = "veil",
+  dimsUnrelated = true,
   isMuted = false,
   surfaceClassName,
   color,
@@ -40,8 +43,7 @@ export default function CourseCard({
   course: Course;
   curriculum: Curriculum;
   gestureCourseId?: number | null;
-  ignoredFocusCourseId?: number | null;
-  relationStyle?: "veil" | "ring";
+  dimsUnrelated?: boolean;
   isMuted?: boolean;
   surfaceClassName?: string;
   color: HexColor;
@@ -60,12 +62,13 @@ export default function CourseCard({
 }) {
   const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
   // How this course stands toward the course whose connections are shown.
-  const role = useConnectionFocus((state) => {
-    const focusedCourseId = gestureCourseId ?? getFocusedCourseId(state);
-    return focusedCourseId === ignoredFocusCourseId
-      ? null
-      : getConnectionRole(curriculum, focusedCourseId, course.id);
-  });
+  const role = useConnectionFocus((state) =>
+    getConnectionRole(
+      curriculum,
+      gestureCourseId ?? getFocusedCourseId(state),
+      course.id,
+    ),
+  );
 
   useEffect(() => () => release(course.id), [release, course.id]);
 
@@ -75,7 +78,10 @@ export default function CourseCard({
       className="group/card relative"
       data-course-card
       data-selected={isSelected || undefined}
-      style={{ ...style, color: getTextColor(color) }}
+      style={{
+        ...style,
+        color: isMuted ? MUTED_TEXT_COLOR : getTextColor(color),
+      }}
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") hover(course.id);
       }}
@@ -105,33 +111,30 @@ export default function CourseCard({
           ref={surfaceRef}
           aria-hidden
           className={cn(
-            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10",
+            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10 transition-colors duration-150 ease-out",
             role === "misplaced" && "ring-2 ring-warning",
-            relationStyle === "ring" &&
-              role === "prerequisite" &&
-              "ring-(--connection-prerequisite) ring-2",
-            relationStyle === "ring" &&
-              role === "successor" &&
-              "ring-(--connection-successor) ring-2",
             surfaceClassName,
             isSelected &&
               "ring-2 ring-ring ring-offset-2 ring-offset-background",
           )}
-          style={{ backgroundColor: color }}
+          style={{
+            backgroundColor: isMuted
+              ? `color-mix(in oklab, ${color} ${MUTED_COLOR_PERCENT}%, var(--background))`
+              : color,
+          }}
         />
         <span className="flex size-full items-center justify-center overflow-hidden">
           <span className="line-clamp-3 font-medium">{course.name}</span>
         </span>
         {decoration}
-        {/* Dims the card when muted, or while the connections shown leave it
-            out. A veil over it, rather than fading it, keeps the connections
-            running beneath from showing through. */}
+        {/* Dims the card while the connections shown leave it out. A veil
+            over it, rather than fading it, keeps the connections running
+            beneath from showing through. */}
         <span
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-0 rounded-lg bg-background/60 opacity-0 transition-opacity duration-150 ease-out",
-            relationStyle === "veil" && role === "unrelated" && "opacity-100",
-            isMuted && "bg-background/45 opacity-100",
+            dimsUnrelated && role === "unrelated" && "opacity-100",
           )}
         />
       </button>

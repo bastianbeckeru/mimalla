@@ -19,12 +19,7 @@ export type Connection = {
 };
 
 // How a course stands toward the focused course.
-export type ConnectionRole =
-  | "focused"
-  | "prerequisite"
-  | "successor"
-  | "misplaced"
-  | "unrelated";
+export type ConnectionRole = "focused" | "related" | "misplaced" | "unrelated";
 
 function getEnd(card: ConnectionCard) {
   return card.column + card.duration - 1;
@@ -108,7 +103,7 @@ export function getConnectionRole(
       courseId,
     )
       ? "misplaced"
-      : "prerequisite";
+      : "related";
   if (
     findCourse(curriculum, courseId)?.prerequisiteIds.includes(focusedCourseId)
   )
@@ -116,6 +111,6 @@ export function getConnectionRole(
       focusedCourseId,
     )
       ? "misplaced"
-      : "successor";
+      : "related";
   return "unrelated";
 }

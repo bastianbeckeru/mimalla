@@ -22,10 +22,10 @@ export default function EnrollmentCard({
   ComponentProps<typeof DraggableCourseCard>,
   | "className"
   | "decoration"
+  | "dimsUnrelated"
   | "isMuted"
   | "label"
   | "onContextMenu"
-  | "relationStyle"
   | "surfaceClassName"
 > & {
   status: EnrollmentStatus;
@@ -39,13 +39,12 @@ export default function EnrollmentCard({
   return (
     <DraggableCourseCard
       {...props}
-      relationStyle="ring"
+      dimsUnrelated={false}
       isMuted={isBlocked}
       surfaceClassName={isBlocker ? "ring-2 ring-destructive" : undefined}
       label={`${props.course.name}, ${isBlocked ? "bloqueado" : STATUS_LABELS[status]}`}
       className={cn(
         "touch-manipulation select-none [-webkit-touch-callout:none]",
-        isBlocked && "saturate-[0.15]",
         isEntering &&
           "fade-in slide-in-from-bottom-1 animate-in fill-mode-both duration-300 ease-out [--tw-animation-delay:var(--enter-delay)] motion-reduce:animate-none",
       )}

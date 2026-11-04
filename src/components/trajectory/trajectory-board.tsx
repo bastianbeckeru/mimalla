@@ -780,13 +780,6 @@ export default function TrajectoryBoard({
                   dragId={card.id}
                   course={card.course}
                   curriculum={layoutCurriculum}
-                  ignoredFocusCourseId={
-                    missingIdsOfSelected &&
-                    selected &&
-                    !missingIdsOfSelected.has(card.courseId)
-                      ? selected.courseId
-                      : null
-                  }
                   color={getCourseColor(curriculum, card.course)}
                   status={card.enrollment.status}
                   isAvailable={isAvailable(card.course, progress)}

@@ -27,6 +27,7 @@ import StatusControl from "@/components/trajectory/status-control";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerTitle,
@@ -214,6 +215,7 @@ function CourseDrawer({
                 onSnapPointChange(FULL_SNAP_POINT);
             }}
           >
+            <DrawerClose className="sr-only">Cerrar</DrawerClose>
             {children}
           </DrawerContent>
         </DrawerVirtualKeyboardProvider>
@@ -318,15 +320,17 @@ function PanelContent({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Cerrar"
-            className="shrink-0 text-muted-foreground"
-            onClick={onClose}
-          >
-            <X />
-          </Button>
+          {!isDrawer && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Cerrar"
+              className="shrink-0 text-muted-foreground"
+              onClick={onClose}
+            >
+              <X />
+            </Button>
+          )}
         </div>
         <Description className="truncate text-muted-foreground text-xs">
           {[
@@ -340,7 +344,7 @@ function PanelContent({
             .join(" · ")}
         </Description>
       </div>
-      <div className="flex items-center gap-2 pr-2">
+      <div className="flex flex-wrap items-center gap-2 pr-2">
         {isLocked ? (
           <p className="flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-muted px-2.5 text-muted-foreground text-xs">
             <Lock className="size-3 shrink-0" />
@@ -357,7 +361,7 @@ function PanelContent({
         )}
         {onRetake && (
           <Button size="sm" className="h-9 shrink-0" onClick={onRetake}>
-            Volver a cursar
+            Recursar
           </Button>
         )}
       </div>
