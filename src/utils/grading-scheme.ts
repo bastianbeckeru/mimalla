@@ -23,6 +23,18 @@ export function flattenScheme(
   ]);
 }
 
+export function getVisibleRows(
+  rows: SchemeRow[],
+  collapsedIds: ReadonlySet<string>,
+) {
+  let collapsedDepth: number | null = null;
+  return rows.filter(({ assessment, depth }) => {
+    if (collapsedDepth !== null && depth > collapsedDepth) return false;
+    collapsedDepth = collapsedIds.has(assessment.id) ? depth : null;
+    return true;
+  });
+}
+
 // The levels an assessment takes up. A group keeps one below it for its
 // single assessments even while empty.
 export function getAssessmentHeight(assessment: Assessment): number {

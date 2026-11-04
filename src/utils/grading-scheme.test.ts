@@ -4,6 +4,7 @@ import {
   copyScheme,
   flattenScheme,
   getDropProjection,
+  getVisibleRows,
   getWeightIssue,
   indentAssessment,
   moveAssessment,
@@ -215,5 +216,28 @@ describe("getDropProjection", () => {
       index: 1,
       depth: 1,
     });
+  });
+});
+
+describe("getVisibleRows", () => {
+  const rows = flattenScheme([
+    group("a", [group("b", [single("c")]), single("d")]),
+    single("e"),
+  ]);
+  const visibleIds = (collapsed: string[]) =>
+    getVisibleRows(rows, new Set(collapsed)).map(
+      ({ assessment }) => assessment.id,
+    );
+
+  test("keeps every row when nothing is collapsed", () => {
+    expect(visibleIds([])).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  test("hides every descendant of a collapsed group", () => {
+    expect(visibleIds(["a"])).toEqual(["a", "e"]);
+  });
+
+  test("keeps the siblings after a nested collapsed group", () => {
+    expect(visibleIds(["b"])).toEqual(["a", "b", "d", "e"]);
   });
 });
