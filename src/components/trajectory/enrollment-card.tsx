@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "cn";
-import type { ComponentProps } from "react";
+import { type ComponentProps, memo } from "react";
 import DraggableCourseCard from "@/components/builder/course-card";
 import type { EnrollmentStatus } from "@/types/trajectory";
 
@@ -11,12 +11,19 @@ export const STATUS_LABELS: Record<EnrollmentStatus, string> = {
   FAILED: "reprobado",
 };
 
-export default function EnrollmentCard({
+// Memoized, and fed primitives and stable callbacks, so that a drag only renders
+// the cards it moves.
+export default memo(function EnrollmentCard({
+  dragId,
   status,
   isAvailable,
   isBlocker,
   isEntering,
   enterDelay,
+  gridColumn,
+  gridRow,
+  onSelect,
+  takeDropOrigin,
   ...props
 }: Omit<
   ComponentProps<typeof DraggableCourseCard>,
@@ -26,19 +33,27 @@ export default function EnrollmentCard({
   | "isMuted"
   | "label"
   | "onContextMenu"
+  | "onSelect"
+  | "style"
   | "surfaceClassName"
+  | "takeDropOrigin"
 > & {
   status: EnrollmentStatus;
   isAvailable: boolean;
   isBlocker: boolean;
   isEntering: boolean;
   enterDelay: number;
+  gridColumn: string;
+  gridRow: string;
+  onSelect: (id: string) => void;
+  takeDropOrigin: (id: string) => { x: number; y: number } | null;
 }) {
   const isBlocked = !isAvailable && status === "PENDING";
 
   return (
     <DraggableCourseCard
       {...props}
+      dragId={dragId}
       dimsUnrelated={false}
       isMuted={isBlocked}
       surfaceClassName={isBlocker ? "ring-2 ring-destructive" : undefined}
@@ -48,8 +63,11 @@ export default function EnrollmentCard({
         isEntering &&
           "fade-in slide-in-from-bottom-1 animate-in fill-mode-both duration-300 ease-out [--tw-animation-delay:var(--enter-delay)] motion-reduce:animate-none",
       )}
+      onSelect={() => onSelect(dragId)}
+      takeDropOrigin={() => takeDropOrigin(dragId)}
       style={{
-        ...props.style,
+        gridColumn,
+        gridRow,
         ...(isBlocker && { zIndex: 20 }),
         ...(isEntering && { "--enter-delay": `${enterDelay}ms` }),
       }}
@@ -62,7 +80,7 @@ export default function EnrollmentCard({
       decoration={status !== "PENDING" && <StrikeLine status={status} />}
     />
   );
-}
+});
 
 function StrikeLine({ status }: { status: EnrollmentStatus }) {
   return (

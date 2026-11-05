@@ -10,12 +10,7 @@ import {
 } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { cn } from "cn";
-import { ChevronDown } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getCourseColor } from "@/builder/colors";
-import AddButton from "@/components/builder/add-button";
-import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
 import ClosePeriodDialog from "@/components/trajectory/close-period-dialog";
 import CoursePanel, {
@@ -25,17 +20,14 @@ import CoursePanel, {
   PEEK_SNAP_POINT,
   type SchemeSource,
 } from "@/components/trajectory/course-panel";
-import EnrollmentCard, {
-  STATUS_LABELS,
-} from "@/components/trajectory/enrollment-card";
+import { STATUS_LABELS } from "@/components/trajectory/enrollment-card";
 import MoveEnrollmentDialog from "@/components/trajectory/move-enrollment-dialog";
 import PassedPeriodsDialog from "@/components/trajectory/passed-periods-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import TrajectoryGrid, {
+  ENTER_STAGGER_MS,
+  type Gesture,
+  hasLeftStart,
+} from "@/components/trajectory/trajectory-grid";
 import { toast } from "@/components/ui/toast";
 import { useGridGesture } from "@/hooks/use-grid-gesture";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -55,9 +47,6 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-  getEmptyCells,
-  getRowCount,
-  HEADER_ROWS,
 } from "@/utils/curriculum-grid";
 import {
   formatGrade,
@@ -86,7 +75,6 @@ import {
   retakeEnrollment,
   setEnrollmentStatus,
   setEnrollmentStatuses,
-  toLayoutCurriculum,
 } from "@/utils/trajectory";
 
 const DRAG_ACTIVATION_DISTANCE = 5;
@@ -94,7 +82,6 @@ const TOUCH_HOLD_MS = 300;
 const TOUCH_HOLD_TOLERANCE = 8;
 const ROOT_FONT_SIZE = 16;
 const DRAG_CLICK_MS = 300;
-const ENTER_STAGGER_MS = 30;
 const ENTER_MS = 300;
 const PREVIOUS_PERIOD_PEEK_REM = 2.5;
 const REVEAL_MARGIN_REM = 1;
@@ -141,7 +128,6 @@ const EDIT_ERROR_DESCRIPTIONS: Record<EditError, string> = {
   PREREQUISITE_ON_THE_WAY: "Hay uno de sus prerrequisitos en el camino.",
 };
 
-type Gesture = { dragId: string; placement: Placement };
 type PeriodClosing = { period: PeriodKey; isOpen: boolean };
 
 function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
@@ -154,10 +140,6 @@ function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
         : `${revertedCount} cursos que lo requerían volvieron a pendiente.`,
     isShownOnDesktop: true,
   };
-}
-
-function hasLeftStart({ x, y }: { x: number; y: number }) {
-  return Math.hypot(x, y) >= TOUCH_HOLD_TOLERANCE;
 }
 
 function showEditError(title: string, error: EditError) {
@@ -189,7 +171,6 @@ export default function TrajectoryBoard({
   const sectionRef = useRef<HTMLElement>(null);
   const lastDragEndAt = useRef(Number.NEGATIVE_INFINITY);
   const isDragging = useRef(false);
-  const [gesture, setGesture] = useState<Gesture | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [panelId, setPanelId] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -213,61 +194,7 @@ export default function TrajectoryBoard({
   const gesturePeriods = nextPeriod
     ? [...base.periods, nextPeriod]
     : base.periods;
-  const preview = gesture
-    ? moveEnrollment(enrollments, gesture.dragId, gesture.placement, context)
-    : null;
-  const shown = gesture
-    ? layOutTrajectory(
-        preview?.enrollments ?? enrollments,
-        context,
-        gesturePeriods,
-      )
-    : base;
-  const baseCardsById = new Map(base.cards.map((card) => [card.id, card]));
-  const draggedCard = gesture ? baseCardsById.get(gesture.dragId) : undefined;
-  const landing = gesture
-    ? preview?.error
-      ? draggedCard && {
-          column: shown.periods.indexOf(gesture.placement.period) + 1,
-          row: gesture.placement.row,
-          duration: draggedCard.duration,
-          height: draggedCard.height,
-        }
-      : shown.cards.find((card) => card.id === gesture.dragId)
-    : undefined;
-
-  const columns = shown.periods.length;
-  const rows = getRowCount(shown.cards);
-
-  const selected = shown.cards.find((card) => card.id === selectedId) ?? null;
   const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
-  const startsNoConnection = new Set(
-    shown.cards
-      .filter(
-        (card) => card.enrollment.status === "FAILED" && card.id !== selectedId,
-      )
-      .map((card) => card.id),
-  );
-  const layoutCurriculum = toLayoutCurriculum(curriculum, shown, shown.cards);
-  const missingIdsOfSelected =
-    selected && isBlocked(selected)
-      ? new Set(
-          selected.course.prerequisiteIds.filter(
-            (id) => !progress.approvedCourseIds.has(id),
-          ),
-        )
-      : null;
-  const moveConflicts = new Map(
-    draggingId
-      ? gesturePeriods.map((period) => [
-          period,
-          getMoveConflict(enrollments, draggingId, period, context),
-        ])
-      : [],
-  );
-  const blockerIds = new Set(
-    gesture ? moveConflicts.get(gesture.placement.period)?.blockerIds : [],
-  );
   const [firstVisibleColumn] = useState(() => getOpeningColumn(base, entry));
   const panelColumn = panelCard?.column;
   const panelRow = panelCard?.row;
@@ -386,13 +313,6 @@ export default function TrajectoryBoard({
     enabled: isPanelOpen && !isMobile,
   });
 
-  const emptyCells =
-    isMobile || isPanelOpen
-      ? []
-      : getEmptyCells(shown.cards, { rows, columns }).flatMap((cell) => {
-          const period = shown.periods[cell.column - 1];
-          return period ? [{ ...cell, period }] : [];
-        });
   const passedPeriodOptions = base.periods.flatMap((period) => {
     const { label, hasStarted, isCurrent } = getPeriodInfo(period, entry);
     return label && hasStarted && !isCurrent ? [{ period, label }] : [];
@@ -431,13 +351,6 @@ export default function TrajectoryBoard({
         suggestedStatus: getSuggestedStatus(card.enrollment, gradingScale),
       };
     });
-
-  function isBlocked(card: PlacedEnrollment) {
-    return (
-      card.enrollment.status === "PENDING" &&
-      !isAvailable(card.course, progress)
-    );
-  }
 
   function hasPendingEnrollments(column: number) {
     return base.cards.some(
@@ -494,27 +407,21 @@ export default function TrajectoryBoard({
       : null;
   }
 
-  function isSameGesture(next: Gesture) {
-    return (
-      gesture?.dragId === next.dragId &&
-      gesture.placement.period === next.placement.period &&
-      gesture.placement.row === next.placement.row
-    );
-  }
-
   function openPanel(card: PlacedEnrollment) {
     if (!isPanelOpen) setSnapPoint(PEEK_SNAP_POINT);
     setPanelId(card.id);
     setIsPanelOpen(true);
   }
 
-  function selectCard(card: PlacedEnrollment) {
+  function selectCard(id: string) {
     if (
       isDragging.current ||
       performance.now() - lastDragEndAt.current < DRAG_CLICK_MS
     )
       return;
-    if (card.id !== selectedId) openPanel(card);
+    const card = base.cards.find((card) => card.id === id);
+    if (!card) return;
+    if (id !== selectedId) openPanel(card);
     else if (isMobile) setSnapPoint(FULL_SNAP_POINT);
     else setIsPanelOpen(false);
   }
@@ -570,7 +477,6 @@ export default function TrajectoryBoard({
   }
 
   function handleDragEnd({ operation, canceled }: DragEndEvent) {
-    setGesture(null);
     setDraggingId(null);
     useConnectionFocus.getState().setSuspended(false);
     isDragging.current = false;
@@ -632,11 +538,6 @@ export default function TrajectoryBoard({
         setDraggingId(String(operation.source?.id));
         useConnectionFocus.getState().setSuspended(true);
       }}
-      onDragMove={({ operation }) => {
-        if (hasLeftStart(operation.transform)) setIsPanelOpen(false);
-        const next = getMove(operation);
-        if (next && !isSameGesture(next)) setGesture(next);
-      }}
       onDragEnd={handleDragEnd}
     >
       <div className="flex min-h-0 flex-1">
@@ -650,166 +551,32 @@ export default function TrajectoryBoard({
               : undefined
           }
         >
-          <div
-            className="relative grid w-max"
-            style={{
-              gridTemplateColumns: `repeat(${columns + 1}, ${GRID_CELL_WIDTH}rem)`,
-              gridTemplateRows: `auto repeat(${rows}, ${GRID_CELL_HEIGHT}rem)`,
-              gap: `${GRID_GAP}rem`,
-            }}
-          >
-            {shown.periods.map((period, index) => {
-              const { label, isCurrent, hasStarted } = getPeriodInfo(
-                period,
-                entry,
-              );
-              const column = index + 1;
-              return (
-                <h2
-                  key={period}
-                  className="min-w-0"
-                  style={{ gridColumn: column, gridRow: 1 }}
-                >
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      aria-label={`Acciones de ${getPeriodLabel(period)}`}
-                      className={cn(
-                        "flex min-h-7 w-full items-center gap-1.5 rounded-md px-2 py-1 text-left font-semibold text-muted-foreground text-xs outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-muted",
-                        isCurrent && "text-foreground",
-                      )}
-                    >
-                      <span className="min-w-0 truncate">{label}</span>
-                      <span className="font-normal tabular-nums opacity-70">
-                        {parsePeriodKey(period).year}
-                      </span>
-                      <ChevronDown className="ml-auto size-3 shrink-0 opacity-60" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-44">
-                      <DropdownMenuItem
-                        onClick={() => addAtPeriodEnd(period, column)}
-                      >
-                        Agregar curso
-                      </DropdownMenuItem>
-                      {hasStarted && hasPendingEnrollments(column) && (
-                        <DropdownMenuItem
-                          onClick={() =>
-                            setPeriodClosing({ period, isOpen: true })
-                          }
-                        >
-                          Cerrar periodo
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </h2>
-              );
-            })}
-            <div
-              ref={firstCellRef}
-              aria-hidden
-              className="pointer-events-none"
-              style={{ gridColumn: 1, gridRow: HEADER_ROWS + 1 }}
-            />
-            {emptyCells.map(({ period, column, row }) => (
-              <AddButton
-                key={`${column}/${row}`}
-                label={`Agregar curso en ${getPeriodLabel(period)}, fila ${row}`}
-                revealOnHover
-                style={{ gridColumn: column, gridRow: HEADER_ROWS + row }}
-                onClick={() => setAddPlacement({ period, row })}
-              />
-            ))}
-            {nextPeriod && (
-              <AddButton
-                label="Agregar periodo"
-                revealOnHover={!isMobile}
-                style={{
-                  gridColumn: columns + 1,
-                  gridRow: isMobile
-                    ? HEADER_ROWS + 1
-                    : `${HEADER_ROWS + 1} / span ${rows}`,
-                }}
-                onClick={() => setAddPlacement({ period: nextPeriod, row: 1 })}
-              />
-            )}
-            {!isEntering && (
-              <ConnectionsOverlay
-                curriculum={layoutCurriculum}
-                cards={shown.cards}
-                size={{ rows, columns }}
-                firstRow={HEADER_ROWS + 1}
-                selectedCourseId={selected?.courseId ?? null}
-                isShown={(connection) => {
-                  if (missingIdsOfSelected && selected) {
-                    if (
-                      connection.kind === "prerequisite" &&
-                      connection.to.courseId === selected.courseId
-                    )
-                      return missingIdsOfSelected.has(connection.from.courseId);
-                    if (
-                      connection.kind === "successor" &&
-                      connection.from.courseId === selected.courseId
-                    )
-                      return false;
-                  }
-                  return !startsNoConnection.has(connection.from.id);
-                }}
-              />
-            )}
-            {shown.cards.map((shownCard) => {
-              const baseCard = baseCardsById.get(shownCard.id) ?? shownCard;
-              const card =
-                shownCard.id === gesture?.dragId ? baseCard : shownCard;
-              return (
-                <EnrollmentCard
-                  key={card.id}
-                  dragId={card.id}
-                  course={card.course}
-                  curriculum={layoutCurriculum}
-                  color={getCourseColor(curriculum, card.course)}
-                  status={card.enrollment.status}
-                  isAvailable={isAvailable(card.course, progress)}
-                  isBlocker={blockerIds.has(card.id)}
-                  isSelected={card.id === selectedId}
-                  isEntering={isEntering}
-                  enterDelay={(card.column - 1) * ENTER_STAGGER_MS}
-                  onSelect={() => selectCard(card)}
-                  takeDropOrigin={() => takeDropOrigin(card.id)}
-                  style={{
-                    gridColumn: `${card.column} / span ${card.duration}`,
-                    gridRow: `${HEADER_ROWS + card.row} / span ${card.height}`,
-                  }}
-                />
-              );
-            })}
-            {shown.periods.map(
-              (period, index) =>
-                moveConflicts.get(period) && (
-                  <div
-                    key={period}
-                    aria-hidden
-                    className="fade-in pointer-events-none z-10 -mx-1 animate-in bg-background/70 duration-150 motion-reduce:animate-none"
-                    style={{
-                      gridColumn: index + 1,
-                      gridRow: `1 / span ${rows + HEADER_ROWS}`,
-                    }}
-                  />
-                ),
-            )}
-            {landing && (
-              <div
-                aria-hidden
-                className={cn(
-                  "pointer-events-none z-10 rounded-lg",
-                  preview?.error ? "bg-destructive/15" : "bg-primary/10",
-                )}
-                style={{
-                  gridColumn: `${landing.column} / span ${landing.duration}`,
-                  gridRow: `${HEADER_ROWS + landing.row} / span ${landing.height}`,
-                }}
-              />
-            )}
-          </div>
+          <TrajectoryGrid
+            base={base}
+            nextPeriod={nextPeriod}
+            gesturePeriods={gesturePeriods}
+            enrollments={enrollments}
+            entry={entry}
+            curriculum={curriculum}
+            progress={progress}
+            selectedId={selectedId}
+            draggingId={draggingId}
+            isEntering={isEntering}
+            isMobile={isMobile}
+            isPanelOpen={isPanelOpen}
+            firstCellRef={firstCellRef}
+            getMove={getMove}
+            takeDropOrigin={takeDropOrigin}
+            getPeriodLabel={getPeriodLabel}
+            hasPendingEnrollments={hasPendingEnrollments}
+            onLeaveStart={() => setIsPanelOpen(false)}
+            onSelectCard={selectCard}
+            onAddAtPeriodEnd={addAtPeriodEnd}
+            onAddAt={setAddPlacement}
+            onClosePeriod={(period) =>
+              setPeriodClosing({ period, isOpen: true })
+            }
+          />
         </section>
         <CoursePanel
           open={isPanelOpen && panelCard !== null}

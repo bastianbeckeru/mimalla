@@ -37,7 +37,7 @@ export default function DraggableCourseCard({
       surfaceRef={surfaceRef}
       className={cn(
         !isDragDisabled && "cursor-grab",
-        isDragging && "cursor-grabbing shadow-lg",
+        isDragging && "cursor-grabbing shadow-lg will-change-[translate]",
         className,
       )}
     />
