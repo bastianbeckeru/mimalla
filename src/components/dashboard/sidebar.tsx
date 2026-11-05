@@ -4,15 +4,11 @@ import { ChevronLeft, ChevronRight, Settings, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import SettingsDialog from "@/components/dashboard/settings-dialog";
 import {
-  type CurriculumSettings,
   SETTINGS_SECTIONS,
   SettingsSection,
 } from "@/components/dashboard/settings-sections";
 import SidebarResizeHandle from "@/components/dashboard/sidebar-resize-handle";
-import {
-  type SidebarScreen,
-  useSidebarScreen,
-} from "@/components/dashboard/use-sidebar-screen";
+import { useSidebarScreen } from "@/components/dashboard/use-sidebar-screen";
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -30,6 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTrajectoryStore } from "@/stores/trajectory";
+import type { SettingsSectionId, TrajectorySettings } from "@/types/settings";
 import type { GradingScale } from "@/types/trajectory";
 import { formatGrade } from "@/utils/grades";
 
@@ -92,7 +89,7 @@ function ScreenHeader({
 function MobileSettingsList({
   onOpenSection,
 }: {
-  onOpenSection: (screen: SidebarScreen) => void;
+  onOpenSection: (section: SettingsSectionId) => void;
 }) {
   return (
     <SidebarContent className="p-4">
@@ -142,7 +139,7 @@ export default function DashboardSidebar({
     cumulativeAverage,
   } = stats;
 
-  const settings: CurriculumSettings = {
+  const settings: TrajectorySettings = {
     programName,
     gradingScale,
     onGradingScaleChange,

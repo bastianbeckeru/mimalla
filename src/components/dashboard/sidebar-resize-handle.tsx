@@ -1,7 +1,7 @@
 "use client";
 
 import { MoveHorizontal, PanelLeftClose } from "lucide-react";
-import { type PointerEvent, useState } from "react";
+import { type PointerEvent, useEffect, useRef, useState } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
   clampSidebarWidth,
@@ -13,18 +13,23 @@ import {
 
 const KEYBOARD_STEP = 16;
 
+const WIDTH_PROPERTY = "--sidebar-width";
+
 type DraggedWidth = ReturnType<typeof getDraggedSidebarWidth>;
 
-function getWrapper(handle: HTMLElement) {
-  return handle.closest<HTMLElement>("[data-slot=sidebar-wrapper]");
+type ActiveDrag = {
+  wrapper: HTMLElement;
+  startWidth: number;
+  grabOffset: number;
+};
+
+function previewWidth(wrapper: HTMLElement, width: number) {
+  wrapper.style.setProperty(WIDTH_PROPERTY, `${width}px`);
 }
 
-function previewWidth(handle: HTMLElement, width: number) {
-  getWrapper(handle)?.style.setProperty("--sidebar-width", `${width}px`);
-}
-
-function setResizing(handle: HTMLElement, isResizing: boolean) {
-  getWrapper(handle)?.toggleAttribute("data-resizing", isResizing);
+function abandonDrag({ wrapper, startWidth }: ActiveDrag) {
+  wrapper.removeAttribute("data-resizing");
+  previewWidth(wrapper, startWidth);
 }
 
 export default function SidebarResizeHandle({
@@ -36,38 +41,59 @@ export default function SidebarResizeHandle({
 }) {
   const { setOpen } = useSidebar();
   const [drag, setDrag] = useState<DraggedWidth | null>(null);
+  const activeDrag = useRef<ActiveDrag | null>(null);
+
+  useEffect(
+    () => () => {
+      if (activeDrag.current) abandonDrag(activeDrag.current);
+    },
+    [],
+  );
 
   function startDrag(event: PointerEvent<HTMLDivElement>) {
-    if (event.button !== 0) return;
+    const wrapper = event.currentTarget.closest<HTMLElement>(
+      "[data-slot=sidebar-wrapper]",
+    );
+    if (event.button !== 0 || !wrapper) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    setResizing(event.currentTarget, true);
+    wrapper.setAttribute("data-resizing", "");
+    activeDrag.current = {
+      wrapper,
+      startWidth: width,
+      grabOffset: event.clientX - width,
+    };
     setDrag({ width, isClosing: false });
   }
 
   function moveDrag(event: PointerEvent<HTMLDivElement>) {
-    if (!drag) return;
-    const next = getDraggedSidebarWidth(event.clientX);
-    previewWidth(event.currentTarget, next.width);
+    const active = activeDrag.current;
+    if (!active) return;
+    const next = getDraggedSidebarWidth(event.clientX - active.grabOffset);
+    previewWidth(active.wrapper, next.width);
     setDrag(next);
   }
 
-  function cancelDrag(event: PointerEvent<HTMLDivElement>) {
-    if (!drag) return;
-    setResizing(event.currentTarget, false);
-    previewWidth(event.currentTarget, width);
+  function cancelDrag() {
+    if (!activeDrag.current) return;
+    abandonDrag(activeDrag.current);
+    activeDrag.current = null;
     setDrag(null);
   }
 
   function finishDrag(event: PointerEvent<HTMLDivElement>) {
-    if (!drag) return;
-    if (drag.isClosing) {
-      cancelDrag(event);
+    const active = activeDrag.current;
+    if (!active) return;
+    const next = getDraggedSidebarWidth(event.clientX - active.grabOffset);
+    if (next.isClosing) {
+      cancelDrag();
       setOpen(false);
       return;
     }
-    setResizing(event.currentTarget, false);
+    previewWidth(active.wrapper, next.width);
+    active.wrapper.removeAttribute("data-resizing");
+    activeDrag.current = null;
     setDrag(null);
-    onWidthChange(drag.width);
+    onWidthChange(next.width);
   }
 
   return (
@@ -90,6 +116,7 @@ export default function SidebarResizeHandle({
         onPointerMove={moveDrag}
         onPointerUp={finishDrag}
         onPointerCancel={cancelDrag}
+        onLostPointerCapture={cancelDrag}
         onDoubleClick={() => onWidthChange(DEFAULT_SIDEBAR_WIDTH)}
         onKeyDown={(event) => {
           const direction =

@@ -3,10 +3,8 @@
 import { Settings } from "lucide-react";
 import { useState } from "react";
 import {
-  type CurriculumSettings,
   SETTINGS_SECTIONS,
   SettingsSection,
-  type SettingsSectionId,
 } from "@/components/dashboard/settings-sections";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,15 +14,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
+import type { SettingsSectionId, TrajectorySettings } from "@/types/settings";
 
 export default function SettingsDialog({
   settings,
 }: {
-  settings: CurriculumSettings;
+  settings: TrajectorySettings;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] =
-    useState<SettingsSectionId>("curriculum");
+    useState<SettingsSectionId>("trajectory");
 
   const activeLabel = SETTINGS_SECTIONS.find(
     ({ id }) => id === activeSection,
@@ -35,7 +34,7 @@ export default function SettingsDialog({
       <SidebarMenuButton
         className="text-sidebar-muted-foreground"
         onClick={() => {
-          setActiveSection("curriculum");
+          setActiveSection("trajectory");
           setIsOpen(true);
         }}
       >

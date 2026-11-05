@@ -29,19 +29,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { SettingsSectionId, TrajectorySettings } from "@/types/settings";
 import type { GradingScale } from "@/types/trajectory";
 import { formatGrade, isValidGradingScale, parseGrade } from "@/utils/grades";
 import { version } from "../../../package.json";
-
-export type SettingsSectionId = "curriculum" | "appearance" | "help";
-
-export type CurriculumSettings = {
-  programName: string;
-  gradingScale: GradingScale;
-  onGradingScaleChange: (scale: GradingScale) => void;
-  onReset: () => void;
-  onRemove: () => void;
-};
 
 export const SETTINGS_SECTIONS: {
   id: SettingsSectionId;
@@ -50,7 +41,7 @@ export const SETTINGS_SECTIONS: {
   icon: LucideIcon;
 }[] = [
   {
-    id: "curriculum",
+    id: "trajectory",
     label: "Esta malla",
     summary: "Escala de notas, reiniciar y eliminar",
     icon: GraduationCap,
@@ -165,7 +156,7 @@ function RowText({
 function GradingScaleGroup({
   gradingScale,
   onGradingScaleChange,
-}: Pick<CurriculumSettings, "gradingScale" | "onGradingScaleChange">) {
+}: Pick<TrajectorySettings, "gradingScale" | "onGradingScaleChange">) {
   const [drafts, setDrafts] = useState<
     Partial<Record<keyof GradingScale, string>>
   >({});
@@ -281,13 +272,13 @@ function DangerRow({
   );
 }
 
-function CurriculumSection({
+function TrajectorySection({
   programName,
   gradingScale,
   onGradingScaleChange,
   onReset,
   onRemove,
-}: CurriculumSettings) {
+}: TrajectorySettings) {
   return (
     <>
       <GradingScaleGroup
@@ -409,9 +400,9 @@ export function SettingsSection({
   settings,
 }: {
   section: SettingsSectionId;
-  settings: CurriculumSettings;
+  settings: TrajectorySettings;
 }) {
   if (section === "appearance") return <AppearanceSection />;
   if (section === "help") return <HelpSection />;
-  return <CurriculumSection {...settings} />;
+  return <TrajectorySection {...settings} />;
 }

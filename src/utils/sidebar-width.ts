@@ -2,7 +2,7 @@ export const MIN_SIDEBAR_WIDTH = 240;
 export const DEFAULT_SIDEBAR_WIDTH = 288;
 export const MAX_SIDEBAR_WIDTH = 360;
 
-const CLOSE_DISTANCE_PAST_MIN = 40;
+const CLOSE_DISTANCE_PAST_MIN = MIN_SIDEBAR_WIDTH * 0.75;
 
 export function clampSidebarWidth(width: number) {
   return Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, width));

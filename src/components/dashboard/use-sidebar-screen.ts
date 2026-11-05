@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { SettingsSectionId } from "@/components/dashboard/settings-sections";
 import { useSidebar } from "@/components/ui/sidebar";
+import type { SettingsSectionId } from "@/types/settings";
 
-export type SidebarScreen = "main" | "settings" | SettingsSectionId;
+type SidebarScreen = "main" | "settings" | SettingsSectionId;
 
 type ScreenEntry = { sidebarScreen: SidebarScreen; sidebarDepth: number };
 
@@ -59,7 +59,9 @@ export function useSidebarScreen() {
   useEffect(
     () => () => {
       const entry = readEntry(window.history.state);
-      if (entry) window.history.go(-entry.sidebarDepth);
+      if (entry && !isUnwinding.current) {
+        window.history.go(-entry.sidebarDepth);
+      }
     },
     [],
   );
