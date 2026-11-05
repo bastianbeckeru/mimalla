@@ -89,6 +89,17 @@ const sensors = [
 ];
 
 type Indicator = { top: number; depth: number };
+type Drop = SchemePlacement & { activeId: string; indicator: Indicator };
+
+function isSameDrop(a: Drop | null, b: Drop | null) {
+  return (
+    a?.activeId === b?.activeId &&
+    a?.parentId === b?.parentId &&
+    a?.index === b?.index &&
+    a?.indicator.top === b?.indicator.top &&
+    a?.indicator.depth === b?.indicator.depth
+  );
+}
 
 function createSingle(name = "Evaluación"): Assessment {
   return { kind: "SINGLE", id: nanoid(), name, weight: null, grade: null };
@@ -125,9 +136,7 @@ export default function GradingSchemeEditor({
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef(new Map<string, HTMLElement>());
   const [focusId, setFocusId] = useState<string | null>(null);
-  const [drop, setDrop] = useState<
-    (SchemePlacement & { activeId: string; indicator: Indicator }) | null
-  >(null);
+  const [drop, setDrop] = useState<Drop | null>(null);
   const [collapsedIds, setCollapsedIds] = useState<ReadonlySet<string>>(
     new Set(),
   );
@@ -163,7 +172,7 @@ export default function GradingSchemeEditor({
     if (next) onChange(next);
   }
 
-  function getProjection(operation: DragMoveEvent["operation"]) {
+  function getProjection(operation: DragMoveEvent["operation"]): Drop | null {
     const activeId = operation.source?.id;
     const list = listRef.current?.getBoundingClientRect();
     if (typeof activeId !== "string" || !list) return null;
@@ -285,7 +294,10 @@ export default function GradingSchemeEditor({
           ...defaults,
           Feedback.configure({ dropAnimation: null }),
         ]}
-        onDragMove={({ operation }) => setDrop(getProjection(operation))}
+        onDragMove={({ operation }) => {
+          const next = getProjection(operation);
+          if (!isSameDrop(drop, next)) setDrop(next);
+        }}
         onDragEnd={({ operation, canceled }) => {
           const projection = getProjection(operation);
           setDrop(null);
@@ -464,6 +476,7 @@ function AssessmentRow({
         <button
           ref={handleRef}
           type="button"
+          data-base-ui-swipe-ignore
           aria-label={`Mover ${assessment.name}`}
           className={cn(
             "flex h-7 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-opacity active:cursor-grabbing",
