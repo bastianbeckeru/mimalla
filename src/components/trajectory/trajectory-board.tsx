@@ -3,18 +3,20 @@
 import type { DragEndEvent, DragMoveEvent } from "@dnd-kit/dom";
 import { Feedback } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
-import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useRef, useState } from "react";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
+import {
+  getClosingEnrollments,
+  getMoveOptions,
+  getPassedPeriodOptions,
+  getSchemeSource,
+} from "@/components/trajectory/board-options";
 import { sensors } from "@/components/trajectory/board-sensors";
 import ClosePeriodDialog from "@/components/trajectory/close-period-dialog";
 import CoursePanel, {
-  FULL_SNAP_POINT,
-  type PanelSnapPoint,
   PEEK_SNAP_POINT,
 } from "@/components/trajectory/course-panel";
 import {
-  EDIT_ERROR_DESCRIPTIONS,
   getStatusNotice,
   showEditError,
 } from "@/components/trajectory/edit-feedback";
@@ -26,6 +28,7 @@ import TrajectoryGrid, {
   type Gesture,
   hasLeftStart,
 } from "@/components/trajectory/trajectory-grid";
+import { useBoardPanel } from "@/components/trajectory/use-board-panel";
 import {
   useOpeningScroll,
   useRevealPanelCard,
@@ -41,19 +44,11 @@ import type {
   Entry,
   GradingScale,
   Placement,
-  SchemeSource,
 } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
-import {
-  formatGrade,
-  getCourseGrade,
-  getSuggestedStatus,
-  roundGrade,
-} from "@/utils/grades";
 import { parsePeriodKey } from "@/utils/period-key";
 import {
   addEnrollment,
-  getMoveConflict,
   moveEnrollment,
   removeEnrollment,
   retakeEnrollment,
@@ -75,7 +70,6 @@ import {
   setEnrollmentStatuses,
 } from "@/utils/trajectory/progress";
 
-const DRAG_CLICK_MS = 300;
 const ENTER_MS = 300;
 
 type PeriodClosing = { period: PeriodKey; isOpen: boolean };
@@ -99,18 +93,12 @@ export default function TrajectoryBoard({
   const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
     useGridGesture();
   const sectionRef = useRef<HTMLElement>(null);
-  const lastDragEndAt = useRef(Number.NEGATIVE_INFINITY);
-  const isDragging = useRef(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [panelId, setPanelId] = useState<string | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [snapPoint, setSnapPoint] = useState<PanelSnapPoint>(PEEK_SNAP_POINT);
   const [isMoveOpen, setIsMoveOpen] = useState(false);
   const [periodClosing, setPeriodClosing] = useState<PeriodClosing | null>(
     null,
   );
   const [isAskingPassedPeriods, setIsAskingPassedPeriods] = useState(isNew);
-  const selectedId = isPanelOpen ? panelId : null;
   const [addPlacement, setAddPlacement] = useState<Placement | null>(null);
   const [isEntering, setIsEntering] = useState(true);
 
@@ -124,7 +112,18 @@ export default function TrajectoryBoard({
   const gesturePeriods = nextPeriod
     ? [...base.periods, nextPeriod]
     : base.periods;
-  const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
+  const {
+    panelCard,
+    selectedId,
+    isPanelOpen,
+    setIsPanelOpen,
+    snapPoint,
+    setSnapPoint,
+    openPanel,
+    selectCard,
+    markDragStart,
+    markDragEnd,
+  } = useBoardPanel({ sectionRef, isMobile, cards: base.cards });
   const [firstVisibleColumn] = useState(() => getOpeningColumn(base, entry));
 
   useEffect(() => {
@@ -146,69 +145,25 @@ export default function TrajectoryBoard({
     card: panelCard,
   });
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || !isPanelOpen) return;
-    function closeOnEmptyClick(event: MouseEvent) {
-      if (
-        performance.now() - lastDragEndAt.current < DRAG_CLICK_MS ||
-        (event.target instanceof Element &&
-          event.target.closest("button, [data-course-card]"))
-      )
-        return;
-      setIsPanelOpen(false);
-    }
-    section.addEventListener("click", closeOnEmptyClick);
-    return () => section.removeEventListener("click", closeOnEmptyClick);
-  }, [isPanelOpen]);
-
-  useHotkey(
-    "Escape",
-    (event) => {
-      // The Escape that cancels a keyboard drag does not close the panel too.
-      if (!event.defaultPrevented) setIsPanelOpen(false);
-    },
-    { enabled: isPanelOpen && !isMobile, preventDefault: false },
-  );
-
-  const passedPeriodOptions = base.periods.flatMap((period) => {
-    const { label, hasStarted, isCurrent } = getPeriodInfo(period, entry);
-    return label && hasStarted && !isCurrent ? [{ period, label }] : [];
-  });
+  const passedPeriodOptions = getPassedPeriodOptions(base.periods, entry);
   const moveOptions = panelCard
-    ? gesturePeriods.map((period) => {
-        const conflict = getMoveConflict(
-          enrollments,
-          panelCard.id,
-          period,
-          context,
-        );
-        return {
-          period,
-          label: getPeriodLabel(period),
-          isCurrent: period === base.periods[panelCard.column - 1],
-          conflict: conflict && EDIT_ERROR_DESCRIPTIONS[conflict.error],
-        };
+    ? getMoveOptions({
+        enrollments,
+        card: panelCard,
+        periods: gesturePeriods,
+        currentPeriod: base.periods[panelCard.column - 1],
+        context,
+        getPeriodLabel,
       })
     : [];
-  const closingColumn = periodClosing
-    ? base.periods.indexOf(periodClosing.period) + 1
-    : null;
-  const closingEnrollments = base.cards
-    .filter(
-      (card) =>
-        card.column === closingColumn && card.enrollment.status === "PENDING",
-    )
-    .map((card) => {
-      const grade = getCourseGrade(card.enrollment, gradingScale);
-      return {
-        id: card.id,
-        name: card.course.name,
-        grade: grade === null ? null : formatGrade(roundGrade(grade)),
-        isAvailable: isAvailable(card.course, progress),
-        suggestedStatus: getSuggestedStatus(card.enrollment, gradingScale),
-      };
-    });
+  const closingEnrollments = getClosingEnrollments({
+    cards: base.cards,
+    column: periodClosing
+      ? base.periods.indexOf(periodClosing.period) + 1
+      : null,
+    gradingScale,
+    progress,
+  });
 
   function hasPendingEnrollments(column: number) {
     return base.cards.some(
@@ -228,27 +183,6 @@ export default function TrajectoryBoard({
     return `${label} (${parsePeriodKey(period).year})`;
   }
 
-  // The latest other enrollment of the same course with assessments, whose
-  // grading scheme a new attempt can start from.
-  function getSchemeSource(card: PlacedEnrollment): SchemeSource | null {
-    const source = base.cards
-      .filter(
-        (other) =>
-          other.courseId === card.courseId &&
-          other.id !== card.id &&
-          (other.enrollment.assessments?.length ?? 0) > 0,
-      )
-      .sort((a, b) => a.column - b.column)
-      .at(-1);
-    const period = source && base.periods[source.column - 1];
-    return source && period
-      ? {
-          label: getPeriodLabel(period),
-          assessments: source.enrollment.assessments ?? [],
-        }
-      : null;
-  }
-
   function getMove(operation: DragMoveEvent["operation"]): Gesture | null {
     const card = base.cards.find((card) => card.id === operation.source?.id);
     const rect = operation.shape?.current.boundingRectangle;
@@ -263,25 +197,6 @@ export default function TrajectoryBoard({
     return card && cell && period
       ? { dragId: card.id, placement: { period, row: cell.row } }
       : null;
-  }
-
-  function openPanel(card: PlacedEnrollment) {
-    if (!isPanelOpen) setSnapPoint(PEEK_SNAP_POINT);
-    setPanelId(card.id);
-    setIsPanelOpen(true);
-  }
-
-  function selectCard(id: string) {
-    if (
-      isDragging.current ||
-      performance.now() - lastDragEndAt.current < DRAG_CLICK_MS
-    )
-      return;
-    const card = base.cards.find((card) => card.id === id);
-    if (!card) return;
-    if (id !== selectedId) openPanel(card);
-    else if (isMobile) setSnapPoint(FULL_SNAP_POINT);
-    else setIsPanelOpen(false);
   }
 
   function moveTo(card: PlacedEnrollment, period: PeriodKey) {
@@ -337,8 +252,7 @@ export default function TrajectoryBoard({
   function handleDragEnd({ operation, canceled }: DragEndEvent) {
     setDraggingId(null);
     useConnectionFocus.getState().setSuspended(false);
-    isDragging.current = false;
-    lastDragEndAt.current = performance.now();
+    markDragEnd();
     const card = base.cards.find((card) => card.id === operation.source?.id);
     if (!card) return;
 
@@ -392,7 +306,7 @@ export default function TrajectoryBoard({
         Feedback.configure({ dropAnimation: null }),
       ]}
       onDragStart={({ operation }) => {
-        isDragging.current = true;
+        markDragStart();
         setDraggingId(String(operation.source?.id));
         useConnectionFocus.getState().setSuspended(true);
       }}
@@ -444,7 +358,9 @@ export default function TrajectoryBoard({
           curriculum={curriculum}
           progress={progress}
           gradingScale={gradingScale}
-          schemeSource={panelCard && getSchemeSource(panelCard)}
+          schemeSource={
+            panelCard && getSchemeSource(panelCard, base, getPeriodLabel)
+          }
           isAvailable={
             panelCard !== null && isAvailable(panelCard.course, progress)
           }

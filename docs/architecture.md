@@ -14,7 +14,7 @@ The dashboard spans two component folders: `components/dashboard/` is the shell 
 
 `utils/trajectory/` is split by what it answers: `layout.ts` (where each card goes), `edits.ts` (whether a change is allowed) and `progress.ts` (what the student has approved).
 
-In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and edits; `use-board-scroll.ts`, `board-sensors.ts` and `edit-feedback.ts` hold its scrolling, drag input and error messages. `course-panel.tsx` chooses between the desktop panel and the mobile drawer, and `course-panel-content.tsx` is what both show, built from `grade-summary.tsx`, `grading-scheme-editor.tsx` and `course-details.tsx`. `grading-scheme-editor.tsx` owns the assessment list; `assessment-row.tsx`, `assessment-menu.tsx` and `use-scheme-drag.ts` hold each row, its options and the dragging.
+In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and edits; `use-board-panel.ts`, `use-board-scroll.ts`, `board-sensors.ts`, `board-options.ts` and `edit-feedback.ts` hold its course panel state, scrolling, drag input, dialog options and error messages. `course-panel.tsx` chooses between the desktop panel and the mobile drawer, and `course-panel-content.tsx` is what both show, built from `grade-summary.tsx`, `grading-scheme-editor.tsx` and `course-details.tsx`. `grading-scheme-editor.tsx` owns the assessment list; `assessment-row.tsx`, `assessment-menu.tsx` and `use-scheme-drag.ts` hold each row, its options and the dragging.
 
 ## What the surfaces share
 
