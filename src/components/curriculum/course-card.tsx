@@ -10,7 +10,7 @@ import {
   useEffect,
 } from "react";
 import { getTextColor } from "@/builder/colors";
-import { getConnectionRole } from "@/builder/connections";
+import { type ConnectionRole, getConnectionRole } from "@/builder/connections";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
 import type { Course, Curriculum } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
@@ -22,7 +22,7 @@ const MUTED_TEXT_COLOR =
 export default function CourseCard({
   course,
   curriculum,
-  gestureCourseId = null,
+  gestureRole,
   dimsUnrelated = true,
   isMuted = false,
   surfaceClassName,
@@ -42,7 +42,9 @@ export default function CourseCard({
 }: {
   course: Course;
   curriculum: Curriculum;
-  gestureCourseId?: number | null;
+  // How this course stands toward the one in an ongoing gesture, if any. Given
+  // by the grid, which knows the gesture's layout.
+  gestureRole?: ConnectionRole | null;
   dimsUnrelated?: boolean;
   isMuted?: boolean;
   surfaceClassName?: string;
@@ -62,13 +64,12 @@ export default function CourseCard({
 }) {
   const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
   // How this course stands toward the course whose connections are shown.
-  const role = useConnectionFocus((state) =>
-    getConnectionRole(
-      curriculum,
-      gestureCourseId ?? getFocusedCourseId(state),
-      course.id,
-    ),
+  const focusRole = useConnectionFocus((state) =>
+    gestureRole === undefined
+      ? getConnectionRole(curriculum, getFocusedCourseId(state), course.id)
+      : null,
   );
+  const role = gestureRole === undefined ? focusRole : gestureRole;
 
   useEffect(() => () => release(course.id), [release, course.id]);
 
