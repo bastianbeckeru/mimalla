@@ -10,6 +10,11 @@ export type SchemeRow = {
 
 export type SchemePlacement = { parentId: string | null; index: number };
 
+// How many levels to the right an assessment has to be dragged to go below a
+// single assessment. Further than into a group, because it turns that one into
+// a group and a finger easily drifts one level while reordering.
+const LEVELS_TO_NEST_BELOW_SINGLE = 2;
+
 export function flattenScheme(
   assessments: Assessment[],
   depth = 0,
@@ -127,9 +132,30 @@ export function insertAssessment(
   );
 }
 
+// A group in place of a single assessment. A grade it had stays in an
+// assessment of the group, so that nothing the student entered is lost.
+function toGroup(assessments: Assessment[], id: string): Assessment[] {
+  return updateAssessment(assessments, id, (assessment) =>
+    assessment.kind === "SINGLE"
+      ? {
+          kind: "GROUP",
+          id: assessment.id,
+          name: assessment.name,
+          weight: assessment.weight,
+          droppedCount: 0,
+          assessments:
+            assessment.grade === null
+              ? []
+              : [{ ...assessment, id: nanoid(), weight: null }],
+        }
+      : assessment,
+  );
+}
+
 // Moves an assessment with everything in it. `index` counts its new siblings
-// once it has left its place. Returns null when it cannot go there: inside
-// itself, or deeper than three levels.
+// once it has left its place. Moved below a single assessment, it turns that
+// one into a group and goes last in it. Returns null when it cannot go there:
+// inside itself, or deeper than three levels.
 export function moveAssessment(
   assessments: Assessment[],
   id: string,
@@ -144,9 +170,20 @@ export function moveAssessment(
     );
   if (isInsideSource) return null;
 
-  const rest = removeAssessment(assessments, id);
-  if (!canPlace(rest, source, placement.parentId)) return null;
-  return insertAssessment(rest, source, placement);
+  const parentId = placement.parentId;
+  const removed = removeAssessment(assessments, id);
+  const isParentSingle =
+    parentId !== null &&
+    findAssessment(removed, parentId)?.assessment.kind === "SINGLE";
+  const rest =
+    parentId !== null && isParentSingle ? toGroup(removed, parentId) : removed;
+  if (!canPlace(rest, source, parentId)) return null;
+  return insertAssessment(rest, source, {
+    parentId,
+    index: isParentSingle
+      ? getSiblings(rest, parentId).length
+      : placement.index,
+  });
 }
 
 export function moveAssessmentBy(
@@ -227,9 +264,10 @@ export function getDropProjection(
   const previous = rest[gapIndex - 1];
   const next = rest[gapIndex];
 
-  const deepest = previous
-    ? previous.depth + (previous.assessment.kind === "GROUP" ? 1 : 0)
-    : 0;
+  const canGoBelowPrevious =
+    previous?.assessment.kind === "GROUP" ||
+    depthOffset >= LEVELS_TO_NEST_BELOW_SINGLE;
+  const deepest = previous ? previous.depth + (canGoBelowPrevious ? 1 : 0) : 0;
   const maxDepth = Math.min(
     deepest,
     MAX_ASSESSMENT_DEPTH - getAssessmentHeight(active.assessment),

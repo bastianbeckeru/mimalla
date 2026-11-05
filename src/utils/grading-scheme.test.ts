@@ -164,6 +164,49 @@ describe("getWeightIssue", () => {
   });
 });
 
+describe("moveAssessment below a single assessment", () => {
+  test("turns it into a group that keeps its place, name and weight", () => {
+    const moved = moveAssessment(
+      [single("exam", 40), single("extra", 60)],
+      "extra",
+      { parentId: "exam", index: 0 },
+    );
+
+    expect(moved).toEqual([
+      {
+        kind: "GROUP",
+        id: "exam",
+        name: "exam",
+        weight: 40,
+        droppedCount: 0,
+        assessments: [single("extra", 60)],
+      },
+    ]);
+  });
+
+  test("keeps its grade in an assessment of the new group", () => {
+    const moved = moveAssessment(
+      [single("exam", 40, 6), single("extra")],
+      "extra",
+      { parentId: "exam", index: 0 },
+    );
+
+    const exam = moved?.[0];
+    if (exam?.kind !== "GROUP") throw new Error("Expected a group");
+    expect(exam.assessments).toMatchObject([
+      { kind: "SINGLE", name: "exam", weight: null, grade: 6 },
+      { id: "extra" },
+    ]);
+    expect(exam.assessments[0]?.id).not.toBe("exam");
+  });
+
+  test("leaves it alone when that goes past three levels", () => {
+    const scheme = [group("a", [group("b", [single("c")])]), single("d")];
+
+    expect(moveAssessment(scheme, "d", { parentId: "c", index: 0 })).toBeNull();
+  });
+});
+
 describe("getDropProjection", () => {
   const scheme = [
     group("controls", [single("c1"), single("c2")]),
@@ -197,10 +240,37 @@ describe("getDropProjection", () => {
     });
   });
 
-  test("cannot go below a single assessment", () => {
-    expect(getDropProjection(rows, "extra", 4, 3)).toMatchObject({
+  test("stays beside a single assessment when dragged one level", () => {
+    expect(getDropProjection(rows, "extra", 4, 1)).toMatchObject({
       parentId: null,
       depth: 0,
+    });
+  });
+
+  test("goes below a single assessment when dragged two levels", () => {
+    expect(getDropProjection(rows, "extra", 4, 2)).toEqual({
+      parentId: "exam",
+      index: 0,
+      depth: 1,
+    });
+  });
+
+  test("goes no further than one level below a single assessment", () => {
+    expect(getDropProjection(rows, "extra", 4, 9)).toMatchObject({
+      parentId: "exam",
+      depth: 1,
+    });
+  });
+
+  test("cannot go below a single assessment on the last level", () => {
+    const deep = flattenScheme([
+      group("a", [group("b", [single("c")])]),
+      single("d"),
+    ]);
+
+    expect(getDropProjection(deep, "d", 3, 9)).toMatchObject({
+      parentId: "b",
+      depth: 2,
     });
   });
 

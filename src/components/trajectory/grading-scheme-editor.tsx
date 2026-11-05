@@ -141,6 +141,12 @@ export default function GradingSchemeEditor({
     new Set(),
   );
   const rows = flattenScheme(assessments);
+  // The single assessment the ongoing drag would turn into a group.
+  const newGroupId =
+    rows.find(
+      ({ assessment }) =>
+        assessment.id === drop?.parentId && assessment.kind === "SINGLE",
+    )?.assessment.id ?? null;
   const visibleRows = getVisibleRows(rows, collapsedIds);
   const rootIssue = getWeightIssue(assessments);
   const hasInvalidGrade = rows.some(
@@ -319,6 +325,7 @@ export default function GradingSchemeEditor({
               assessments={assessments}
               scale={scale}
               isLifted={drop?.activeId === row.assessment.id}
+              isNewGroup={newGroupId === row.assessment.id}
               isCollapsed={collapsedIds.has(row.assessment.id)}
               isReadOnly={isReadOnly}
               autoFocus={focusId === row.assessment.id}
@@ -398,6 +405,7 @@ function AssessmentRow({
   assessments,
   scale,
   isLifted,
+  isNewGroup,
   isCollapsed,
   isReadOnly,
   autoFocus,
@@ -414,6 +422,7 @@ function AssessmentRow({
   assessments: Assessment[];
   scale: GradingScale;
   isLifted: boolean;
+  isNewGroup: boolean;
   isCollapsed: boolean;
   isReadOnly: boolean;
   autoFocus: boolean;
@@ -468,6 +477,7 @@ function AssessmentRow({
       className={cn(
         "group/row flex h-9 items-center rounded-md pr-1 transition-colors hover:bg-muted/50",
         isLifted && "bg-background opacity-60 shadow-md",
+        isNewGroup && "bg-primary/10 hover:bg-primary/10",
       )}
     >
       {isReadOnly ? (
