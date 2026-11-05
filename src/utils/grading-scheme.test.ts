@@ -1,15 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import type { Assessment } from "@/types/trajectory";
 import {
+  convertToGroup,
   copyScheme,
   flattenScheme,
   getDropProjection,
+  getSchemeSlots,
   getVisibleRows,
   getWeightIssue,
-  indentAssessment,
   moveAssessment,
-  moveAssessmentBy,
-  outdentAssessment,
 } from "@/utils/grading-scheme";
 
 function single(
@@ -85,54 +84,6 @@ describe("moveAssessment", () => {
     expect(
       moveAssessment(scheme, "controls", { parentId: "tests", index: 0 }),
     ).not.toBeNull();
-  });
-});
-
-describe("moveAssessmentBy", () => {
-  test("swaps an assessment with its neighbor", () => {
-    expect(
-      outline(moveAssessmentBy([single("a"), single("b")], "b", -1)),
-    ).toEqual(["b", "a"]);
-  });
-
-  test("stays within its group", () => {
-    expect(moveAssessmentBy([single("a"), single("b")], "b", 1)).toBeNull();
-  });
-});
-
-describe("indentAssessment", () => {
-  test("moves an assessment into the group above it", () => {
-    const scheme = [group("controls", [single("c1")]), single("c2")];
-
-    expect(outline(indentAssessment(scheme, "c2"))).toEqual([
-      "controls",
-      "  c1",
-      "  c2",
-    ]);
-  });
-
-  test("needs a group above", () => {
-    expect(indentAssessment([single("a"), single("b")], "b")).toBeNull();
-  });
-});
-
-describe("outdentAssessment", () => {
-  test("moves an assessment out of its group, right after it", () => {
-    const scheme = [
-      group("controls", [single("c1"), single("c2")]),
-      single("exam"),
-    ];
-
-    expect(outline(outdentAssessment(scheme, "c1"))).toEqual([
-      "controls",
-      "  c2",
-      "c1",
-      "exam",
-    ]);
-  });
-
-  test("needs a group", () => {
-    expect(outdentAssessment([single("a")], "a")).toBeNull();
   });
 });
 
@@ -309,5 +260,81 @@ describe("getVisibleRows", () => {
 
   test("keeps the siblings after a nested collapsed group", () => {
     expect(visibleIds(["b"])).toEqual(["a", "b", "d", "e"]);
+  });
+});
+
+describe("getSchemeSlots", () => {
+  const slots = (scheme: Assessment[], collapsed: string[] = []) => {
+    const collapsedIds = new Set(collapsed);
+    return getSchemeSlots(
+      getVisibleRows(flattenScheme(scheme), collapsedIds),
+      collapsedIds,
+    ).map((slot) =>
+      slot.kind === "ROW"
+        ? slot.row.assessment.id
+        : `+${slot.group.assessment.id}`,
+    );
+  };
+
+  test("adds to a group after its last row", () => {
+    expect(slots([group("a", [single("b")]), single("c")])).toEqual([
+      "a",
+      "b",
+      "+a",
+      "c",
+    ]);
+  });
+
+  test("closes nested groups from the inside out", () => {
+    expect(slots([group("a", [group("b", [single("c")])])])).toEqual([
+      "a",
+      "b",
+      "c",
+      "+b",
+      "+a",
+    ]);
+  });
+
+  test("adds to an empty group", () => {
+    expect(slots([group("a", [])])).toEqual(["a", "+a"]);
+  });
+
+  test("does not add to a collapsed group", () => {
+    expect(slots([group("a", [single("b")]), single("c")], ["a"])).toEqual([
+      "a",
+      "c",
+    ]);
+  });
+});
+
+describe("convertToGroup", () => {
+  test("keeps the name and weight, and leaves an ungraded group empty", () => {
+    const [converted] = convertToGroup([single("a", 40)], "a") ?? [];
+
+    expect(converted).toMatchObject({
+      kind: "GROUP",
+      name: "a",
+      weight: 40,
+      assessments: [],
+    });
+  });
+
+  test("keeps the grade inside the group", () => {
+    const [converted] = convertToGroup([single("a", 40, 6)], "a") ?? [];
+
+    expect(converted).toMatchObject({
+      assessments: [{ kind: "SINGLE", name: "a", weight: null, grade: 6 }],
+    });
+  });
+
+  test("leaves groups alone", () => {
+    expect(convertToGroup([group("a", [])], "a")).toBeNull();
+  });
+
+  test("needs a level left below it", () => {
+    const scheme = [group("a", [group("b", [single("c")])])];
+
+    expect(convertToGroup(scheme, "c")).toBeNull();
+    expect(convertToGroup([group("a", [single("b")])], "b")).not.toBeNull();
   });
 });

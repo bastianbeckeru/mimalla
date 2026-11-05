@@ -3,27 +3,24 @@
 import {
   type DragMoveEvent,
   Feedback,
+  KeyboardSensor,
   PointerActivationConstraints,
   PointerSensor,
 } from "@dnd-kit/dom";
 import { DragDropProvider, useDraggable } from "@dnd-kit/react";
 import { cn } from "cn";
 import {
-  ArrowDown,
-  ArrowUp,
   ChevronRight,
   Copy,
   Ellipsis,
   FolderPlus,
   GripVertical,
-  IndentDecrease,
-  IndentIncrease,
   Plus,
   Trash2,
   TriangleAlert,
 } from "lucide-react";
 import { nanoid } from "nanoid";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CommitInput from "@/components/trajectory/commit-input";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,16 +46,15 @@ import {
 } from "@/utils/grades";
 import {
   canPlace,
+  convertToGroup,
   flattenScheme,
   getDropProjection,
+  getSchemeSlots,
   getSiblings,
   getVisibleRows,
   getWeightIssue,
-  indentAssessment,
   insertAssessment,
   moveAssessment,
-  moveAssessmentBy,
-  outdentAssessment,
   removeAssessment,
   type SchemePlacement,
   type SchemeRow,
@@ -70,6 +66,8 @@ const DRAG_ACTIVATION_DISTANCE = 4;
 const BATCH_SIZES = [2, 3, 4, 5, 6, 7, 8];
 const DROPPED_COUNTS = [0, 1, 2, 3];
 const INDICATOR_LEFT_PX = 20;
+const ROW_HEIGHT_PX = 36;
+const NAME_LEFT_PX = 44;
 
 const FIELD =
   "h-7 border-transparent bg-transparent shadow-none disabled:bg-transparent dark:bg-transparent dark:disabled:bg-transparent";
@@ -88,6 +86,7 @@ const sensors = [
       }),
     ],
   }),
+  KeyboardSensor.configure({ offset: { x: INDENT_PX, y: ROW_HEIGHT_PX } }),
 ];
 
 type Indicator = { top: number; depth: number };
@@ -105,17 +104,6 @@ function isSameDrop(a: Drop | null, b: Drop | null) {
 
 function createSingle(name = "Evaluación"): Assessment {
   return { kind: "SINGLE", id: nanoid(), name, weight: null, grade: null };
-}
-
-function createGroup(): Assessment {
-  return {
-    kind: "GROUP",
-    id: nanoid(),
-    name: "Grupo",
-    weight: null,
-    assessments: [],
-    droppedCount: 0,
-  };
 }
 
 function formatWeight(weight: number) {
@@ -138,6 +126,7 @@ export default function GradingSchemeEditor({
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef(new Map<string, HTMLElement>());
   const [focusId, setFocusId] = useState<string | null>(null);
+  const refocusIdRef = useRef<string | null>(null);
   const [drop, setDrop] = useState<Drop | null>(null);
   const [collapsedIds, setCollapsedIds] = useState<ReadonlySet<string>>(
     new Set(),
@@ -169,6 +158,15 @@ export default function GradingSchemeEditor({
     });
   }
 
+  // Moving a row in the DOM blurs its handle, and a keyboard drag has to be able
+  // to go on from there.
+  useEffect(() => {
+    const id = refocusIdRef.current;
+    if (id === null) return;
+    refocusIdRef.current = null;
+    rowRefs.current.get(id)?.querySelector("button")?.focus();
+  });
+
   function add(assessment: Assessment, parentId: string | null) {
     if (parentId) expand(parentId);
     const index = getSiblings(assessments, parentId).length;
@@ -198,7 +196,10 @@ export default function GradingSchemeEditor({
     const rects = visibleRest.map((row) =>
       rowRefs.current.get(row.assessment.id)?.getBoundingClientRect(),
     );
-    const y = operation.position.current.y;
+    // A key press lands exactly on a row's middle. Moving down, that row counts
+    // as passed, so every press moves one row in either direction.
+    const y =
+      operation.position.current.y + (operation.transform.y > 0 ? 1 : 0);
     const gapIndex = rects.filter(
       (rect) => rect && rect.top + rect.height / 2 < y,
     ).length;
@@ -212,11 +213,13 @@ export default function GradingSchemeEditor({
     if (!projection) return null;
     const below = rects[gapIndex];
     const above = rects[gapIndex - 1];
-    const top = below
-      ? below.top - list.top
-      : above
+    // Past the last row of a group, the group's add button sits between them.
+    const top =
+      above && projection.depth > (nextRow?.depth ?? 0)
         ? above.bottom - list.top
-        : 0;
+        : below
+          ? below.top - list.top
+          : list.height;
     return {
       activeId,
       parentId: projection.parentId,
@@ -300,6 +303,8 @@ export default function GradingSchemeEditor({
         onDragEnd={({ operation, canceled }) => {
           const projection = getProjection(operation);
           setDrop(null);
+          if (operation.activatorEvent instanceof KeyboardEvent)
+            refocusIdRef.current = String(operation.source?.id);
           if (canceled || !projection) return;
           if (projection.parentId) expand(projection.parentId);
           apply(
@@ -311,62 +316,92 @@ export default function GradingSchemeEditor({
         }}
       >
         <div ref={listRef} className="relative">
-          {visibleRows.map((row) => (
-            <AssessmentRow
-              key={row.assessment.id}
-              row={row}
-              assessments={assessments}
-              scale={scale}
-              isLifted={drop?.activeId === row.assessment.id}
-              isNewGroup={newGroupId === row.assessment.id}
-              isCollapsed={collapsedIds.has(row.assessment.id)}
-              isReadOnly={isReadOnly}
-              autoFocus={focusId === row.assessment.id}
-              onAutoFocused={() => setFocusId(null)}
-              rowRef={(element) => {
-                if (element) rowRefs.current.set(row.assessment.id, element);
-                else rowRefs.current.delete(row.assessment.id);
-              }}
-              onToggleCollapsed={() =>
-                setCollapsedIds((current) => {
-                  const next = new Set(current);
-                  if (!next.delete(row.assessment.id))
-                    next.add(row.assessment.id);
-                  return next;
-                })
-              }
-              onUpdate={(update) =>
-                onChange(
-                  updateAssessment(assessments, row.assessment.id, update),
-                )
-              }
-              onAdd={(assessment) => add(assessment, row.assessment.id)}
-              onAddBatch={(count) => {
-                const prefix =
-                  row.assessment.name.trim().charAt(0).toUpperCase() || "E";
-                const start =
-                  getSiblings(assessments, row.assessment.id).length + 1;
-                const batch = Array.from({ length: count }, (_, offset) =>
-                  createSingle(`${prefix}${start + offset}`),
-                );
-                expand(row.assessment.id);
-                onChange(
-                  batch.reduce(
-                    (scheme, assessment) =>
-                      insertAssessment(scheme, assessment, {
-                        parentId: row.assessment.id,
-                        index: getSiblings(scheme, row.assessment.id).length,
-                      }),
-                    assessments,
-                  ),
-                );
-              }}
-              onMove={apply}
-              onRemove={() =>
-                onChange(removeAssessment(assessments, row.assessment.id))
-              }
-            />
-          ))}
+          {getSchemeSlots(visibleRows, collapsedIds).map((slot) => {
+            if (slot.kind === "ADD")
+              return canPlace(
+                assessments,
+                createSingle(),
+                slot.group.assessment.id,
+              ) ? (
+                <div
+                  key={`add-${slot.group.assessment.id}`}
+                  className="flex h-9 items-center pr-1"
+                  style={{
+                    paddingLeft:
+                      NAME_LEFT_PX + (slot.group.depth + 1) * INDENT_PX,
+                  }}
+                >
+                  <Button
+                    variant="ghost"
+                    className="h-7 w-full justify-start px-1 text-muted-foreground"
+                    onClick={() =>
+                      add(createSingle(), slot.group.assessment.id)
+                    }
+                  >
+                    <Plus />
+                    Evaluación
+                  </Button>
+                </div>
+              ) : null;
+            const { row } = slot;
+            return (
+              <AssessmentRow
+                key={row.assessment.id}
+                row={row}
+                assessments={assessments}
+                scale={scale}
+                isLifted={drop?.activeId === row.assessment.id}
+                isNewGroup={newGroupId === row.assessment.id}
+                isCollapsed={collapsedIds.has(row.assessment.id)}
+                isReadOnly={isReadOnly}
+                autoFocus={focusId === row.assessment.id}
+                onAutoFocused={() => setFocusId(null)}
+                rowRef={(element) => {
+                  if (element) rowRefs.current.set(row.assessment.id, element);
+                  else rowRefs.current.delete(row.assessment.id);
+                }}
+                onToggleCollapsed={() =>
+                  setCollapsedIds((current) => {
+                    const next = new Set(current);
+                    if (!next.delete(row.assessment.id))
+                      next.add(row.assessment.id);
+                    return next;
+                  })
+                }
+                onUpdate={(update) =>
+                  onChange(
+                    updateAssessment(assessments, row.assessment.id, update),
+                  )
+                }
+                onAddBatch={(count) => {
+                  const prefix =
+                    row.assessment.name.trim().charAt(0).toUpperCase() || "E";
+                  const start =
+                    getSiblings(assessments, row.assessment.id).length + 1;
+                  const batch = Array.from({ length: count }, (_, offset) =>
+                    createSingle(`${prefix}${start + offset}`),
+                  );
+                  expand(row.assessment.id);
+                  onChange(
+                    batch.reduce(
+                      (scheme, assessment) =>
+                        insertAssessment(scheme, assessment, {
+                          parentId: row.assessment.id,
+                          index: getSiblings(scheme, row.assessment.id).length,
+                        }),
+                      assessments,
+                    ),
+                  );
+                }}
+                onConvert={() =>
+                  apply(convertToGroup(assessments, row.assessment.id))
+                }
+                onRemove={() =>
+                  onChange(removeAssessment(assessments, row.assessment.id))
+                }
+              />
+            );
+          })}
           {drop && (
             <div
               aria-hidden
@@ -414,9 +449,8 @@ function AssessmentRow({
   rowRef,
   onToggleCollapsed,
   onUpdate,
-  onAdd,
   onAddBatch,
-  onMove,
+  onConvert,
   onRemove,
 }: {
   row: SchemeRow;
@@ -431,9 +465,8 @@ function AssessmentRow({
   rowRef: (element: HTMLElement | null) => void;
   onToggleCollapsed: () => void;
   onUpdate: (update: (assessment: Assessment) => Assessment) => void;
-  onAdd: (assessment: Assessment) => void;
   onAddBatch: (count: number) => void;
-  onMove: (assessments: Assessment[] | null) => void;
+  onConvert: () => void;
   onRemove: () => void;
 }) {
   const { assessment, depth, parentId } = row;
@@ -448,13 +481,9 @@ function AssessmentRow({
   const grade = getAssessmentGrade(assessment, scale);
   const childIssue =
     assessment.kind === "GROUP" ? getWeightIssue(assessment.assessments) : null;
-  const index = siblings.indexOf(assessment);
   const canAddSingle =
     assessment.kind === "GROUP" &&
     canPlace(assessments, createSingle(), assessment.id);
-  const canAddGroup =
-    assessment.kind === "GROUP" &&
-    canPlace(assessments, createGroup(), assessment.id);
 
   const droppedCount =
     assessment.kind === "GROUP" ? assessment.droppedCount : 0;
@@ -634,15 +663,16 @@ function AssessmentRow({
             <Ellipsis />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            {assessment.kind === "GROUP" && (
+            {assessment.kind === "SINGLE" ? (
+              <DropdownMenuItem
+                disabled={convertToGroup(assessments, assessment.id) === null}
+                onClick={onConvert}
+              >
+                <FolderPlus />
+                Convertir en grupo
+              </DropdownMenuItem>
+            ) : (
               <>
-                <DropdownMenuItem
-                  disabled={!canAddSingle}
-                  onClick={() => onAdd(createSingle())}
-                >
-                  <Plus />
-                  Agregar evaluación
-                </DropdownMenuItem>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger disabled={!canAddSingle}>
                     <Plus />
@@ -659,13 +689,6 @@ function AssessmentRow({
                     ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                <DropdownMenuItem
-                  disabled={!canAddGroup}
-                  onClick={() => onAdd(createGroup())}
-                >
-                  <FolderPlus />
-                  Agregar grupo
-                </DropdownMenuItem>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     Descartar las peores notas
@@ -693,45 +716,8 @@ function AssessmentRow({
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                <DropdownMenuSeparator />
               </>
             )}
-            <DropdownMenuItem
-              disabled={index === 0}
-              onClick={() =>
-                onMove(moveAssessmentBy(assessments, assessment.id, -1))
-              }
-            >
-              <ArrowUp />
-              Subir
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={index === siblings.length - 1}
-              onClick={() =>
-                onMove(moveAssessmentBy(assessments, assessment.id, 1))
-              }
-            >
-              <ArrowDown />
-              Bajar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={indentAssessment(assessments, assessment.id) === null}
-              onClick={() =>
-                onMove(indentAssessment(assessments, assessment.id))
-              }
-            >
-              <IndentIncrease />
-              Meter en el grupo de arriba
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={parentId === null}
-              onClick={() =>
-                onMove(outdentAssessment(assessments, assessment.id))
-              }
-            >
-              <IndentDecrease />
-              Sacar del grupo
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onClick={onRemove}>
               <Trash2 />

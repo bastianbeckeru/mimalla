@@ -309,9 +309,14 @@ export default function TrajectoryBoard({
     return () => section.removeEventListener("click", closeOnEmptyClick);
   }, [isPanelOpen]);
 
-  useHotkey("Escape", () => setIsPanelOpen(false), {
-    enabled: isPanelOpen && !isMobile,
-  });
+  useHotkey(
+    "Escape",
+    (event) => {
+      // The Escape that cancels a keyboard drag does not close the panel too.
+      if (!event.defaultPrevented) setIsPanelOpen(false);
+    },
+    { enabled: isPanelOpen && !isMobile, preventDefault: false },
+  );
 
   const passedPeriodOptions = base.periods.flatMap((period) => {
     const { label, hasStarted, isCurrent } = getPeriodInfo(period, entry);

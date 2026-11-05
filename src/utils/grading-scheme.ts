@@ -10,10 +10,17 @@ export type SchemeRow = {
 
 export type SchemePlacement = { parentId: string | null; index: number };
 
+export type SchemeSlot =
+  | { kind: "ROW"; row: SchemeRow }
+  | { kind: "ADD"; group: SchemeRow };
+
 // How many levels to the right an assessment has to be dragged to go below a
 // single assessment. Further than into a group, because it turns that one into
 // a group and a finger easily drifts one level while reordering.
 const LEVELS_TO_NEST_BELOW_SINGLE = 2;
+
+// A group and the level below it for its single assessments.
+const GROUP_MIN_LEVELS = 2;
 
 export function flattenScheme(
   assessments: Assessment[],
@@ -38,6 +45,30 @@ export function getVisibleRows(
     collapsedDepth = collapsedIds.has(assessment.id) ? depth : null;
     return true;
   });
+}
+
+// The visible rows with a place to add an assessment after the last row of each
+// expanded group.
+export function getSchemeSlots(
+  visibleRows: SchemeRow[],
+  collapsedIds: ReadonlySet<string>,
+) {
+  const slots: SchemeSlot[] = [];
+  const open: SchemeRow[] = [];
+  const closeDownTo = (depth: number) => {
+    while ((open.at(-1)?.depth ?? -1) >= depth) {
+      const group = open.pop();
+      if (group) slots.push({ kind: "ADD", group });
+    }
+  };
+  for (const row of visibleRows) {
+    closeDownTo(row.depth);
+    slots.push({ kind: "ROW", row });
+    if (row.assessment.kind === "GROUP" && !collapsedIds.has(row.assessment.id))
+      open.push(row);
+  }
+  closeDownTo(0);
+  return slots;
 }
 
 // The levels an assessment takes up. A group keeps one below it for its
@@ -152,6 +183,16 @@ function toGroup(assessments: Assessment[], id: string): Assessment[] {
   );
 }
 
+// Turns a single assessment into a group that keeps its name and weight. A grade
+// stays on an assessment of the same name inside it. Returns null when there is
+// no level left below it.
+export function convertToGroup(assessments: Assessment[], id: string) {
+  const found = findAssessment(assessments, id);
+  if (found?.assessment.kind !== "SINGLE") return null;
+  if (found.depth + GROUP_MIN_LEVELS > MAX_ASSESSMENT_DEPTH) return null;
+  return toGroup(assessments, id);
+}
+
 // Moves an assessment with everything in it. `index` counts its new siblings
 // once it has left its place. Moved below a single assessment, it turns that
 // one into a group and goes last in it. Returns null when it cannot go there:
@@ -183,43 +224,6 @@ export function moveAssessment(
     index: isParentSingle
       ? getSiblings(rest, parentId).length
       : placement.index,
-  });
-}
-
-export function moveAssessmentBy(
-  assessments: Assessment[],
-  id: string,
-  offset: -1 | 1,
-) {
-  const found = findAssessment(assessments, id);
-  if (!found) return null;
-  const index = found.index + offset;
-  const siblingCount = getSiblings(assessments, found.parentId).length;
-  if (index < 0 || index >= siblingCount) return null;
-  return moveAssessment(assessments, id, { parentId: found.parentId, index });
-}
-
-// Moves an assessment into the group just above it, as its last assessment.
-export function indentAssessment(assessments: Assessment[], id: string) {
-  const found = findAssessment(assessments, id);
-  const previous =
-    found && getSiblings(assessments, found.parentId)[found.index - 1];
-  if (previous?.kind !== "GROUP") return null;
-  return moveAssessment(assessments, id, {
-    parentId: previous.id,
-    index: previous.assessments.length,
-  });
-}
-
-// Moves an assessment out of its group, right after it.
-export function outdentAssessment(assessments: Assessment[], id: string) {
-  const found = findAssessment(assessments, id);
-  if (!found?.parentId) return null;
-  const parent = findAssessment(assessments, found.parentId);
-  if (!parent) return null;
-  return moveAssessment(assessments, id, {
-    parentId: parent.parentId,
-    index: parent.index + 1,
   });
 }
 
