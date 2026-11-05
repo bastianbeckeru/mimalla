@@ -45,6 +45,10 @@
           "options": { "style": "type" }
         },
         "useImportType": "error",
+        "noExcessiveLinesPerFile": {
+          "level": "error",
+          "options": { "maxLines": 500 }
+        },
         "noRestrictedImports": {
           "level": "error",
           "options": {
@@ -61,6 +65,12 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["**/*.test.ts", "src/components/ui/**"],
+      "linter": {
+        "rules": { "style": { "noExcessiveLinesPerFile": "off" } }
+      }
+    },
     {
       "includes": ["src/curriculum/**", "!**/*.test.ts"],
       "linter": {

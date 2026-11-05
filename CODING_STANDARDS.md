@@ -15,6 +15,7 @@ Biome enforces `type` over `interface`, `import type`, and the `@/*` alias for i
 
 - Put pure helpers, parsers, and domain utilities (URL/subdomain handlers, formatters, sanitizers) in `@/utils` once two or more modules use them. Keep single-use logic in its file; extract it only when that simplifies the caller. A util that merely renames an expression is noise.
 - Put types shared by two or more modules in `@/types`; keep single-use types in the file that uses them. Import a type from where it is defined; do not re-export it.
+- Keep a file at 500 lines or fewer; Biome rejects longer ones, except tests and `components/ui/`. Split by responsibility, so that each new file has one job you can name; moving lines around to pass the limit only adds files to read.
 - Export only what another module imports.
 - Delete code that has no caller in production.
 
