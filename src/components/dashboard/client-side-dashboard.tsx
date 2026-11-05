@@ -2,9 +2,12 @@
 
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Redo2, Undo2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import AreasLegend from "@/components/curriculum/areas-legend";
-import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
+import NewTrajectoryFlow, {
+  PROGRAM_PARAM,
+} from "@/components/dashboard/new-trajectory-flow";
 import Sidebar from "@/components/dashboard/sidebar";
 import TrajectoryBoard from "@/components/trajectory/trajectory-board";
 import { Button } from "@/components/ui/button";
@@ -32,7 +35,11 @@ import type {
   Trajectory,
   TrajectoryContent,
 } from "@/types/trajectory";
-import { extendCourses } from "@/utils/curriculum";
+import {
+  extendCourses,
+  findCatalogProgram,
+  getProgramPath,
+} from "@/utils/curriculum";
 import { fetchCurriculum } from "@/utils/curriculum-file";
 import { getCumulativeAverage } from "@/utils/grades";
 import { parseSidebarWidth } from "@/utils/sidebar-width";
@@ -47,9 +54,11 @@ type LoadedCurriculum = {
   curriculum: Curriculum | null;
 };
 
-const loader = (
-  <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
-);
+export function DashboardLoader() {
+  return (
+    <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
+  );
+}
 
 const NOTICE_MS = 4000;
 const SIDEBAR_WIDTH_KEY = "dashboard-sidebar-width";
@@ -66,6 +75,17 @@ export default function ClientSideDashboard({
   );
   const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
   const [importedId, setImportedId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const requested = findCatalogProgram(
+    catalog,
+    searchParams.get(PROGRAM_PARAM),
+  );
+  const isRequestedImported = useTrajectoryStore((state) =>
+    state.trajectories.some(
+      (trajectory) =>
+        getProgramPath(trajectory.curriculumPath) === requested?.program.path,
+    ),
+  );
 
   const activePath = activeTrajectory?.curriculumPath;
   const loadedPath = loaded?.path;
@@ -88,21 +108,24 @@ export default function ClientSideDashboard({
     };
   }, [activePath, loadedPath]);
 
-  if (!hasHydrated) return loader;
+  if (!hasHydrated) return <DashboardLoader />;
 
-  if (!activeTrajectory) {
+  if (!activeTrajectory || (requested && !isRequestedImported)) {
     return (
-      <NewTrajectoryForm
+      <NewTrajectoryFlow
         catalog={catalog}
+        requested={requested}
         onImport={(path, curriculum) => {
           setLoaded({ path, curriculum });
           setImportedId(useTrajectoryStore.getState().activeTrajectoryId);
+          window.history.replaceState(null, "", "/dashboard");
         }}
       />
     );
   }
 
-  if (loaded?.path !== activeTrajectory.curriculumPath) return loader;
+  if (loaded?.path !== activeTrajectory.curriculumPath)
+    return <DashboardLoader />;
 
   if (!loaded.curriculum) {
     return (
