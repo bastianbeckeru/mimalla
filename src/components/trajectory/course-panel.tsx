@@ -207,6 +207,7 @@ function CourseDrawer({
             ref={popupRef}
             initialFocus={popupRef}
             finalFocus={false}
+            className="data-[swipe-axis=y]:[--drawer-content-max-height:calc(100dvh-3.5rem)]"
             onFocusCapture={(event) => {
               if (event.target instanceof HTMLInputElement)
                 onSnapPointChange(FULL_SNAP_POINT);

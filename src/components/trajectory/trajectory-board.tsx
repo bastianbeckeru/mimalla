@@ -521,7 +521,9 @@ export default function TrajectoryBoard({
       performance.now() - lastDragEndAt.current < DRAG_CLICK_MS
     )
       return;
-    openPanel(card);
+    if (card.id !== selectedId) openPanel(card);
+    else if (isMobile) setSnapPoint(FULL_SNAP_POINT);
+    else setIsPanelOpen(false);
   }
 
   function moveTo(card: PlacedEnrollment, period: PeriodKey) {
