@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { exportFile, isExportable } from "@/builder/export";
-import { importFile } from "@/builder/import";
+import { exportFile, isExportable } from "@/curriculum/export";
+import { importFile } from "@/curriculum/import";
 import type { Action } from "@/types/builder";
 
 type FileRecord = Record<string, unknown>;

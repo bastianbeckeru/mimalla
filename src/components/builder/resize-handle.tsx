@@ -5,7 +5,7 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
 
 type Point = { x: number; y: number };
 type CellDelta = { height: number; duration: number };

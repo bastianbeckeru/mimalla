@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { importFile } from "@/builder/import";
 import { toast } from "@/components/ui/toast";
+import { importFile } from "@/curriculum/import";
 import type { Draft } from "@/types/builder";
 
 /** Opens a file picker and loads the chosen builder file as a new curriculum. */

@@ -1,7 +1,8 @@
-import { findCourse } from "@/builder/draft";
-import { fitsInPeriods, pushDownCollisions } from "@/builder/grid";
-import { isSamePeriod } from "@/builder/periods";
-import type { Curriculum, Handlers, Slot, SlotAction } from "@/types/builder";
+import { findCourse } from "@/curriculum/courses";
+import { fitsInPeriods, pushDownCollisions } from "@/curriculum/grid";
+import { isSamePeriod } from "@/curriculum/periods";
+import type { Handlers, SlotAction } from "@/types/builder";
+import type { Curriculum, Slot } from "@/types/curriculum";
 
 function isValidSlot(curriculum: Curriculum, slot: Slot, duration: number) {
   return (

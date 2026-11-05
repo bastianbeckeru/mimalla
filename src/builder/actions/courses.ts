@@ -1,12 +1,13 @@
-import { findCourse } from "@/builder/draft";
+import { findCourse } from "@/curriculum/courses";
 import {
   changeCourse,
   getDefaultCredits,
   getFirstFreePosition,
   slotsFitInPeriods,
-} from "@/builder/grid";
-import { compareSlots } from "@/builder/periods";
-import type { Course, CourseAction, Draft, Handlers } from "@/types/builder";
+} from "@/curriculum/grid";
+import { compareSlots } from "@/curriculum/periods";
+import type { CourseAction, Draft, Handlers } from "@/types/builder";
+import type { Course } from "@/types/curriculum";
 
 function nextCourseId(draft: Draft) {
   return (

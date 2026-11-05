@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Course } from "@/types/builder";
+import type { Course } from "@/types/curriculum";
 import type { Placement } from "@/types/trajectory";
 
 export default function AddEnrollmentDialog({

@@ -60,6 +60,36 @@
       "react": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/curriculum/**", "!**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  { "group": ["./*", "../*"], "message": "Use the @/* alias" },
+                  {
+                    "group": [
+                      "@/builder/**",
+                      "@/components/**",
+                      "@/stores/**",
+                      "@/hooks/**",
+                      "@/server/**",
+                      "@/app/**"
+                    ],
+                    "message": "src/curriculum depends on no surface"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "actions": {
       "source": {

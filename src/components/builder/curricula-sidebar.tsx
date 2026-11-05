@@ -12,7 +12,6 @@ import {
   Upload,
 } from "lucide-react";
 import { useState } from "react";
-import { isExportable } from "@/builder/export";
 import { downloadDraft } from "@/components/builder/download-button";
 import { useFileImport } from "@/components/builder/use-file-import";
 import Logo from "@/components/logo";
@@ -47,6 +46,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { isExportable } from "@/curriculum/export";
 import type { SavedCurriculum } from "@/stores/builder";
 import type { Draft } from "@/types/builder";
 

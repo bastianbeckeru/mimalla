@@ -1,5 +1,5 @@
-import { findPeriodIndex } from "@/builder/periods";
-import type { Course, Curriculum, Period, Slot } from "@/types/builder";
+import { findPeriodIndex } from "@/curriculum/periods";
+import type { Course, Curriculum, Period, Slot } from "@/types/curriculum";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
 

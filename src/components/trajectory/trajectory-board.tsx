@@ -29,11 +29,15 @@ import TrajectoryGrid, {
   hasLeftStart,
 } from "@/components/trajectory/trajectory-grid";
 import { toast } from "@/components/ui/toast";
+import {
+  GRID_CELL_HEIGHT,
+  GRID_CELL_WIDTH,
+  GRID_GAP,
+} from "@/curriculum/grid-cells";
 import { useGridGesture } from "@/hooks/use-grid-gesture";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useConnectionFocus } from "@/stores/connections";
-import type { Course, Curriculum } from "@/types/builder";
-import type { PeriodKey } from "@/types/curriculum";
+import type { Course, Curriculum, PeriodKey } from "@/types/curriculum";
 import type {
   ChangeNotice,
   Enrollment,
@@ -43,11 +47,6 @@ import type {
   Placement,
 } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
-import {
-  GRID_CELL_HEIGHT,
-  GRID_CELL_WIDTH,
-  GRID_GAP,
-} from "@/utils/curriculum-grid";
 import {
   formatGrade,
   getCourseGrade,

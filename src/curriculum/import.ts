@@ -3,29 +3,29 @@ import {
   DEFAULT_BASE_COLOR,
   getAreaShades,
   isHexColor,
-} from "@/builder/colors";
-import { SCHEMA_VERSION } from "@/builder/export";
-import { pushDownCollisions, slotsFitInPeriods } from "@/builder/grid";
+} from "@/curriculum/colors";
+import { SCHEMA_VERSION } from "@/curriculum/export";
+import { pushDownCollisions, slotsFitInPeriods } from "@/curriculum/grid";
 import {
   comparePeriods,
   INTENSIVE_TERMS,
   isSamePeriod,
   REGULAR_TERMS,
-} from "@/builder/periods";
-import { dependsOn } from "@/builder/prerequisites";
-import { isValidEffectiveYear } from "@/builder/schemas";
+} from "@/curriculum/periods";
+import { dependsOn } from "@/curriculum/prerequisites";
+import { isValidEffectiveYear } from "@/curriculum/schemas";
+import type { Draft } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
 import type {
   Area,
   Course,
   CredentialType,
   Curriculum,
-  Draft,
   Period,
   Slot,
   TermSystem,
   Track,
-} from "@/types/builder";
-import type { HexColor } from "@/types/colors";
+} from "@/types/curriculum";
 
 type ImportResult = { ok: true; draft: Draft } | { ok: false; reason: string };
 

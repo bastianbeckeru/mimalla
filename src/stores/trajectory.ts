@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { LEGACY_CURRICULUMS } from "@/stores/legacy-curriculums";
-import type { Curriculum } from "@/types/builder";
+import type { Curriculum } from "@/types/curriculum";
 import type {
   Enrollment,
   Entry,

@@ -1,7 +1,7 @@
-import { findCourse } from "@/builder/draft";
-import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
-import type { Box } from "@/builder/routing";
-import type { Curriculum } from "@/types/builder";
+import { findCourse } from "@/curriculum/courses";
+import { getMisplacedPrerequisiteIds } from "@/curriculum/prerequisites";
+import type { Box } from "@/curriculum/routing";
+import type { Curriculum } from "@/types/curriculum";
 
 // A card is one slot of a course as the grid lays it out.
 export type ConnectionCard = Box & { id: string; courseId: number };

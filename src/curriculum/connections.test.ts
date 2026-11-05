@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
+import { createDraft } from "@/builder/draft";
 import {
   type ConnectionCard,
   getConnectionRole,
   getConnections,
-} from "@/builder/connections";
-import { createDraft } from "@/builder/draft";
+} from "@/curriculum/connections";
 import type { Action } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };

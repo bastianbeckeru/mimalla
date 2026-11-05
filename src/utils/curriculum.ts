@@ -1,5 +1,8 @@
-import type { Course } from "@/types/builder";
-import type { CatalogInstitution, ExtendedCourse } from "@/types/curriculum";
+import type {
+  CatalogInstitution,
+  Course,
+  ExtendedCourse,
+} from "@/types/curriculum";
 
 export function extendCourses(courses: Course[]) {
   const successorIds = new Map<number, number[]>();

@@ -3,8 +3,6 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor, Redo2, Undo2 } from "lucide-react";
 import { type CSSProperties, useEffect, useState } from "react";
-import { findCourse } from "@/builder/draft";
-import { getMaxDuration } from "@/builder/grid";
 import AreasBar from "@/components/builder/areas-bar";
 import CoursePanel from "@/components/builder/course-panel";
 import CurriculaSidebar from "@/components/builder/curricula-sidebar";
@@ -21,6 +19,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { findCourse } from "@/curriculum/courses";
+import { getMaxDuration } from "@/curriculum/grid";
 import { useBuilderHasHydrated, useBuilderStore } from "@/stores/builder";
 import type { Draft } from "@/types/builder";
 

@@ -1,4 +1,5 @@
-import type { Draft, Handlers, Track, TrackAction } from "@/types/builder";
+import type { Draft, Handlers, TrackAction } from "@/types/builder";
+import type { Track } from "@/types/curriculum";
 
 function nextTrackId(draft: Draft) {
   return Math.max(0, ...draft.curriculum.tracks.map((track) => track.id)) + 1;

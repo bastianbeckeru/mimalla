@@ -1,6 +1,6 @@
-import { findCourse } from "@/builder/draft";
-import { findPeriodIndex } from "@/builder/periods";
-import type { Course, Curriculum } from "@/types/builder";
+import { findCourse } from "@/curriculum/courses";
+import { findPeriodIndex } from "@/curriculum/periods";
+import type { Course, Curriculum } from "@/types/curriculum";
 
 function getPeriodIndexes(curriculum: Curriculum, course: Course) {
   return course.slots.map((slot) => findPeriodIndex(curriculum.periods, slot));

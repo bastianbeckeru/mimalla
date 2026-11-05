@@ -5,7 +5,7 @@ import {
   canRemovePeriod,
   getAvailableIntensiveTerms,
   getPeriodLabel,
-} from "@/builder/periods";
+} from "@/curriculum/periods";
 import type { Action } from "@/types/builder";
 
 function draftAfter(...actions: Action[]) {

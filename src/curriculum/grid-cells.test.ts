@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getCellAt, getEmptyCells, getRowCount } from "@/utils/curriculum-grid";
+import { getCellAt, getEmptyCells, getRowCount } from "@/curriculum/grid-cells";
 
 const firstCell = { left: 100, top: 50, width: 128, height: 64 };
 const gap = 8;

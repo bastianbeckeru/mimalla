@@ -1,6 +1,6 @@
 "use client";
 
-import type { Area } from "@/types/builder";
+import type { Area } from "@/types/curriculum";
 
 export default function AreasLegend({ areas }: { areas: Area[] }) {
   return (

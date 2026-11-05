@@ -5,7 +5,6 @@ import { useDragDropMonitor } from "@dnd-kit/react";
 import { cn } from "cn";
 import { ChevronDown } from "lucide-react";
 import { memo, type RefObject, startTransition, useState } from "react";
-import { getCourseColor } from "@/builder/colors";
 import AddButton from "@/components/builder/add-button";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import EnrollmentCard from "@/components/trajectory/enrollment-card";
@@ -15,14 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Curriculum } from "@/types/builder";
-import type { PeriodKey } from "@/types/curriculum";
-import type {
-  Enrollment,
-  Entry,
-  Placement,
-  TrajectoryProgress,
-} from "@/types/trajectory";
+import { getCourseColor } from "@/curriculum/colors";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -30,7 +22,14 @@ import {
   getEmptyCells,
   getRowCount,
   HEADER_ROWS,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
+import type { Curriculum, PeriodKey } from "@/types/curriculum";
+import type {
+  Enrollment,
+  Entry,
+  Placement,
+  TrajectoryProgress,
+} from "@/types/trajectory";
 import { parsePeriodKey } from "@/utils/period-key";
 import {
   getMoveConflict,

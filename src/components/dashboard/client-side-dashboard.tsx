@@ -27,8 +27,7 @@ import {
   useHasHydrated,
   useTrajectoryStore,
 } from "@/stores/trajectory";
-import type { Curriculum } from "@/types/builder";
-import type { CatalogInstitution } from "@/types/curriculum";
+import type { CatalogInstitution, Curriculum } from "@/types/curriculum";
 import type {
   ChangeNotice,
   Enrollment,

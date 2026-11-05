@@ -2,18 +2,18 @@
 
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
-import { getCourseColor } from "@/builder/colors";
-import { getCourseCards } from "@/builder/grid";
-import { getPeriodLabel } from "@/builder/periods";
 import AreasLegend from "@/components/curriculum/areas-legend";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
 import CourseCard from "@/components/curriculum/course-card";
-import type { Curriculum } from "@/types/builder";
+import { getCourseColor } from "@/curriculum/colors";
+import { getCourseCards } from "@/curriculum/grid";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
+import { getPeriodLabel } from "@/curriculum/periods";
+import type { Curriculum } from "@/types/curriculum";
 
 const HEADER_ROWS = 1;
 

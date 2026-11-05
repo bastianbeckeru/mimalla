@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { exportFile } from "@/builder/export";
-import { getMaxDuration } from "@/builder/grid";
-import type { Action, Course, Draft } from "@/types/builder";
+import { exportFile } from "@/curriculum/export";
+import { getMaxDuration } from "@/curriculum/grid";
+import type { Action, Draft } from "@/types/builder";
+import type { Course } from "@/types/curriculum";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };

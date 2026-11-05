@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Action, Area, Course } from "@/types/builder";
+import type { Action } from "@/types/builder";
+import type { Area, Course } from "@/types/curriculum";
 
 const NO_AREA_LABEL = "Sin área";
 

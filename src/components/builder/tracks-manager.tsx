@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Action, CredentialType, Draft } from "@/types/builder";
+import type { Action, Draft } from "@/types/builder";
+import type { CredentialType } from "@/types/curriculum";
 
 const NEW_TRACK_NAME = "Nuevo plan";
 const NO_CREDENTIAL_LABEL = "Sin credencial";

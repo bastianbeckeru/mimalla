@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Course, Curriculum, Slot } from "@/types/builder";
-import type { PeriodKey } from "@/types/curriculum";
+import type { Course, Curriculum, PeriodKey, Slot } from "@/types/curriculum";
 import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import {

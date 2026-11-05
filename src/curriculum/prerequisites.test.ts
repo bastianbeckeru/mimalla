@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { getMisplacedPrerequisiteIds } from "@/builder/prerequisites";
+import { getMisplacedPrerequisiteIds } from "@/curriculum/prerequisites";
 import type { Action, Draft } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };

@@ -1,5 +1,5 @@
-import { comparePeriods, compareSlots } from "@/builder/periods";
-import { exportableCurriculumSchema } from "@/builder/schemas";
+import { comparePeriods, compareSlots } from "@/curriculum/periods";
+import { exportableCurriculumSchema } from "@/curriculum/schemas";
 import type { Draft } from "@/types/builder";
 import { slugify } from "@/utils/strings";
 

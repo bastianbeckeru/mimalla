@@ -1,9 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
-import { getAreaShades, getCourseColor, getTextColor } from "@/builder/colors";
 import { createDraft } from "@/builder/draft";
-import type { Action, Area, Course } from "@/types/builder";
+import {
+  getAreaShades,
+  getCourseColor,
+  getTextColor,
+} from "@/curriculum/colors";
+import type { Action } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
+import type { Area, Course } from "@/types/curriculum";
 import { getLuminance } from "@/utils/colors";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };

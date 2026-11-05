@@ -2,7 +2,7 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
 
 // Routes connections between cards along the gaps of the grid, in rem.
 //

@@ -10,30 +10,22 @@ import {
 import { DragDropProvider, useDragDropMonitor } from "@dnd-kit/react";
 import { memo, type RefObject, startTransition, useState } from "react";
 import { apply } from "@/builder/apply";
-import { getCourseColor } from "@/builder/colors";
-import { type ConnectionRole, getConnectionRole } from "@/builder/connections";
-import {
-  type CourseCardLayout,
-  getCourseCards,
-  getMaxDuration,
-} from "@/builder/grid";
-import { getPeriodLabel } from "@/builder/periods";
 import AddButton from "@/components/builder/add-button";
 import DraggableCourseCard from "@/components/builder/course-card";
 import NewCourseDialog from "@/components/builder/new-course-dialog";
 import PeriodHeader from "@/components/builder/period-header";
 import ResizeHandle from "@/components/builder/resize-handle";
 import ConnectionsOverlay from "@/components/curriculum/connections-overlay";
-import { useGridGesture } from "@/hooks/use-grid-gesture";
-import type {
-  Action,
-  Curriculum,
-  Draft,
-  Period,
-  ResizeAction,
-  SlotAction,
-} from "@/types/builder";
-import type { HexColor } from "@/types/colors";
+import { getCourseColor } from "@/curriculum/colors";
+import {
+  type ConnectionRole,
+  getConnectionRole,
+} from "@/curriculum/connections";
+import {
+  type CourseCardLayout,
+  getCourseCards,
+  getMaxDuration,
+} from "@/curriculum/grid";
 import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
@@ -41,7 +33,12 @@ import {
   getEmptyCells,
   getRowCount,
   HEADER_ROWS,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
+import { getPeriodLabel } from "@/curriculum/periods";
+import { useGridGesture } from "@/hooks/use-grid-gesture";
+import type { Action, Draft, ResizeAction, SlotAction } from "@/types/builder";
+import type { HexColor } from "@/types/colors";
+import type { Curriculum, Period } from "@/types/curriculum";
 
 const DRAG_ACTIVATION_DISTANCE = 5;
 

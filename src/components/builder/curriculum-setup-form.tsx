@@ -2,7 +2,6 @@
 
 import { type ReactNode, useId, useState } from "react";
 import { z } from "zod";
-import { detailsSchema } from "@/builder/schemas";
 import TermSystemSelect from "@/components/builder/term-system-select";
 import {
   Field,
@@ -11,7 +10,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { CurriculumDetails, TermSystem } from "@/types/builder";
+import { detailsSchema } from "@/curriculum/schemas";
+import type { CurriculumDetails, TermSystem } from "@/types/curriculum";
 
 export default function CurriculumSetupForm({
   onSubmit,

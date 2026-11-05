@@ -1,5 +1,5 @@
-import type { Course, Curriculum } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
+import type { Course, Curriculum } from "@/types/curriculum";
 import {
   DEFAULT_COURSE_COLOR,
   getLuminance,

@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { TermSystem } from "@/types/builder";
+import type { TermSystem } from "@/types/curriculum";
 
 const TERM_SYSTEMS: { value: TermSystem; label: string }[] = [
   { value: "semester", label: "Semestral" },

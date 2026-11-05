@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronDown, Coins, Layers, Lock, Slash } from "lucide-react";
-import { detailsSchema } from "@/builder/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -16,7 +15,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { Action, Curriculum, TermSystem } from "@/types/builder";
+import { detailsSchema } from "@/curriculum/schemas";
+import type { Action } from "@/types/builder";
+import type { Curriculum, TermSystem } from "@/types/curriculum";
 
 const TERM_SYSTEMS: { value: TermSystem; label: string }[] = [
   { value: "semester", label: "Semestral" },

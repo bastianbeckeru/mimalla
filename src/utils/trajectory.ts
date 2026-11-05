@@ -3,10 +3,14 @@ import {
   getCourseHeight,
   getDefaultCredits,
   pushDownCollisions,
-} from "@/builder/grid";
-import { compareSlots } from "@/builder/periods";
-import type { Course, Curriculum } from "@/types/builder";
-import type { ExtendedCourse, PeriodKey } from "@/types/curriculum";
+} from "@/curriculum/grid";
+import { compareSlots } from "@/curriculum/periods";
+import type {
+  Course,
+  Curriculum,
+  ExtendedCourse,
+  PeriodKey,
+} from "@/types/curriculum";
 import type {
   Enrollment,
   EnrollmentStatus,

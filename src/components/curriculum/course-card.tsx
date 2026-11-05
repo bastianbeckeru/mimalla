@@ -9,11 +9,14 @@ import {
   type Ref,
   useEffect,
 } from "react";
-import { getTextColor } from "@/builder/colors";
-import { type ConnectionRole, getConnectionRole } from "@/builder/connections";
+import { getTextColor } from "@/curriculum/colors";
+import {
+  type ConnectionRole,
+  getConnectionRole,
+} from "@/curriculum/connections";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
-import type { Course, Curriculum } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
+import type { Course, Curriculum } from "@/types/curriculum";
 
 const MUTED_COLOR_PERCENT = 30;
 const MUTED_TEXT_COLOR =

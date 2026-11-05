@@ -1,11 +1,12 @@
 "use client";
 
 import { Plus, Shuffle, X } from "lucide-react";
-import { getPeriodTitle } from "@/builder/periods";
 import PropertyRow from "@/components/builder/property-row";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import type { Action, Course, TermSystem } from "@/types/builder";
+import { getPeriodTitle } from "@/curriculum/periods";
+import type { Action } from "@/types/builder";
+import type { Course, TermSystem } from "@/types/curriculum";
 
 export default function ElectiveSlots({
   course,

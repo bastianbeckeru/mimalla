@@ -2,11 +2,6 @@
 
 import { Plus, Search, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
-import { getPeriodTitle } from "@/builder/periods";
-import {
-  canAddPrerequisite,
-  getMisplacedPrerequisiteIds,
-} from "@/builder/prerequisites";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -22,7 +17,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Action, Course, Curriculum } from "@/types/builder";
+import { getPeriodTitle } from "@/curriculum/periods";
+import {
+  canAddPrerequisite,
+  getMisplacedPrerequisiteIds,
+} from "@/curriculum/prerequisites";
+import type { Action } from "@/types/builder";
+import type { Course, Curriculum } from "@/types/curriculum";
 
 const CREDITS_PATTERN = /^\d+$/;
 

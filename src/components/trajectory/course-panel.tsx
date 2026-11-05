@@ -19,7 +19,6 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { getCourseColor } from "@/builder/colors";
 import CommitInput from "@/components/trajectory/commit-input";
 import { STATUS_LABELS } from "@/components/trajectory/enrollment-card";
 import GradingSchemeEditor from "@/components/trajectory/grading-scheme-editor";
@@ -40,8 +39,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
+import { getCourseColor } from "@/curriculum/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
-import type { Course, Curriculum } from "@/types/builder";
+import type { Course, Curriculum } from "@/types/curriculum";
 import type {
   Assessment,
   Enrollment,

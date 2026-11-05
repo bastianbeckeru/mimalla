@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { type Box, routeConnections } from "@/builder/routing";
+import { type Box, routeConnections } from "@/curriculum/routing";
 
 function box(column: number, row: number, duration = 1, height = 1): Box {
   return { column, row, duration, height };

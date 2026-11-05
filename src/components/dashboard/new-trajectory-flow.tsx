@@ -24,8 +24,11 @@ import {
 } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useImportTrajectory } from "@/hooks/use-import-trajectory";
-import type { Curriculum } from "@/types/builder";
-import type { CatalogInstitution, CatalogProgram } from "@/types/curriculum";
+import type {
+  CatalogInstitution,
+  CatalogProgram,
+  Curriculum,
+} from "@/types/curriculum";
 import { ENTRY_TERMS } from "@/utils/period-key";
 
 export const PROGRAM_PARAM = "programa";

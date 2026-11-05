@@ -1,8 +1,8 @@
 "use client";
 
 import { Download } from "lucide-react";
-import { exportFile, getFileName, isExportable } from "@/builder/export";
 import { Button } from "@/components/ui/button";
+import { exportFile, getFileName, isExportable } from "@/curriculum/export";
 import type { Draft } from "@/types/builder";
 
 export function downloadDraft(draft: Draft) {

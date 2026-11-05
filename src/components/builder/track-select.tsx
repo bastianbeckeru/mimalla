@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Action, Course, Track } from "@/types/builder";
+import type { Action } from "@/types/builder";
+import type { Course, Track } from "@/types/curriculum";
 
 const NO_TRACK_LABEL = "Sin plan";
 

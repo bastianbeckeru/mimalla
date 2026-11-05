@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { GRID_GAP, getCellAt } from "@/utils/curriculum-grid";
+import { GRID_GAP, getCellAt } from "@/curriculum/grid-cells";
 
 type Origin = { x: number; y: number };
 

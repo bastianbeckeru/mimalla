@@ -5,14 +5,9 @@ import {
   getAvailableIntensiveTerms,
   isSamePeriod,
   REGULAR_TERMS,
-} from "@/builder/periods";
-import type {
-  Curriculum,
-  Draft,
-  Handlers,
-  Period,
-  PeriodAction,
-} from "@/types/builder";
+} from "@/curriculum/periods";
+import type { Draft, Handlers, PeriodAction } from "@/types/builder";
+import type { Curriculum, Period } from "@/types/curriculum";
 
 function withPeriods(draft: Draft, periods: Period[]): Draft {
   return { ...draft, curriculum: { ...draft.curriculum, periods } };

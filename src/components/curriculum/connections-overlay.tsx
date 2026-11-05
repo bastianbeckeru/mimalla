@@ -6,15 +6,15 @@ import {
   type Connection,
   type ConnectionCard,
   getConnections,
-} from "@/builder/connections";
+} from "@/curriculum/connections";
+import { GRID_GAP } from "@/curriculum/grid-cells";
 import {
   type GridSize,
   getCanvasSize,
   routeConnections,
-} from "@/builder/routing";
+} from "@/curriculum/routing";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
-import type { Curriculum } from "@/types/builder";
-import { GRID_GAP } from "@/utils/curriculum-grid";
+import type { Curriculum } from "@/types/curriculum";
 
 const STROKE_WIDTH = 0.1;
 const MISPLACED_DASHES = "0.3 0.2";
