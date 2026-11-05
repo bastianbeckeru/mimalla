@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # The curriculum file is the only curriculum format
 
 A curriculum travels in one format, the `.malla` curriculum file: the builder downloads and loads it, and the catalog imports it, replacing the catalog's own JSON format. Catalog data that describes the program rather than one curriculum (department, acronyms, SIES and DEMRE codes, schedule) stays in the database: a program is registered once, and each curriculum file is imported into it. We chose one format over keeping a richer catalog format beside the builder's because the catalog will grow to hundreds of curriculums extracted from PDFs, and one guide, one validator and one visual tool to review them is worth more than two schemas drifting apart.
@@ -9,5 +13,6 @@ A curriculum travels in one format, the `.malla` curriculum file: the builder do
 
 ## Consequences
 
+- Until ADR 0001 is implemented there is no database: the catalog reads the curriculum files at build time and keeps program data in `src/server/db/programs.ts`.
 - What the catalog format carried and the curriculum file lacks is dropped on purpose: program statistics (costly to keep current and rarely used), course descriptions (PDFs do not carry them), the courses that can fill an elective (they change every term), subareas, and nested tracks.
 - The curriculum file allows courses without a code, but the catalog rejects them on import, because trajectories reference courses by code.

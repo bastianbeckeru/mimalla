@@ -23,18 +23,6 @@ Mi Malla is a web app that lets university students customize their curriculum a
 
 Is your program missing? See [Adding a curriculum](CONTRIBUTING.md#adding-a-curriculum).
 
-## Tech stack
-
-- [Bun](https://bun.sh)
-- [Next.js](https://nextjs.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [shadcn/ui](https://ui.shadcn.com/) on [Base UI](https://base-ui.com)
-- [Motion](https://motion.dev)
-- [@hello-pangea/dnd](https://github.com/hello-pangea/dnd)
-- [Zustand](https://zustand.docs.pmnd.rs)
-- [Vercel Analytics](https://vercel.com/docs/analytics)
-- [Biome](https://biomejs.dev)
-
 ## Getting started
 
 Prerequisites: [Bun](https://bun.sh) 1.x. Mi Malla needs no environment variables or external services.
@@ -63,21 +51,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Project structure
 
-```
-src/
-├── app/            Next.js routes: landing, program pages, dashboard and curriculum JSON API
-├── components/
-│   ├── curriculum/ Official curriculum grid, course cards and prerequisite paths
-│   ├── dashboard/  Dashboard shell: sidebar and new trajectory form
-│   ├── trajectory/ Trajectory board: periods, enrollments and their dialogs
-│   └── ui/         shadcn/ui components
-├── hooks/          Shared React hooks
-├── server/db/      Curriculum JSON files and the build-time reader
-├── stores/         Trajectory store persisted to local storage
-├── styles/         Global and curriculum styles
-├── types/          Shared types
-└── utils/          Shared helpers
-```
+See [docs/architecture.md](docs/architecture.md) for where each part of the app lives and what they share.
 
 ## Contributing
 

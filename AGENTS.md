@@ -8,6 +8,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Code map
+
+`docs/architecture.md`: where each surface (dashboard, curriculum viewer, builder) lives and what they share. Read it before exploring `src/`.
+
 ## Agent skills
 
 ### Issue tracker
