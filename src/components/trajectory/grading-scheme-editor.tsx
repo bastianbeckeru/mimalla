@@ -279,7 +279,9 @@ export default function GradingSchemeEditor({
     );
 
   return (
-    <div className="py-3 pr-3 pl-1">
+    // Holding a drag handle must not select the text around it. Inputs opt back
+    // in because Safari would otherwise not let them be edited.
+    <div className="select-none py-3 pr-3 pl-1 [-webkit-touch-callout:none] [&_input]:select-text">
       <div className="flex h-6 items-center pr-1 text-muted-foreground text-xs">
         <span className="min-w-0 flex-1 pl-5">Evaluaciones</span>
         <span className="w-15 shrink-0 pr-2 text-right">Peso</span>
