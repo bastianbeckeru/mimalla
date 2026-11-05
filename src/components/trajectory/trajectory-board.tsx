@@ -73,6 +73,7 @@ import {
   getAddableCourses,
   getMoveConflict,
   getNextPeriod,
+  getOpeningColumn,
   getPeriodEndRow,
   getPeriodInfo,
   getProgress,
@@ -267,15 +268,7 @@ export default function TrajectoryBoard({
   const blockerIds = new Set(
     gesture ? moveConflicts.get(gesture.placement.period)?.blockerIds : [],
   );
-  const [firstVisibleColumn] = useState(
-    () =>
-      Math.max(
-        0,
-        base.periods.findLastIndex(
-          (period) => getPeriodInfo(period, entry).hasStarted,
-        ),
-      ) + 1,
-  );
+  const [firstVisibleColumn] = useState(() => getOpeningColumn(base, entry));
   const panelColumn = panelCard?.column;
   const panelRow = panelCard?.row;
   const panelDuration = panelCard?.duration;

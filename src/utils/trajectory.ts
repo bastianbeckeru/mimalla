@@ -560,6 +560,27 @@ export function getPeriodInfo(id: PeriodKey, entry: Entry) {
   };
 }
 
+// The column a board opens on: the last one holding an approved course, or the
+// current period while nothing is approved, or the first if that is off the board.
+export function getOpeningColumn(
+  { periods, cards }: TrajectoryLayout,
+  entry: Entry,
+) {
+  const lastApproved = Math.max(
+    0,
+    ...cards
+      .filter((card) => card.enrollment.status === "APPROVED")
+      .map((card) => card.column + card.duration - 1),
+  );
+  if (lastApproved > 0) return lastApproved;
+  return (
+    Math.max(
+      0,
+      periods.findIndex((period) => getPeriodInfo(period, entry).isCurrent),
+    ) + 1
+  );
+}
+
 export function isAvailable(course: Course, progress: TrajectoryProgress) {
   return (
     course.prerequisiteIds.every((id) => progress.approvedCourseIds.has(id)) &&

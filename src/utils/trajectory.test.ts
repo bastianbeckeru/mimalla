@@ -7,6 +7,7 @@ import {
   approveThroughPeriod,
   createEnrollments,
   getMoveConflict,
+  getOpeningColumn,
   getPeriodEndRow,
   layOutTrajectory,
   MAX_ENROLLMENTS_PER_PERIOD,
@@ -463,6 +464,70 @@ describe("layOutTrajectory", () => {
 
     expect(periods).toEqual(["2024-1", "2024-3", "2025-1"]);
     expect(cards.map((card) => card.column)).toEqual([1]);
+  });
+});
+
+describe("getOpeningColumn", () => {
+  const curriculum = curriculumOf([
+    course(1),
+    course(2),
+    course(3),
+    course(4, { duration: 2 }),
+  ]);
+
+  function openingColumn(
+    layout: Record<PeriodKey, number[]>,
+    statuses: Record<number, EnrollmentStatus>,
+    from = entry,
+  ) {
+    return getOpeningColumn(
+      layOutTrajectory(trajectory(layout, statuses), {
+        entry: from,
+        curriculum,
+      }),
+      from,
+    );
+  }
+
+  test("opens on the last period with an approved course, not at the end of the board", () => {
+    expect(
+      openingColumn(
+        { "2024-1": [1], "2024-3": [2], "2025-1": [3] },
+        { 1: "APPROVED", 2: "FAILED" },
+      ),
+    ).toBe(1);
+  });
+
+  test("counts the last period an approved course spans", () => {
+    expect(
+      openingColumn({ "2024-1": [4], "2025-1": [1] }, { 4: "APPROVED" }),
+    ).toBe(2);
+  });
+
+  test("opens on the current period while nothing is approved", () => {
+    const year = new Date().getFullYear();
+    const current = new Date().getMonth() < 7 ? 1 : 3;
+    expect(
+      openingColumn(
+        {
+          [`${year - 1}-1`]: [1],
+          [`${year - 1}-3`]: [2],
+          [`${year}-${current}`]: [3],
+        },
+        {},
+        { year: year - 1, term: 1 },
+      ),
+    ).toBe(current === 1 ? 3 : 4);
+  });
+
+  test("opens on the first period when nothing is approved and the board ended long ago", () => {
+    expect(
+      openingColumn(
+        { "2010-1": [1], "2010-3": [2] },
+        {},
+        { year: 2010, term: 1 },
+      ),
+    ).toBe(1);
   });
 });
 
