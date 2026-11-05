@@ -1,6 +1,6 @@
 import type { GradingScale } from "@/types/trajectory";
 
-export type SettingsSectionId = "trajectory" | "appearance" | "help";
+export type SettingsSectionId = "trajectory" | "preferences" | "help";
 
 export type TrajectorySettings = {
   programName: string;

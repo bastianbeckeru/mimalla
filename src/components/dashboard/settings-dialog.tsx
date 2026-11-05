@@ -73,7 +73,7 @@ export default function SettingsDialog({
                   {activeLabel}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
-                  Ajusta esta malla y la apariencia, o busca ayuda.
+                  Ajusta esta malla y tus preferencias, o busca ayuda.
                 </DialogDescription>
               </header>
               <div

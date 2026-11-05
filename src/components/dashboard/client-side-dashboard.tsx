@@ -21,6 +21,7 @@ import {
 import { toast } from "@/components/ui/toast";
 import { useHistory } from "@/hooks/use-history";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePreferencesStore } from "@/stores/preferences";
 import {
   useActiveTrajectory,
   useHasHydrated,
@@ -178,6 +179,7 @@ function TrajectoryDashboard({
     gradingScale: trajectory.gradingScale,
   }));
   const isMobile = useIsMobile();
+  const showsAreasBar = usePreferencesStore((state) => state.showsAreasBar);
   const noticeId = useRef<string | null>(null);
   const [sidebarWidth, setSidebarWidth] = useState(() =>
     parseSidebarWidth(localStorage.getItem(SIDEBAR_WIDTH_KEY)),
@@ -300,7 +302,7 @@ function TrajectoryDashboard({
           isNew={isNew}
           onChange={commit}
         />
-        {curriculum.areas.length > 0 && (
+        {showsAreasBar && curriculum.areas.length > 0 && (
           <footer className="flex shrink-0 border-t px-4 py-3 lg:px-8">
             <AreasLegend areas={curriculum.areas} />
           </footer>

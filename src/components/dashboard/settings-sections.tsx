@@ -8,7 +8,7 @@ import {
   type LucideIcon,
   Monitor,
   Moon,
-  Palette,
+  SlidersHorizontal,
   Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePreferencesStore } from "@/stores/preferences";
 import type { SettingsSectionId, TrajectorySettings } from "@/types/settings";
 import type { GradingScale } from "@/types/trajectory";
 import { formatGrade, isValidGradingScale, parseGrade } from "@/utils/grades";
@@ -46,7 +48,12 @@ export const SETTINGS_SECTIONS: {
     summary: "Escala de notas, reiniciar y eliminar",
     icon: GraduationCap,
   },
-  { id: "appearance", label: "Apariencia", summary: "Tema", icon: Palette },
+  {
+    id: "preferences",
+    label: "Preferencias",
+    summary: "Tema y barra de áreas",
+    icon: SlidersHorizontal,
+  },
   {
     id: "help",
     label: "Ayuda",
@@ -308,36 +315,60 @@ function TrajectorySection({
   );
 }
 
-function AppearanceSection() {
+function PreferencesSection() {
   const { theme, setTheme } = useTheme();
+  const showsAreasBar = usePreferencesStore((state) => state.showsAreasBar);
+  const setShowsAreasBar = usePreferencesStore(
+    (state) => state.setShowsAreasBar,
+  );
 
   return (
-    <section className="space-y-2">
-      <h3 className="font-heading font-semibold text-sm">Tema</h3>
-      <ToggleGroup
-        aria-label="Tema"
-        spacing={1}
-        className="w-full rounded-lg bg-muted/50 p-1 sm:w-fit"
-        value={theme ? [theme] : []}
-        onValueChange={([next]) => {
-          if (next) setTheme(next);
-        }}
-      >
-        {THEMES.map(({ value, label, icon: Icon }) => (
-          <ToggleGroupItem
-            key={value}
-            value={value}
-            className="flex-1 text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground sm:flex-none"
+    <>
+      <section className="space-y-2">
+        <h3 className="font-heading font-semibold text-sm">Tema</h3>
+        <ToggleGroup
+          aria-label="Tema"
+          spacing={1}
+          className="w-full rounded-lg bg-muted/50 p-1 sm:w-fit"
+          value={theme ? [theme] : []}
+          onValueChange={([next]) => {
+            if (next) setTheme(next);
+          }}
+        >
+          {THEMES.map(({ value, label, icon: Icon }) => (
+            <ToggleGroupItem
+              key={value}
+              value={value}
+              className="flex-1 text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground sm:flex-none"
+            >
+              <Icon />
+              {label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </section>
+      <SettingsGroup title="Tablero">
+        <div className={ROW_CLASS}>
+          <label
+            htmlFor="settings-areas-bar"
+            className="min-w-0 flex-1 cursor-pointer"
           >
-            <Icon />
-            {label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+            <RowText
+              label="Barra de áreas"
+              description="Muestra las áreas de la malla bajo el tablero."
+            />
+          </label>
+          <Switch
+            id="settings-areas-bar"
+            checked={showsAreasBar}
+            onCheckedChange={setShowsAreasBar}
+          />
+        </div>
+      </SettingsGroup>
       <p className="text-muted-foreground text-xs">
-        Se aplica en este dispositivo.
+        Se aplican en este dispositivo.
       </p>
-    </section>
+    </>
   );
 }
 
@@ -402,7 +433,7 @@ export function SettingsSection({
   section: SettingsSectionId;
   settings: TrajectorySettings;
 }) {
-  if (section === "appearance") return <AppearanceSection />;
+  if (section === "preferences") return <PreferencesSection />;
   if (section === "help") return <HelpSection />;
   return <TrajectorySection {...settings} />;
 }
