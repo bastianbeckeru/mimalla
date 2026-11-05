@@ -424,7 +424,7 @@ function PanelContent({
       {isDrawer && summary}
       <Tabs defaultValue="grades" className="min-h-0 flex-1">
         <TabsList className="shrink-0 px-5 pt-2">
-          <TabsTab value="grades">Notas</TabsTab>
+          <TabsTab value="grades">Calificaciones</TabsTab>
           <TabsTab value="details">Detalles</TabsTab>
         </TabsList>
         <TabsPanel

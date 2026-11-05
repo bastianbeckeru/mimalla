@@ -19,6 +19,9 @@ _Avoid_: Career, carrera, degree
 **Catalog**:
 Every program available in Mi Malla, grouped by institution and department.
 
+**Curriculum viewer**:
+The public page of a program, where anyone explores one of its official curriculums.
+
 ## Curriculums
 
 **Curriculum**:
@@ -91,6 +94,9 @@ _Avoid_: Diploma
 
 ## Trajectories
 
+**Dashboard**:
+Where a student creates their trajectories and works on them.
+
 **Trajectory**:
 A student's own path through a curriculum: it starts as a copy of a base curriculum, and the student rearranges its enrollments and tracks their status. Shown in the UI as "mi malla".
 _Avoid_: Student curriculum, study plan, roadmap, malla
@@ -147,7 +153,7 @@ Moving a course the student has not approved out of a passed period, toward the 
 ## Grades
 
 **Grade**:
-A mark the student obtained in an assessment, on the trajectory's grading scale. Shown in the UI as "nota".
+A mark the student obtained in an assessment, on the trajectory's grading scale. Shown in the UI as "nota", and the tab that holds them as "calificaciones".
 _Avoid_: Score, mark, calificación (in code)
 
 **Grading scale**:

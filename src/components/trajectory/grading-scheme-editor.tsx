@@ -78,6 +78,8 @@ const NUMBER_FIELD =
 const REVEAL_ON_ROW =
   "pointer-fine:opacity-0 pointer-fine:focus-visible:opacity-100 pointer-fine:group-focus-within/row:opacity-100 pointer-fine:group-hover/row:opacity-100 pointer-fine:data-popup-open:opacity-100";
 
+const ADD_BUTTON = "pointer-coarse:h-11";
+
 const sensors = [
   PointerSensor.configure({
     activationConstraints: [
@@ -223,29 +225,6 @@ export default function GradingSchemeEditor({
     };
   }
 
-  const addButtons = (isEmpty: boolean, hasSource: boolean) => (
-    <>
-      <Button
-        variant={!isEmpty ? "ghost" : hasSource ? "outline" : "default"}
-        size="sm"
-        className={cn(!isEmpty && "text-muted-foreground")}
-        onClick={() => add(createSingle(), null)}
-      >
-        <Plus />
-        Evaluación
-      </Button>
-      <Button
-        variant={isEmpty ? "outline" : "ghost"}
-        size="sm"
-        className={cn(!isEmpty && "text-muted-foreground")}
-        onClick={() => add(createGroup(), null)}
-      >
-        <FolderPlus />
-        Grupo
-      </Button>
-    </>
-  );
-
   if (rows.length === 0 && isReadOnly)
     return (
       <p className="p-6 text-muted-foreground text-sm">
@@ -268,12 +247,24 @@ export default function GradingSchemeEditor({
         </div>
         <div className="flex flex-wrap gap-2">
           {copySource && (
-            <Button size="sm" onClick={copySource.onCopy}>
+            <Button
+              size="lg"
+              className={ADD_BUTTON}
+              onClick={copySource.onCopy}
+            >
               <Copy />
               Copiar de {copySource.label}
             </Button>
           )}
-          {addButtons(true, copySource !== undefined)}
+          <Button
+            variant={copySource ? "outline" : "default"}
+            size="lg"
+            className={ADD_BUTTON}
+            onClick={() => add(createSingle(), null)}
+          >
+            <Plus />
+            Evaluación
+          </Button>
         </div>
       </div>
     );
@@ -394,8 +385,16 @@ export default function GradingSchemeEditor({
         </p>
       )}
       {!isReadOnly && (
-        <div className="flex flex-wrap gap-0.5 pt-1.5 pl-3">
-          {addButtons(false, false)}
+        <div className="pt-2 pl-5">
+          <Button
+            variant="outline"
+            size="lg"
+            className={cn(ADD_BUTTON, "w-full")}
+            onClick={() => add(createSingle(), null)}
+          >
+            <Plus />
+            Evaluación
+          </Button>
         </div>
       )}
     </div>
