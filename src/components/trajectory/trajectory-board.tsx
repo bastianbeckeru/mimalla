@@ -1,25 +1,23 @@
 "use client";
 
-import {
-  type DragEndEvent,
-  type DragMoveEvent,
-  Feedback,
-  KeyboardSensor,
-  PointerActivationConstraints,
-  PointerSensor,
-} from "@dnd-kit/dom";
+import type { DragEndEvent, DragMoveEvent } from "@dnd-kit/dom";
+import { Feedback } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddEnrollmentDialog from "@/components/trajectory/add-enrollment-dialog";
+import { sensors } from "@/components/trajectory/board-sensors";
 import ClosePeriodDialog from "@/components/trajectory/close-period-dialog";
 import CoursePanel, {
   FULL_SNAP_POINT,
-  getPeekHeight,
   type PanelSnapPoint,
   PEEK_SNAP_POINT,
-  type SchemeSource,
 } from "@/components/trajectory/course-panel";
+import {
+  EDIT_ERROR_DESCRIPTIONS,
+  getStatusNotice,
+  showEditError,
+} from "@/components/trajectory/edit-feedback";
 import { STATUS_LABELS } from "@/components/trajectory/enrollment-card";
 import MoveEnrollmentDialog from "@/components/trajectory/move-enrollment-dialog";
 import PassedPeriodsDialog from "@/components/trajectory/passed-periods-dialog";
@@ -28,12 +26,10 @@ import TrajectoryGrid, {
   type Gesture,
   hasLeftStart,
 } from "@/components/trajectory/trajectory-grid";
-import { toast } from "@/components/ui/toast";
 import {
-  GRID_CELL_HEIGHT,
-  GRID_CELL_WIDTH,
-  GRID_GAP,
-} from "@/curriculum/grid-cells";
+  useOpeningScroll,
+  useRevealPanelCard,
+} from "@/components/trajectory/use-board-scroll";
 import { useGridGesture } from "@/hooks/use-grid-gesture";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useConnectionFocus } from "@/stores/connections";
@@ -45,6 +41,7 @@ import type {
   Entry,
   GradingScale,
   Placement,
+  SchemeSource,
 } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import {
@@ -57,7 +54,6 @@ import { parsePeriodKey } from "@/utils/period-key";
 import {
   addEnrollment,
   approveThroughPeriod,
-  type EditError,
   getAddableCourses,
   getMoveConflict,
   getNextPeriod,
@@ -67,7 +63,6 @@ import {
   getProgress,
   isAvailable,
   layOutTrajectory,
-  MAX_ENROLLMENTS_PER_PERIOD,
   moveEnrollment,
   type PlacedEnrollment,
   removeEnrollment,
@@ -76,78 +71,10 @@ import {
   setEnrollmentStatuses,
 } from "@/utils/trajectory";
 
-const DRAG_ACTIVATION_DISTANCE = 5;
-const TOUCH_HOLD_MS = 300;
-const TOUCH_HOLD_TOLERANCE = 8;
-const ROOT_FONT_SIZE = 16;
 const DRAG_CLICK_MS = 300;
 const ENTER_MS = 300;
-const PREVIOUS_PERIOD_PEEK_REM = 2.5;
-const REVEAL_MARGIN_REM = 1;
-
-const sensors = [
-  PointerSensor.configure({
-    activationConstraints: (event) =>
-      event.pointerType === "touch"
-        ? [
-            new PointerActivationConstraints.Delay({
-              value: TOUCH_HOLD_MS,
-              tolerance: TOUCH_HOLD_TOLERANCE,
-            }),
-          ]
-        : [
-            new PointerActivationConstraints.Distance({
-              value: DRAG_ACTIVATION_DISTANCE,
-            }),
-          ],
-  }),
-  KeyboardSensor.configure({
-    offset: {
-      x: (GRID_CELL_WIDTH + GRID_GAP) * ROOT_FONT_SIZE,
-      y: (GRID_CELL_HEIGHT + GRID_GAP) * ROOT_FONT_SIZE,
-    },
-    keyboardCodes: {
-      start: ["Space"],
-      cancel: ["Escape", "Tab"],
-      end: ["Space"],
-      up: ["ArrowUp"],
-      down: ["ArrowDown"],
-      left: ["ArrowLeft"],
-      right: ["ArrowRight"],
-    },
-  }),
-];
-
-const EDIT_ERROR_DESCRIPTIONS: Record<EditError, string> = {
-  PERIOD_FULL: `Un periodo no puede tener más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,
-  DUPLICATE_COURSE: "Este periodo ya tiene este curso.",
-  SUCCESSOR_IN_PERIOD: "Este periodo tiene un curso que lo requiere.",
-  PREREQUISITE_IN_PERIOD: "Este periodo tiene uno de sus prerrequisitos.",
-  SUCCESSOR_ON_THE_WAY: "Hay un curso que lo requiere en el camino.",
-  PREREQUISITE_ON_THE_WAY: "Hay uno de sus prerrequisitos en el camino.",
-};
 
 type PeriodClosing = { period: PeriodKey; isOpen: boolean };
-
-function getStatusNotice(title: string, revertedCount: number): ChangeNotice {
-  if (revertedCount === 0) return { title };
-  return {
-    title,
-    description:
-      revertedCount === 1
-        ? "1 curso que lo requería volvió a pendiente."
-        : `${revertedCount} cursos que lo requerían volvieron a pendiente.`,
-    isShownOnDesktop: true,
-  };
-}
-
-function showEditError(title: string, error: EditError) {
-  toast.add({
-    type: "error",
-    title,
-    description: EDIT_ERROR_DESCRIPTIONS[error],
-  });
-}
 
 export default function TrajectoryBoard({
   enrollments,
@@ -195,10 +122,6 @@ export default function TrajectoryBoard({
     : base.periods;
   const panelCard = base.cards.find((card) => card.id === panelId) ?? null;
   const [firstVisibleColumn] = useState(() => getOpeningColumn(base, entry));
-  const panelColumn = panelCard?.column;
-  const panelRow = panelCard?.row;
-  const panelDuration = panelCard?.duration;
-  const panelHeight = panelCard?.height;
 
   useEffect(() => {
     const timeout = setTimeout(
@@ -208,89 +131,16 @@ export default function TrajectoryBoard({
     return () => clearTimeout(timeout);
   }, [base.periods.length]);
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    const firstCell = firstCellRef.current;
-    if (!section || !firstCell) return;
-    const rootFontSize = Number.parseFloat(
-      getComputedStyle(document.documentElement).fontSize,
-    );
-    const column = (firstVisibleColumn - 1) * (GRID_CELL_WIDTH + GRID_GAP);
-    section.scrollLeft +=
-      firstCell.getBoundingClientRect().left -
-      section.getBoundingClientRect().left +
-      (column - PREVIOUS_PERIOD_PEEK_REM) * rootFontSize;
-  }, [firstCellRef, firstVisibleColumn]);
+  useOpeningScroll({ sectionRef, firstCellRef, firstVisibleColumn });
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const firstCell = firstCellRef.current;
-    if (
-      !isPanelOpen ||
-      snapPoint === FULL_SNAP_POINT ||
-      !section ||
-      !firstCell ||
-      panelColumn === undefined ||
-      panelRow === undefined ||
-      panelDuration === undefined ||
-      panelHeight === undefined
-    )
-      return;
-
-    const rem = Number.parseFloat(
-      getComputedStyle(document.documentElement).fontSize,
-    );
-    const sectionRect = section.getBoundingClientRect();
-    const cellRect = firstCell.getBoundingClientRect();
-    const stepX = (GRID_CELL_WIDTH + GRID_GAP) * rem;
-    const stepY = (GRID_CELL_HEIGHT + GRID_GAP) * rem;
-    const margin = REVEAL_MARGIN_REM * rem;
-    const left =
-      cellRect.left -
-      sectionRect.left +
-      section.scrollLeft +
-      (panelColumn - 1) * stepX;
-    const top =
-      cellRect.top -
-      sectionRect.top +
-      section.scrollTop +
-      (panelRow - 1) * stepY;
-    const right = left + panelDuration * stepX - GRID_GAP * rem;
-    const bottom = top + panelHeight * stepY - GRID_GAP * rem;
-    const visibleHeight = isMobile
-      ? Math.min(
-          section.clientHeight,
-          window.innerHeight - getPeekHeight() - sectionRect.top,
-        )
-      : section.clientHeight;
-
-    section.scrollTo({
-      left:
-        left - margin < section.scrollLeft
-          ? left - margin
-          : right + margin > section.scrollLeft + section.clientWidth
-            ? right + margin - section.clientWidth
-            : section.scrollLeft,
-      top:
-        top - margin < section.scrollTop
-          ? top - margin
-          : bottom + margin > section.scrollTop + visibleHeight
-            ? bottom + margin - visibleHeight
-            : section.scrollTop,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth",
-    });
-  }, [
+  useRevealPanelCard({
+    sectionRef,
     firstCellRef,
     isMobile,
     isPanelOpen,
-    panelColumn,
-    panelDuration,
-    panelHeight,
-    panelRow,
     snapPoint,
-  ]);
+    card: panelCard,
+  });
 
   useEffect(() => {
     const section = sectionRef.current;

@@ -12,6 +12,8 @@ A map of what `ls` does not tell you: where each surface of the app lives and wh
 
 The dashboard spans two component folders: `components/dashboard/` is the shell (sidebar, settings, new trajectory flow) and `components/trajectory/` is the board (grid, enrollment cards, course panel, dialogs).
 
+In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and edits; `use-board-scroll.ts`, `board-sensors.ts` and `edit-feedback.ts` hold its scrolling, drag input and error messages. `course-panel.tsx` chooses between the desktop panel and the mobile drawer, and `course-panel-content.tsx` is what both show, built from `grade-summary.tsx`, `grading-scheme-editor.tsx` and `course-details.tsx`.
+
 ## What the surfaces share
 
 `curriculum/` is what every surface builds on: the curriculum file, the grid and the connections. It depends on no surface, and Biome rejects imports from `builder/`, `components/`, `stores/`, `hooks/`, `server/` and `app/` in it.

@@ -79,3 +79,17 @@ export type ChangeNotice = {
   description?: string;
   isShownOnDesktop?: boolean;
 };
+
+export type SchemeSource = { label: string; assessments: Assessment[] };
+
+export type GradesChange = Partial<
+  Pick<Enrollment, "assessments" | "courseGrade">
+>;
+
+export type PanelPrerequisite = {
+  key: string;
+  name: string;
+  isMet: boolean;
+  courseId?: number;
+  detail?: string;
+};
