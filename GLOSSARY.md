@@ -106,6 +106,9 @@ _Avoid_: Start, ingreso date
 A year and a term. In a trajectory the year is a calendar year, such as the first semester of 2026; in a curriculum it is a program year, such as the first semester of year 1.
 _Avoid_: Column, semester (when it may be a summer or winter term)
 
+**Passed period**:
+A period of a trajectory that has already ended. The current period has started but is not a passed period.
+
 **Term**:
 The part of a year a period or slot covers: a regular term of the term system, or an intensive winter or summer term.
 _Avoid_: Season
@@ -133,6 +136,13 @@ Said of a pending enrollment whose course is not available. It stays dimmed on t
 
 **Closing a period**:
 Setting at once the status of the pending enrollments of a period that has started, starting from what their course grades suggest.
+
+**Catch-up**:
+Setting at once the status of the enrollments of every passed period of a trajectory. Shown in the UI as "poner al día".
+_Avoid_: Bulk
+
+**Carry forward**:
+Moving a course the student has not approved out of a passed period, toward the present.
 
 ## Grades
 
