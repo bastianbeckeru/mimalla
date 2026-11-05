@@ -2,6 +2,10 @@ import { nanoid } from "nanoid";
 import type { Assessment } from "@/types/trajectory";
 import { MAX_ASSESSMENT_DEPTH } from "@/utils/grades";
 
+export function createSingle(name = "Evaluación"): Assessment {
+  return { kind: "SINGLE", id: nanoid(), name, weight: null, grade: null };
+}
+
 export type SchemeRow = {
   assessment: Assessment;
   depth: number;
