@@ -401,10 +401,8 @@ export default function TrajectoryBoard({
           return period ? [{ ...cell, period }] : [];
         });
   const passedPeriodOptions = base.periods.flatMap((period) => {
-    const { hasStarted, isCurrent } = getPeriodInfo(period, entry);
-    return hasStarted && !isCurrent
-      ? [{ period, label: getPeriodLabel(period) }]
-      : [];
+    const { label, hasStarted, isCurrent } = getPeriodInfo(period, entry);
+    return label && hasStarted && !isCurrent ? [{ period, label }] : [];
   });
   const moveOptions = panelCard
     ? gesturePeriods.map((period) => {
@@ -557,19 +555,8 @@ export default function TrajectoryBoard({
   }
 
   function approvePassedPeriods(period: PeriodKey) {
-    const { enrollments: next, approvedCount } = approveThroughPeriod(
-      enrollments,
-      period,
-      context,
-    );
     setIsAskingPassedPeriods(false);
-    onChange(next, {
-      title:
-        approvedCount === 1
-          ? "1 curso aprobado"
-          : `${approvedCount} cursos aprobados`,
-      isShownOnDesktop: true,
-    });
+    onChange(approveThroughPeriod(enrollments, period, context).enrollments);
   }
 
   function closePeriod(
@@ -929,8 +916,11 @@ export default function TrajectoryBoard({
       <PassedPeriodsDialog
         open={isAskingPassedPeriods && passedPeriodOptions.length > 0}
         options={passedPeriodOptions}
+        getApprovedCount={(period) =>
+          approveThroughPeriod(enrollments, period, context).approvedCount
+        }
         onOpenChange={setIsAskingPassedPeriods}
-        onChoose={approvePassedPeriods}
+        onApprove={approvePassedPeriods}
       />
     </DragDropProvider>
   );
