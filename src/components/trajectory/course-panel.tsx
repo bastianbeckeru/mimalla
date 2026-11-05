@@ -225,8 +225,10 @@ function CourseDrawer({
             tabIndex={-1}
             aria-label="Reducir"
             className={cn(
-              "fixed inset-0 z-40 bg-black/30 opacity-0 transition-opacity duration-300 ease-out",
-              isFull ? "opacity-100" : "pointer-events-none",
+              "fixed inset-0 z-40 bg-black/30 opacity-0 transition-[opacity,backdrop-filter] duration-300 ease-out",
+              isFull
+                ? "opacity-100 supports-backdrop-filter:backdrop-blur-sm"
+                : "pointer-events-none",
             )}
             onClick={() => onSnapPointChange(PEEK_SNAP_POINT)}
           />,
