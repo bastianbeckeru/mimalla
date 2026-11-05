@@ -45,9 +45,9 @@ import { getCumulativeAverage } from "@/utils/grades";
 import { parseSidebarWidth } from "@/utils/sidebar-width";
 import {
   createEnrollments,
-  getTrajectoryStats,
   settleEnrollments,
-} from "@/utils/trajectory";
+} from "@/utils/trajectory/layout";
+import { getTrajectoryStats } from "@/utils/trajectory/progress";
 
 type LoadedCurriculum = {
   path: string;

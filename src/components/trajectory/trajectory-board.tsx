@@ -53,23 +53,27 @@ import {
 import { parsePeriodKey } from "@/utils/period-key";
 import {
   addEnrollment,
-  approveThroughPeriod,
-  getAddableCourses,
   getMoveConflict,
+  moveEnrollment,
+  removeEnrollment,
+  retakeEnrollment,
+} from "@/utils/trajectory/edits";
+import {
   getNextPeriod,
   getOpeningColumn,
   getPeriodEndRow,
   getPeriodInfo,
+  layOutTrajectory,
+  type PlacedEnrollment,
+} from "@/utils/trajectory/layout";
+import {
+  approveThroughPeriod,
+  getAddableCourses,
   getProgress,
   isAvailable,
-  layOutTrajectory,
-  moveEnrollment,
-  type PlacedEnrollment,
-  removeEnrollment,
-  retakeEnrollment,
   setEnrollmentStatus,
   setEnrollmentStatuses,
-} from "@/utils/trajectory";
+} from "@/utils/trajectory/progress";
 
 const DRAG_CLICK_MS = 300;
 const ENTER_MS = 300;

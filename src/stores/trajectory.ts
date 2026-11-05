@@ -12,7 +12,7 @@ import type {
 } from "@/types/trajectory";
 import { getCurriculumPath } from "@/utils/curriculum";
 import { DEFAULT_GRADING_SCALE } from "@/utils/grades";
-import { createEnrollments } from "@/utils/trajectory";
+import { createEnrollments } from "@/utils/trajectory/layout";
 
 type TrajectoryState = {
   trajectories: Trajectory[];

@@ -31,15 +31,14 @@ import type {
   TrajectoryProgress,
 } from "@/types/trajectory";
 import { parsePeriodKey } from "@/utils/period-key";
+import { getMoveConflict, moveEnrollment } from "@/utils/trajectory/edits";
 import {
-  getMoveConflict,
   getPeriodInfo,
-  isAvailable,
   layOutTrajectory,
-  moveEnrollment,
   type PlacedEnrollment,
   toLayoutCurriculum,
-} from "@/utils/trajectory";
+} from "@/utils/trajectory/layout";
+import { isAvailable } from "@/utils/trajectory/progress";
 
 export const ENTER_STAGGER_MS = 30;
 

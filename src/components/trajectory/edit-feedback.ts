@@ -1,6 +1,9 @@
 import { toast } from "@/components/ui/toast";
 import type { ChangeNotice } from "@/types/trajectory";
-import { type EditError, MAX_ENROLLMENTS_PER_PERIOD } from "@/utils/trajectory";
+import {
+  type EditError,
+  MAX_ENROLLMENTS_PER_PERIOD,
+} from "@/utils/trajectory/edits";
 
 export const EDIT_ERROR_DESCRIPTIONS: Record<EditError, string> = {
   PERIOD_FULL: `Un periodo no puede tener más de ${MAX_ENROLLMENTS_PER_PERIOD} cursos.`,

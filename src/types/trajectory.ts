@@ -1,4 +1,4 @@
-import type { PeriodKey } from "@/types/curriculum";
+import type { Curriculum, PeriodKey } from "@/types/curriculum";
 
 export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
 
@@ -63,6 +63,11 @@ export type TrajectoryContent = Pick<
   Trajectory,
   "enrollments" | "gradingScale"
 >;
+
+export type TrajectoryContext = {
+  entry: Entry;
+  curriculum: Curriculum;
+};
 
 export type TrajectoryProgress = {
   approvedCourseIds: Set<number>;

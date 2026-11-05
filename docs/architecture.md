@@ -7,10 +7,12 @@ A map of what `ls` does not tell you: where each surface of the app lives and wh
 | Surface | Route | Entry point | State and logic |
 | --- | --- | --- | --- |
 | Curriculum viewer | `/[institutionAcronym]/[programSlug]`, optionally followed by `/[effectiveYear]` | `components/curriculum/program-page.tsx` | `server/db/curriculums.ts`, `utils/curriculum.ts` |
-| Dashboard | `/dashboard` | `components/dashboard/client-side-dashboard.tsx`, which renders `components/trajectory/trajectory-board.tsx` | `stores/trajectory.ts`, `utils/trajectory.ts`, `utils/grades.ts`, `utils/grading-scheme.ts`, `hooks/use-history.ts` |
+| Dashboard | `/dashboard` | `components/dashboard/client-side-dashboard.tsx`, which renders `components/trajectory/trajectory-board.tsx` | `stores/trajectory.ts`, `utils/trajectory/`, `utils/grades.ts`, `utils/grading-scheme.ts`, `hooks/use-history.ts` |
 | Builder | `/builder` | `components/builder/builder.tsx` | `stores/builder.ts`, `builder/apply.ts`, `builder/draft.ts`, `builder/actions/` |
 
 The dashboard spans two component folders: `components/dashboard/` is the shell (sidebar, settings, new trajectory flow) and `components/trajectory/` is the board (grid, enrollment cards, course panel, dialogs).
+
+`utils/trajectory/` is split by what it answers: `layout.ts` (where each card goes), `edits.ts` (whether a change is allowed) and `progress.ts` (what the student has approved).
 
 In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and edits; `use-board-scroll.ts`, `board-sensors.ts` and `edit-feedback.ts` hold its scrolling, drag input and error messages. `course-panel.tsx` chooses between the desktop panel and the mobile drawer, and `course-panel-content.tsx` is what both show, built from `grade-summary.tsx`, `grading-scheme-editor.tsx` and `course-details.tsx`.
 
