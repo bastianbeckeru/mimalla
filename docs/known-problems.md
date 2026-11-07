@@ -14,7 +14,7 @@ Trajectories will reference courses by code, so the catalog will reject courses 
 
 | File | Courses without a code |
 | --- | --- |
-| `uch/quimica-y-farmacia_2022.malla` | 67 of 67 |
+| `uch/quimica-y-farmacia_2022.malla` | 5 of 67 |
 | `uch/quimica-y-farmacia_2025.malla` | 66 of 66 |
 | `udp/ingenieria-civil-industrial_2026.malla` | 46 of 46 |
 | `udp/ingenieria-civil-en-informatica-y-telecomunicaciones_2020.malla` | 26 of 49 |
