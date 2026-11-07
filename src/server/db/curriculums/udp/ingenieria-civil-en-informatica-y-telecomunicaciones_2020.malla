@@ -320,6 +320,7 @@
       "code": "CIG1014",
       "credits": 5,
       "areaId": 7,
+      "prerequisiteIds": [27],
       "slots": [{ "programYear": 3, "term": 3, "position": 6 }]
     },
     {
