@@ -49,6 +49,7 @@ In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and e
 
 ## Other docs
 
+- `DESIGN.md`: the fonts and visual rules.
 - `GLOSSARY.md`: the domain vocabulary.
 - `docs/adr/`: decisions and why they were made. Check each one's status note: ADRs 0001 and 0002 are not implemented yet.
 - `docs/known-problems.md`: known errors in the curriculum files.
