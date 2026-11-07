@@ -8,8 +8,14 @@ import {
   type ReactNode,
   type Ref,
   useEffect,
+  useLayoutEffect,
+  useRef,
 } from "react";
-import { getTextColor } from "@/curriculum/colors";
+import {
+  getCardEdge,
+  getTextColor,
+  MUTED_COLOR_PERCENT,
+} from "@/curriculum/colors";
 import {
   type ConnectionRole,
   getConnectionRole,
@@ -18,9 +24,58 @@ import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
 import type { HexColor } from "@/types/colors";
 import type { Course, Curriculum } from "@/types/curriculum";
 
-const MUTED_COLOR_PERCENT = 30;
 const MUTED_TEXT_COLOR =
   "color-mix(in oklab, var(--foreground) 70%, var(--background))";
+const NAME_SIZE_CLASSES = [["text-xs"], ["text-2xs", "leading-3"]];
+
+function getEdgeClassName(color: HexColor, isMuted: boolean) {
+  const { onLight, onDark } = getCardEdge(color, isMuted);
+  if (onLight && onDark) return "ring-foreground/40";
+  if (onLight) return "ring-foreground/40 dark:ring-foreground/10";
+  if (onDark) return "dark:ring-foreground/40";
+  return undefined;
+}
+
+function useFittedName(name: string) {
+  const nameRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    const nameElement = nameRef.current;
+    const box = nameElement?.parentElement;
+    if (!nameElement || !box) return;
+
+    const overflows = () => nameElement.scrollHeight > nameElement.clientHeight;
+    const fit = () => {
+      for (const sizeClasses of NAME_SIZE_CLASSES) {
+        nameElement.classList.remove(...NAME_SIZE_CLASSES.flat());
+        nameElement.classList.add(...sizeClasses);
+        const lineHeightPx = Number.parseFloat(
+          getComputedStyle(nameElement).lineHeight,
+        );
+        nameElement.style.webkitLineClamp = String(
+          Math.max(1, Math.floor(box.clientHeight / lineHeightPx)),
+        );
+        if (!overflows()) break;
+      }
+      if (overflows()) nameElement.title = name;
+      else nameElement.removeAttribute("title");
+    };
+
+    fit();
+    let isActive = true;
+    document.fonts.ready.then(() => {
+      if (isActive) fit();
+    });
+    const observer = new ResizeObserver(fit);
+    observer.observe(box);
+    return () => {
+      isActive = false;
+      observer.disconnect();
+    };
+  }, [name]);
+
+  return nameRef;
+}
 
 export default function CourseCard({
   course,
@@ -73,6 +128,8 @@ export default function CourseCard({
       : null,
   );
   const role = gestureRole === undefined ? focusRole : gestureRole;
+  const nameRef = useFittedName(course.name);
+  const hasOwnRing = role === "misplaced" || isSelected || !!surfaceClassName;
 
   useEffect(() => () => release(course.id), [release, course.id]);
 
@@ -116,6 +173,7 @@ export default function CourseCard({
           aria-hidden
           className={cn(
             "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10 transition-colors duration-150 ease-out",
+            !hasOwnRing && getEdgeClassName(color, isMuted),
             role === "misplaced" && "ring-2 ring-warning",
             surfaceClassName,
             isSelected && "ring-2 ring-ring",
@@ -127,7 +185,12 @@ export default function CourseCard({
           }}
         />
         <span className="flex size-full items-center justify-center overflow-hidden">
-          <span className="line-clamp-3 font-medium">{course.name}</span>
+          <span
+            ref={nameRef}
+            className="line-clamp-3 text-balance font-medium text-xs"
+          >
+            {course.name}
+          </span>
         </span>
         {decoration}
         {/* Dims the card while the connections shown leave it out. A veil
