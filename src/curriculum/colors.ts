@@ -52,6 +52,15 @@ export function getCourseColor(
 
 const DARK_TEXT_COLOR = "#0a0a0a";
 const LIGHT_TEXT_COLOR = "#fafafa";
+const BLACK = "#000000";
+const WHITE = "#ffffff";
+const MIN_TEXT_CONTRAST = 4.5;
+
+const LIGHT_BACKGROUND: HexColor = "#fafafa";
+const DARK_BACKGROUND: HexColor = "#0a0a0a";
+const MIN_EDGE_CONTRAST = 2;
+
+export const MUTED_COLOR_PERCENT = 30;
 
 function getContrastRatio(a: HexColor, b: HexColor) {
   const [lighter, darker] = [getLuminance(a), getLuminance(b)].toSorted(
@@ -61,8 +70,43 @@ function getContrastRatio(a: HexColor, b: HexColor) {
 }
 
 export function getTextColor(background: HexColor) {
-  return getContrastRatio(background, DARK_TEXT_COLOR) >=
-    getContrastRatio(background, LIGHT_TEXT_COLOR)
-    ? DARK_TEXT_COLOR
-    : LIGHT_TEXT_COLOR;
+  const isDarkText =
+    getContrastRatio(background, DARK_TEXT_COLOR) >=
+    getContrastRatio(background, LIGHT_TEXT_COLOR);
+  if (isDarkText)
+    return getContrastRatio(background, DARK_TEXT_COLOR) >= MIN_TEXT_CONTRAST
+      ? DARK_TEXT_COLOR
+      : BLACK;
+  return getContrastRatio(background, LIGHT_TEXT_COLOR) >= MIN_TEXT_CONTRAST
+    ? LIGHT_TEXT_COLOR
+    : WHITE;
+}
+
+function mixColors(color: HexColor, base: HexColor, colorPercent: number) {
+  const channel = (hex: HexColor, index: number) =>
+    Number.parseInt(hex.slice(1 + index * 2, 3 + index * 2), 16);
+  const mixed = [0, 1, 2].map((index) =>
+    Math.round(
+      (channel(color, index) * colorPercent +
+        channel(base, index) * (100 - colorPercent)) /
+        100,
+    )
+      .toString(16)
+      .padStart(2, "0"),
+  );
+  return `#${mixed.join("")}` as HexColor;
+}
+
+function blendsWith(color: HexColor, background: HexColor, isMuted: boolean) {
+  const shown = isMuted
+    ? mixColors(color, background, MUTED_COLOR_PERCENT)
+    : color;
+  return getContrastRatio(shown, background) < MIN_EDGE_CONTRAST;
+}
+
+export function getCardEdge(color: HexColor, isMuted: boolean) {
+  return {
+    onLight: blendsWith(color, LIGHT_BACKGROUND, isMuted),
+    onDark: blendsWith(color, DARK_BACKGROUND, isMuted),
+  };
 }
