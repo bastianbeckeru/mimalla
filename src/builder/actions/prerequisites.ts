@@ -1,11 +1,7 @@
-import { findCourse } from "@/builder/draft";
-import { canAddPrerequisite } from "@/builder/prerequisites";
-import type {
-  Course,
-  Draft,
-  Handlers,
-  PrerequisiteAction,
-} from "@/types/builder";
+import { findCourse } from "@/curriculum/courses";
+import { canAddPrerequisite } from "@/curriculum/prerequisites";
+import type { Draft, Handlers, PrerequisiteAction } from "@/types/builder";
+import type { Course } from "@/types/curriculum";
 
 function updateCourse(
   draft: Draft,

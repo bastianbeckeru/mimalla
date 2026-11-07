@@ -1,12 +1,7 @@
-import { findCourse } from "@/builder/draft";
-import { getFirstFreePosition, pushDownCollisions } from "@/builder/grid";
-import type {
-  Curriculum,
-  Draft,
-  ElectiveAction,
-  Handlers,
-  Slot,
-} from "@/types/builder";
+import { findCourse } from "@/curriculum/courses";
+import { getFirstFreePosition, pushDownCollisions } from "@/curriculum/grid";
+import type { Draft, ElectiveAction, Handlers } from "@/types/builder";
+import type { Curriculum, Slot } from "@/types/curriculum";
 
 function withSlots(
   { curriculum }: Draft,

@@ -3,18 +3,19 @@
 import { Ellipsis, Plus, Trash2 } from "lucide-react";
 import type { CSSProperties } from "react";
 import {
-  canRemovePeriod,
-  getAvailableIntensiveTerms,
-  getPeriodLabel,
-} from "@/builder/periods";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Action, Curriculum, Period } from "@/types/builder";
+import {
+  canRemovePeriod,
+  getAvailableIntensiveTerms,
+  getPeriodLabel,
+} from "@/curriculum/periods";
+import type { Action } from "@/types/builder";
+import type { Curriculum, Period } from "@/types/curriculum";
 import { TERM_LABELS } from "@/utils/period-key";
 
 export default function PeriodHeader({

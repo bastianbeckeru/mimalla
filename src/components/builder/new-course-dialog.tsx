@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { courseNameSchema } from "@/builder/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { courseNameSchema } from "@/curriculum/schemas";
 
 function NewCourseForm({ onCreate }: { onCreate: (name: string) => void }) {
   const [name, setName] = useState("");

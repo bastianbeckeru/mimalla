@@ -11,6 +11,14 @@ Thanks for your interest in contributing! This guide explains how to report issu
 
 For questions, join the [Discord](https://discord.gg/wez3cJDzXk).
 
+## Before you start
+
+Opening a pull request does not oblige the maintainers to review or merge it. We may ask for a smaller scope, defer it or close it.
+
+- **Likely to be accepted:** bug fixes, performance improvements, accessibility, documentation and new or corrected curricula.
+- **Needs approval first:** features and changes to existing behavior. Open an issue and wait for a maintainer to agree on the direction and scope. Link that approval in your pull request. Calling a behavior change a bug fix does not skip this step.
+- **No approval needed:** a very small fix for an obvious bug, and curriculum contributions. For the fix, explain the defect in the pull request.
+
 ## Development setup
 
 1. Fork the repository and clone your fork.
@@ -27,11 +35,25 @@ No environment variables are needed.
 ## Pull requests
 
 1. Create a branch from `main` (for example `feat/course-search` or `fix/drag-on-mobile`).
-2. Keep each pull request focused on a single change.
+2. Solve one underlying problem per pull request. If it fixes several independent problems, we will ask you to split it, even when each fix is useful. Include the tests and docs that problem needs, but put unrelated cleanups in their own pull request.
 3. Follow the [coding standards](CODING_STANDARDS.md).
 4. Run `bun run verify` and make sure it passes. `bun run lint:write` fixes most Biome issues.
-5. Describe what changed and why. Add screenshots for UI changes.
-6. Link the issue the pull request resolves, if there is one.
+5. Describe what changed and why, and link the issue it resolves, if there is one.
+6. Provide [evidence](#evidence) that the change works.
+
+### Evidence
+
+Explain how you reproduced the problem, how you checked the fix and what you observed. Include the steps, your browser and any test you ran. Say what you could not check. "Tests pass" alone does not show that the change works.
+
+UI changes need before and after screenshots. Add a short recording when the change involves motion or interaction, such as drag and drop.
+
+### AI-assisted pull requests
+
+You may use AI tools. You are responsible for the result: read the diff, run it and be able to explain every change. Agents must follow [AGENTS.md](AGENTS.md).
+
+### Closing pull requests
+
+We may close a pull request that breaks these rules, such as missing approval, mixed scope or missing evidence. We will name the rule and what to fix, and you can request a new review once you have addressed it.
 
 ## Commit messages
 
@@ -79,7 +101,7 @@ Curricula are stored as curriculum files in `src/server/db/curriculums/<institut
 2. Save it in the folder of its institution. A new version of an existing program is a new file with its effective year.
 3. For a new program, register its department, SIES and DEMRE codes and schedule in `src/server/db/programs.ts`, and its institution if it is new. The institution name must match the one in the file.
 4. Run `bun test`, which loads every curriculum file, and check the program page in the app.
-5. In the pull request, link the official source of the curriculum.
+5. In the pull request, link the official source of the curriculum and confirm that you checked every course, credit and prerequisite against it. This applies in particular if an LLM converted the PDF.
 
 ## License
 

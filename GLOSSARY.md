@@ -19,6 +19,9 @@ _Avoid_: Career, carrera, degree
 **Catalog**:
 Every program available in Mi Malla, grouped by institution and department.
 
+**Curriculum viewer**:
+The public page of a program, where anyone explores one of its official curriculums.
+
 ## Curriculums
 
 **Curriculum**:
@@ -91,6 +94,9 @@ _Avoid_: Diploma
 
 ## Trajectories
 
+**Dashboard**:
+Where a student creates their trajectories and works on them.
+
 **Trajectory**:
 A student's own path through a curriculum: it starts as a copy of a base curriculum, and the student rearranges its enrollments and tracks their status. Shown in the UI as "mi malla".
 _Avoid_: Student curriculum, study plan, roadmap, malla
@@ -106,6 +112,9 @@ _Avoid_: Start, ingreso date
 A year and a term. In a trajectory the year is a calendar year, such as the first semester of 2026; in a curriculum it is a program year, such as the first semester of year 1.
 _Avoid_: Column, semester (when it may be a summer or winter term)
 
+**Passed period**:
+A period of a trajectory that has already ended. The current period has started but is not a passed period.
+
 **Term**:
 The part of a year a period or slot covers: a regular term of the term system, or an intensive winter or summer term.
 _Avoid_: Season
@@ -118,12 +127,64 @@ _Avoid_: Régimen, calendar
 A first or second semester term. Winter and summer terms are not semesters and do not count toward the semester number.
 
 **Enrollment**:
-A course placed in a period of a trajectory, with its status. The same elective can have several enrollments.
+A course placed in a period of a trajectory, with its status and its grading scheme. The same elective can have several enrollments, and a failed course retaken later gets a new enrollment.
 _Avoid_: Enrolled course, inscripción
 
 **Status**:
-Where an enrollment stands: pending, approved or failed.
+Where an enrollment stands: pending, approved or failed. The student sets it; a course grade only suggests it.
 
 **Available**:
 Said of a course whose prerequisites are all approved and whose required credits are reached.
 _Avoid_: Unlocked, enabled
+
+**Blocked**:
+Said of a pending enrollment whose course is not available. It stays dimmed on the trajectory, the only thing dimming means there. Shown in the UI as "bloqueado".
+
+**Closing a period**:
+Setting at once the status of the pending enrollments of a period that has started, starting from what their course grades suggest.
+
+**Catch-up**:
+Setting at once the status of the enrollments of every passed period of a trajectory. Shown in the UI as "poner al día".
+_Avoid_: Bulk
+
+**Carry forward**:
+Moving a course the student has not approved out of a passed period, toward the present.
+
+## Grades
+
+**Grade**:
+A mark the student obtained in an assessment, on the trajectory's grading scale. Shown in the UI as "nota", and the tab that holds them as "calificaciones".
+_Avoid_: Score, mark, calificación (in code)
+
+**Grading scale**:
+The lowest and highest grades of a trajectory and the passing grade, 1.0 to 7.0 passing at 4.0 by default.
+_Avoid_: Grade range
+
+**Assessment**:
+Something that counts toward an enrollment's course grade, with a weight within its parent. It is either a single test that takes a grade, such as an exam, or a group of assessments whose grade is the weighted average of their grades, possibly dropping the lowest ones, such as all the controles. Shown in the UI as "evaluación".
+_Avoid_: Evaluation, test, item
+
+**Weight**:
+The share of its parent's grade an assessment counts for, as a percentage. When a group sets no weights, its assessments count equally.
+_Avoid_: Ponderación (in code), percentage
+
+**Grading scheme**:
+The tree of assessments of one enrollment, at most three levels deep.
+_Avoid_: Syllabus, rubric, evaluation plan
+
+**Course grade**:
+The grade of an enrollment, rounded to one decimal. The student can enter it directly, such as for a course whose assessments they no longer remember, and then it prevails; otherwise it is computed from the grading scheme once every assessment has a grade.
+_Avoid_: Final grade, nota final (in code)
+
+**Partial average**:
+The weighted average of the assessments of an enrollment that already have a grade, while others are still missing.
+_Avoid_: Current grade, running average
+
+**Required grade**:
+The grade the student needs in every assessment still missing to reach the passing grade.
+_Avoid_: Target grade, needed grade
+
+**Cumulative average**:
+The average of the course grades of every approved and failed enrollment of a trajectory, weighted by credits. Each attempt at a course counts.
+_Avoid_: GPA, PPA, global average
+

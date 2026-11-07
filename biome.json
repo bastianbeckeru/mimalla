@@ -45,6 +45,10 @@
           "options": { "style": "type" }
         },
         "useImportType": "error",
+        "noExcessiveLinesPerFile": {
+          "level": "error",
+          "options": { "maxLines": 500 }
+        },
         "noRestrictedImports": {
           "level": "error",
           "options": {
@@ -60,6 +64,42 @@
       "react": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/*.test.ts", "src/components/ui/**"],
+      "linter": {
+        "rules": { "style": { "noExcessiveLinesPerFile": "off" } }
+      }
+    },
+    {
+      "includes": ["src/curriculum/**", "!**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  { "group": ["./*", "../*"], "message": "Use the @/* alias" },
+                  {
+                    "group": [
+                      "@/builder/**",
+                      "@/components/**",
+                      "@/stores/**",
+                      "@/hooks/**",
+                      "@/server/**",
+                      "@/app/**"
+                    ],
+                    "message": "src/curriculum depends on no surface"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "actions": {
       "source": {

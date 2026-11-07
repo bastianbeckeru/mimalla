@@ -1,4 +1,10 @@
+---
+status: accepted
+---
+
 # The builder file stores only what cannot be derived
+
+**Read with ADR 0004**, which made this format the only curriculum format. "The catalog" below means the old catalog JSON format, which no longer exists.
 
 A curriculum made in the builder is downloaded as a minified JSON file with the `.malla` extension that can be loaded back to keep editing. Its format departs on purpose from the curriculum files of the catalog: it stores only data that cannot be derived from other data, and every reference points from the referencing item to the referenced one, so no reference can be left dangling. We chose this because files will be kept and shared outside Mi Malla, so a format change is costly, and the catalog files show what redundant, inward references lead to (see `docs/known-problems.md`).
 

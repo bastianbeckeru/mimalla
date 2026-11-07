@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { migrateTrajectoryState } from "@/stores/trajectory";
+import { DEFAULT_GRADING_SCALE } from "@/utils/grades";
 
 describe("migrateTrajectoryState", () => {
   test("renames the fields of a version 1 trajectory already in calendar years", () => {
@@ -34,6 +35,7 @@ describe("migrateTrajectoryState", () => {
           id: "t1",
           curriculumPath: "uni/program",
           entry: { year: 2024, term: 1 },
+          gradingScale: DEFAULT_GRADING_SCALE,
           enrollments: [
             {
               id: "e1",
@@ -156,6 +158,7 @@ describe("migrateTrajectoryState", () => {
         id: "t1",
         curriculumPath: "udp/derecho/2023",
         entry: { year: 2024, term: 1 },
+        gradingScale: DEFAULT_GRADING_SCALE,
         enrollments: [
           {
             id: "e1",
@@ -182,6 +185,39 @@ describe("migrateTrajectoryState", () => {
       migrateTrajectoryState(
         { trajectories: [trajectory], activeTrajectoryId: "t1" },
         2,
+      ).trajectories,
+    ).toEqual([{ ...trajectory, gradingScale: DEFAULT_GRADING_SCALE }]);
+  });
+
+  test("gives a version 3 trajectory the default grading scale", () => {
+    const trajectory = {
+      id: "t1",
+      curriculumPath: "udp/derecho/2023",
+      entry: { year: 2024, term: 1 },
+      enrollments: [],
+    };
+
+    expect(
+      migrateTrajectoryState(
+        { trajectories: [trajectory], activeTrajectoryId: "t1" },
+        3,
+      ).trajectories,
+    ).toEqual([{ ...trajectory, gradingScale: DEFAULT_GRADING_SCALE }]);
+  });
+
+  test("keeps the grading scale of a version 4 trajectory", () => {
+    const trajectory = {
+      id: "t1",
+      curriculumPath: "udp/derecho/2023",
+      entry: { year: 2024, term: 1 },
+      gradingScale: { min: 1, max: 7, passing: 4.5 },
+      enrollments: [],
+    };
+
+    expect(
+      migrateTrajectoryState(
+        { trajectories: [trajectory], activeTrajectoryId: "t1" },
+        4,
       ).trajectories,
     ).toEqual([trajectory]);
   });

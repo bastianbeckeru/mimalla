@@ -4,12 +4,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import type {
-  Action,
-  CurriculumDetails,
-  Draft,
-  TermSystem,
-} from "@/types/builder";
+import type { Action, Draft } from "@/types/builder";
+import type { CurriculumDetails, TermSystem } from "@/types/curriculum";
 import type { History, HistoryAction } from "@/types/history";
 import { createHistory, historyReducer } from "@/utils/history";
 

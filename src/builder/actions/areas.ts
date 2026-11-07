@@ -2,8 +2,9 @@ import {
   getAreaShade,
   isHexColor,
   toLowerCaseHexColor,
-} from "@/builder/colors";
-import type { Area, AreaAction, Draft, Handlers } from "@/types/builder";
+} from "@/curriculum/colors";
+import type { AreaAction, Draft, Handlers } from "@/types/builder";
+import type { Area } from "@/types/curriculum";
 
 function nextAreaId(draft: Draft) {
   return Math.max(0, ...draft.curriculum.areas.map((area) => area.id)) + 1;

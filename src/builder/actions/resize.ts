@@ -1,10 +1,10 @@
-import { findCourse } from "@/builder/draft";
+import { findCourse } from "@/curriculum/courses";
 import {
   changeCourse,
   getCourseHeight,
   getDefaultCredits,
   slotsFitInPeriods,
-} from "@/builder/grid";
+} from "@/curriculum/grid";
 import type { Handlers, ResizeAction } from "@/types/builder";
 
 export const resizeHandlers: Handlers<ResizeAction> = {

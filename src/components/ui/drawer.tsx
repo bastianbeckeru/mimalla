@@ -55,6 +55,12 @@ function DrawerTrigger({ ...props }: DrawerPrimitive.Trigger.Props) {
   return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
 }
 
+function DrawerVirtualKeyboardProvider({
+  ...props
+}: DrawerPrimitive.VirtualKeyboardProvider.Props) {
+  return <DrawerPrimitive.VirtualKeyboardProvider {...props} />;
+}
+
 function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) {
   return <DrawerPrimitive.Close data-slot="drawer-close" {...props} />;
 }
@@ -221,4 +227,5 @@ export {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
+  DrawerVirtualKeyboardProvider,
 };

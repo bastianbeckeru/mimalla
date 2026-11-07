@@ -2,8 +2,6 @@
 
 import { Coins, Hash, Minus, Plus, Trash2, X } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { getPeriodTitle } from "@/builder/periods";
-import { courseNameSchema } from "@/builder/schemas";
 import AreaSelect from "@/components/builder/area-select";
 import DurationSelect from "@/components/builder/duration-select";
 import ElectiveSlots from "@/components/builder/elective-slots";
@@ -14,7 +12,10 @@ import TrackSelect from "@/components/builder/track-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
-import type { Action, Area, Course, TermSystem, Track } from "@/types/builder";
+import { getPeriodTitle } from "@/curriculum/periods";
+import { courseNameSchema } from "@/curriculum/schemas";
+import type { Action } from "@/types/builder";
+import type { Area, Course, TermSystem, Track } from "@/types/curriculum";
 
 const CREDITS_PATTERN = /^\d+$/;
 

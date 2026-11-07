@@ -7,7 +7,7 @@ import { prerequisiteHandlers } from "@/builder/actions/prerequisites";
 import { resizeHandlers } from "@/builder/actions/resize";
 import { slotHandlers } from "@/builder/actions/slots";
 import { trackHandlers } from "@/builder/actions/tracks";
-import { pushDownCollisions } from "@/builder/grid";
+import { pushDownCollisions } from "@/curriculum/grid";
 import type { Action, Draft, Handlers } from "@/types/builder";
 
 const handlers: Handlers<Action> = {

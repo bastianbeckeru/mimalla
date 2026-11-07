@@ -1,5 +1,8 @@
-import type { Course } from "@/types/builder";
-import type { ExtendedCourse } from "@/types/curriculum";
+import type {
+  CatalogInstitution,
+  Course,
+  ExtendedCourse,
+} from "@/types/curriculum";
 
 export function extendCourses(courses: Course[]) {
   const successorIds = new Map<number, number[]>();
@@ -34,6 +37,21 @@ export function getCurrentYear(effectiveYears: number[]) {
 
 export function getCurriculumPath(programPath: string, effectiveYear: number) {
   return `${programPath}/${effectiveYear}`;
+}
+
+export function findCatalogProgram(
+  catalog: CatalogInstitution[],
+  programPath: string | null,
+) {
+  for (const institution of catalog) {
+    for (const department of institution.departments) {
+      const program = department.programs.find(
+        ({ path }) => path === programPath,
+      );
+      if (program) return { institution, program };
+    }
+  }
+  return null;
 }
 
 export function getProgramPath(curriculumPath: string) {

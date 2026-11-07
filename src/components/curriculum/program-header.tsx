@@ -1,12 +1,11 @@
 import { cn } from "cn";
 import { Award, Clock, GraduationCap, Sun } from "lucide-react";
 import type { ReactNode } from "react";
-import { REGULAR_TERMS } from "@/builder/periods";
 import ImportCurriculumButton from "@/components/curriculum/import-button";
 import VersionSelect from "@/components/curriculum/version-select";
 import { Separator } from "@/components/ui/separator";
-import type { CredentialType, Curriculum } from "@/types/builder";
-import type { Program } from "@/types/curriculum";
+import { REGULAR_TERMS } from "@/curriculum/periods";
+import type { CredentialType, Curriculum, Program } from "@/types/curriculum";
 
 const CREDENTIAL_ORDER: CredentialType[] = [
   "professional",

@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Action, Course, TermSystem } from "@/types/builder";
+import type { Action } from "@/types/builder";
+import type { Course, TermSystem } from "@/types/curriculum";
 
 const UNITS: Record<TermSystem, [string, string]> = {
   semester: ["semestre", "semestres"],

@@ -1,49 +1,78 @@
 "use client";
 
 import { cn } from "cn";
-import { type CSSProperties, type ReactNode, type Ref, useEffect } from "react";
-import { getTextColor } from "@/builder/colors";
-import { getConnectionRole } from "@/builder/connections";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+  useEffect,
+} from "react";
+import { getTextColor } from "@/curriculum/colors";
+import {
+  type ConnectionRole,
+  getConnectionRole,
+} from "@/curriculum/connections";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
-import type { Course, Curriculum } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
+import type { Course, Curriculum } from "@/types/curriculum";
+
+const MUTED_COLOR_PERCENT = 30;
+const MUTED_TEXT_COLOR =
+  "color-mix(in oklab, var(--foreground) 70%, var(--background))";
 
 export default function CourseCard({
   course,
   curriculum,
-  gestureCourseId = null,
+  gestureRole,
+  dimsUnrelated = true,
+  isMuted = false,
+  surfaceClassName,
   color,
   isSelected,
   onSelect,
+  onContextMenu,
+  onKeyDown,
+  label,
   style,
   className,
   cellRef,
   buttonRef,
   surfaceRef,
+  decoration,
   children,
 }: {
   course: Course;
   curriculum: Curriculum;
-  gestureCourseId?: number | null;
+  // How this course stands toward the one in an ongoing gesture, if any. Given
+  // by the grid, which knows the gesture's layout.
+  gestureRole?: ConnectionRole | null;
+  dimsUnrelated?: boolean;
+  isMuted?: boolean;
+  surfaceClassName?: string;
   color: HexColor;
   isSelected: boolean;
   onSelect: () => void;
+  onContextMenu?: (event: MouseEvent<HTMLButtonElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  label?: string;
   style: CSSProperties;
   className?: string;
   cellRef?: Ref<HTMLDivElement>;
   buttonRef?: Ref<HTMLButtonElement>;
   surfaceRef?: Ref<HTMLSpanElement>;
+  decoration?: ReactNode;
   children?: ReactNode;
 }) {
   const { hover, focusByKeyboard, release } = useConnectionFocus.getState();
   // How this course stands toward the course whose connections are shown.
-  const role = useConnectionFocus((state) =>
-    getConnectionRole(
-      curriculum,
-      gestureCourseId ?? getFocusedCourseId(state),
-      course.id,
-    ),
+  const focusRole = useConnectionFocus((state) =>
+    gestureRole === undefined
+      ? getConnectionRole(curriculum, getFocusedCourseId(state), course.id)
+      : null,
   );
+  const role = gestureRole === undefined ? focusRole : gestureRole;
 
   useEffect(() => () => release(course.id), [release, course.id]);
 
@@ -53,14 +82,20 @@ export default function CourseCard({
       className="group/card relative"
       data-course-card
       data-selected={isSelected || undefined}
-      style={{ ...style, color: getTextColor(color) }}
-      onPointerEnter={() => hover(course.id)}
+      style={{
+        ...style,
+        color: isMuted ? MUTED_TEXT_COLOR : getTextColor(color),
+      }}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "touch") hover(course.id);
+      }}
       onPointerLeave={() => release(course.id, "hoveredCourseId")}
     >
       <button
         ref={buttonRef}
         type="button"
         aria-pressed={isSelected}
+        aria-label={label}
         onFocus={(event) => {
           if (event.target.matches(":focus-visible"))
             focusByKeyboard(course.id);
@@ -71,6 +106,8 @@ export default function CourseCard({
           className,
         )}
         onClick={onSelect}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
       >
         {/* The card's painted body, kept apart from the text so it can be
             clipped to animate a change of size. */}
@@ -78,16 +115,21 @@ export default function CourseCard({
           ref={surfaceRef}
           aria-hidden
           className={cn(
-            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10",
+            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10 transition-colors duration-150 ease-out",
             role === "misplaced" && "ring-2 ring-warning",
-            isSelected &&
-              "ring-2 ring-ring ring-offset-2 ring-offset-background",
+            surfaceClassName,
+            isSelected && "ring-2 ring-ring",
           )}
-          style={{ backgroundColor: color }}
+          style={{
+            backgroundColor: isMuted
+              ? `color-mix(in oklab, ${color} ${MUTED_COLOR_PERCENT}%, var(--background))`
+              : color,
+          }}
         />
         <span className="flex size-full items-center justify-center overflow-hidden">
           <span className="line-clamp-3 font-medium">{course.name}</span>
         </span>
+        {decoration}
         {/* Dims the card while the connections shown leave it out. A veil
             over it, rather than fading it, keeps the connections running
             beneath from showing through. */}
@@ -95,7 +137,7 @@ export default function CourseCard({
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-0 rounded-lg bg-background/60 opacity-0 transition-opacity duration-150 ease-out",
-            role === "unrelated" && "opacity-100",
+            dimsUnrelated && role === "unrelated" && "opacity-100",
           )}
         />
       </button>

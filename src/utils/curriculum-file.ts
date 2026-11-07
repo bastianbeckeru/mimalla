@@ -1,4 +1,4 @@
-import { importFile } from "@/builder/import";
+import { importFile } from "@/curriculum/import";
 
 export async function fetchCurriculum(curriculumPath: string) {
   const response = await fetch(`/api/curriculums/${curriculumPath}`);

@@ -8,7 +8,8 @@ import { useFileImport } from "@/components/builder/use-file-import";
 import { Button } from "@/components/ui/button";
 import { FieldSeparator } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
-import type { CurriculumDetails, Draft, TermSystem } from "@/types/builder";
+import type { Draft } from "@/types/builder";
+import type { CurriculumDetails, TermSystem } from "@/types/curriculum";
 
 const AGENT_PROMPT = `Help me build my curriculum so I can use it in Mi Malla. Fetch https://mimalla.vercel.app${GUIDE_URL} and follow the guide to build the curriculum.`;
 const COPIED_DURATION = 2000;

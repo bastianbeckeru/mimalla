@@ -5,7 +5,7 @@ import {
   GRID_CELL_HEIGHT,
   GRID_CELL_WIDTH,
   GRID_GAP,
-} from "@/utils/curriculum-grid";
+} from "@/curriculum/grid-cells";
 
 type Point = { x: number; y: number };
 type CellDelta = { height: number; duration: number };
@@ -34,6 +34,7 @@ export default function ResizeHandle({
   onRelease: (delta: CellDelta) => void;
 }) {
   const origin = useRef<Point | null>(null);
+  const lastDelta = useRef<CellDelta | null>(null);
 
   return (
     <div
@@ -44,10 +45,18 @@ export default function ResizeHandle({
         event.stopPropagation();
         event.currentTarget.setPointerCapture(event.pointerId);
         origin.current = { x: event.clientX, y: event.clientY };
+        lastDelta.current = null;
       }}
       onPointerMove={(event) => {
         if (origin.current === null) return;
-        onResize(getCellDelta(event, origin.current));
+        const delta = getCellDelta(event, origin.current);
+        if (
+          delta.height === lastDelta.current?.height &&
+          delta.duration === lastDelta.current.duration
+        )
+          return;
+        lastDelta.current = delta;
+        onResize(delta);
       }}
       onPointerUp={(event) => {
         if (origin.current === null) return;

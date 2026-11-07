@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
-import { getDefaultCredits } from "@/builder/grid";
-import { isSamePeriod } from "@/builder/periods";
-import type { Draft, Period } from "@/types/builder";
+import { getDefaultCredits } from "@/curriculum/grid";
+import { isSamePeriod } from "@/curriculum/periods";
+import type { Draft } from "@/types/builder";
+import type { Period } from "@/types/curriculum";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
 const SECOND_SEMESTER = { programYear: 1, term: 3 };

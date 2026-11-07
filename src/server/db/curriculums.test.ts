@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { exportFile } from "@/builder/export";
-import { importFile } from "@/builder/import";
+import { exportFile } from "@/curriculum/export";
+import { importFile } from "@/curriculum/import";
 import {
   getCatalog,
   getCurriculumParams,

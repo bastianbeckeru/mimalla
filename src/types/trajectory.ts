@@ -1,4 +1,4 @@
-import type { PeriodKey } from "@/types/curriculum";
+import type { Curriculum, PeriodKey } from "@/types/curriculum";
 
 export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
 
@@ -9,7 +9,41 @@ export type Enrollment = {
   position: number;
   status: EnrollmentStatus;
   courseId: number;
+  // The enrollment's grading scheme, without the course at its root.
+  assessments?: Assessment[];
+  // A course grade the student entered, which prevails over the computed one.
+  courseGrade?: number;
 };
+
+// An assessment's weight is a percentage of its parent, or null to share
+// what the weighted assessments around it leave equally.
+export type Assessment =
+  | {
+      kind: "SINGLE";
+      id: string;
+      name: string;
+      weight: number | null;
+      grade: number | null;
+    }
+  | {
+      kind: "GROUP";
+      id: string;
+      name: string;
+      weight: number | null;
+      assessments: Assessment[];
+      droppedCount: number;
+    };
+
+export type GradingScale = {
+  min: number;
+  max: number;
+  passing: number;
+};
+
+export type RequiredGrade =
+  | { status: "REACHED" }
+  | { status: "UNREACHABLE" }
+  | { status: "NEEDED"; grade: number };
 
 export type Entry = {
   year: number;
@@ -20,7 +54,19 @@ export type Trajectory = {
   id: string;
   curriculumPath: string;
   entry: Entry;
+  gradingScale: GradingScale;
   enrollments: Enrollment[];
+};
+
+// What the student changes in a trajectory, and what undo brings back.
+export type TrajectoryContent = Pick<
+  Trajectory,
+  "enrollments" | "gradingScale"
+>;
+
+export type TrajectoryContext = {
+  entry: Entry;
+  curriculum: Curriculum;
 };
 
 export type TrajectoryProgress = {
@@ -28,7 +74,27 @@ export type TrajectoryProgress = {
   approvedCredits: number;
 };
 
-export type PeriodWithEnrollments = {
-  id: PeriodKey;
-  enrollments: Enrollment[];
+export type Placement = {
+  period: PeriodKey;
+  row: number;
+};
+
+export type ChangeNotice = {
+  title: string;
+  description?: string;
+  isShownOnDesktop?: boolean;
+};
+
+export type SchemeSource = { label: string; assessments: Assessment[] };
+
+export type GradesChange = Partial<
+  Pick<Enrollment, "assessments" | "courseGrade">
+>;
+
+export type PanelPrerequisite = {
+  key: string;
+  name: string;
+  isMet: boolean;
+  courseId?: number;
+  detail?: string;
 };

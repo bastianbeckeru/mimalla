@@ -1,50 +1,67 @@
 "use client";
 
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { Loader2, Save, SquarePen } from "lucide-react";
-import { useEffect, useState } from "react";
-import NewTrajectoryForm from "@/components/dashboard/new-trajectory-form";
+import { Loader2, Redo2, Undo2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
+import AreasLegend from "@/components/curriculum/areas-legend";
+import NewTrajectoryFlow, {
+  PROGRAM_PARAM,
+} from "@/components/dashboard/new-trajectory-flow";
 import Sidebar from "@/components/dashboard/sidebar";
-import KbdHotkey from "@/components/kbd-hotkey";
-import ScrollAreaWrapper from "@/components/scroll-area-wrapper";
 import TrajectoryBoard from "@/components/trajectory/trajectory-board";
 import { Button } from "@/components/ui/button";
-import { KbdGroup } from "@/components/ui/kbd";
 import { Progress } from "@/components/ui/progress";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { toast } from "@/components/ui/toast";
-import { Toggle } from "@/components/ui/toggle";
 import { useHistory } from "@/hooks/use-history";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { usePreferencesStore } from "@/stores/preferences";
 import {
   useActiveTrajectory,
   useHasHydrated,
   useTrajectoryStore,
 } from "@/stores/trajectory";
-import type { Curriculum } from "@/types/builder";
-import type { CatalogInstitution } from "@/types/curriculum";
-import type { Trajectory } from "@/types/trajectory";
-import { extendCourses } from "@/utils/curriculum";
+import type { CatalogInstitution, Curriculum } from "@/types/curriculum";
+import type {
+  ChangeNotice,
+  Enrollment,
+  GradingScale,
+  Trajectory,
+  TrajectoryContent,
+} from "@/types/trajectory";
+import {
+  extendCourses,
+  findCatalogProgram,
+  getProgramPath,
+} from "@/utils/curriculum";
 import { fetchCurriculum } from "@/utils/curriculum-file";
+import { getCumulativeAverage } from "@/utils/grades";
+import { parseSidebarWidth } from "@/utils/sidebar-width";
 import {
   createEnrollments,
-  extractCourseIds,
-  getTrajectoryStats,
-  groupEnrollmentsByPeriod,
-  trimEmptyPeriods,
-} from "@/utils/trajectory";
+  settleEnrollments,
+} from "@/utils/trajectory/layout";
+import { getTrajectoryStats } from "@/utils/trajectory/progress";
 
 type LoadedCurriculum = {
   path: string;
   curriculum: Curriculum | null;
 };
 
-const loader = (
-  <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
-);
+export function DashboardLoader() {
+  return (
+    <Loader2 className="absolute top-[40%] left-[50%] size-8 animate-spin" />
+  );
+}
+
+const NOTICE_MS = 4000;
+const SIDEBAR_WIDTH_KEY = "dashboard-sidebar-width";
 
 export default function ClientSideDashboard({
   catalog,
@@ -57,6 +74,18 @@ export default function ClientSideDashboard({
     (state) => state.removeActiveTrajectory,
   );
   const [loaded, setLoaded] = useState<LoadedCurriculum | null>(null);
+  const [importedId, setImportedId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const requested = findCatalogProgram(
+    catalog,
+    searchParams.get(PROGRAM_PARAM),
+  );
+  const isRequestedImported = useTrajectoryStore((state) =>
+    state.trajectories.some(
+      (trajectory) =>
+        getProgramPath(trajectory.curriculumPath) === requested?.program.path,
+    ),
+  );
 
   const activePath = activeTrajectory?.curriculumPath;
   const loadedPath = loaded?.path;
@@ -79,18 +108,24 @@ export default function ClientSideDashboard({
     };
   }, [activePath, loadedPath]);
 
-  if (!hasHydrated) return loader;
+  if (!hasHydrated) return <DashboardLoader />;
 
-  if (!activeTrajectory) {
+  if (!activeTrajectory || (requested && !isRequestedImported)) {
     return (
-      <NewTrajectoryForm
+      <NewTrajectoryFlow
         catalog={catalog}
-        onImport={(path, curriculum) => setLoaded({ path, curriculum })}
+        requested={requested}
+        onImport={(path, curriculum) => {
+          setLoaded({ path, curriculum });
+          setImportedId(useTrajectoryStore.getState().activeTrajectoryId);
+          window.history.replaceState(null, "", "/dashboard");
+        }}
       />
     );
   }
 
-  if (loaded?.path !== activeTrajectory.curriculumPath) return loader;
+  if (loaded?.path !== activeTrajectory.curriculumPath)
+    return <DashboardLoader />;
 
   if (!loaded.curriculum) {
     return (
@@ -108,6 +143,19 @@ export default function ClientSideDashboard({
       key={activeTrajectory.id}
       trajectory={activeTrajectory}
       curriculum={loaded.curriculum}
+      isNew={activeTrajectory.id === importedId}
+    />
+  );
+}
+
+function SidebarToggle() {
+  const { open, isMobile } = useSidebar();
+  return (
+    <SidebarTrigger
+      aria-label={
+        open && !isMobile ? "Ocultar barra lateral" : "Mostrar barra lateral"
+      }
+      className="text-muted-foreground"
     />
   );
 }
@@ -115,137 +163,149 @@ export default function ClientSideDashboard({
 function TrajectoryDashboard({
   trajectory,
   curriculum,
+  isNew,
 }: {
   trajectory: Trajectory;
   curriculum: Curriculum;
+  isNew: boolean;
 }) {
-  const updateActiveEnrollments = useTrajectoryStore(
-    (state) => state.updateActiveEnrollments,
+  const updateActiveTrajectory = useTrajectoryStore(
+    (state) => state.updateActiveTrajectory,
   );
-  const history = useHistory(() =>
-    groupEnrollmentsByPeriod(trajectory.enrollments),
+  const context = { entry: trajectory.entry, curriculum };
+  const history = useHistory<TrajectoryContent>(() => ({
+    enrollments: settleEnrollments(trajectory.enrollments, context),
+    gradingScale: trajectory.gradingScale,
+  }));
+  const isMobile = useIsMobile();
+  const showsAreasBar = usePreferencesStore((state) => state.showsAreasBar);
+  const noticeId = useRef<string | null>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(() =>
+    parseSidebarWidth(localStorage.getItem(SIDEBAR_WIDTH_KEY)),
   );
-  const [editMode, setEditMode] = useState(false);
 
+  const { enrollments, gradingScale } = history.present;
   const courses = extendCourses(curriculum.courses);
-  const enrollments = history.present.flatMap((p) => p.enrollments);
-  const stats = getTrajectoryStats(enrollments, courses);
+  const stats = {
+    ...getTrajectoryStats(enrollments, courses),
+    cumulativeAverage: getCumulativeAverage(enrollments, courses, gradingScale),
+  };
 
-  useHotkey("Mod+E", toggleEditMode);
-  useHotkey("Mod+S", saveChanges, { enabled: editMode });
-  useHotkey("Mod+Z", history.undo, {
-    enabled: editMode,
-    ignoreInputs: true,
-  });
+  useEffect(() => {
+    updateActiveTrajectory(history.present);
+  }, [history.present, updateActiveTrajectory]);
+
+  useHotkey("Mod+Z", history.undo, { enabled: !isMobile, ignoreInputs: true });
   useHotkey("Mod+Shift+Z", history.redo, {
-    enabled: editMode,
+    enabled: !isMobile,
     ignoreInputs: true,
   });
 
-  function toggleEditMode() {
-    if (history.canUndo) {
-      toast.add({
-        type: "warning",
-        title: "Cambios sin guardar",
-        description:
-          "Guarda los cambios realizados antes de finalizar la edición.",
-      });
-      return;
-    }
-
-    history.reset(history.present);
-    setEditMode(!editMode);
+  // Changes without a notice, such as a grade, are undone from the header.
+  function commitContent(next: TrajectoryContent, notice?: ChangeNotice) {
+    history.commit(next);
+    if (!notice || (!isMobile && !notice.isShownOnDesktop)) return;
+    if (noticeId.current) toast.close(noticeId.current);
+    noticeId.current = toast.add({
+      title: notice.title,
+      description: notice.description,
+      timeout: NOTICE_MS,
+      actionProps: {
+        children: "Deshacer",
+        onClick: () => {
+          history.undo();
+          if (noticeId.current) toast.close(noticeId.current);
+        },
+      },
+    });
   }
 
-  function saveChanges() {
-    const periods = trimEmptyPeriods(history.present);
+  function commit(next: Enrollment[], notice?: ChangeNotice) {
+    commitContent({ ...history.present, enrollments: next }, notice);
+  }
 
-    updateActiveEnrollments(periods.flatMap((p) => p.enrollments));
-    history.reset(periods);
-    setEditMode(false);
+  function changeGradingScale(next: GradingScale) {
+    commitContent({ ...history.present, gradingScale: next });
+  }
+
+  function changeSidebarWidth(width: number) {
+    setSidebarWidth(width);
+    localStorage.setItem(SIDEBAR_WIDTH_KEY, String(width));
   }
 
   function resetCurriculum() {
-    const officialEnrollments = createEnrollments({
-      entry: trajectory.entry,
-      curriculum,
-    });
-
-    updateActiveEnrollments(officialEnrollments);
-    history.reset(groupEnrollmentsByPeriod(officialEnrollments));
-    setEditMode(false);
+    commit(
+      settleEnrollments(
+        createEnrollments({ entry: trajectory.entry, curriculum }),
+        context,
+      ),
+      { title: "Malla reiniciada", isShownOnDesktop: true },
+    );
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      className="h-full min-h-0 data-resizing:**:data-[slot=sidebar-container]:transition-none data-resizing:**:data-[slot=sidebar-gap]:transition-none"
+      style={{ "--sidebar-width": `${sidebarWidth}px` } as CSSProperties}
+    >
       <Sidebar
-        areas={curriculum.areas}
+        programName={curriculum.programName}
         stats={stats}
+        width={sidebarWidth}
+        onWidthChange={changeSidebarWidth}
+        gradingScale={gradingScale}
+        onGradingScaleChange={changeGradingScale}
         onReset={resetCurriculum}
       />
 
-      <SidebarInset className="relative grid h-dvh min-h-dvh grid-rows-[auto_1fr] overflow-hidden">
-        <div>
-          <header className="relative flex h-14 shrink-0 items-center justify-center gap-2 border-b bg-card px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-            <SidebarTrigger className="absolute left-2 md:hidden" />
-
-            <div className="flex items-center justify-center px-2 font-bold">
-              <h1>{curriculum.programName}</h1>
-            </div>
-
-            <div className="absolute right-2 flex flex-row items-center gap-2">
-              {editMode && (
-                <Button
-                  aria-label="save changes"
-                  variant="outline"
-                  className="hidden bg-accent hover:brightness-110 disabled:bg-muted md:flex"
-                  disabled={!history.canUndo}
-                  onClick={saveChanges}
-                >
-                  <Save />
-                  <span className="hidden md:inline">Guardar</span>
-                  <KbdGroup className="sr-only">
-                    <KbdHotkey hotkey="Mod+S" />
-                  </KbdGroup>
-                </Button>
-              )}
-
-              <Toggle
-                aria-label="toggle edit mode"
-                variant="outline"
-                pressed={editMode}
-                onPressedChange={toggleEditMode}
-              >
-                <SquarePen />
-                <span className="hidden md:inline">Editar</span>
-                <KbdGroup className="sr-only">
-                  <KbdHotkey hotkey="Mod+E" />
-                </KbdGroup>
-              </Toggle>
-            </div>
-          </header>
-          <Progress
-            value={stats.progress}
-            className="*:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none md:hidden"
-          />
-        </div>
-
-        <ScrollAreaWrapper className="h-[calc(100dvh-3.5rem)] w-dvw overflow-hidden lg:w-[calc(100dvw-18rem)]">
-          <TrajectoryBoard
-            editMode={editMode}
-            history={history}
-            entry={trajectory.entry}
-            areas={curriculum.areas}
-            courses={courses}
-            progress={{
-              approvedCourseIds: new Set(
-                extractCourseIds(enrollments, "APPROVED"),
-              ),
-              approvedCredits: stats.approvedCredits,
-            }}
-            onSave={saveChanges}
-          />
-        </ScrollAreaWrapper>
+      <SidebarInset className="min-w-0 overflow-hidden">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarToggle />
+          <h1 className="min-w-0 truncate px-2 font-heading font-semibold text-base">
+            {curriculum.programName}
+          </h1>
+          <div className="ml-auto flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Deshacer"
+              title="Deshacer (⌘ Z)"
+              className="text-muted-foreground"
+              disabled={!history.canUndo}
+              onClick={history.undo}
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Rehacer"
+              title="Rehacer (⌘ ⇧ Z)"
+              className="text-muted-foreground"
+              disabled={!history.canRedo}
+              onClick={history.redo}
+            >
+              <Redo2 />
+            </Button>
+          </div>
+        </header>
+        <Progress
+          value={stats.progress}
+          className="*:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none md:hidden"
+        />
+        <TrajectoryBoard
+          enrollments={enrollments}
+          entry={trajectory.entry}
+          curriculum={curriculum}
+          gradingScale={gradingScale}
+          isNew={isNew}
+          onChange={commit}
+        />
+        {showsAreasBar && curriculum.areas.length > 0 && (
+          <footer className="flex shrink-0 border-t px-4 py-3 lg:px-8">
+            <AreasLegend areas={curriculum.areas} />
+          </footer>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );

@@ -1,65 +1,14 @@
 import type { HexColor } from "@/types/colors";
-
-export type TermSystem = "semester" | "annual";
-
-export type Period = {
-  programYear: number;
-  term: number;
-};
-
-export type Slot = Period & {
-  position: number;
-};
-
-export type Course = {
-  id: number;
-  name: string;
-  code: string;
-  credits: number;
-  areaId: number | null;
-  trackIds: number[];
-  duration: number;
-  prerequisiteIds: number[];
-  prerequisiteCredits: number;
-  isElective: boolean;
-  slots: Slot[];
-};
-
-export type Area = {
-  id: number;
-  name: string;
-  color: HexColor;
-};
-
-export type CredentialType =
-  | "professional"
-  | "academic"
-  | "technical"
-  | "certificate"
-  | "mention";
-
-export type Track = {
-  id: number;
-  name: string;
-  credentialType: CredentialType | null;
-};
-
-export type Curriculum = {
-  programName: string;
-  institution: string;
-  effectiveYear: number | null;
-  versionName: string;
-  termSystem: TermSystem;
-  periods: Period[];
-  areas: Area[];
-  tracks: Track[];
-  courses: Course[];
-};
-
-export type CurriculumDetails = Pick<
+import type {
+  Area,
+  Course,
   Curriculum,
-  "programName" | "institution" | "effectiveYear" | "versionName"
->;
+  CurriculumDetails,
+  Period,
+  Slot,
+  TermSystem,
+  Track,
+} from "@/types/curriculum";
 
 export type Draft = {
   curriculum: Curriculum;

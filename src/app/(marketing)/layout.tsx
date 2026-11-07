@@ -1,10 +1,6 @@
-import { cn } from "cn";
-import { Figtree } from "next/font/google";
 import Link from "next/link";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
-
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
 
 export default async function MarketingLayout({
   children,
@@ -12,12 +8,7 @@ export default async function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        figtree.variable,
-        "grid min-h-dvh grid-rows-[auto_1fr_auto] gap-y-4 font-sans [--font-heading:var(--font-figtree)] [--font-sans:var(--font-figtree)]",
-      )}
-    >
+    <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] gap-y-4">
       <Navbar className="mx-auto w-full max-w-310 px-4 sm:px-6">
         <Link
           href="/dashboard"

@@ -1,134 +1,104 @@
 "use client";
 
-import { ArrowLeft, RotateCcw, Settings, Trash } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { Settings } from "lucide-react";
+import { useState } from "react";
 import {
-  AdaptiveDialog,
-  AdaptiveDialogBody,
-  AdaptiveDialogClose,
-  AdaptiveDialogContent,
-  AdaptiveDialogDescription,
-  AdaptiveDialogFooter,
-  AdaptiveDialogHeader,
-  AdaptiveDialogTitle,
-  AdaptiveDialogTrigger,
-} from "@/components/ui/adaptive-dialog";
+  SETTINGS_SECTIONS,
+  SettingsSection,
+} from "@/components/dashboard/settings-sections";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-
-type Action = {
-  icon: ReactNode;
-  label: string;
-  description: string;
-  confirmTitle: string;
-  confirmDescription: string;
-  onConfirm: () => void;
-};
-
-type SettingsDialogProps = {
-  onReset: () => void;
-  onRemove: () => void;
-};
+import type { SettingsSectionId, TrajectorySettings } from "@/types/settings";
 
 export default function SettingsDialog({
-  onReset,
-  onRemove,
-}: SettingsDialogProps) {
-  const [pending, setPending] = useState<Action | null>(null);
+  settings,
+}: {
+  settings: TrajectorySettings;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] =
+    useState<SettingsSectionId>("trajectory");
 
-  const actions: Action[] = [
-    {
-      icon: <RotateCcw />,
-      label: "Reiniciar malla",
-      description: "Vuelve a la malla oficial y descarta tu progreso.",
-      confirmTitle: "¿Deseas reiniciar esta malla curricular?",
-      confirmDescription:
-        "Volverá a la malla oficial y perderás tu progreso y cambios.",
-      onConfirm: onReset,
-    },
-    {
-      icon: <Trash />,
-      label: "Eliminar malla",
-      description: "Borra esta malla y todos sus datos.",
-      confirmTitle: "¿Deseas eliminar esta malla curricular?",
-      confirmDescription:
-        "Esta acción es irreversible, todos los datos se perderán.",
-      onConfirm: onRemove,
-    },
-  ];
+  const activeLabel = SETTINGS_SECTIONS.find(
+    ({ id }) => id === activeSection,
+  )?.label;
 
   return (
-    <AdaptiveDialog
-      onOpenChange={(open) => {
-        if (open) setPending(null);
-      }}
-    >
-      <AdaptiveDialogTrigger
-        render={<SidebarMenuButton tooltip="Configuraciones" />}
+    <>
+      <SidebarMenuButton
+        className="text-sidebar-muted-foreground"
+        onClick={() => {
+          setActiveSection("trajectory");
+          setIsOpen(true);
+        }}
       >
         <Settings />
         <span>Configuraciones</span>
-      </AdaptiveDialogTrigger>
-      <AdaptiveDialogContent className="sm:max-w-[425px]">
-        {pending ? (
-          <>
-            <AdaptiveDialogHeader>
-              <AdaptiveDialogTitle>{pending.confirmTitle}</AdaptiveDialogTitle>
-              <AdaptiveDialogDescription>
-                {pending.confirmDescription}
-              </AdaptiveDialogDescription>
-            </AdaptiveDialogHeader>
-            <AdaptiveDialogFooter>
-              <Button variant="ghost" onClick={() => setPending(null)}>
-                <ArrowLeft />
-                Volver
-              </Button>
-              <AdaptiveDialogClose
-                render={
-                  <Button variant="destructive" onClick={pending.onConfirm} />
-                }
+      </SidebarMenuButton>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[800px]">
+          <div className="flex h-[580px] max-h-[calc(100dvh-2rem)] min-w-0">
+            <nav
+              aria-label="Secciones de configuraciones"
+              className="flex w-51 shrink-0 flex-col gap-1 border-r p-2"
+            >
+              {SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
+                <Button
+                  key={id}
+                  variant="ghost"
+                  aria-current={id === activeSection ? "page" : undefined}
+                  className="h-9 justify-start text-muted-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
+                  onClick={() => setActiveSection(id)}
+                >
+                  <Icon />
+                  {label}
+                </Button>
+              ))}
+            </nav>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <header className="flex h-13 shrink-0 items-center border-b px-6">
+                <DialogTitle className="flex items-center gap-1.5 font-medium font-sans text-sm">
+                  <span className="font-normal text-muted-foreground">
+                    Configuraciones
+                  </span>
+                  <span aria-hidden className="text-muted-foreground">
+                    /
+                  </span>
+                  {activeLabel}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Ajusta esta malla y tus preferencias, o busca ayuda.
+                </DialogDescription>
+              </header>
+              <div
+                key={activeSection}
+                className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6"
               >
-                {pending.icon}
-                {pending.label}
-              </AdaptiveDialogClose>
-            </AdaptiveDialogFooter>
-          </>
-        ) : (
-          <>
-            <AdaptiveDialogHeader>
-              <AdaptiveDialogTitle>Configuraciones</AdaptiveDialogTitle>
-              <AdaptiveDialogDescription>
-                Administra la malla curricular activa.
-              </AdaptiveDialogDescription>
-            </AdaptiveDialogHeader>
-            <AdaptiveDialogBody>
-              <ul className="divide-y rounded-lg border">
-                {actions.map((action) => (
-                  <li
-                    key={action.label}
-                    className="flex items-center justify-between gap-4 p-3"
-                  >
-                    <div className="space-y-0.5">
-                      <p className="font-medium">{action.label}</p>
-                      <p className="text-muted-foreground">
-                        {action.description}
-                      </p>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      aria-label={action.label}
-                      onClick={() => setPending(action)}
-                    >
-                      {action.icon}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </AdaptiveDialogBody>
-          </>
-        )}
-      </AdaptiveDialogContent>
-    </AdaptiveDialog>
+                <SettingsSection
+                  section={activeSection}
+                  settings={{
+                    ...settings,
+                    onReset: () => {
+                      setIsOpen(false);
+                      settings.onReset();
+                    },
+                    onRemove: () => {
+                      setIsOpen(false);
+                      settings.onRemove();
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

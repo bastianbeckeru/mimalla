@@ -3,7 +3,7 @@
 import { cn } from "cn";
 import { Check } from "lucide-react";
 import type { ComponentProps } from "react";
-import { getTextColor } from "@/builder/colors";
+import { getTextColor } from "@/curriculum/colors";
 import type { HexColor } from "@/types/colors";
 
 export default function ColorSwatch({

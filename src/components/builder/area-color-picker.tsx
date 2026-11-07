@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { BASE_COLORS, getAreaShades, isHexColor } from "@/builder/colors";
 import ColorSwatch from "@/components/builder/color-swatch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +9,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Action, Area } from "@/types/builder";
+import { BASE_COLORS, getAreaShades, isHexColor } from "@/curriculum/colors";
+import type { Action } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
+import type { Area } from "@/types/curriculum";
 
 export default function AreaColorPicker({
   area,

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { importFile } from "@/builder/import";
+import { importFile } from "@/curriculum/import";
 import { INSTITUTIONS, PROGRAMS } from "@/server/db/programs";
 import type { CatalogInstitution, Program } from "@/types/curriculum";
 import { getCurrentYear } from "@/utils/curriculum";

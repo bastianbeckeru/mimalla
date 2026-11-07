@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -20,7 +19,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -28,7 +26,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 // parts are typed as their dialog counterparts.
 const dialogParts = {
   Root: Dialog,
-  Trigger: DialogTrigger,
   Content: DialogContent,
   Header: DialogHeader,
   Footer: DialogFooter,
@@ -39,7 +36,6 @@ const dialogParts = {
 
 const drawerParts = {
   Root: Drawer,
-  Trigger: DrawerTrigger,
   Content: DrawerContent,
   Header: DrawerHeader,
   Footer: DrawerFooter,
@@ -74,13 +70,6 @@ function AdaptiveDialog(props: React.ComponentProps<typeof Dialog>) {
       <parts.Root {...props} />
     </AdaptiveDialogContext.Provider>
   );
-}
-
-function AdaptiveDialogTrigger(
-  props: React.ComponentProps<typeof DialogTrigger>,
-) {
-  const { Trigger } = useAdaptiveDialog().parts;
-  return <Trigger {...props} />;
 }
 
 function AdaptiveDialogContent({
@@ -150,5 +139,4 @@ export {
   AdaptiveDialogFooter,
   AdaptiveDialogHeader,
   AdaptiveDialogTitle,
-  AdaptiveDialogTrigger,
 };
