@@ -45,6 +45,7 @@ In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and e
 - **Curriculums:** `.malla` files in `server/db/curriculums/<institution>/<program>_<effectiveYear>.malla`, read at build time by `server/db/curriculums.ts` and served to the browser by the route under `app/api/curriculums/`.
 - **Program data:** `server/db/programs.ts` holds what a curriculum file leaves out, such as the department and the SIES and DEMRE codes.
 - **File format:** `curriculum/schemas.ts`, `curriculum/import.ts` and `curriculum/export.ts`. `public/builder/pdf-to-malla.md` is the guide for writing a file from a PDF.
+- **Database (in progress, #52):** Postgres on Neon through Drizzle. `server/db/schema/` holds the tables, `server/db/relations.ts` their relations and `server/db/client.ts` the connection; `server/db/seed.ts` loads institutions and programs, run by `scripts/seed.ts`. Database tests run on PGlite through `test/database.ts`, without Neon. The app does not read from the database yet. Rules in `docs/sql-conventions.md`.
 - **Student data:** browser local storage only. The keys are `curriculum-storage` (trajectories, despite its name), `builder-storage` and `preferences-storage`. `stores/legacy-curriculums.ts` exists only to migrate old trajectories.
 
 ## Other docs
