@@ -51,7 +51,8 @@ In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and e
 
 - `DESIGN.md`: the fonts and visual rules.
 - `GLOSSARY.md`: the domain vocabulary.
-- `docs/adr/`: decisions and why they were made. Check each one's status note: ADRs 0001 and 0002 are not implemented yet.
+- `docs/adr/`: decisions and why they were made. Check each one's status note: ADR 0001 is superseded, and ADRs 0005 to 0007 (the curriculum hub) are not implemented yet.
 - `docs/known-problems.md`: known errors in the curriculum files.
+- `docs/sql-conventions.md`: rules for the database of the curriculum hub.
 - `CONTRIBUTING.md`: commit format, pull request rules and how to add a curriculum.
 - `CODING_STANDARDS.md`: rules for writing and reviewing code.

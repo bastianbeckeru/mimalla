@@ -4,7 +4,7 @@ status: accepted
 
 # Courses belong to the institution, their rules to the curriculum
 
-**Not implemented yet.** It takes effect with ADR 0001. Until then, each curriculum file holds its own courses.
+**Read with ADR 0005.** Courses of an institution are a projection of the current revisions of its curriculums, not where courses are stored: each curriculum file holds its own courses, so a change approved in one curriculum never changes another.
 
 A course (code, name, description, credits) belongs to its institution and is shared by every curriculum that includes it, so programs that share courses, such as the engineering programs of UDP, do not repeat them. What a curriculum decides about a course lives in the curriculum course instead: its prerequisites, the minimum approved credits it requires, its duration and whether it is an elective. Areas and tracks also belong to the curriculum.
 
