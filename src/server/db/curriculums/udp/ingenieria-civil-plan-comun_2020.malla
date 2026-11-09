@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": {
     "name": "Ingeniería Civil Plan Común",
     "institution": "Universidad Diego Portales"
@@ -9,105 +9,113 @@
   "termSystem": "semester",
   "periods": [{ "programYear": 1, "term": 1 }, { "programYear": 1, "term": 3 }],
   "areas": [
-    { "id": 1, "name": "Formación en Ciencias Básicas", "color": "#34c1cd" },
     {
-      "id": 2,
+      "id": "are_xNYxthon",
+      "name": "Formación en Ciencias Básicas",
+      "color": "#34c1cd"
+    },
+    {
+      "id": "are_neegFhNb",
       "name": "Formación en Ciencias de la Ingeniería",
       "color": "#bbe5eb"
     },
-    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
     {
-      "id": 4,
+      "id": "are_2PlcIUMq",
+      "name": "Formación General e Inglés",
+      "color": "#ffffff"
+    },
+    {
+      "id": "are_i0rzwxiS",
       "name": "Programación Avanzada o Ingeniería de los Materiales",
       "color": "#bbe5eb"
     },
-    { "id": 5, "name": "Formación General", "color": "#ffffff" }
+    { "id": "are_cmIgsAbz", "name": "Formación General", "color": "#ffffff" }
   ],
   "tracks": [],
   "courses": [
     {
-      "id": 1,
+      "id": "crs_OgA6nvI4",
       "name": "Álgebra y Geometría",
       "code": "CBM1000",
       "credits": 7,
-      "areaId": 1,
+      "areaId": "are_xNYxthon",
       "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
     },
     {
-      "id": 2,
+      "id": "crs_NueOsSse",
       "name": "Cálculo I",
       "code": "CBM1001",
       "credits": 7,
-      "areaId": 1,
+      "areaId": "are_xNYxthon",
       "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
     },
     {
-      "id": 3,
+      "id": "crs_gJDZnmqQ",
       "name": "Química",
       "code": "CBQ1000",
       "credits": 6,
-      "areaId": 1,
+      "areaId": "are_xNYxthon",
       "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
     },
     {
-      "id": 4,
+      "id": "crs_VPnkCoHp",
       "name": "Programación",
       "code": "CIT1000",
       "credits": 6,
-      "areaId": 2,
+      "areaId": "are_neegFhNb",
       "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
     },
     {
-      "id": 5,
+      "id": "crs_cRxPE1Th",
       "name": "Comunicación para la Ingeniería",
       "code": "FIC1000",
       "credits": 5,
-      "areaId": 3,
+      "areaId": "are_2PlcIUMq",
       "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
     },
     {
-      "id": 6,
+      "id": "crs_cJXPuRKf",
       "name": "Álgebra Lineal",
       "code": "CBM1002",
       "credits": 6,
-      "areaId": 1,
-      "prerequisiteIds": [1],
+      "areaId": "are_xNYxthon",
+      "prerequisiteIds": ["crs_OgA6nvI4"],
       "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
     },
     {
-      "id": 7,
+      "id": "crs_c9TMLxcT",
       "name": "Cálculo II",
       "code": "CBM1003",
       "credits": 6,
-      "areaId": 1,
-      "prerequisiteIds": [2],
+      "areaId": "are_xNYxthon",
+      "prerequisiteIds": ["crs_NueOsSse"],
       "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
     },
     {
-      "id": 8,
+      "id": "crs_t9TWSwSC",
       "name": "Mecánica",
       "code": "CBF1000",
       "credits": 7,
-      "areaId": 1,
-      "prerequisiteIds": [2],
+      "areaId": "are_xNYxthon",
+      "prerequisiteIds": ["crs_NueOsSse"],
       "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
     },
     {
-      "id": 9,
+      "id": "crs_LTqsCii2",
       "name": "Programación Avanzada o Ingeniería de los Materiales",
       "code": "CIT1010 / COC2001",
       "credits": 6,
-      "areaId": 4,
-      "prerequisiteIds": [3, 4],
+      "areaId": "are_i0rzwxiS",
+      "prerequisiteIds": ["crs_gJDZnmqQ", "crs_VPnkCoHp"],
       "isElective": true,
       "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
     },
     {
-      "id": 10,
+      "id": "crs_tbRmMm6X",
       "name": "Curso de Formación General",
       "code": "CFGXXXX",
       "credits": 5,
-      "areaId": 5,
+      "areaId": "are_cmIgsAbz",
       "isElective": true,
       "slots": [{ "programYear": 1, "term": 3, "position": 5 }]
     }

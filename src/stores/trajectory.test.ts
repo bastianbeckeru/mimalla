@@ -1,6 +1,14 @@
 import { describe, expect, test } from "bun:test";
+import legacyCourseIds from "@/stores/legacy-course-ids.json";
 import { migrateTrajectoryState } from "@/stores/trajectory";
+import type { CourseId } from "@/types/curriculum";
+import type { Trajectory } from "@/types/trajectory";
 import { DEFAULT_GRADING_SCALE } from "@/utils/grades";
+
+function legacyId(curriculumPath: string, courseId: number) {
+  const ids: Record<string, Record<string, string>> = legacyCourseIds;
+  return ids[curriculumPath]?.[courseId] as CourseId;
+}
 
 describe("migrateTrajectoryState", () => {
   test("renames the fields of a version 1 trajectory already in calendar years", () => {
@@ -9,7 +17,7 @@ describe("migrateTrajectoryState", () => {
         curriculums: [
           {
             id: "t1",
-            path: "uni/program",
+            path: "udp/psicologia/2020",
             year: 2024,
             term: 1,
             enrolledCourses: [
@@ -33,13 +41,13 @@ describe("migrateTrajectoryState", () => {
       trajectories: [
         {
           id: "t1",
-          curriculumPath: "uni/program",
+          curriculumPath: "udp/psicologia/2020",
           entry: { year: 2024, term: 1 },
           gradingScale: DEFAULT_GRADING_SCALE,
           enrollments: [
             {
               id: "e1",
-              courseId: 10,
+              courseId: legacyId("udp/psicologia/2020", 10),
               year: 2025,
               term: 1,
               position: 2,
@@ -58,7 +66,7 @@ describe("migrateTrajectoryState", () => {
         curriculums: [
           {
             id: "t1",
-            path: "uni/other",
+            path: "udp/psicologia/2020",
             year: 2023,
             term: 2,
             enrolledCourses: [
@@ -162,7 +170,7 @@ describe("migrateTrajectoryState", () => {
         enrollments: [
           {
             id: "e1",
-            courseId: 1,
+            courseId: legacyId("udp/derecho/2023", 1),
             year: 2024,
             term: 1,
             position: 1,
@@ -218,6 +226,78 @@ describe("migrateTrajectoryState", () => {
       migrateTrajectoryState(
         { trajectories: [trajectory], activeTrajectoryId: "t1" },
         4,
+      ).trajectories,
+    ).toEqual([trajectory]);
+  });
+
+  test("gives the enrollments of a version 4 trajectory the stable ids of its courses", () => {
+    const state = migrateTrajectoryState(
+      {
+        trajectories: [
+          {
+            id: "t1",
+            curriculumPath: "udp/derecho/2023",
+            entry: { year: 2024, term: 1 },
+            gradingScale: DEFAULT_GRADING_SCALE,
+            enrollments: [
+              {
+                id: "e1",
+                courseId: 1,
+                year: 2024,
+                term: 1,
+                position: 1,
+                status: "APPROVED",
+              },
+              {
+                id: "e2",
+                courseId: 999,
+                year: 2024,
+                term: 1,
+                position: 2,
+                status: "PENDING",
+              },
+            ],
+          },
+        ],
+        activeTrajectoryId: "t1",
+      },
+      4,
+    );
+
+    expect(state.trajectories[0]?.enrollments).toEqual([
+      {
+        id: "e1",
+        courseId: legacyId("udp/derecho/2023", 1),
+        year: 2024,
+        term: 1,
+        position: 1,
+        status: "APPROVED",
+      },
+    ]);
+  });
+
+  test("keeps the enrollments of a version 5 trajectory", () => {
+    const trajectory: Trajectory = {
+      id: "t1",
+      curriculumPath: "udp/derecho/2023",
+      entry: { year: 2024, term: 1 },
+      gradingScale: DEFAULT_GRADING_SCALE,
+      enrollments: [
+        {
+          id: "e1",
+          courseId: "crs_k3T9xQ2a",
+          year: 2024,
+          term: 1,
+          position: 1,
+          status: "APPROVED",
+        },
+      ],
+    };
+
+    expect(
+      migrateTrajectoryState(
+        { trajectories: [trajectory], activeTrajectoryId: "t1" },
+        5,
       ).trajectories,
     ).toEqual([trajectory]);
   });

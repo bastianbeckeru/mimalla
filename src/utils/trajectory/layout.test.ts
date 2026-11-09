@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { crs } from "@/test/ids";
 import type { PeriodKey } from "@/types/curriculum";
 import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
 import {
@@ -31,19 +32,19 @@ describe("createEnrollments", () => {
 
   test("places each slot, in curriculum order, in the calendar period of its program year for a first semester entry", () => {
     expect(periodsOf({ year: 2024, term: 1 })).toEqual([
-      { courseId: 1, year: 2024, term: 1 },
-      { courseId: 2, year: 2024, term: 3 },
-      { courseId: 3, year: 2025, term: 1 },
-      { courseId: 4, year: 2026, term: 3 },
+      { courseId: crs(1), year: 2024, term: 1 },
+      { courseId: crs(2), year: 2024, term: 3 },
+      { courseId: crs(3), year: 2025, term: 1 },
+      { courseId: crs(4), year: 2026, term: 3 },
     ]);
   });
 
   test("shifts every slot one semester later for a second semester entry", () => {
     expect(periodsOf({ year: 2024, term: 3 })).toEqual([
-      { courseId: 1, year: 2024, term: 3 },
-      { courseId: 2, year: 2025, term: 1 },
-      { courseId: 3, year: 2025, term: 3 },
-      { courseId: 4, year: 2027, term: 1 },
+      { courseId: crs(1), year: 2024, term: 3 },
+      { courseId: crs(2), year: 2025, term: 1 },
+      { courseId: crs(3), year: 2025, term: 3 },
+      { courseId: crs(4), year: 2027, term: 1 },
     ]);
   });
 
@@ -78,7 +79,7 @@ describe("layOutTrajectory", () => {
     const [year = 0, term = 0] = period.split("-").map(Number);
     return {
       id: `${period}/${courseId}`,
-      courseId,
+      courseId: crs(courseId),
       year,
       term,
       position,

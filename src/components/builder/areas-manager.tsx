@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { BASE_COLORS } from "@/curriculum/colors";
+import { createAreaId } from "@/curriculum/ids";
 import type { Action, Draft } from "@/types/builder";
 
 const NEW_AREA_NAME = "Nueva área";
@@ -98,7 +99,13 @@ export default function AreasManager({
           <Button
             variant="ghost"
             className="self-start"
-            onClick={() => dispatch({ type: "addArea", name: NEW_AREA_NAME })}
+            onClick={() =>
+              dispatch({
+                type: "addArea",
+                id: createAreaId(),
+                name: NEW_AREA_NAME,
+              })
+            }
           >
             <Plus />
             Agregar área

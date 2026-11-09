@@ -1,5 +1,11 @@
 import { findPeriodIndex } from "@/curriculum/periods";
-import type { Course, Curriculum, Period, Slot } from "@/types/curriculum";
+import type {
+  Course,
+  CourseId,
+  Curriculum,
+  Period,
+  Slot,
+} from "@/types/curriculum";
 
 const FALLBACK_DEFAULT_CREDITS = 5;
 
@@ -90,7 +96,7 @@ export function getMaxDuration(curriculum: Curriculum, course: Course) {
   );
 }
 
-type SlotRef = { courseId: number; slotIndex: number };
+type SlotRef = { courseId: CourseId; slotIndex: number };
 
 type Box = { left: number; right: number; top: number; bottom: number };
 
@@ -172,7 +178,7 @@ export function pushDownCollisions(
 
 export function changeCourse(
   curriculum: Curriculum,
-  courseId: number,
+  courseId: CourseId,
   change: (course: Course) => Course,
   anchorSlotIndexes: number[],
 ): Curriculum {

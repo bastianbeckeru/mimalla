@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { exportFile } from "@/curriculum/export";
+import { crs } from "@/test/ids";
 import type { Action, Draft } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
@@ -18,10 +19,15 @@ function positionsOf(draft: Draft) {
 describe("moving a course", () => {
   test("places it at the column and row it is dropped on", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 0,
         to: { ...SECOND_SEMESTER, position: 4 },
       },
@@ -32,12 +38,22 @@ describe("moving a course", () => {
 
   test("dropping an 8-credit course on top of another pushes it down 2 rows", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
-      { type: "editCourse", courseId: 2, changes: { credits: 8 } },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
+      { type: "editCourse", courseId: crs(2), changes: { credits: 8 } },
       {
         type: "moveSlot",
-        courseId: 2,
+        courseId: crs(2),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 1 },
       },
@@ -51,14 +67,34 @@ describe("moving a course", () => {
 
   test("pushes down a chain of colliding courses and leaves those above in place", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
-      { type: "editCourse", courseId: 4, changes: { credits: 10 } },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(3),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(4),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
+      { type: "editCourse", courseId: crs(4), changes: { credits: 10 } },
       {
         type: "moveSlot",
-        courseId: 4,
+        courseId: crs(4),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 2 },
       },
@@ -74,18 +110,33 @@ describe("moving a course", () => {
 
   test("keeps the gap below a pushed course when it does not reach the next one", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(3),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
       {
         type: "moveSlot",
-        courseId: 3,
+        courseId: crs(3),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 5 },
       },
       {
         type: "moveSlot",
-        courseId: 2,
+        courseId: crs(2),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 1 },
       },
@@ -108,18 +159,20 @@ describe("moving a course", () => {
   ])("rejects a drop on %s and keeps the draft", (_, to) => {
     const before = draftAfter({
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: FIRST_SEMESTER,
     });
 
     expect(
-      apply(before, { type: "moveSlot", courseId: 1, slotIndex: 0, to }),
+      apply(before, { type: "moveSlot", courseId: crs(1), slotIndex: 0, to }),
     ).toBe(before);
   });
 
   test("keeps the draft when the course is dropped where it already is", () => {
     const before = draftAfter({
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: FIRST_SEMESTER,
     });
@@ -127,7 +180,7 @@ describe("moving a course", () => {
     expect(
       apply(before, {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 1 },
       }),
@@ -136,11 +189,21 @@ describe("moving a course", () => {
 
   test("exports the pushed-down positions and the order they produce", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
       {
         type: "moveSlot",
-        courseId: 2,
+        courseId: crs(2),
         slotIndex: 0,
         to: { ...FIRST_SEMESTER, position: 1 },
       },
@@ -148,18 +211,28 @@ describe("moving a course", () => {
 
     expect(exportFile(draft)).toContain(
       '"courses":[' +
-        '{"id":1,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
-        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
+        '{"id":"crs_00000002","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
+        '{"id":"crs_00000001","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
     );
   });
 
   test("leaves the courses below in place when a course moves away", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 0,
         to: { ...SECOND_SEMESTER, position: 1 },
       },

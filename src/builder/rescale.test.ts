@@ -3,6 +3,7 @@ import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { getDefaultCredits } from "@/curriculum/grid";
 import { isSamePeriod } from "@/curriculum/periods";
+import { crs } from "@/test/ids";
 import type { Draft } from "@/types/builder";
 import type { Period } from "@/types/curriculum";
 
@@ -15,12 +16,13 @@ function addCourses(draft: Draft, period: Period, credits: number[]) {
   return credits.reduce((current, value) => {
     const added = apply(current, {
       type: "addCourse",
+      id: crs(current.curriculum.courses.length + 1),
       name: "Nuevo curso",
       period,
     });
     return apply(added, {
       type: "editCourse",
-      courseId: added.curriculum.courses.length,
+      courseId: crs(added.curriculum.courses.length),
       changes: { credits: value },
     });
   }, draft);
@@ -29,7 +31,11 @@ function addCourses(draft: Draft, period: Period, credits: number[]) {
 function setCredits(draft: Draft, courseIds: number[], credits: number) {
   return courseIds.reduce(
     (current, courseId) =>
-      apply(current, { type: "editCourse", courseId, changes: { credits } }),
+      apply(current, {
+        type: "editCourse",
+        courseId: crs(courseId),
+        changes: { credits },
+      }),
     draft,
   );
 }
@@ -93,7 +99,7 @@ describe("re-scaling when the default credits change", () => {
     const before = addCourses(fives, FIRST_SEMESTER, [7, 5, 4, 4]);
     expect(getDefaultCredits(before.curriculum)).toBe(5);
 
-    const after = apply(before, { type: "deleteCourse", courseId: 1 });
+    const after = apply(before, { type: "deleteCourse", courseId: crs(1) });
 
     expect(getDefaultCredits(after.curriculum)).toBe(4);
     expect(creditsAndPositionsIn(after, FIRST_SEMESTER)).toEqual([
@@ -136,7 +142,7 @@ describe("re-scaling when the default credits change", () => {
 
     const after = apply(before, {
       type: "resizeCourse",
-      courseId: 2,
+      courseId: crs(2),
       slotIndex: 0,
       rows: 2,
       duration: 1,

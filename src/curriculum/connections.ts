@@ -1,10 +1,10 @@
 import { findCourse } from "@/curriculum/courses";
 import { getMisplacedPrerequisiteIds } from "@/curriculum/prerequisites";
 import type { Box } from "@/curriculum/routing";
-import type { Curriculum } from "@/types/curriculum";
+import type { CourseId, Curriculum } from "@/types/curriculum";
 
 // A card is one slot of a course as the grid lays it out.
-export type ConnectionCard = Box & { id: string; courseId: number };
+export type ConnectionCard = Box & { id: string; courseId: CourseId };
 
 // Seen from the focused course: its prerequisites lead into it, and it leads
 // into its successors.
@@ -30,7 +30,7 @@ function getEnd(card: ConnectionCard) {
 // the prerequisite is misplaced and the link comes from its nearest card.
 function connect(
   cards: ConnectionCard[],
-  prerequisiteId: number,
+  prerequisiteId: CourseId,
   to: ConnectionCard,
   kind: ConnectionKind,
 ): Connection | null {
@@ -65,11 +65,12 @@ function connect(
 export function getConnections(
   curriculum: Curriculum,
   cards: ConnectionCard[],
-  courseId: number,
+  courseId: CourseId,
 ): Connection[] {
   const course = findCourse(curriculum, courseId);
   if (!course) return [];
-  const cardsOf = (id: number) => cards.filter((card) => card.courseId === id);
+  const cardsOf = (id: CourseId) =>
+    cards.filter((card) => card.courseId === id);
 
   const prerequisites = cardsOf(courseId).flatMap((card) =>
     course.prerequisiteIds.map((id) =>
@@ -90,8 +91,8 @@ export function getConnections(
 
 export function getConnectionRole(
   curriculum: Curriculum,
-  focusedCourseId: number | null,
-  courseId: number,
+  focusedCourseId: CourseId | null,
+  courseId: CourseId,
 ): ConnectionRole | null {
   if (focusedCourseId === null) return null;
   const focused = findCourse(curriculum, focusedCourseId);

@@ -1,4 +1,6 @@
-"use client";
+import type { CourseId } from "@/types/curriculum";
+
+("use client");
 
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Loader2, Monitor, Redo2, Undo2 } from "lucide-react";
@@ -70,7 +72,9 @@ function BuilderWorkspace() {
   const undo = useBuilderStore((state) => state.undo);
   const redo = useBuilderStore((state) => state.redo);
   const endGroup = useBuilderStore((state) => state.endGroup);
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<CourseId | null>(
+    null,
+  );
   const [isCreating, setIsCreating] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const isStarting = isCreating || activeId === null;

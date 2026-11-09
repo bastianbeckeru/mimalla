@@ -3,11 +3,13 @@ import { arabicToRoman } from "@/utils/numbers";
 
 export const REGULAR_TERMS: Record<TermSystem, number[]> = {
   semester: [1, 3],
+  trimester: [1, 2, 3],
   annual: [1],
 };
 
 export const INTENSIVE_TERMS: Record<TermSystem, number[]> = {
   semester: [2, 4],
+  trimester: [4],
   annual: [4],
 };
 
@@ -46,6 +48,7 @@ export function getAvailableIntensiveTerms(
 
 const PERIOD_NAMES: Record<TermSystem, Record<number, string>> = {
   semester: { 1: "SEMESTRE", 2: "INVIERNO", 3: "SEMESTRE", 4: "VERANO" },
+  trimester: { 1: "TRIMESTRE", 2: "TRIMESTRE", 3: "TRIMESTRE", 4: "VERANO" },
   annual: { 1: "AÑO", 4: "VERANO" },
 };
 

@@ -1,6 +1,6 @@
 import { findCourse } from "@/curriculum/courses";
 import { findPeriodIndex } from "@/curriculum/periods";
-import type { Course, Curriculum } from "@/types/curriculum";
+import type { Course, CourseId, Curriculum } from "@/types/curriculum";
 
 function getPeriodIndexes(curriculum: Curriculum, course: Course) {
   return course.slots.map((slot) => findPeriodIndex(curriculum.periods, slot));
@@ -8,7 +8,7 @@ function getPeriodIndexes(curriculum: Curriculum, course: Course) {
 
 export function getMisplacedPrerequisiteIds(
   curriculum: Curriculum,
-  courseId: number,
+  courseId: CourseId,
 ) {
   const course = findCourse(curriculum, courseId);
   if (!course) return [];
@@ -25,10 +25,10 @@ export function getMisplacedPrerequisiteIds(
 
 export function dependsOn(
   curriculum: Curriculum,
-  fromId: number,
-  targetId: number,
+  fromId: CourseId,
+  targetId: CourseId,
 ) {
-  const visited = new Set<number>();
+  const visited = new Set<CourseId>();
   const pending = [fromId];
   while (pending.length > 0) {
     const id = pending.pop();
@@ -43,8 +43,8 @@ export function dependsOn(
 
 export function canAddPrerequisite(
   curriculum: Curriculum,
-  courseId: number,
-  prerequisiteId: number,
+  courseId: CourseId,
+  prerequisiteId: CourseId,
 ) {
   const course = findCourse(curriculum, courseId);
   return (

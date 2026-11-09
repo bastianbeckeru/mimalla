@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Action } from "@/types/builder";
-import type { Area, Course } from "@/types/curriculum";
+import type { Area, AreaId, Course } from "@/types/curriculum";
 
 const NO_AREA_LABEL = "Sin área";
 
@@ -45,7 +45,7 @@ export default function AreaSelect({
       <Select
         items={items}
         value={course.areaId}
-        onValueChange={(areaId: number | null) =>
+        onValueChange={(areaId: AreaId | null) =>
           dispatch({ type: "assignArea", courseId: course.id, areaId })
         }
       >

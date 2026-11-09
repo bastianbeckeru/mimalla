@@ -13,7 +13,7 @@ import {
   GRID_GAP,
 } from "@/curriculum/grid-cells";
 import { getPeriodLabel } from "@/curriculum/periods";
-import type { Curriculum } from "@/types/curriculum";
+import type { CourseId, Curriculum } from "@/types/curriculum";
 
 const HEADER_ROWS = 1;
 
@@ -22,7 +22,9 @@ export default function CurriculumView({
 }: {
   curriculum: Curriculum;
 }) {
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<CourseId | null>(
+    null,
+  );
   const cards = getCourseCards(curriculum);
   const columns = curriculum.periods.length;
   const rows = Math.max(1, ...cards.map((card) => card.row + card.height - 1));

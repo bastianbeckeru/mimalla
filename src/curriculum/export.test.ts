@@ -2,8 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { exportFile, getFileName } from "@/curriculum/export";
+import { are, crs, trk } from "@/test/ids";
 import type { Action } from "@/types/builder";
-import type { Area } from "@/types/curriculum";
+import type { Area, CourseId } from "@/types/curriculum";
 
 function draftAfter(...actions: Action[]) {
   return actions.reduce(apply, createDraft("semester"));
@@ -22,9 +23,9 @@ const PERIODS =
   '{"programYear":5,"term":1},{"programYear":5,"term":3}]';
 
 describe("exporting a curriculum", () => {
-  test("writes minified JSON with schema version 1 and only the fields set", () => {
+  test("writes minified JSON with schema version 2 and only the fields set", () => {
     expect(exportFile(draftAfter(details))).toBe(
-      `{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"areas":[],"tracks":[],"courses":[]}`,
+      `{"schemaVersion":2,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester","periods":${PERIODS},"areas":[],"tracks":[],"courses":[]}`,
     );
   });
 
@@ -35,7 +36,7 @@ describe("exporting a curriculum", () => {
     });
 
     expect(exportFile(draft)).toStartWith(
-      '{"schemaVersion":1,"program":{"name":"Derecho","institution":"UDP"},"effectiveYear":2023,"versionName":"v6.0","termSystem":"semester",',
+      '{"schemaVersion":2,"program":{"name":"Derecho","institution":"UDP"},"effectiveYear":2023,"versionName":"v6.0","termSystem":"semester",',
     );
   });
 
@@ -50,48 +51,51 @@ describe("exporting a curriculum", () => {
     );
 
     expect(exportFile(draft)).toStartWith(
-      '{"schemaVersion":1,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester",',
+      '{"schemaVersion":2,"program":{"name":"Derecho"},"effectiveYear":2023,"termSystem":"semester",',
     );
   });
 
-  test("writes areas by first appearance with renumbered ids, and each course's areaId", () => {
+  test("writes areas by first appearance with their ids, and each course's areaId", () => {
     const draft = draftAfter(
       details,
-      { type: "addArea", name: "Sin cursos" },
-      { type: "addArea", name: "Público" },
-      { type: "addArea", name: "Privado" },
-      { type: "setAreaColor", areaId: 3, color: "#ff8800" },
+      { type: "addArea", id: are(1), name: "Sin cursos" },
+      { type: "addArea", id: are(2), name: "Público" },
+      { type: "addArea", id: are(3), name: "Privado" },
+      { type: "setAreaColor", areaId: are(3), color: "#ff8800" },
       { type: "setBaseColor", color: "#16a34a" },
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 2, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(2),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(3),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
-      { type: "assignArea", courseId: 1, areaId: 2 },
-      { type: "assignArea", courseId: 2, areaId: 3 },
+      { type: "assignArea", courseId: crs(1), areaId: are(2) },
+      { type: "assignArea", courseId: crs(2), areaId: are(3) },
     );
     const [unused, publico] = draft.curriculum.areas as [Area, Area];
     const file = exportFile(draft);
 
     expect(JSON.parse(file).areas).toEqual([
-      { id: 1, name: "Privado", color: "#ff8800" },
-      { id: 2, name: "Público", color: publico.color },
-      { id: 3, name: "Sin cursos", color: unused.color },
+      { id: are(3), name: "Privado", color: "#ff8800" },
+      { id: are(2), name: "Público", color: publico.color },
+      { id: are(1), name: "Sin cursos", color: unused.color },
     ]);
     expect(file).toContain(
-      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"areaId":1,"slots":[{"programYear":1,"term":1,"position":1}]},' +
-        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]},' +
-        '{"id":3,"name":"Nuevo curso","credits":5,"areaId":2,"slots":[{"programYear":2,"term":1,"position":1}]}]',
+      `"courses":[{"id":"${crs(2)}","name":"Nuevo curso","credits":5,"areaId":"${are(3)}","slots":[{"programYear":1,"term":1,"position":1}]},` +
+        `{"id":"${crs(3)}","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]},` +
+        `{"id":"${crs(1)}","name":"Nuevo curso","credits":5,"areaId":"${are(2)}","slots":[{"programYear":2,"term":1,"position":1}]}]`,
     );
     expect(file).not.toContain("16a34a");
     expect(file).not.toContain("baseColor");
@@ -101,74 +105,78 @@ describe("exporting a curriculum", () => {
   test("writes tracks in order with their credential type when set, and each course's trackIds after its area", () => {
     const draft = draftAfter(
       details,
-      { type: "addArea", name: "Privado" },
-      { type: "addTrack", name: "Sin uso" },
-      { type: "addTrack", name: "Plan Común" },
-      { type: "addTrack", name: "Licenciatura en Derecho" },
+      { type: "addArea", id: are(1), name: "Privado" },
+      { type: "addTrack", id: trk(1), name: "Sin uso" },
+      { type: "addTrack", id: trk(2), name: "Plan Común" },
+      { type: "addTrack", id: trk(3), name: "Licenciatura en Derecho" },
       {
         type: "editTrack",
-        trackId: 3,
+        trackId: trk(3),
         changes: { credentialType: "academic" },
       },
-      { type: "deleteTrack", trackId: 1 },
+      { type: "deleteTrack", trackId: trk(1) },
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
-      { type: "assignArea", courseId: 1, areaId: 1 },
-      { type: "assignTracks", courseId: 1, trackIds: [3, 2] },
+      { type: "assignArea", courseId: crs(1), areaId: are(1) },
+      { type: "assignTracks", courseId: crs(1), trackIds: [trk(3), trk(2)] },
     );
     const file = exportFile(draft);
 
     expect(file).toContain(
-      '"tracks":[{"id":1,"name":"Plan Común"},{"id":2,"name":"Licenciatura en Derecho","credentialType":"academic"}],' +
-        '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"areaId":1,"trackIds":[1,2],"slots":[{"programYear":1,"term":1,"position":1}]}]',
+      `"tracks":[{"id":"${trk(2)}","name":"Plan Común"},{"id":"${trk(3)}","name":"Licenciatura en Derecho","credentialType":"academic"}],` +
+        `"courses":[{"id":"${crs(1)}","name":"Nuevo curso","credits":5,"areaId":"${are(1)}","trackIds":["${trk(2)}","${trk(3)}"],"slots":[{"programYear":1,"term":1,"position":1}]}]`,
     );
   });
 
-  test("sorts courses by their first slot and renumbers their ids from 1", () => {
+  test("sorts courses by their first slot and keeps their ids", () => {
     const draft = draftAfter(
       details,
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 2, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(2),
         name: "Nuevo curso",
         period: { programYear: 1, term: 3 },
       },
       {
         type: "addCourse",
+        id: crs(3),
         name: "Nuevo curso",
         period: { programYear: 1, term: 3 },
       },
-      { type: "editCourse", courseId: 1, changes: { name: "Penal" } },
-      { type: "editCourse", courseId: 2, changes: { name: "Romano" } },
+      { type: "editCourse", courseId: crs(1), changes: { name: "Penal" } },
+      { type: "editCourse", courseId: crs(2), changes: { name: "Romano" } },
       {
         type: "editCourse",
-        courseId: 3,
+        courseId: crs(3),
         changes: { credits: 6, name: "Civil" },
       },
     );
 
     expect(JSON.parse(exportFile(draft)).courses).toEqual([
       {
-        id: 1,
+        id: crs(2),
         name: "Romano",
         credits: 5,
         slots: [{ programYear: 1, term: 3, position: 1 }],
       },
       {
-        id: 2,
+        id: crs(3),
         name: "Civil",
         credits: 6,
         slots: [{ programYear: 1, term: 3, position: 2 }],
       },
       {
-        id: 3,
+        id: crs(1),
         name: "Penal",
         credits: 5,
         slots: [{ programYear: 2, term: 1, position: 1 }],
@@ -179,12 +187,13 @@ describe("exporting a curriculum", () => {
   test("writes keys in a fixed order regardless of the editing order", () => {
     const course: Action = {
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
     };
     const first = draftAfter(details, course, {
       type: "editCourse",
-      courseId: 1,
+      courseId: crs(1),
       changes: { credits: 6, name: "Civil" },
     });
     const second = draftAfter(
@@ -193,14 +202,14 @@ describe("exporting a curriculum", () => {
         changes: { effectiveYear: 2023, programName: "Derecho" },
       },
       course,
-      { type: "editCourse", courseId: 1, changes: { name: "Civil" } },
-      { type: "editCourse", courseId: 1, changes: { credits: 6 } },
+      { type: "editCourse", courseId: crs(1), changes: { name: "Civil" } },
+      { type: "editCourse", courseId: crs(1), changes: { credits: 6 } },
     );
 
     expect(exportFile(first)).toBe(exportFile(second));
     expect(exportFile(first)).toBe(exportFile(first));
     expect(exportFile(first)).toContain(
-      '"courses":[{"id":1,"name":"Civil","credits":6,"slots":[{"programYear":1,"term":1,"position":1}]}]',
+      `"courses":[{"id":"${crs(1)}","name":"Civil","credits":6,"slots":[{"programYear":1,"term":1,"position":1}]}]`,
     );
   });
 
@@ -229,23 +238,24 @@ describe("exporting a curriculum", () => {
   });
 
   test("writes the course code after the name, and omits it when empty", () => {
-    const course: Action = {
+    const course = (id: CourseId): Action => ({
       type: "addCourse",
+      id,
       name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
-    };
+    });
     const draft = draftAfter(
       details,
-      course,
-      course,
-      { type: "editCourse", courseId: 1, changes: { code: "DER101" } },
-      { type: "editCourse", courseId: 2, changes: { code: "DER102" } },
-      { type: "editCourse", courseId: 2, changes: { code: "" } },
+      course(crs(1)),
+      course(crs(2)),
+      { type: "editCourse", courseId: crs(1), changes: { code: "DER101" } },
+      { type: "editCourse", courseId: crs(2), changes: { code: "DER102" } },
+      { type: "editCourse", courseId: crs(2), changes: { code: "" } },
     );
 
     expect(exportFile(draft)).toContain(
-      '"courses":[{"id":1,"name":"Nuevo curso","code":"DER101","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
-        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
+      `"courses":[{"id":"${crs(1)}","name":"Nuevo curso","code":"DER101","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},` +
+        `{"id":"${crs(2)}","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]`,
     );
   });
 
@@ -254,62 +264,67 @@ describe("exporting a curriculum", () => {
       details,
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(2),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
-      { type: "editCourse", courseId: 1, changes: { isElective: true } },
-      { type: "addSlot", courseId: 1 },
+      { type: "editCourse", courseId: crs(1), changes: { isElective: true } },
+      { type: "addSlot", courseId: crs(1) },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 1,
         to: { programYear: 2, term: 1, position: 1 },
       },
     );
 
     expect(exportFile(draft)).toContain(
-      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"isElective":true,"slots":[{"programYear":1,"term":1,"position":1},{"programYear":2,"term":1,"position":1}]},' +
-        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]',
+      `"courses":[{"id":"${crs(1)}","name":"Nuevo curso","credits":5,"isElective":true,"slots":[{"programYear":1,"term":1,"position":1},{"programYear":2,"term":1,"position":1}]},` +
+        `{"id":"${crs(2)}","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":2}]}]`,
     );
   });
 
-  test("writes renumbered prerequisites and prerequisite credits after the area, and omits them when empty or 0", () => {
+  test("writes prerequisites in course order and prerequisite credits after the area, and omits them when empty or 0", () => {
     const draft = draftAfter(
       details,
-      { type: "addArea", name: "Privado" },
+      { type: "addArea", id: are(1), name: "Privado" },
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 2, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(2),
         name: "Nuevo curso",
         period: { programYear: 1, term: 3 },
       },
       {
         type: "addCourse",
+        id: crs(3),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
-      { type: "assignArea", courseId: 1, areaId: 1 },
-      { type: "editCourse", courseId: 1, changes: { isElective: true } },
-      { type: "addPrerequisite", courseId: 1, prerequisiteId: 2 },
-      { type: "addPrerequisite", courseId: 1, prerequisiteId: 3 },
-      { type: "setPrerequisiteCredits", courseId: 1, credits: 30 },
-      { type: "setPrerequisiteCredits", courseId: 2, credits: 10 },
-      { type: "setPrerequisiteCredits", courseId: 2, credits: 0 },
+      { type: "assignArea", courseId: crs(1), areaId: are(1) },
+      { type: "editCourse", courseId: crs(1), changes: { isElective: true } },
+      { type: "addPrerequisite", courseId: crs(1), prerequisiteId: crs(2) },
+      { type: "addPrerequisite", courseId: crs(1), prerequisiteId: crs(3) },
+      { type: "setPrerequisiteCredits", courseId: crs(1), credits: 30 },
+      { type: "setPrerequisiteCredits", courseId: crs(2), credits: 10 },
+      { type: "setPrerequisiteCredits", courseId: crs(2), credits: 0 },
     );
 
     expect(exportFile(draft)).toContain(
-      '"courses":[{"id":1,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},' +
-        '{"id":2,"name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":3,"position":1}]},' +
-        '{"id":3,"name":"Nuevo curso","credits":5,"areaId":1,"prerequisiteIds":[1,2],"prerequisiteCredits":30,"isElective":true,"slots":[{"programYear":2,"term":1,"position":1}]}]',
+      `"courses":[{"id":"${crs(3)}","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":1,"position":1}]},` +
+        `{"id":"${crs(2)}","name":"Nuevo curso","credits":5,"slots":[{"programYear":1,"term":3,"position":1}]},` +
+        `{"id":"${crs(1)}","name":"Nuevo curso","credits":5,"areaId":"${are(1)}","prerequisiteIds":["${crs(3)}","${crs(2)}"],"prerequisiteCredits":30,"isElective":true,"slots":[{"programYear":2,"term":1,"position":1}]}]`,
     );
   });
 

@@ -1,4 +1,4 @@
-import type { Curriculum, PeriodKey } from "@/types/curriculum";
+import type { CourseId, Curriculum, PeriodKey } from "@/types/curriculum";
 
 export type EnrollmentStatus = "APPROVED" | "PENDING" | "FAILED";
 
@@ -8,7 +8,7 @@ export type Enrollment = {
   term: number;
   position: number;
   status: EnrollmentStatus;
-  courseId: number;
+  courseId: CourseId;
   // The enrollment's grading scheme, without the course at its root.
   assessments?: Assessment[];
   // A course grade the student entered, which prevails over the computed one.
@@ -70,7 +70,7 @@ export type TrajectoryContext = {
 };
 
 export type TrajectoryProgress = {
-  approvedCourseIds: Set<number>;
+  approvedCourseIds: Set<CourseId>;
   approvedCredits: number;
 };
 
@@ -95,6 +95,6 @@ export type PanelPrerequisite = {
   key: string;
   name: string;
   isMet: boolean;
-  courseId?: number;
+  courseId?: CourseId;
   detail?: string;
 };

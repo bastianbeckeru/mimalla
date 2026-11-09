@@ -29,9 +29,9 @@ export const trackNameSchema = z
 
 export const exportableCurriculumSchema = detailsSchema
   .extend({
-    tracks: z.array(z.object({ id: z.number(), name: trackNameSchema })),
+    tracks: z.array(z.object({ id: z.string(), name: trackNameSchema })),
     courses: z.array(
-      z.object({ name: courseNameSchema, trackIds: z.array(z.number()) }),
+      z.object({ name: courseNameSchema, trackIds: z.array(z.string()) }),
     ),
   })
   .refine(

@@ -34,11 +34,12 @@ import {
   getRowCount,
   HEADER_ROWS,
 } from "@/curriculum/grid-cells";
+import { createCourseId } from "@/curriculum/ids";
 import { getPeriodLabel } from "@/curriculum/periods";
 import { useGridGesture } from "@/hooks/use-grid-gesture";
 import type { Action, Draft, ResizeAction, SlotAction } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
-import type { Curriculum, Period } from "@/types/curriculum";
+import type { CourseId, Curriculum, Period } from "@/types/curriculum";
 
 const DRAG_ACTIVATION_DISTANCE = 5;
 
@@ -111,7 +112,7 @@ const GridCard = memo(function GridCard({
   color: HexColor;
   isSelected: boolean;
   takeDropOrigin: (dragId: string) => { x: number; y: number } | null;
-  onSelect: (courseId: number) => void;
+  onSelect: (courseId: CourseId) => void;
   onResize: (card: CourseCardLayout, delta: Size) => void;
   onRelease: (card: CourseCardLayout, delta: Size) => void;
 }) {
@@ -169,8 +170,8 @@ export default function CurriculumGrid({
 }: {
   draft: Draft;
   dispatch: (action: Action) => void;
-  selectedCourseId: number | null;
-  onSelectCourse: (courseId: number) => void;
+  selectedCourseId: CourseId | null;
+  onSelectCourse: (courseId: CourseId) => void;
 }) {
   const { firstCellRef, getCellUnder, keepDropOrigin, takeDropOrigin } =
     useGridGesture();
@@ -241,11 +242,11 @@ function GridContent({
   draft: Draft;
   baseCards: CourseCardLayout[];
   dispatch: (action: Action) => void;
-  selectedCourseId: number | null;
+  selectedCourseId: CourseId | null;
   firstCellRef: RefObject<HTMLDivElement | null>;
   getMove: (operation: DragMoveEvent["operation"]) => Gesture | null;
   takeDropOrigin: (dragId: string) => { x: number; y: number } | null;
-  onSelectCourse: (courseId: number) => void;
+  onSelectCourse: (courseId: CourseId) => void;
 }) {
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [newCourse, setNewCourse] = useState<NewCourse | null>(null);
@@ -394,7 +395,12 @@ function GridContent({
           periodLabel={getPeriodLabel(curriculum.termSystem, newCourse.period)}
           onOpenChange={setIsNewCourseOpen}
           onCreate={(name) => {
-            dispatch({ type: "addCourse", name, ...newCourse });
+            dispatch({
+              type: "addCourse",
+              id: createCourseId(),
+              name,
+              ...newCourse,
+            });
             setIsNewCourseOpen(false);
           }}
         />

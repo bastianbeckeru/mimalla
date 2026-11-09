@@ -14,7 +14,7 @@ import {
   routeConnections,
 } from "@/curriculum/routing";
 import { getFocusedCourseId, useConnectionFocus } from "@/stores/connections";
-import type { Curriculum } from "@/types/curriculum";
+import type { CourseId, Curriculum } from "@/types/curriculum";
 
 const STROKE_WIDTH = 0.1;
 const MISPLACED_DASHES = "0.3 0.2";
@@ -42,8 +42,8 @@ export default function ConnectionsOverlay({
   cards: ConnectionCard[];
   size: GridSize;
   firstRow: number;
-  gestureCourseId?: number | null;
-  selectedCourseId: number | null;
+  gestureCourseId?: CourseId | null;
+  selectedCourseId: CourseId | null;
   isShown?: (connection: Connection) => boolean;
 }) {
   const select = useConnectionFocus((state) => state.select);

@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
-import type { Course, Curriculum } from "@/types/curriculum";
+import type { Course, CourseId, Curriculum } from "@/types/curriculum";
 import type {
   Enrollment,
   EnrollmentStatus,
@@ -93,8 +93,8 @@ type PanelContentProps = {
   gradingScale: GradingScale;
   schemeSource: SchemeSource | null;
   isAvailable: boolean;
-  canOpenCourse: (courseId: number) => boolean;
-  onOpenCourse: (courseId: number) => void;
+  canOpenCourse: (courseId: CourseId) => boolean;
+  onOpenCourse: (courseId: CourseId) => void;
   onSetStatus: (status: EnrollmentStatus) => void;
   onGradesChange: (grades: GradesChange) => void;
   onRetake: (() => void) | null;

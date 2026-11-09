@@ -1,11 +1,11 @@
 import { findCourse } from "@/curriculum/courses";
 import { canAddPrerequisite } from "@/curriculum/prerequisites";
 import type { Draft, Handlers, PrerequisiteAction } from "@/types/builder";
-import type { Course } from "@/types/curriculum";
+import type { Course, CourseId } from "@/types/curriculum";
 
 function updateCourse(
   draft: Draft,
-  courseId: number,
+  courseId: CourseId,
   update: (course: Course) => Course,
 ): Draft {
   const { curriculum } = draft;

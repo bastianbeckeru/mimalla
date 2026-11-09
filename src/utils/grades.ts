@@ -1,3 +1,4 @@
+import type { CourseId } from "@/types/curriculum";
 import type {
   Assessment,
   Enrollment,
@@ -240,7 +241,7 @@ function getAssessmentPartial(assessment: Assessment, gradeOf: GradeOf) {
 // Every attempt that ended, approved or failed, counts by its credits.
 export function getCumulativeAverage(
   enrollments: Enrollment[],
-  courses: Map<number, { credits: number }>,
+  courses: Map<CourseId, { credits: number }>,
   scale: GradingScale,
 ) {
   let credits = 0;

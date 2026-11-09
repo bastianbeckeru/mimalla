@@ -4,8 +4,16 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
+import { createAreaId, createCourseId, createTrackId } from "@/curriculum/ids";
 import type { Action, Draft } from "@/types/builder";
-import type { CurriculumDetails, TermSystem } from "@/types/curriculum";
+import type {
+  Area,
+  Course,
+  Curriculum,
+  CurriculumDetails,
+  TermSystem,
+  Track,
+} from "@/types/curriculum";
 import type { History, HistoryAction } from "@/types/history";
 import { createHistory, historyReducer } from "@/utils/history";
 
@@ -61,6 +69,62 @@ function addTracks(draft: Draft): Draft {
       courses: curriculum.courses.map((course) => ({
         ...course,
         trackIds: course.trackIds ?? [],
+      })),
+    },
+  };
+}
+
+// Before version 4, courses, areas and tracks had numbered ids (ADR 0007).
+type Numbered<T> = Omit<T, "id"> & { id: number };
+type NumberedCourse = Omit<
+  Numbered<Course>,
+  "areaId" | "trackIds" | "prerequisiteIds"
+> & { areaId: number | null; trackIds: number[]; prerequisiteIds: number[] };
+type NumberedDraft = Omit<Draft, "curriculum" | "handColoredAreaIds"> & {
+  handColoredAreaIds: number[];
+  curriculum: Omit<Curriculum, "courses" | "areas" | "tracks"> & {
+    courses: NumberedCourse[];
+    areas: Numbered<Area>[];
+    tracks: Numbered<Track>[];
+  };
+};
+
+function giveIds<T>(items: { id: number }[], create: () => T) {
+  const ids = new Map(items.map(({ id }) => [id, create()]));
+  return {
+    get: (id: number) => ids.get(id) ?? create(),
+    list: (numbered: number[]) => numbered.flatMap((id) => ids.get(id) ?? []),
+  };
+}
+
+/** Gives the courses, areas and tracks of a saved draft stable ids. */
+export function migrateToStableIds(draft: NumberedDraft): Draft {
+  const { curriculum } = draft;
+  const courseIds = giveIds(curriculum.courses, createCourseId);
+  const areaIds = giveIds(curriculum.areas, createAreaId);
+  const trackIds = giveIds(curriculum.tracks, createTrackId);
+
+  return {
+    ...draft,
+    handColoredAreaIds: areaIds.list(draft.handColoredAreaIds),
+    curriculum: {
+      ...curriculum,
+      areas: curriculum.areas.map((area) => ({
+        ...area,
+        id: areaIds.get(area.id),
+      })),
+      tracks: curriculum.tracks.map((track) => ({
+        ...track,
+        id: trackIds.get(track.id),
+      })),
+      courses: curriculum.courses.map((course) => ({
+        ...course,
+        id: courseIds.get(course.id),
+        areaId:
+          areaIds.list(course.areaId === null ? [] : [course.areaId])[0] ??
+          null,
+        trackIds: trackIds.list(course.trackIds),
+        prerequisiteIds: courseIds.list(course.prerequisiteIds),
       })),
     },
   };
@@ -146,7 +210,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
     },
     {
       name: "builder-storage",
-      version: 3,
+      version: 4,
       partialize: (state): PersistedState => ({
         curricula: state.curricula,
         activeId: state.activeId,
@@ -169,6 +233,15 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
             curricula: state.curricula.map(({ id, draft }) => ({
               id,
               draft: addTracks(draft),
+            })),
+          };
+        }
+        if (version < 4) {
+          state = {
+            ...state,
+            curricula: state.curricula.map(({ id, draft }) => ({
+              id,
+              draft: migrateToStableIds(draft as unknown as NumberedDraft),
             })),
           };
         }

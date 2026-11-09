@@ -6,14 +6,8 @@ import {
   slotsFitInPeriods,
 } from "@/curriculum/grid";
 import { compareSlots } from "@/curriculum/periods";
-import type { CourseAction, Draft, Handlers } from "@/types/builder";
+import type { CourseAction, Handlers } from "@/types/builder";
 import type { Course } from "@/types/curriculum";
-
-function nextCourseId(draft: Draft) {
-  return (
-    Math.max(0, ...draft.curriculum.courses.map((course) => course.id)) + 1
-  );
-}
 
 function isValidCredits(credits: number) {
   return Number.isInteger(credits) && credits >= 0;
@@ -28,10 +22,10 @@ function applyChanges(course: Course, changes: Partial<Course>): Course {
 }
 
 export const courseHandlers: Handlers<CourseAction> = {
-  addCourse: (draft, { name, period, position }) => {
+  addCourse: (draft, { id, name, period, position }) => {
     const { curriculum } = draft;
     const course = {
-      id: nextCourseId(draft),
+      id,
       name,
       code: "",
       credits: getDefaultCredits(curriculum),

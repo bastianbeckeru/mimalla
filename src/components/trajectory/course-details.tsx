@@ -3,7 +3,7 @@
 import { cn } from "cn";
 import { Check, ChevronRight, Circle } from "lucide-react";
 import { getCourseColor } from "@/curriculum/colors";
-import type { Course, Curriculum } from "@/types/curriculum";
+import type { Course, CourseId, Curriculum } from "@/types/curriculum";
 import type { PanelPrerequisite } from "@/types/trajectory";
 
 function RelationRow({
@@ -60,8 +60,8 @@ export function Prerequisites({
   onOpenCourse,
 }: {
   prerequisites: PanelPrerequisite[];
-  canOpenCourse: (courseId: number) => boolean;
-  onOpenCourse: (courseId: number) => void;
+  canOpenCourse: (courseId: CourseId) => boolean;
+  onOpenCourse: (courseId: CourseId) => void;
 }) {
   if (prerequisites.length === 0)
     return <p className="text-muted-foreground text-sm">Ninguno</p>;
@@ -111,8 +111,8 @@ export default function CourseDetails({
   curriculum: Curriculum;
   prerequisites: PanelPrerequisite[];
   successors: Course[];
-  canOpenCourse: (courseId: number) => boolean;
-  onOpenCourse: (courseId: number) => void;
+  canOpenCourse: (courseId: CourseId) => boolean;
+  onOpenCourse: (courseId: CourseId) => void;
 }) {
   const area = curriculum.areas.find(({ id }) => id === course.areaId);
 

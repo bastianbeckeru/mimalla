@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { CourseId } from "@/types/curriculum";
 
 // Connections that show up again this soon after hiding are still "warm", so
 // they switch at once instead of drawing in.
@@ -6,22 +7,22 @@ const WARM_MS = 300;
 const DRAW_IN_MS = 250;
 
 type ConnectionFocusState = {
-  hoveredCourseId: number | null;
-  keyboardCourseId: number | null;
-  selectedCourseId: number | null;
+  hoveredCourseId: CourseId | null;
+  keyboardCourseId: CourseId | null;
+  selectedCourseId: CourseId | null;
   // Whether connections that appear now draw themselves in.
   isDrawingIn: boolean;
   isSuspended: boolean;
 };
 
 type ConnectionFocusStore = ConnectionFocusState & {
-  hover: (courseId: number) => void;
-  focusByKeyboard: (courseId: number) => void;
-  select: (courseId: number | null) => void;
+  hover: (courseId: CourseId) => void;
+  focusByKeyboard: (courseId: CourseId) => void;
+  select: (courseId: CourseId | null) => void;
   setSuspended: (isSuspended: boolean) => void;
   // Stops a course being hovered or focused, if it still is.
   release: (
-    courseId: number,
+    courseId: CourseId,
     source?: "hoveredCourseId" | "keyboardCourseId",
   ) => void;
 };

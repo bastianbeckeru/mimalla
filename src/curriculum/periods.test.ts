@@ -6,6 +6,7 @@ import {
   getAvailableIntensiveTerms,
   getPeriodLabel,
 } from "@/curriculum/periods";
+import { crs } from "@/test/ids";
 import type { Action } from "@/types/builder";
 
 function draftAfter(...actions: Action[]) {
@@ -23,6 +24,31 @@ describe("a new annual curriculum", () => {
   });
 });
 
+describe("a new trimester curriculum", () => {
+  test("has three trimesters per program year, numbered across years", () => {
+    const { curriculum } = createDraft("trimester");
+
+    expect(curriculum.periods.slice(0, 4)).toEqual([
+      { programYear: 1, term: 1 },
+      { programYear: 1, term: 2 },
+      { programYear: 1, term: 3 },
+      { programYear: 2, term: 1 },
+    ]);
+    expect(getPeriodLabel("trimester", { programYear: 2, term: 1 })).toBe(
+      "TRIMESTRE IV",
+    );
+  });
+
+  test("can only get a summer as an intensive term", () => {
+    expect(
+      getAvailableIntensiveTerms(createDraft("trimester").curriculum, 1),
+    ).toEqual([4]);
+    expect(getPeriodLabel("trimester", { programYear: 1, term: 4 })).toBe(
+      "VERANO I",
+    );
+  });
+});
+
 describe("creating a curriculum", () => {
   test("replaces the current draft with a blank one in the chosen term system and details", () => {
     const details = {
@@ -35,6 +61,7 @@ describe("creating a curriculum", () => {
       { type: "editDetails", changes: { programName: "Derecho" } },
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
@@ -67,6 +94,7 @@ describe("changing the term system", () => {
   test("is not possible while the curriculum has courses", () => {
     const withCourse = draftAfter({
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: { programYear: 1, term: 1 },
     });
@@ -245,6 +273,7 @@ describe("removing a column", () => {
   test("is not possible while the column has courses", () => {
     const withCourse = draftAfter({
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: SECOND_SEMESTER,
     });
@@ -263,7 +292,7 @@ describe("removing a column", () => {
         ...empty.curriculum,
         courses: [
           {
-            id: 1,
+            id: crs(1),
             name: "Taller anual",
             code: "",
             credits: 10,

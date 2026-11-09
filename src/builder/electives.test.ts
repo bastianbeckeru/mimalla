@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
+import { crs } from "@/test/ids";
 import type { Action, Draft } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
@@ -16,17 +17,27 @@ function slotsOf(draft: Draft) {
 
 const markElective: Action = {
   type: "editCourse",
-  courseId: 1,
+  courseId: crs(1),
   changes: { isElective: true },
 };
 
 describe("elective slots", () => {
   test("an elective gets another slot in the first free row of its last slot's column", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       markElective,
-      { type: "addSlot", courseId: 1 },
+      { type: "addSlot", courseId: crs(1) },
     );
 
     expect(slotsOf(draft)).toEqual([
@@ -41,21 +52,27 @@ describe("elective slots", () => {
   test("a non-elective keeps its single slot", () => {
     const before = draftAfter({
       type: "addCourse",
+      id: crs(1),
       name: "Nuevo curso",
       period: FIRST_SEMESTER,
     });
 
-    expect(apply(before, { type: "addSlot", courseId: 1 })).toBe(before);
+    expect(apply(before, { type: "addSlot", courseId: crs(1) })).toBe(before);
   });
 
   test("each slot of an elective is dragged on its own", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       markElective,
-      { type: "addSlot", courseId: 1 },
+      { type: "addSlot", courseId: crs(1) },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 1,
         to: { ...SECOND_YEAR, position: 3 },
       },
@@ -71,11 +88,16 @@ describe("elective slots", () => {
 
   test("removing a slot of an elective keeps the others", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       markElective,
-      { type: "addSlot", courseId: 1 },
-      { type: "addSlot", courseId: 1 },
-      { type: "removeSlot", courseId: 1, slotIndex: 1 },
+      { type: "addSlot", courseId: crs(1) },
+      { type: "addSlot", courseId: crs(1) },
+      { type: "removeSlot", courseId: crs(1), slotIndex: 1 },
     );
 
     expect(slotsOf(draft)).toEqual([
@@ -88,23 +110,28 @@ describe("elective slots", () => {
 
   test("unmarking an elective keeps only its earliest slot", () => {
     const draft = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       markElective,
-      { type: "addSlot", courseId: 1 },
-      { type: "addSlot", courseId: 1 },
+      { type: "addSlot", courseId: crs(1) },
+      { type: "addSlot", courseId: crs(1) },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 0,
         to: { ...SECOND_YEAR, position: 1 },
       },
       {
         type: "moveSlot",
-        courseId: 1,
+        courseId: crs(1),
         slotIndex: 1,
         to: { ...SECOND_YEAR, position: 4 },
       },
-      { type: "editCourse", courseId: 1, changes: { isElective: false } },
+      { type: "editCourse", courseId: crs(1), changes: { isElective: false } },
     );
 
     expect(draft.curriculum.courses[0]?.isElective).toBe(false);
@@ -113,12 +140,17 @@ describe("elective slots", () => {
 
   test("the last slot of a course cannot be removed", () => {
     const before = draftAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
       markElective,
     );
 
     expect(
-      apply(before, { type: "removeSlot", courseId: 1, slotIndex: 0 }),
+      apply(before, { type: "removeSlot", courseId: crs(1), slotIndex: 0 }),
     ).toBe(before);
   });
 });

@@ -16,6 +16,7 @@ import type { Course, TermSystem } from "@/types/curriculum";
 
 const UNITS: Record<TermSystem, [string, string]> = {
   semester: ["semestre", "semestres"],
+  trimester: ["trimestre", "trimestres"],
   annual: ["año", "años"],
 };
 

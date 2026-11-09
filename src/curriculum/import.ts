@@ -5,6 +5,23 @@ import {
   isHexColor,
 } from "@/curriculum/colors";
 import { SCHEMA_VERSION } from "@/curriculum/export";
+import {
+  AREA_IDS,
+  COURSE_IDS,
+  readIds,
+  TRACK_IDS,
+  translateId,
+} from "@/curriculum/file-ids";
+import {
+  type FileObject,
+  InvalidFileError,
+  isInteger,
+  isObject,
+  readObjects,
+  readOptional,
+  readOptionalText,
+  reject,
+} from "@/curriculum/file-reading";
 import { pushDownCollisions, slotsFitInPeriods } from "@/curriculum/grid";
 import {
   comparePeriods,
@@ -18,58 +35,30 @@ import type { Draft } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
 import type {
   Area,
+  AreaId,
   Course,
+  CourseId,
   CredentialType,
   Curriculum,
   Period,
   Slot,
   TermSystem,
   Track,
+  TrackId,
 } from "@/types/curriculum";
 
 type ImportResult = { ok: true; draft: Draft } | { ok: false; reason: string };
-
-type FileObject = Record<string, unknown>;
-
-class InvalidFileError extends Error {}
-
-function reject(reason: string): never {
-  throw new InvalidFileError(reason);
-}
-
-function isObject(value: unknown): value is FileObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isInteger(value: unknown): value is number {
-  return Number.isInteger(value);
-}
-
-function readOptionalText(
-  value: unknown,
-  notTextReason: string,
-  emptyReason: string,
-) {
-  if (value === undefined) return "";
-  if (typeof value !== "string") reject(notTextReason);
-  if (value === "") reject(emptyReason);
-  return value;
-}
-
-function readObjects(value: unknown, reason: string) {
-  if (!Array.isArray(value) || !value.every(isObject)) reject(reason);
-  return value;
-}
 
 function readSchemaVersion(value: unknown) {
   if (isInteger(value) && value > SCHEMA_VERSION)
     reject(
       `El archivo usa la versión ${value} del formato, más nueva que la que reconoce este constructor.`,
     );
-  if (value !== SCHEMA_VERSION)
+  if (!isInteger(value) || value < 1)
     reject(
-      `La versión del formato (schemaVersion) debe ser ${SCHEMA_VERSION}.`,
+      `La versión del formato (schemaVersion) debe ser un número entre 1 y ${SCHEMA_VERSION}.`,
     );
+  return value;
 }
 
 function readProgramName(program: unknown) {
@@ -79,14 +68,19 @@ function readProgramName(program: unknown) {
   return name;
 }
 
-function readTermSystem(value: unknown): TermSystem {
-  if (value !== "semester" && value !== "annual")
-    reject('El régimen debe ser "semester" o "annual".');
-  return value;
+function readTermSystem(value: unknown, schemaVersion: number): TermSystem {
+  if (value === "semester" || value === "annual") return value;
+  if (value === "trimester" && schemaVersion >= 2) return value;
+  reject(
+    schemaVersion >= 2
+      ? 'El régimen debe ser "semester", "trimester" o "annual".'
+      : 'El régimen debe ser "semester" o "annual".',
+  );
 }
 
 const TERM_SYSTEM_NAMES: Record<TermSystem, string> = {
   semester: "semestral",
+  trimester: "trimestral",
   annual: "anual",
 };
 
@@ -120,14 +114,6 @@ function readPeriods(value: unknown, termSystem: TermSystem): Period[] {
   return periods;
 }
 
-function checkIds(items: FileObject[], reason: string) {
-  const ids = new Set(items.map(({ id }) => id));
-  const isSequence =
-    ids.size === items.length &&
-    items.every(({ id }) => isInteger(id) && id >= 1 && id <= items.length);
-  if (!isSequence) reject(reason);
-}
-
 function isLowerCaseHexColor(color: unknown): color is HexColor {
   return (
     typeof color === "string" &&
@@ -136,20 +122,21 @@ function isLowerCaseHexColor(color: unknown): color is HexColor {
   );
 }
 
-function readAreas(value: unknown): Area[] {
-  const areas = readObjects(value, "La malla debe tener una lista de áreas.");
-  checkIds(
-    areas,
-    `Los ids de las áreas deben ir de 1 a ${areas.length}, sin saltos ni repetirse.`,
-  );
-  return areas.map(({ id, name, color }) => {
+function readAreas(
+  value: unknown,
+  schemaVersion: number,
+): { areas: Area[]; areaIds: Map<unknown, AreaId> } {
+  const items = readObjects(value, "La malla debe tener una lista de áreas.");
+  const areaIds = readIds(items, schemaVersion, AREA_IDS);
+  const areas = items.map(({ id, name, color }) => {
     if (typeof name !== "string") reject(`El área ${id} debe tener un nombre.`);
     if (!isLowerCaseHexColor(color))
       reject(
         `El color del área "${name}" debe tener el formato #rrggbb en minúsculas.`,
       );
-    return { id: id as number, name, color };
+    return { id: translateId(areaIds, id), name, color };
   });
+  return { areas, areaIds };
 }
 
 const CREDENTIAL_TYPES: CredentialType[] = [
@@ -164,17 +151,17 @@ function isCredentialType(value: unknown): value is CredentialType {
   return CREDENTIAL_TYPES.includes(value as CredentialType);
 }
 
-function readTracks(value: unknown): Track[] {
-  const tracks = readObjects(value, "La malla debe tener una lista de planes.");
-  checkIds(
-    tracks,
-    `Los ids de los planes deben ir de 1 a ${tracks.length}, sin saltos ni repetirse.`,
-  );
-  return tracks.map(({ id, name, credentialType }) => {
+function readTracks(
+  value: unknown,
+  schemaVersion: number,
+): { tracks: Track[]; trackIds: Map<unknown, TrackId> } {
+  const items = readObjects(value, "La malla debe tener una lista de planes.");
+  const trackIds = readIds(items, schemaVersion, TRACK_IDS);
+  const tracks = items.map(({ id, name, credentialType }) => {
     if (typeof name !== "string" || name.trim() === "")
       reject(`El plan ${id} debe tener un nombre.`);
     return {
-      id: id as number,
+      id: translateId(trackIds, id),
       name,
       credentialType: readOptional<CredentialType | null>(
         credentialType,
@@ -184,17 +171,7 @@ function readTracks(value: unknown): Track[] {
       ),
     };
   });
-}
-
-function readOptional<T>(
-  value: unknown,
-  fallback: T,
-  isValid: (value: unknown) => value is T,
-  reason: string,
-) {
-  if (value === undefined) return fallback;
-  if (!isValid(value)) reject(reason);
-  return value;
+  return { tracks, trackIds };
 }
 
 function readSlots(
@@ -225,14 +202,18 @@ function readSlots(
   });
 }
 
+type CourseContext = {
+  periods: Period[];
+  courseIds: Map<unknown, CourseId>;
+  areaIds: Map<unknown, AreaId>;
+  trackIds: Map<unknown, TrackId>;
+};
+
 function readCourse(
   value: FileObject,
-  periods: Period[],
-  areas: Area[],
-  tracks: Track[],
-  courseCount: number,
+  { periods, courseIds, areaIds, trackIds: knownTrackIds }: CourseContext,
 ): Course {
-  const id = value.id as number;
+  const id = translateId(courseIds, value.id);
   const { name } = value;
   if (typeof name !== "string" || name.trim() === "")
     reject(`El curso ${id} debe tener un nombre.`);
@@ -251,40 +232,35 @@ function readCourse(
     (duration): duration is number => isInteger(duration) && duration > 1,
     `La duración del curso "${name}" debe ser un número entero mayor que 1 (se omite cuando es 1).`,
   );
-  const areaId = readOptional<number | null>(
-    value.areaId,
-    null,
-    (areaId): areaId is number => areas.some((area) => area.id === areaId),
-    `El área del curso "${name}" no existe.`,
-  );
+  const areaId =
+    value.areaId === undefined
+      ? null
+      : (areaIds.get(value.areaId) ??
+        reject(`El área del curso "${name}" no existe.`));
   const trackIds = readOptional(
     value.trackIds,
     [],
-    (ids): ids is number[] =>
+    (ids): ids is unknown[] =>
       Array.isArray(ids) &&
       ids.length > 0 &&
       new Set(ids).size === ids.length &&
-      ids.every((trackId) => tracks.some((track) => track.id === trackId)),
+      ids.every((trackId) => knownTrackIds.has(trackId)),
     `Los planes del curso "${name}" deben ser una lista de ids distintos de planes que existen (se omite cuando no tiene).`,
-  );
-  const prerequisiteIds = readOptional(
+  ).map((trackId) => translateId(knownTrackIds, trackId));
+  const fileIds = readOptional(
     value.prerequisiteIds,
     [],
-    (ids): ids is number[] =>
-      Array.isArray(ids) &&
-      ids.length > 0 &&
-      ids.every(isInteger) &&
-      new Set(ids).size === ids.length,
+    (ids): ids is unknown[] =>
+      Array.isArray(ids) && ids.length > 0 && new Set(ids).size === ids.length,
     `Los prerrequisitos del curso "${name}" deben ser una lista de ids distintos (se omite cuando no tiene).`,
   );
-  if (prerequisiteIds.some((prerequisiteId) => prerequisiteId === id))
+  if (fileIds.some((prerequisiteId) => prerequisiteId === value.id))
     reject(`El curso "${name}" no puede ser su propio prerrequisito.`);
-  if (
-    prerequisiteIds.some(
-      (prerequisiteId) => prerequisiteId < 1 || prerequisiteId > courseCount,
-    )
-  )
+  if (fileIds.some((prerequisiteId) => !courseIds.has(prerequisiteId)))
     reject(`El curso "${name}" tiene un prerrequisito que no existe.`);
+  const prerequisiteIds = fileIds.map((prerequisiteId) =>
+    translateId(courseIds, prerequisiteId),
+  );
   const prerequisiteCredits = readOptional<number>(
     value.prerequisiteCredits,
     0,
@@ -346,21 +322,15 @@ function checkLayout(curriculum: Curriculum) {
 
 function readCourses(
   value: unknown,
-  periods: Period[],
-  areas: Area[],
-  tracks: Track[],
+  schemaVersion: number,
+  context: Omit<CourseContext, "courseIds">,
 ): Course[] {
   const courses = readObjects(
     value,
     "La malla debe tener una lista de cursos.",
   );
-  checkIds(
-    courses,
-    `Los ids de los cursos deben ir de 1 a ${courses.length}, sin saltos ni repetirse.`,
-  );
-  return courses.map((course) =>
-    readCourse(course, periods, areas, tracks, courses.length),
-  );
+  const courseIds = readIds(courses, schemaVersion, COURSE_IDS);
+  return courses.map((course) => readCourse(course, { ...context, courseIds }));
 }
 
 function checkTracksHaveCourses({ tracks, courses }: Curriculum) {
@@ -372,7 +342,7 @@ function checkTracksHaveCourses({ tracks, courses }: Curriculum) {
 
 function readCurriculum(file: unknown): Curriculum {
   if (!isObject(file)) reject("El archivo no contiene una malla curricular.");
-  readSchemaVersion(file.schemaVersion);
+  const schemaVersion = readSchemaVersion(file.schemaVersion);
   const programName = readProgramName(file.program);
   const institution = readOptionalText(
     (file.program as FileObject).institution,
@@ -386,10 +356,10 @@ function readCurriculum(file: unknown): Curriculum {
     "La versión debe ser texto.",
     "La versión no puede estar vacía (se omite cuando no hay).",
   );
-  const termSystem = readTermSystem(file.termSystem);
+  const termSystem = readTermSystem(file.termSystem, schemaVersion);
   const periods = readPeriods(file.periods, termSystem);
-  const areas = readAreas(file.areas);
-  const tracks = readTracks(file.tracks);
+  const { areas, areaIds } = readAreas(file.areas, schemaVersion);
+  const { tracks, trackIds } = readTracks(file.tracks, schemaVersion);
 
   const curriculum = {
     programName,
@@ -400,7 +370,11 @@ function readCurriculum(file: unknown): Curriculum {
     periods,
     areas,
     tracks,
-    courses: readCourses(file.courses, periods, areas, tracks),
+    courses: readCourses(file.courses, schemaVersion, {
+      periods,
+      areaIds,
+      trackIds,
+    }),
   };
   checkTracksHaveCourses(curriculum);
   checkLayout(curriculum);

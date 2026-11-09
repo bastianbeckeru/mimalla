@@ -5,7 +5,12 @@ import ImportCurriculumButton from "@/components/curriculum/import-button";
 import VersionSelect from "@/components/curriculum/version-select";
 import { Separator } from "@/components/ui/separator";
 import { REGULAR_TERMS } from "@/curriculum/periods";
-import type { CredentialType, Curriculum, Program } from "@/types/curriculum";
+import type {
+  CredentialType,
+  Curriculum,
+  Program,
+  TermSystem,
+} from "@/types/curriculum";
 
 const CREDENTIAL_ORDER: CredentialType[] = [
   "professional",
@@ -19,9 +24,12 @@ function getDuration({ termSystem, periods }: Curriculum) {
   const regularPeriods = periods.filter(({ term }) =>
     REGULAR_TERMS[termSystem].includes(term),
   ).length;
-  return termSystem === "semester"
-    ? `${regularPeriods} semestres`
-    : `${regularPeriods} años`;
+  const unit: Record<TermSystem, string> = {
+    semester: "semestres",
+    trimester: "trimestres",
+    annual: "años",
+  };
+  return `${regularPeriods} ${unit[termSystem]}`;
 }
 
 function MetaItem({

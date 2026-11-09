@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createTrackId } from "@/curriculum/ids";
 import type { Action, Draft } from "@/types/builder";
-import type { CredentialType } from "@/types/curriculum";
+import type { CredentialType, TrackId } from "@/types/curriculum";
 
 const NEW_TRACK_NAME = "Nuevo plan";
 const NO_CREDENTIAL_LABEL = "Sin credencial";
@@ -46,7 +47,7 @@ export default function TracksManager({
 }) {
   const { tracks, courses } = draft.curriculum;
 
-  function countCourses(trackId: number) {
+  function countCourses(trackId: TrackId) {
     return courses.filter((course) => course.trackIds.includes(trackId)).length;
   }
 
@@ -146,7 +147,13 @@ export default function TracksManager({
         <Button
           variant="ghost"
           className="self-start"
-          onClick={() => dispatch({ type: "addTrack", name: NEW_TRACK_NAME })}
+          onClick={() =>
+            dispatch({
+              type: "addTrack",
+              id: createTrackId(),
+              name: NEW_TRACK_NAME,
+            })
+          }
         >
           <Plus />
           Agregar plan

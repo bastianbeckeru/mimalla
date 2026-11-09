@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": {
     "name": "Ingeniería Civil Industrial",
     "institution": "Universidad Diego Portales"
@@ -20,114 +20,126 @@
     { "programYear": 6, "term": 1 }
   ],
   "areas": [
-    { "id": 1, "name": "Ciencias Básicas FIC", "color": "#47be71" },
     {
-      "id": 2,
+      "id": "are_RcRAUStG",
+      "name": "Ciencias Básicas FIC",
+      "color": "#47be71"
+    },
+    {
+      "id": "are_WCLqS8PH",
       "name": "Liderazgo y Gestión de Equipos Multidisciplinarios",
       "color": "#cfedd1"
     },
-    { "id": 3, "name": "Formación General e Inglés", "color": "#ffffff" },
-    { "id": 4, "name": "Operaciones y Logística", "color": "#91d79e" },
     {
-      "id": 5,
+      "id": "are_SRt6yNhy",
+      "name": "Formación General e Inglés",
+      "color": "#ffffff"
+    },
+    {
+      "id": "are_O09vyVxT",
+      "name": "Operaciones y Logística",
+      "color": "#91d79e"
+    },
+    {
+      "id": "are_XeJMBzcQ",
       "name": "Asignatura Curricular Integradora",
       "color": "#615e5e"
     },
-    { "id": 6, "name": "Análisis de Datos", "color": "#6dc284" },
-    { "id": 7, "name": "Energía Sostenible", "color": "#a7a5a6" },
-    { "id": 8, "name": "Electivo Profesional", "color": "#deddde" }
+    { "id": "are_FsELpzU3", "name": "Análisis de Datos", "color": "#6dc284" },
+    { "id": "are_PcXfshBu", "name": "Energía Sostenible", "color": "#a7a5a6" },
+    { "id": "are_rmlNnPBH", "name": "Electivo Profesional", "color": "#deddde" }
   ],
   "tracks": [
     {
-      "id": 1,
+      "id": "trk_Mjn2vmF7",
       "name": "Licenciatura en Ciencias de la Ingeniería",
       "credentialType": "academic"
     },
     {
-      "id": 2,
+      "id": "trk_jNsZqhow",
       "name": "Ingeniería Civil Industrial",
       "credentialType": "professional"
     }
   ],
   "courses": [
     {
-      "id": 1,
+      "id": "crs_UX7fuWHO",
       "name": "Introducción al Álgebra",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
     },
     {
-      "id": 2,
+      "id": "crs_EJBBT2Kt",
       "name": "Introducción al Cálculo",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
     },
     {
-      "id": 3,
+      "id": "crs_gstjNeYE",
       "name": "Química",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
     },
     {
-      "id": 4,
+      "id": "crs_qhakLSQY",
       "name": "Programación",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
     },
     {
-      "id": 5,
+      "id": "crs_L7CAh8v0",
       "name": "Introducción a la Ingeniería",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
     },
     {
-      "id": 6,
+      "id": "crs_UXkU4tLU",
       "name": "Álgebra Lineal",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
     },
     {
-      "id": 7,
+      "id": "crs_TF2e3yAi",
       "name": "Cálculo Diferencial e Integral",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
     },
     {
-      "id": 8,
+      "id": "crs_bJF1wYVT",
       "name": "Mecánica",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
     },
     {
-      "id": 9,
+      "id": "crs_iSqZwNX6",
       "name": "Herramientas de Programación en Ingeniería Industrial",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
     },
     {
-      "id": 10,
+      "id": "crs_lbT8DOXw",
       "name": "Curso de Formación General",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1, 2],
+      "areaId": "are_SRt6yNhy",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "isElective": true,
       "slots": [
         { "programYear": 1, "term": 3, "position": 5 },
@@ -139,269 +151,269 @@
       ]
     },
     {
-      "id": 11,
+      "id": "crs_4GZIcOSV",
       "name": "Ecuaciones Diferenciales",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
     },
     {
-      "id": 12,
+      "id": "crs_6tatiAnB",
       "name": "Cálculo en Varias Variables",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
     },
     {
-      "id": 13,
+      "id": "crs_9sfp8BDl",
       "name": "Calor y Ondas",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
     },
     {
-      "id": 14,
+      "id": "crs_iEimZVik",
       "name": "Introducción a la Economía",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
     },
     {
-      "id": 15,
+      "id": "crs_it10MMkz",
       "name": "Probabilidades y Estadísticas",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
     },
     {
-      "id": 16,
+      "id": "crs_iv0J0dKK",
       "name": "Electromagnetismo y Física Moderna",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1, 2],
+      "areaId": "are_RcRAUStG",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
     },
     {
-      "id": 17,
+      "id": "crs_F571ClU7",
       "name": "Optimización",
       "credits": 6,
-      "areaId": 4,
-      "trackIds": [1, 2],
+      "areaId": "are_O09vyVxT",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
     },
     {
-      "id": 18,
+      "id": "crs_dOGyF1JW",
       "name": "Ingeniería Económica",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
     },
     {
-      "id": 19,
+      "id": "crs_wPFjKUAS",
       "name": "Inglés General I",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1, 2],
+      "areaId": "are_SRt6yNhy",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
     },
     {
-      "id": 20,
+      "id": "crs_2bs78eRa",
       "name": "Pasantía Laboral I",
       "credits": 6,
       "duration": 2,
-      "areaId": 5,
-      "trackIds": [1, 2],
+      "areaId": "are_XeJMBzcQ",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 2, "term": 3, "position": 7 }]
     },
     {
-      "id": 21,
+      "id": "crs_xdOSjIe8",
       "name": "Inferencia Estadística",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1, 2],
+      "areaId": "are_FsELpzU3",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
     },
     {
-      "id": 22,
+      "id": "crs_qeJH1PqP",
       "name": "Mecánica de Fluidos",
       "credits": 6,
-      "areaId": 7,
-      "trackIds": [1, 2],
+      "areaId": "are_PcXfshBu",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
     },
     {
-      "id": 23,
+      "id": "crs_Lsk9ShTu",
       "name": "Modelos Estocásticos",
       "credits": 6,
-      "areaId": 4,
-      "trackIds": [1, 2],
+      "areaId": "are_O09vyVxT",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
     },
     {
-      "id": 24,
+      "id": "crs_CIjqXJ3c",
       "name": "Microeconomía",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
     },
     {
-      "id": 25,
+      "id": "crs_IKAkAgK8",
       "name": "Inglés General II",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1, 2],
+      "areaId": "are_SRt6yNhy",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 1, "position": 6 }]
     },
     {
-      "id": 26,
+      "id": "crs_niFNwNvt",
       "name": "Ingeniería de Datos",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1, 2],
+      "areaId": "are_FsELpzU3",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
     },
     {
-      "id": 27,
+      "id": "crs_OyrvC9ED",
       "name": "Termodinámica",
       "credits": 6,
-      "areaId": 7,
-      "trackIds": [1, 2],
+      "areaId": "are_PcXfshBu",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
     },
     {
-      "id": 28,
+      "id": "crs_9bPjnidg",
       "name": "Producción",
       "credits": 6,
-      "areaId": 4,
-      "trackIds": [1, 2],
+      "areaId": "are_O09vyVxT",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
     },
     {
-      "id": 29,
+      "id": "crs_pkGCabEG",
       "name": "Finanzas",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
     },
     {
-      "id": 30,
+      "id": "crs_X3Xd5JLl",
       "name": "Inglés General III",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1, 2],
+      "areaId": "are_SRt6yNhy",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 3, "term": 3, "position": 6 }]
     },
     {
-      "id": 31,
+      "id": "crs_AezrTREV",
       "name": "Econometría",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1, 2],
+      "areaId": "are_FsELpzU3",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
     },
     {
-      "id": 32,
+      "id": "crs_Xai8pVAd",
       "name": "Gestión Energética",
       "credits": 6,
-      "areaId": 7,
-      "trackIds": [1, 2],
+      "areaId": "are_PcXfshBu",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
     },
     {
-      "id": 33,
+      "id": "crs_bjYvcPJY",
       "name": "Logística",
       "credits": 6,
-      "areaId": 4,
-      "trackIds": [1, 2],
+      "areaId": "are_O09vyVxT",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
     },
     {
-      "id": 34,
+      "id": "crs_znpyECSb",
       "name": "Simulación",
       "credits": 6,
-      "areaId": 4,
-      "trackIds": [1, 2],
+      "areaId": "are_O09vyVxT",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
     },
     {
-      "id": 35,
+      "id": "crs_6vgDix01",
       "name": "Teoría Organizacional",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 1, "position": 5 }]
     },
     {
-      "id": 36,
+      "id": "crs_oUpwg1J1",
       "name": "Ciencia de Datos",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1, 2],
+      "areaId": "are_FsELpzU3",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
     },
     {
-      "id": 37,
+      "id": "crs_DtNBz429",
       "name": "Organización Industrial",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
     },
     {
-      "id": 38,
+      "id": "crs_Qbdcefo0",
       "name": "Gestión de Procesos",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
     },
     {
-      "id": 39,
+      "id": "crs_jy2J3CTq",
       "name": "Evaluación de Proyectos",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
     },
     {
-      "id": 40,
+      "id": "crs_CovNR5j0",
       "name": "Gestión Estratégica",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
     },
     {
-      "id": 41,
+      "id": "crs_Ll4IDjrH",
       "name": "Gestión de Innovación",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1, 2],
+      "areaId": "are_WCLqS8PH",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 6 }]
     },
     {
-      "id": 42,
+      "id": "crs_tXvdxD9o",
       "name": "Pasantía Laboral II",
       "credits": 6,
       "duration": 2,
-      "areaId": 5,
-      "trackIds": [1, 2],
+      "areaId": "are_XeJMBzcQ",
+      "trackIds": ["trk_Mjn2vmF7", "trk_jNsZqhow"],
       "slots": [{ "programYear": 4, "term": 3, "position": 7 }]
     },
     {
-      "id": 43,
+      "id": "crs_D4ZLC2GQ",
       "name": "Electivo Profesional",
       "credits": 6,
-      "areaId": 8,
-      "trackIds": [2],
+      "areaId": "are_rmlNnPBH",
+      "trackIds": ["trk_jNsZqhow"],
       "isElective": true,
       "slots": [
         { "programYear": 5, "term": 1, "position": 1 },
@@ -415,27 +427,27 @@
       ]
     },
     {
-      "id": 44,
+      "id": "crs_W1ecbPEh",
       "name": "Taller de Ingeniería I",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [2],
+      "areaId": "are_XeJMBzcQ",
+      "trackIds": ["trk_jNsZqhow"],
       "slots": [{ "programYear": 5, "term": 1, "position": 5 }]
     },
     {
-      "id": 45,
+      "id": "crs_yjQm2DhI",
       "name": "Taller de Ingeniería II",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [2],
+      "areaId": "are_XeJMBzcQ",
+      "trackIds": ["trk_jNsZqhow"],
       "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
     },
     {
-      "id": 46,
+      "id": "crs_7hqPjS3D",
       "name": "Actividad de Titulación",
       "credits": 30,
-      "areaId": 5,
-      "trackIds": [2],
+      "areaId": "are_XeJMBzcQ",
+      "trackIds": ["trk_jNsZqhow"],
       "slots": [{ "programYear": 6, "term": 1, "position": 1 }]
     }
   ]
