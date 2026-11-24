@@ -39,6 +39,7 @@ In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and e
 | `sidebar.tsx` | `components/dashboard/` (the dashboard's), `components/ui/` (the shadcn primitive) |
 | `connections.ts` | `curriculum/` (which connections exist), `stores/` (which course has focus) |
 | `colors.ts` | `curriculum/` (area colors), `utils/` (generic color helpers) |
+| `import.ts`, `export.ts` | `curriculum/` (curriculum files), `utils/trajectory-file/` (trajectory files) |
 
 ## Data
 
@@ -46,6 +47,7 @@ In `components/trajectory/`, `trajectory-board.tsx` owns the board's state and e
 - **Program data:** `server/db/programs.ts` holds what a curriculum file leaves out, such as the department and the SIES and DEMRE codes.
 - **File format:** `curriculum/schemas.ts`, `curriculum/import.ts` (with `curriculum/file-reading.ts` and `curriculum/file-ids.ts`) and `curriculum/export.ts`. `curriculum/ids.ts` makes the stable ids of courses, areas and tracks (ADR 0007). `public/builder/pdf-to-malla.md` is the guide for writing a file from a PDF.
 - **Database (in progress, #52):** Postgres on Neon through Drizzle. `server/db/schema/` holds the tables, `server/db/relations.ts` their relations and `server/db/client.ts` the connection; `server/db/seed.ts` loads institutions and programs, run by `scripts/seed.ts`. Database tests run on PGlite through `test/database.ts`, without Neon. The app does not read from the database yet. Rules in `docs/sql-conventions.md`.
+- **Trajectory file:** `utils/trajectory-file/`. `columns.ts` defines every sheet's columns once, for the README sheet and the import; `export.ts` builds the sheets, `import.ts` (with `sheets.ts` and `assessments.ts`) validates them and replays the enrollments through `utils/trajectory/edits.ts`, `summary.ts` describes what an import changes, and `workbook.ts` is the only file that touches SheetJS, loaded on demand. The UI is `components/dashboard/backup-settings.tsx` and `components/dashboard/import-trajectory-dialog.tsx`, also opened from the new trajectory flow.
 - **Student data:** browser local storage only. The keys are `curriculum-storage` (trajectories, despite its name), `builder-storage` and `preferences-storage`. `stores/legacy-curriculums.ts` and `stores/legacy-course-ids.json` exist only to migrate old trajectories.
 
 ## Other docs

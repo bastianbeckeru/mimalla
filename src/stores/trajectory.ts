@@ -8,6 +8,7 @@ import type { CourseId, Curriculum } from "@/types/curriculum";
 import type {
   Enrollment,
   Entry,
+  ImportedContent,
   Trajectory,
   TrajectoryContent,
 } from "@/types/trajectory";
@@ -26,9 +27,13 @@ type TrajectoryActions = {
     entry: Entry;
     curriculum: Curriculum;
   }) => void;
+  addImportedTrajectory: (trajectory: ImportedTrajectory) => void;
+  replaceActiveTrajectory: (content: ImportedContent) => void;
   removeActiveTrajectory: () => void;
   updateActiveTrajectory: (content: TrajectoryContent) => void;
 };
+
+type ImportedTrajectory = Pick<Trajectory, "curriculumPath"> & ImportedContent;
 
 // Before version 4, trajectories had no grading scale, and before version 5
 // enrollments referenced courses by the number the curriculum file gave them.
@@ -152,6 +157,25 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
           return {
             trajectories: [...state.trajectories, trajectory],
             activeTrajectoryId: trajectory.id,
+          };
+        }),
+
+      addImportedTrajectory: (imported) =>
+        set((state) => {
+          const trajectory = { id: nanoid(), ...imported };
+          return {
+            trajectories: [...state.trajectories, trajectory],
+            activeTrajectoryId: trajectory.id,
+          };
+        }),
+      replaceActiveTrajectory: (imported) =>
+        set((state) => {
+          const id = nanoid();
+          return {
+            trajectories: state.trajectories.map((t) =>
+              t.id === state.activeTrajectoryId ? { ...t, ...imported, id } : t,
+            ),
+            activeTrajectoryId: id,
           };
         }),
 

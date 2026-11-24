@@ -32,6 +32,7 @@ import type {
   ChangeNotice,
   Enrollment,
   GradingScale,
+  ImportedContent,
   Trajectory,
   TrajectoryContent,
 } from "@/types/trajectory";
@@ -120,6 +121,10 @@ export default function ClientSideDashboard({
           setImportedId(useTrajectoryStore.getState().activeTrajectoryId);
           window.history.replaceState(null, "", "/dashboard");
         }}
+        onLoadFile={(path, curriculum) => {
+          setLoaded({ path, curriculum });
+          window.history.replaceState(null, "", "/dashboard");
+        }}
       />
     );
   }
@@ -171,6 +176,9 @@ function TrajectoryDashboard({
 }) {
   const updateActiveTrajectory = useTrajectoryStore(
     (state) => state.updateActiveTrajectory,
+  );
+  const replaceActiveTrajectory = useTrajectoryStore(
+    (state) => state.replaceActiveTrajectory,
   );
   const context = { entry: trajectory.entry, curriculum };
   const history = useHistory<TrajectoryContent>(() => ({
@@ -228,6 +236,11 @@ function TrajectoryDashboard({
     commitContent({ ...history.present, gradingScale: next });
   }
 
+  function importContent(content: ImportedContent) {
+    replaceActiveTrajectory(content);
+    toast.add({ title: "Progreso cargado" });
+  }
+
   function changeSidebarWidth(width: number) {
     setSidebarWidth(width);
     localStorage.setItem(SIDEBAR_WIDTH_KEY, String(width));
@@ -255,6 +268,9 @@ function TrajectoryDashboard({
         onWidthChange={changeSidebarWidth}
         gradingScale={gradingScale}
         onGradingScaleChange={changeGradingScale}
+        trajectory={{ ...trajectory, ...history.present }}
+        curriculum={curriculum}
+        onImport={importContent}
         onReset={resetCurriculum}
       />
 

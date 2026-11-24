@@ -88,6 +88,10 @@ export default function SettingsDialog({
                       setIsOpen(false);
                       settings.onReset();
                     },
+                    onImport: (content) => {
+                      setIsOpen(false);
+                      settings.onImport(content);
+                    },
                     onRemove: () => {
                       setIsOpen(false);
                       settings.onRemove();

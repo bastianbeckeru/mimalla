@@ -12,7 +12,14 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { type ReactNode, useId, useState } from "react";
+import { useId, useState } from "react";
+import BackupSettings from "@/components/dashboard/backup-settings";
+import {
+  LINK_ROW_CLASS,
+  ROW_CLASS,
+  RowText,
+  SettingsGroup,
+} from "@/components/dashboard/settings-layout";
 import KbdHotkey from "@/components/kbd-hotkey";
 import {
   AlertDialog,
@@ -45,7 +52,7 @@ export const SETTINGS_SECTIONS: {
   {
     id: "trajectory",
     label: "Esta malla",
-    summary: "Escala de notas, reiniciar y eliminar",
+    summary: "Escala de notas, respaldo, reiniciar y eliminar",
     icon: GraduationCap,
   },
   {
@@ -115,50 +122,6 @@ const REPORT_URL = `mailto:bastian.becker.u@gmail.com?subject=${encodeURICompone
   `Problema en Mi Malla (v${version})`,
 )}`;
 const RELEASES_URL = "https://github.com/bastianbeckeru/mimalla/releases";
-
-const ROW_CLASS = "flex items-center justify-between gap-4 px-3 py-2.5";
-const LINK_ROW_CLASS = `${ROW_CLASS} outline-none transition-colors hover:bg-muted/50 focus-visible:bg-muted/50`;
-
-function SettingsGroup({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-2">
-      <div>
-        <h3 className="font-heading font-semibold text-sm">{title}</h3>
-        {description && (
-          <p className="text-muted-foreground text-xs">{description}</p>
-        )}
-      </div>
-      <div className="divide-y overflow-hidden rounded-lg border">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function RowText({
-  label,
-  description,
-}: {
-  label: string;
-  description?: string;
-}) {
-  return (
-    <div className="min-w-0 space-y-0.5">
-      <p className="font-medium text-sm">{label}</p>
-      {description && (
-        <p className="text-muted-foreground text-xs">{description}</p>
-      )}
-    </div>
-  );
-}
 
 function GradingScaleGroup({
   gradingScale,
@@ -283,6 +246,9 @@ function TrajectorySection({
   programName,
   gradingScale,
   onGradingScaleChange,
+  trajectory,
+  curriculum,
+  onImport,
   onReset,
   onRemove,
 }: TrajectorySettings) {
@@ -291,6 +257,11 @@ function TrajectorySection({
       <GradingScaleGroup
         gradingScale={gradingScale}
         onGradingScaleChange={onGradingScaleChange}
+      />
+      <BackupSettings
+        trajectory={trajectory}
+        curriculum={curriculum}
+        onImport={onImport}
       />
       <SettingsGroup title="Zona de peligro">
         <DangerRow

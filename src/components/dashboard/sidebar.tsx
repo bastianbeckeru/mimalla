@@ -43,8 +43,10 @@ type DashboardSidebarProps = {
   onWidthChange: (width: number) => void;
   gradingScale: GradingScale;
   onGradingScaleChange: (scale: GradingScale) => void;
-  onReset: () => void;
-};
+} & Pick<
+  TrajectorySettings,
+  "trajectory" | "curriculum" | "onImport" | "onReset"
+>;
 
 const HEADER_CLASS =
   "flex h-14 items-center gap-2 border-sidebar-border border-b px-4";
@@ -124,6 +126,9 @@ export default function DashboardSidebar({
   onWidthChange,
   gradingScale,
   onGradingScaleChange,
+  trajectory,
+  curriculum,
+  onImport,
   onReset,
 }: DashboardSidebarProps) {
   const { isMobile, open, setOpenMobile } = useSidebar();
@@ -143,6 +148,9 @@ export default function DashboardSidebar({
     programName,
     gradingScale,
     onGradingScaleChange,
+    trajectory,
+    curriculum,
+    onImport,
     onReset,
     onRemove: removeActiveTrajectory,
   };
@@ -169,6 +177,10 @@ export default function DashboardSidebar({
                 onReset: () => {
                   setOpenMobile(false);
                   onReset();
+                },
+                onImport: (content) => {
+                  setOpenMobile(false);
+                  onImport(content);
                 },
                 onRemove: () => {
                   setOpenMobile(false);

@@ -236,3 +236,6 @@ _Avoid_: Target grade, needed grade
 The average of the course grades of every approved and failed enrollment of a trajectory, weighted by credits. Each attempt at a course counts.
 _Avoid_: GPA, PPA, global average
 
+**Trajectory file**:
+A trajectory saved as an `.xlsx` workbook, holding its entry, grading scale, enrollments and grading schemes. It is a backup and a way in for grades kept in a spreadsheet: loading it replaces a trajectory, never merges into one. Shown in the UI as "progreso" ("Descargar progreso", "Cargar progreso").
+_Avoid_: Backup file, export, CSV

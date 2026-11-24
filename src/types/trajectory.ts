@@ -64,6 +64,8 @@ export type TrajectoryContent = Pick<
   "enrollments" | "gradingScale"
 >;
 
+export type ImportedContent = Pick<Trajectory, "entry"> & TrajectoryContent;
+
 export type TrajectoryContext = {
   entry: Entry;
   curriculum: Curriculum;
