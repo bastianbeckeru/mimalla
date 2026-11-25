@@ -1,11 +1,11 @@
 import { findCourse } from "@/curriculum/courses";
 import { getFirstFreePosition, pushDownCollisions } from "@/curriculum/grid";
 import type { Draft, ElectiveAction, Handlers } from "@/types/builder";
-import type { Curriculum, Slot } from "@/types/curriculum";
+import type { CourseId, Curriculum, Slot } from "@/types/curriculum";
 
 function withSlots(
   { curriculum }: Draft,
-  courseId: number,
+  courseId: CourseId,
   getSlots: (slots: Slot[]) => Slot[],
 ): Curriculum {
   return {

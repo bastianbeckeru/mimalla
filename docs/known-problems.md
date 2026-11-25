@@ -10,7 +10,7 @@ In the official curriculums of `uch/quimica-y-farmacia_2022.malla` and `uch/quim
 
 ## Courses without a code
 
-Trajectories will reference courses by code, so the catalog will reject courses without one (ADR 0004).
+The catalog accepts courses without a code (ADR 0007), but a curriculum is incomplete until every course has its official code.
 
 | File | Courses without a code |
 | --- | --- |

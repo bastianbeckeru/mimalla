@@ -6,6 +6,7 @@ import {
   getConnectionRole,
   getConnections,
 } from "@/curriculum/connections";
+import { crs } from "@/test/ids";
 import type { Action } from "@/types/builder";
 
 const FIRST_SEMESTER = { programYear: 1, term: 1 };
@@ -22,7 +23,7 @@ function card(
   column: number,
   row = 1,
 ): ConnectionCard {
-  return { id, courseId, column, row, duration: 1, height: 1 };
+  return { id, courseId: crs(courseId), column, row, duration: 1, height: 1 };
 }
 
 function summarize(connections: ReturnType<typeof getConnections>) {
@@ -37,29 +38,44 @@ function summarize(connections: ReturnType<typeof getConnections>) {
 // Course 1 in the first semester, 2 in the second and 3 in the third, where
 // 2 requires 1.
 const chain = curriculumAfter(
-  { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-  { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
-  { type: "addCourse", name: "Nuevo curso", period: THIRD_SEMESTER },
-  { type: "addPrerequisite", courseId: 2, prerequisiteId: 1 },
+  {
+    type: "addCourse",
+    id: crs(1),
+    name: "Nuevo curso",
+    period: FIRST_SEMESTER,
+  },
+  {
+    type: "addCourse",
+    id: crs(2),
+    name: "Nuevo curso",
+    period: SECOND_SEMESTER,
+  },
+  {
+    type: "addCourse",
+    id: crs(3),
+    name: "Nuevo curso",
+    period: THIRD_SEMESTER,
+  },
+  { type: "addPrerequisite", courseId: crs(2), prerequisiteId: crs(1) },
 );
 const chainCards = [card("1/0", 1, 1), card("2/0", 2, 2), card("3/0", 3, 3)];
 
 describe("connections of a course", () => {
   test("lead into it from its prerequisites", () => {
-    expect(summarize(getConnections(chain, chainCards, 2))).toEqual([
+    expect(summarize(getConnections(chain, chainCards, crs(2)))).toEqual([
       { kind: "prerequisite", isMisplaced: false, from: "1/0", to: "2/0" },
     ]);
   });
 
   test("lead out of it into its successors", () => {
-    expect(summarize(getConnections(chain, chainCards, 1))).toEqual([
+    expect(summarize(getConnections(chain, chainCards, crs(1)))).toEqual([
       { kind: "successor", isMisplaced: false, from: "1/0", to: "2/0" },
     ]);
   });
 
   test("are the same link whichever end is focused", () => {
-    const [intoCourse] = getConnections(chain, chainCards, 2);
-    const [outOfPrerequisite] = getConnections(chain, chainCards, 1);
+    const [intoCourse] = getConnections(chain, chainCards, crs(2));
+    const [outOfPrerequisite] = getConnections(chain, chainCards, crs(1));
 
     expect(intoCourse?.id).toBe(outOfPrerequisite?.id ?? "");
   });
@@ -67,7 +83,7 @@ describe("connections of a course", () => {
   test("are misplaced when the prerequisite does not end before the course", () => {
     const cards = [card("1/0", 1, 2), card("2/0", 2, 2, 2), card("3/0", 3, 3)];
 
-    expect(summarize(getConnections(chain, cards, 2))).toEqual([
+    expect(summarize(getConnections(chain, cards, crs(2)))).toEqual([
       { kind: "prerequisite", isMisplaced: true, from: "1/0", to: "2/0" },
     ]);
   });
@@ -80,7 +96,7 @@ describe("connections of a course", () => {
       card("3/0", 3, 2),
     ];
 
-    expect(summarize(getConnections(chain, cards, 2))).toEqual([
+    expect(summarize(getConnections(chain, cards, crs(2)))).toEqual([
       { kind: "prerequisite", isMisplaced: false, from: "1/1", to: "2/0" },
     ]);
   });
@@ -93,42 +109,52 @@ describe("connections of a course", () => {
       card("3/0", 3, 4),
     ];
 
-    expect(summarize(getConnections(chain, cards, 2))).toEqual([
+    expect(summarize(getConnections(chain, cards, crs(2)))).toEqual([
       { kind: "prerequisite", isMisplaced: false, from: "1/0", to: "2/0" },
       { kind: "prerequisite", isMisplaced: false, from: "1/0", to: "2/1" },
     ]);
   });
 
   test("are none for a course that is not in the curriculum", () => {
-    expect(getConnections(chain, chainCards, 99)).toEqual([]);
+    expect(getConnections(chain, chainCards, crs(99))).toEqual([]);
   });
 });
 
 describe("the role of a course toward the focused one", () => {
   test("is none while no course is focused", () => {
-    expect(getConnectionRole(chain, null, 1)).toBeNull();
+    expect(getConnectionRole(chain, null, crs(1))).toBeNull();
   });
 
   test("tells the focused course, its connections and the rest apart", () => {
-    expect([1, 2, 3].map((id) => getConnectionRole(chain, 2, id))).toEqual([
-      "related",
-      "focused",
-      "unrelated",
-    ]);
+    expect(
+      [crs(1), crs(2), crs(3)].map((id) =>
+        getConnectionRole(chain, crs(2), id),
+      ),
+    ).toEqual(["related", "focused", "unrelated"]);
   });
 
   test("is misplaced from either end of a misplaced prerequisite", () => {
     const curriculum = curriculumAfter(
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: SECOND_SEMESTER },
-      { type: "addPrerequisite", courseId: 1, prerequisiteId: 2 },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: SECOND_SEMESTER,
+      },
+      { type: "addPrerequisite", courseId: crs(1), prerequisiteId: crs(2) },
     );
 
-    expect(getConnectionRole(curriculum, 1, 2)).toBe("misplaced");
-    expect(getConnectionRole(curriculum, 2, 1)).toBe("misplaced");
+    expect(getConnectionRole(curriculum, crs(1), crs(2))).toBe("misplaced");
+    expect(getConnectionRole(curriculum, crs(2), crs(1))).toBe("misplaced");
   });
 
   test("is none when the focused course is no longer in the curriculum", () => {
-    expect(getConnectionRole(chain, 99, 1)).toBeNull();
+    expect(getConnectionRole(chain, crs(99), crs(1))).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { crs } from "@/test/ids";
 import {
   getMoveConflict,
   MAX_ENROLLMENTS_PER_PERIOD,
@@ -18,10 +19,10 @@ describe("moveEnrollment", () => {
     entry,
     curriculum: curriculumOf([
       course(1),
-      course(2, { prerequisiteIds: [1] }),
-      course(3, { prerequisiteIds: [2] }),
+      course(2, { prerequisiteIds: [crs(1)] }),
+      course(3, { prerequisiteIds: [crs(2)] }),
       course(4),
-      course(5, { prerequisiteIds: [1], duration: 2 }),
+      course(5, { prerequisiteIds: [crs(1)], duration: 2 }),
       course(9, { isElective: true }),
     ]),
   };
@@ -63,8 +64,8 @@ describe("moveEnrollment", () => {
     );
 
     expect(result.enrollments?.map((e) => [e.courseId, e.position])).toEqual([
-      [1, 2],
-      [4, 1],
+      [crs(1), 2],
+      [crs(4), 1],
     ]);
   });
 
@@ -189,8 +190,8 @@ describe("getMoveConflict", () => {
     entry,
     curriculum: curriculumOf([
       course(1),
-      course(2, { prerequisiteIds: [1] }),
-      course(3, { prerequisiteIds: [2] }),
+      course(2, { prerequisiteIds: [crs(1)] }),
+      course(3, { prerequisiteIds: [crs(2)] }),
       course(9, { isElective: true }),
     ]),
   };

@@ -12,14 +12,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Action } from "@/types/builder";
-import type { Area, Course } from "@/types/curriculum";
+import type { Area, AreaId, Course } from "@/types/curriculum";
 
 const NO_AREA_LABEL = "Sin área";
 
 function AreaDot({ color }: { color?: string }) {
   return (
     <span
-      className="size-2.5 shrink-0 rounded-[3px] bg-muted ring-1 ring-foreground/15"
+      className="bg-muted ring-foreground/15 size-2.5 shrink-0 rounded-[3px] ring-1"
       style={color ? { backgroundColor: color } : undefined}
     />
   );
@@ -45,7 +45,7 @@ export default function AreaSelect({
       <Select
         items={items}
         value={course.areaId}
-        onValueChange={(areaId: number | null) =>
+        onValueChange={(areaId: AreaId | null) =>
           dispatch({ type: "assignArea", courseId: course.id, areaId })
         }
       >

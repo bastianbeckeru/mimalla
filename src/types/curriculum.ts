@@ -1,6 +1,6 @@
 import type { HexColor } from "@/types/colors";
 
-export type TermSystem = "semester" | "annual";
+export type TermSystem = "semester" | "trimester" | "annual";
 
 export type Period = {
   programYear: number;
@@ -11,22 +11,27 @@ export type Slot = Period & {
   position: number;
 };
 
+// Ids are stable: they are kept through every edit, export and load (ADR 0007).
+export type CourseId = `crs_${string}`;
+export type AreaId = `are_${string}`;
+export type TrackId = `trk_${string}`;
+
 export type Course = {
-  id: number;
+  id: CourseId;
   name: string;
   code: string;
   credits: number;
-  areaId: number | null;
-  trackIds: number[];
+  areaId: AreaId | null;
+  trackIds: TrackId[];
   duration: number;
-  prerequisiteIds: number[];
+  prerequisiteIds: CourseId[];
   prerequisiteCredits: number;
   isElective: boolean;
   slots: Slot[];
 };
 
 export type Area = {
-  id: number;
+  id: AreaId;
   name: string;
   color: HexColor;
 };
@@ -39,7 +44,7 @@ export type CredentialType =
   | "mention";
 
 export type Track = {
-  id: number;
+  id: TrackId;
   name: string;
   credentialType: CredentialType | null;
 };
@@ -101,5 +106,5 @@ export type CatalogInstitution = Institution & {
 };
 
 export type ExtendedCourse = Course & {
-  successorIds: number[];
+  successorIds: CourseId[];
 };

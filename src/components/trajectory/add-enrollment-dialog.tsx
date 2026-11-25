@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Course } from "@/types/curriculum";
+import type { Course, CourseId } from "@/types/curriculum";
 import type { Placement } from "@/types/trajectory";
 
 export default function AddEnrollmentDialog({
@@ -35,7 +35,9 @@ export default function AddEnrollmentDialog({
   onOpenChange: (open: boolean) => void;
   onAdd: (placement: Placement, course: Course) => void;
 }) {
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<CourseId | null>(
+    null,
+  );
   const courseOptions = courses.map((c) => ({ value: c.id, label: c.name }));
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
 
@@ -56,7 +58,9 @@ export default function AddEnrollmentDialog({
           <Select
             items={courseOptions}
             value={selectedCourseId}
-            onValueChange={(value: number | null) => setSelectedCourseId(value)}
+            onValueChange={(value: CourseId | null) =>
+              setSelectedCourseId(value)
+            }
           >
             <SelectTrigger aria-label="Curso" className="w-full">
               <SelectValue placeholder="Selecciona un curso" />

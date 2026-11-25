@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Action } from "@/types/builder";
-import type { Course, Track } from "@/types/curriculum";
+import type { Course, Track, TrackId } from "@/types/curriculum";
 
 const NO_TRACK_LABEL = "Sin plan";
 
@@ -38,7 +38,7 @@ export default function TrackSelect({
         items={tracks.map((track) => ({ value: track.id, label: track.name }))}
         value={course.trackIds}
         disabled={tracks.length === 0}
-        onValueChange={(trackIds: number[]) =>
+        onValueChange={(trackIds: TrackId[]) =>
           dispatch({ type: "assignTracks", courseId: course.id, trackIds })
         }
       >

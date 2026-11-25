@@ -2,11 +2,13 @@ import { nanoid } from "nanoid";
 import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import legacyCourseIds from "@/stores/legacy-course-ids.json";
 import { LEGACY_CURRICULUMS } from "@/stores/legacy-curriculums";
-import type { Curriculum } from "@/types/curriculum";
+import type { CourseId, Curriculum } from "@/types/curriculum";
 import type {
   Enrollment,
   Entry,
+  ImportedContent,
   Trajectory,
   TrajectoryContent,
 } from "@/types/trajectory";
@@ -25,13 +27,25 @@ type TrajectoryActions = {
     entry: Entry;
     curriculum: Curriculum;
   }) => void;
+  addImportedTrajectory: (trajectory: ImportedTrajectory) => void;
+  replaceActiveTrajectory: (content: ImportedContent) => void;
   removeActiveTrajectory: () => void;
   updateActiveTrajectory: (content: TrajectoryContent) => void;
 };
 
-// Before version 4, trajectories had no grading scale.
-type PersistedTrajectory = Omit<Trajectory, "gradingScale"> &
-  Partial<Pick<Trajectory, "gradingScale">>;
+type ImportedTrajectory = Pick<Trajectory, "curriculumPath"> & ImportedContent;
+
+// Before version 4, trajectories had no grading scale, and before version 5
+// enrollments referenced courses by the number the curriculum file gave them.
+type PersistedTrajectory = Omit<Trajectory, "gradingScale" | "enrollments"> &
+  Partial<Pick<Trajectory, "gradingScale">> & {
+    enrollments: (Omit<Enrollment, "courseId"> & { courseId: number })[];
+  };
+
+// The stable id each course got when the catalog's curriculum files moved to
+// version 2, by curriculum path and the course's number in version 1.
+const LEGACY_COURSE_IDS: Record<string, Record<string, CourseId> | undefined> =
+  legacyCourseIds as Record<string, Record<string, CourseId>>;
 
 type PersistedStateV1 = {
   curriculums: {
@@ -39,7 +53,7 @@ type PersistedStateV1 = {
     path: string;
     year: number;
     term: number;
-    enrolledCourses: Enrollment[];
+    enrolledCourses: PersistedTrajectory["enrollments"];
   }[];
   activeCurriculumId: string | null;
 };
@@ -86,6 +100,21 @@ function migrateToCurriculumFile(
   };
 }
 
+function migrateToStableCourseIds({
+  enrollments,
+  ...trajectory
+}: PersistedTrajectory): Omit<Trajectory, "gradingScale"> &
+  Partial<Pick<Trajectory, "gradingScale">> {
+  const courseIds = LEGACY_COURSE_IDS[trajectory.curriculumPath] ?? {};
+  return {
+    ...trajectory,
+    enrollments: enrollments.flatMap((enrollment) => {
+      const courseId = courseIds[enrollment.courseId];
+      return courseId === undefined ? [] : [{ ...enrollment, courseId }];
+    }),
+  };
+}
+
 export function migrateTrajectoryState(
   persistedState: unknown,
   version: number,
@@ -102,7 +131,9 @@ export function migrateTrajectoryState(
     ...state,
     trajectories: state.trajectories.map((trajectory) => ({
       gradingScale: DEFAULT_GRADING_SCALE,
-      ...migrateToCurriculumFile(trajectory),
+      ...(version < 5
+        ? migrateToStableCourseIds(migrateToCurriculumFile(trajectory))
+        : (trajectory as unknown as Trajectory)),
     })),
   };
 }
@@ -129,6 +160,25 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
           };
         }),
 
+      addImportedTrajectory: (imported) =>
+        set((state) => {
+          const trajectory = { id: nanoid(), ...imported };
+          return {
+            trajectories: [...state.trajectories, trajectory],
+            activeTrajectoryId: trajectory.id,
+          };
+        }),
+      replaceActiveTrajectory: (imported) =>
+        set((state) => {
+          const id = nanoid();
+          return {
+            trajectories: state.trajectories.map((t) =>
+              t.id === state.activeTrajectoryId ? { ...t, ...imported, id } : t,
+            ),
+            activeTrajectoryId: id,
+          };
+        }),
+
       removeActiveTrajectory: () =>
         set((state) => {
           const trajectories = state.trajectories.filter(
@@ -150,7 +200,7 @@ export const useTrajectoryStore = create<TrajectoryState & TrajectoryActions>()(
     }),
     {
       name: "curriculum-storage",
-      version: 4,
+      version: 5,
       migrate: migrateTrajectoryState,
     },
   ),

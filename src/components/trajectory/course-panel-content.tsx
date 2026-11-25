@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
-import type { Course, Curriculum } from "@/types/curriculum";
+import type { Course, CourseId, Curriculum } from "@/types/curriculum";
 import type {
   Enrollment,
   EnrollmentStatus,
@@ -93,8 +93,8 @@ type PanelContentProps = {
   gradingScale: GradingScale;
   schemeSource: SchemeSource | null;
   isAvailable: boolean;
-  canOpenCourse: (courseId: number) => boolean;
-  onOpenCourse: (courseId: number) => void;
+  canOpenCourse: (courseId: CourseId) => boolean;
+  onOpenCourse: (courseId: CourseId) => void;
   onSetStatus: (status: EnrollmentStatus) => void;
   onGradesChange: (grades: GradesChange) => void;
   onRetake: (() => void) | null;
@@ -146,7 +146,7 @@ export default function CoursePanelContent({
         <div className="flex items-start gap-1.5">
           <Title
             className={cn(
-              "min-w-0 flex-1 font-heading font-semibold text-foreground text-lg leading-snug",
+              "font-heading text-foreground min-w-0 flex-1 text-lg leading-snug font-semibold",
               isPeek && "truncate",
             )}
           >
@@ -155,7 +155,7 @@ export default function CoursePanelContent({
           {isPeek && shownGrade !== null && (
             <span
               className={cn(
-                "shrink-0 px-1 font-heading font-semibold text-lg tabular-nums",
+                "font-heading shrink-0 px-1 text-lg font-semibold tabular-nums",
                 courseGrade !== null &&
                   (courseGrade >= scale.passing
                     ? "text-success"
@@ -172,7 +172,7 @@ export default function CoursePanelContent({
                   variant="ghost"
                   size="icon-sm"
                   aria-label="Más acciones"
-                  className="shrink-0 text-muted-foreground"
+                  className="text-muted-foreground shrink-0"
                 />
               }
             >
@@ -190,14 +190,14 @@ export default function CoursePanelContent({
               variant="ghost"
               size="icon-sm"
               aria-label="Cerrar"
-              className="shrink-0 text-muted-foreground"
+              className="text-muted-foreground shrink-0"
               onClick={onClose}
             >
               <X />
             </Button>
           )}
         </div>
-        <Description className="truncate text-muted-foreground text-xs">
+        <Description className="text-muted-foreground truncate text-xs">
           {[
             course.code,
             `${course.credits} ${course.credits === 1 ? "crédito" : "créditos"}`,
@@ -211,7 +211,7 @@ export default function CoursePanelContent({
       </div>
       <div className="flex flex-wrap items-center gap-2 pr-2">
         {isLocked ? (
-          <p className="flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-muted px-2.5 text-muted-foreground text-xs">
+          <p className="bg-muted text-muted-foreground flex h-9 min-w-0 flex-1 items-center gap-1.5 rounded-lg px-2.5 text-xs">
             <Lock className="size-3 shrink-0" />
             <span className="truncate">
               Bloqueado · {getMissingLabel(prerequisites)}
@@ -256,18 +256,18 @@ export default function CoursePanelContent({
   const summary = (
     <div
       className={cn(
-        "flex shrink-0 flex-row flex-wrap items-center gap-0 bg-muted/50 py-3 pr-4 pl-5",
+        "bg-muted/50 flex shrink-0 flex-row flex-wrap items-center gap-0 py-3 pr-4 pl-5",
         isDrawer ? "border-y" : "border-t",
       )}
     >
       {isLocked ? (
         <>
-          <p className="flex min-w-0 flex-1 items-center gap-2 pr-2 text-muted-foreground text-sm">
+          <p className="text-muted-foreground flex min-w-0 flex-1 items-center gap-2 pr-2 text-sm">
             <Lock className="size-3.5 shrink-0" />
             {getLockedHint(prerequisites)}
           </p>
           {shownGrade !== null && (
-            <span className="shrink-0 px-2 font-heading font-semibold text-3xl text-muted-foreground tabular-nums">
+            <span className="font-heading text-muted-foreground shrink-0 px-2 text-3xl font-semibold tabular-nums">
               {formatGrade(roundGrade(shownGrade))}
             </span>
           )}

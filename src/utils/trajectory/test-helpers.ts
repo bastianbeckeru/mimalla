@@ -1,10 +1,21 @@
-import type { Course, Curriculum, PeriodKey, Slot } from "@/types/curriculum";
+import { crs } from "@/test/ids";
+import type {
+  Course,
+  CourseId,
+  Curriculum,
+  PeriodKey,
+  Slot,
+} from "@/types/curriculum";
 import type { Enrollment, EnrollmentStatus } from "@/types/trajectory";
+
+function courseNumber(id: CourseId) {
+  return Number(id.slice("crs_".length));
+}
 
 export function course(
   id: number,
   {
-    prerequisiteIds = [] as number[],
+    prerequisiteIds = [] as CourseId[],
     isElective = false,
     slots = [] as Slot[],
     credits = 6,
@@ -12,7 +23,7 @@ export function course(
   } = {},
 ): Course {
   return {
-    id,
+    id: crs(id),
     code: `C${id}`,
     name: `Course ${id}`,
     credits,
@@ -49,16 +60,16 @@ export function trajectory(
   return Object.entries(layout).flatMap(([period, courseIds]) => {
     const [year = 0, term = 0] = period.split("-").map(Number);
 
-    return courseIds.map((courseId, index) => ({
+    return courseIds.map((n, index) => ({
       id:
-        courseIds.indexOf(courseId) === index
-          ? `${period}/${courseId}`
-          : `${period}/${courseId}/${index}`,
-      courseId,
+        courseIds.indexOf(n) === index
+          ? `${period}/${n}`
+          : `${period}/${n}/${index}`,
+      courseId: crs(n),
       year,
       term,
       position: index + 1,
-      status: statuses[courseId] ?? "PENDING",
+      status: statuses[n] ?? "PENDING",
     }));
   });
 }
@@ -70,7 +81,7 @@ export function layoutOf(enrollments: Enrollment[] | undefined) {
   ))
     layout[`${e.year}-${e.term}`] = [
       ...(layout[`${e.year}-${e.term}`] ?? []),
-      e.courseId,
+      courseNumber(e.courseId),
     ];
   return layout;
 }

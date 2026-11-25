@@ -27,14 +27,14 @@ export default function Logo({ alwaysShow = false, className }: LogoProps) {
     <Link
       href="/"
       className={cn(
-        "flex flex-row items-center gap-2 pr-2 transition-colors hover:text-muted-foreground",
+        "hover:text-muted-foreground flex flex-row items-center gap-2 pr-2 transition-colors",
         className,
       )}
     >
       <LogoMark className="size-8" />
       <span
         className={cn(
-          "hidden font-semibold text-lg sm:inline-block",
+          "hidden text-lg font-semibold sm:inline-block",
           alwaysShow && "inline-block",
         )}
       >

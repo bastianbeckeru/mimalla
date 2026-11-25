@@ -1,18 +1,14 @@
 import type { Draft, Handlers, TrackAction } from "@/types/builder";
-import type { Track } from "@/types/curriculum";
+import type { Track, TrackId } from "@/types/curriculum";
 
-function nextTrackId(draft: Draft) {
-  return Math.max(0, ...draft.curriculum.tracks.map((track) => track.id)) + 1;
-}
-
-function hasTrack(draft: Draft, trackId: number) {
+function hasTrack(draft: Draft, trackId: TrackId) {
   return draft.curriculum.tracks.some((track) => track.id === trackId);
 }
 
 export const trackHandlers: Handlers<TrackAction> = {
-  addTrack: (draft, { name }) => {
+  addTrack: (draft, { id, name }) => {
     const { curriculum } = draft;
-    const track: Track = { id: nextTrackId(draft), name, credentialType: null };
+    const track: Track = { id, name, credentialType: null };
     return {
       ...draft,
       curriculum: { ...curriculum, tracks: [...curriculum.tracks, track] },
@@ -53,9 +49,11 @@ export const trackHandlers: Handlers<TrackAction> = {
 
   assignTracks: (draft, { courseId, trackIds }) => {
     const { curriculum } = draft;
+    const trackIndex = (trackId: TrackId) =>
+      curriculum.tracks.findIndex((track) => track.id === trackId);
     const assigned = [
       ...new Set(trackIds.filter((trackId) => hasTrack(draft, trackId))),
-    ].toSorted((a, b) => a - b);
+    ].toSorted((a, b) => trackIndex(a) - trackIndex(b));
     return {
       ...draft,
       curriculum: {

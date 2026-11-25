@@ -13,7 +13,7 @@ function FloatingCard({
   return (
     <div
       className={cn(
-        "rounded-[18px] border bg-card shadow-black/10 shadow-lg dark:shadow-black/40",
+        "bg-card rounded-[18px] border shadow-lg shadow-black/10 dark:shadow-black/40",
         className,
       )}
     >
@@ -75,7 +75,7 @@ function ProgressRing({
         x="42"
         y="48"
         textAnchor="middle"
-        className="fill-foreground font-bold text-lg"
+        className="fill-foreground text-lg font-bold"
       >
         {percent}%
       </text>
@@ -87,12 +87,12 @@ function StickyNote({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xs bg-blue-100 px-5 py-5.5 shadow-black/25 shadow-lg dark:bg-blue-950",
+        "flex flex-col gap-3 rounded-xs bg-blue-100 px-5 py-5.5 shadow-lg shadow-black/25 dark:bg-blue-950",
         className,
       )}
     >
       <span className="size-3 self-center rounded-full bg-blue-600" />
-      <p className="font-medium italic leading-snug">
+      <p className="leading-snug font-medium italic">
         Ojo: para tomar Cálculo II necesitas Cálculo I aprobado.
       </p>
     </div>
@@ -102,7 +102,7 @@ function StickyNote({ className }: { className?: string }) {
 function SemesterCard({ className }: { className?: string }) {
   return (
     <FloatingCard className={cn("flex flex-col gap-3 p-4.5", className)}>
-      <span className="font-semibold text-[15px]">Este semestre</span>
+      <span className="text-[15px] font-semibold">Este semestre</span>
       <ul className="flex flex-col gap-2 text-sm">
         {[
           { name: "Álgebra Lineal", checked: true },
@@ -128,11 +128,11 @@ const features = [
     description: "Toca un curso y ve qué necesita y qué desbloquea.",
     preview: (
       <div className="flex items-center gap-2.5">
-        <FloatingCard className="rounded-xl px-3.5 py-2.5 font-semibold text-[13px]">
+        <FloatingCard className="rounded-xl px-3.5 py-2.5 text-[13px] font-semibold">
           Mecánica
         </FloatingCard>
         <ArrowRight className="size-5 text-neutral-400 dark:text-neutral-600" />
-        <FloatingCard className="rounded-xl border-dashed px-3.5 py-2.5 font-semibold text-[13px] text-muted-foreground">
+        <FloatingCard className="text-muted-foreground rounded-xl border-dashed px-3.5 py-2.5 text-[13px] font-semibold">
           Termodinámica
         </FloatingCard>
       </div>
@@ -145,18 +145,18 @@ const features = [
     preview: (
       <div className="flex gap-3">
         <div className="flex w-24 flex-col gap-1.5">
-          <span className="font-semibold text-[11px] text-muted-foreground">
+          <span className="text-muted-foreground text-[11px] font-semibold">
             SEM 3
           </span>
           <FloatingCard className="h-7.5 rounded-lg" />
-          <div className="h-7.5 rounded-lg border-[1.5px] border-blue-500 border-dashed" />
+          <div className="h-7.5 rounded-lg border-[1.5px] border-dashed border-blue-500" />
         </div>
         <div className="flex w-24 flex-col gap-1.5">
-          <span className="font-semibold text-[11px] text-muted-foreground">
+          <span className="text-muted-foreground text-[11px] font-semibold">
             SEM 4
           </span>
           <FloatingCard className="h-7.5 rounded-lg" />
-          <FloatingCard className="flex h-7.5 -translate-x-2 -translate-y-1 -rotate-5 items-center rounded-lg border-blue-500 px-2 font-semibold text-[11px]">
+          <FloatingCard className="flex h-7.5 -translate-x-2 -translate-y-1 -rotate-5 items-center rounded-lg border-blue-500 px-2 text-[11px] font-semibold">
             Mecánica
           </FloatingCard>
         </div>
@@ -174,7 +174,7 @@ const features = [
             38%
           </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-muted">
+        <div className="bg-muted h-2 overflow-hidden rounded-full">
           <div className="h-full w-[38%] rounded-full bg-blue-600" />
         </div>
         <span className="text-muted-foreground text-xs">
@@ -201,17 +201,17 @@ export default function IndexPage() {
   return (
     <main>
       <section className="px-2.5 sm:px-3">
-        <div className="mx-auto flex max-w-314 flex-wrap items-center justify-center gap-9 rounded-3xl border bg-grid bg-neutral-50 px-4.5 pt-10 pb-8 sm:gap-8 sm:rounded-[28px] sm:px-[clamp(1rem,3vw,2.5rem)] sm:py-[clamp(1.75rem,5vw,4rem)] dark:bg-neutral-900/40">
+        <div className="bg-grid mx-auto flex max-w-314 flex-wrap items-center justify-center gap-9 rounded-3xl border bg-neutral-50 px-4.5 pt-10 pb-8 sm:gap-8 sm:rounded-[28px] sm:px-[clamp(1rem,3vw,2.5rem)] sm:py-[clamp(1.75rem,5vw,4rem)] dark:bg-neutral-900/40">
           <div className="order-1 flex min-w-0 flex-[1_1_30rem] flex-col items-center gap-4.5 text-center sm:gap-5.5 sm:py-6">
             <Doodle
               name="meditating"
               className="-mb-2 w-45 sm:-mb-2.5 sm:w-57.5"
             />
-            <h1 className="font-semibold text-[clamp(2.75rem,5.6vw,4.25rem)] leading-[1.04] tracking-[-0.035em]">
+            <h1 className="text-[clamp(2.75rem,5.6vw,4.25rem)] leading-[1.04] font-semibold tracking-[-0.035em]">
               Planifica, avanza
               <br />y respira
             </h1>
-            <p className="max-w-75 text-base text-muted-foreground leading-relaxed sm:max-w-110 sm:text-[17px]">
+            <p className="text-muted-foreground max-w-75 text-base leading-relaxed sm:max-w-110 sm:text-[17px]">
               Ve qué cursos llevas, cuáles te bloquean y cuánto te falta.
             </p>
             <LandingButton
@@ -227,11 +227,11 @@ export default function IndexPage() {
           >
             <div className="grid grid-cols-2 items-start gap-3.5">
               <FloatingCard className="flex -rotate-3 flex-col gap-2.5 rounded-2xl p-3.5">
-                <span className="font-semibold text-[13px]">Tu avance</span>
+                <span className="text-[13px] font-semibold">Tu avance</span>
                 <div className="flex items-center gap-2.5">
                   <ProgressRing percent={38} className="size-14" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-[17px] tracking-tight">
+                    <span className="text-[17px] font-bold tracking-tight">
                       18/48
                     </span>
                     <span className="text-muted-foreground text-xs">
@@ -258,21 +258,21 @@ export default function IndexPage() {
             className="order-2 hidden min-w-0 flex-[0_1_16.25rem] flex-col gap-7 sm:flex"
           >
             <FloatingCard className="flex rotate-3 flex-col gap-3.5 p-5">
-              <span className="font-semibold text-[15px]">Tu avance</span>
+              <span className="text-[15px] font-semibold">Tu avance</span>
               <div className="flex items-center gap-4">
                 <ProgressRing percent={38} />
                 <div className="flex flex-col gap-0.5">
-                  <span className="font-bold text-[22px] tracking-tight">
+                  <span className="text-[22px] font-bold tracking-tight">
                     18 de 48
                   </span>
-                  <span className="text-[13px] text-muted-foreground">
+                  <span className="text-muted-foreground text-[13px]">
                     cursos aprobados
                   </span>
                 </div>
               </div>
             </FloatingCard>
             <FloatingCard className="flex -rotate-2 flex-col gap-3 p-4.5">
-              <span className="font-semibold text-[15px]">Prerrequisitos</span>
+              <span className="text-[15px] font-semibold">Prerrequisitos</span>
               <div className="flex flex-col gap-1.5 text-sm">
                 <div className="flex items-center justify-between rounded-[10px] bg-blue-600 px-3 py-2.25 font-semibold text-white">
                   Cálculo I
@@ -283,7 +283,7 @@ export default function IndexPage() {
                   Cálculo II · disponible
                 </div>
                 <ArrowDown className="size-3.5 self-center text-neutral-400 dark:text-neutral-600" />
-                <div className="flex items-center justify-between rounded-[10px] border border-neutral-400 border-dashed px-3 py-2.25 text-muted-foreground dark:border-neutral-600">
+                <div className="text-muted-foreground flex items-center justify-between rounded-[10px] border border-dashed border-neutral-400 px-3 py-2.25 dark:border-neutral-600">
                   Cálculo III
                   <Lock className="size-3.5" />
                 </div>
@@ -298,10 +298,10 @@ export default function IndexPage() {
         className="mx-auto flex max-w-300 flex-col gap-8 px-4 pt-18 pb-16 sm:gap-12 sm:px-6 sm:pt-26 sm:pb-24"
       >
         <div className="flex flex-col items-center gap-2.5 text-center sm:gap-3">
-          <span className="font-semibold text-blue-700 text-sm dark:text-blue-300">
+          <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
             Funciones
           </span>
-          <h2 className="font-semibold text-[clamp(1.875rem,4vw,2.875rem)] leading-[1.1] tracking-[-0.03em]">
+          <h2 className="text-[clamp(1.875rem,4vw,2.875rem)] leading-[1.1] font-semibold tracking-[-0.03em]">
             Todo lo que necesitas.
             <br />
             <span className="text-neutral-400 dark:text-neutral-500">
@@ -317,15 +317,15 @@ export default function IndexPage() {
             >
               <div
                 aria-hidden="true"
-                className="flex h-35 items-center justify-center bg-grid bg-neutral-50 p-4 sm:h-45 sm:p-5 dark:bg-neutral-900/40"
+                className="bg-grid flex h-35 items-center justify-center bg-neutral-50 p-4 sm:h-45 sm:p-5 dark:bg-neutral-900/40"
               >
                 {feature.preview}
               </div>
               <div className="flex flex-col gap-1.5 p-5 sm:gap-2 sm:p-6">
-                <h3 className="font-semibold text-lg sm:text-xl">
+                <h3 className="text-lg font-semibold sm:text-xl">
                   {feature.title}
                 </h3>
-                <p className="text-[15px] text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground text-[15px] leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -335,13 +335,13 @@ export default function IndexPage() {
       </section>
 
       <section className="mx-auto max-w-300 px-2.5 pb-14 sm:px-6 sm:pb-24">
-        <div className="flex flex-col items-center gap-4.5 rounded-3xl border bg-grid bg-neutral-50 px-4.5 py-12 text-center sm:gap-6 sm:rounded-[28px] sm:px-[clamp(1.25rem,4vw,3.5rem)] sm:py-[clamp(3rem,7vw,6rem)] dark:bg-neutral-900/40">
+        <div className="bg-grid flex flex-col items-center gap-4.5 rounded-3xl border bg-neutral-50 px-4.5 py-12 text-center sm:gap-6 sm:rounded-[28px] sm:px-[clamp(1.25rem,4vw,3.5rem)] sm:py-[clamp(3rem,7vw,6rem)] dark:bg-neutral-900/40">
           <Doodle name="chilling" className="-mb-1.5 w-47.5 sm:-mb-2 sm:w-60" />
-          <h2 className="font-semibold text-[clamp(2.125rem,4.6vw,3.375rem)] leading-[1.06] tracking-[-0.035em]">
+          <h2 className="text-[clamp(2.125rem,4.6vw,3.375rem)] leading-[1.06] font-semibold tracking-[-0.035em]">
             Sin cuenta. <br className="sm:hidden" />
             Sin correos.
           </h2>
-          <p className="max-w-75 text-base text-muted-foreground leading-relaxed sm:max-w-115 sm:text-[17px]">
+          <p className="text-muted-foreground max-w-75 text-base leading-relaxed sm:max-w-115 sm:text-[17px]">
             Todo se guarda en tu navegador. Abres la página y empiezas, así de
             simple.
           </p>

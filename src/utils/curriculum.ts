@@ -1,11 +1,12 @@
 import type {
   CatalogInstitution,
   Course,
+  CourseId,
   ExtendedCourse,
 } from "@/types/curriculum";
 
 export function extendCourses(courses: Course[]) {
-  const successorIds = new Map<number, number[]>();
+  const successorIds = new Map<CourseId, CourseId[]>();
 
   for (const course of courses) {
     for (const prerequisiteId of course.prerequisiteIds) {
@@ -16,7 +17,7 @@ export function extendCourses(courses: Course[]) {
     }
   }
 
-  return new Map<number, ExtendedCourse>(
+  return new Map<CourseId, ExtendedCourse>(
     courses.map((course) => [
       course.id,
       { ...course, successorIds: successorIds.get(course.id) ?? [] },

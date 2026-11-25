@@ -4,19 +4,15 @@ import {
   toLowerCaseHexColor,
 } from "@/curriculum/colors";
 import type { AreaAction, Draft, Handlers } from "@/types/builder";
-import type { Area } from "@/types/curriculum";
+import type { Area, AreaId } from "@/types/curriculum";
 
-function nextAreaId(draft: Draft) {
-  return Math.max(0, ...draft.curriculum.areas.map((area) => area.id)) + 1;
-}
-
-function hasArea(draft: Draft, areaId: number) {
+function hasArea(draft: Draft, areaId: AreaId) {
   return draft.curriculum.areas.some((area) => area.id === areaId);
 }
 
 function updateArea(
   draft: Draft,
-  areaId: number,
+  areaId: AreaId,
   update: (area: Area) => Area,
 ): Draft {
   const { curriculum } = draft;
@@ -32,10 +28,10 @@ function updateArea(
 }
 
 export const areaHandlers: Handlers<AreaAction> = {
-  addArea: (draft, { name }) => {
+  addArea: (draft, { id, name }) => {
     const { curriculum } = draft;
     const area = {
-      id: nextAreaId(draft),
+      id,
       name,
       color: getAreaShade(draft.baseColor, curriculum.areas.length),
     };

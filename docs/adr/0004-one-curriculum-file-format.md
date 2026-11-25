@@ -13,6 +13,6 @@ A curriculum travels in one format, the `.malla` curriculum file: the builder do
 
 ## Consequences
 
-- Until ADR 0001 is implemented there is no database: the catalog reads the curriculum files at build time and keeps program data in `src/server/db/programs.ts`.
+- Until ADR 0005 is implemented there is no database: the catalog reads the curriculum files at build time and keeps program data in `src/server/db/programs.ts`.
 - What the catalog format carried and the curriculum file lacks is dropped on purpose: program statistics (costly to keep current and rarely used), course descriptions (PDFs do not carry them), the courses that can fill an elective (they change every term), subareas, and nested tracks.
-- The curriculum file allows courses without a code, but the catalog rejects them on import, because trajectories reference courses by code.
+- The curriculum file allows courses without a code. This ADR made the catalog reject them, because trajectories would reference courses by code; ADR 0007 reverses that, since trajectories reference courses by a stable id.

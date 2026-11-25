@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { isExportable } from "@/curriculum/export";
+import { crs } from "@/test/ids";
 import type { Action } from "@/types/builder";
 
 describe("curriculum details", () => {
@@ -54,15 +55,17 @@ describe("curriculum details", () => {
       },
       {
         type: "addCourse",
+        id: crs(1),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
       {
         type: "addCourse",
+        id: crs(2),
         name: "Nuevo curso",
         period: { programYear: 1, term: 1 },
       },
-      { type: "editCourse", courseId: 2, changes: { name: " " } },
+      { type: "editCourse", courseId: crs(2), changes: { name: " " } },
     ];
     const draft = actions.reduce(apply, createDraft("semester"));
 

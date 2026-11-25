@@ -23,12 +23,13 @@ import { findCourse } from "@/curriculum/courses";
 import { getMaxDuration } from "@/curriculum/grid";
 import { useBuilderHasHydrated, useBuilderStore } from "@/stores/builder";
 import type { Draft } from "@/types/builder";
+import type { CourseId } from "@/types/curriculum";
 
 export default function Builder() {
   return (
     <div className="h-dvh w-dvw overflow-hidden">
       <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center md:hidden">
-        <Monitor className="size-10 text-muted-foreground" />
+        <Monitor className="text-muted-foreground size-10" />
         <p className="max-w-xs text-balance">
           El constructor de mallas necesita un computador. Ábrelo en una
           pantalla más grande para armar tu malla curricular.
@@ -70,7 +71,9 @@ function BuilderWorkspace() {
   const undo = useBuilderStore((state) => state.undo);
   const redo = useBuilderStore((state) => state.redo);
   const endGroup = useBuilderStore((state) => state.endGroup);
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<CourseId | null>(
+    null,
+  );
   const [isCreating, setIsCreating] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const isStarting = isCreating || activeId === null;
@@ -143,7 +146,7 @@ function BuilderWorkspace() {
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarOpener />
           {isStarting ? (
-            <h1 className="px-2 font-heading font-semibold text-base">
+            <h1 className="font-heading px-2 text-base font-semibold">
               Nueva malla
             </h1>
           ) : (
@@ -180,7 +183,7 @@ function BuilderWorkspace() {
                 </Button>
                 <Separator
                   orientation="vertical"
-                  className="self-center! mx-2 h-5"
+                  className="mx-2 h-5 self-center!"
                 />
                 <DownloadButton draft={draft} />
               </div>
@@ -212,7 +215,7 @@ function BuilderWorkspace() {
             {selectedCourse && (
               // Slides in once when the panel opens; switching courses only
               // swaps its content, so it stays instant.
-              <aside className="slide-in-from-right w-84 shrink-0 animate-in overflow-y-auto border-l duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none">
+              <aside className="slide-in-from-right animate-in w-84 shrink-0 overflow-y-auto border-l duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:animate-none">
                 <CoursePanel
                   key={selectedCourse.id}
                   course={selectedCourse}

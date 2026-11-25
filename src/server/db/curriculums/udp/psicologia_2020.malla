@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": {
     "name": "Psicología",
     "institution": "Universidad Diego Portales"
@@ -8,841 +8,499 @@
   "versionName": "4.2",
   "termSystem": "semester",
   "periods": [
-    {
-      "programYear": 1,
-      "term": 1
-    },
-    {
-      "programYear": 1,
-      "term": 3
-    },
-    {
-      "programYear": 2,
-      "term": 1
-    },
-    {
-      "programYear": 2,
-      "term": 3
-    },
-    {
-      "programYear": 3,
-      "term": 1
-    },
-    {
-      "programYear": 3,
-      "term": 3
-    },
-    {
-      "programYear": 4,
-      "term": 1
-    },
-    {
-      "programYear": 4,
-      "term": 3
-    },
-    {
-      "programYear": 5,
-      "term": 1
-    },
-    {
-      "programYear": 5,
-      "term": 3
-    }
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 }
   ],
   "areas": [
     {
-      "id": 1,
+      "id": "are_WGOZ9JsY",
       "name": "Fundamentos Biológicos, Sociales, Históricos y Filosóficos de la Psicología",
       "color": "#fdc743"
     },
     {
-      "id": 2,
+      "id": "are_W6WHqBwK",
       "name": "Contenidos Básicos de la Psicología",
       "color": "#f9dd92"
     },
+    { "id": "are_ehoQBA7e", "name": "Investigación", "color": "#818284" },
     {
-      "id": 3,
-      "name": "Investigación",
-      "color": "#818284"
-    },
-    {
-      "id": 4,
+      "id": "are_JxQJ41Y6",
       "name": "Formación General e Inglés",
       "color": "#ffffff"
     },
-    {
-      "id": 5,
-      "name": "Psicología Clínica",
-      "color": "#d2d3d5"
-    },
-    {
-      "id": 6,
-      "name": "Campos Psicosociales",
-      "color": "#fdedc8"
-    }
+    { "id": "are_FGgaCEeJ", "name": "Psicología Clínica", "color": "#d2d3d5" },
+    { "id": "are_T2pIEeS2", "name": "Campos Psicosociales", "color": "#fdedc8" }
   ],
   "tracks": [
     {
-      "id": 1,
+      "id": "trk_HFDsS5WN",
       "name": "Psicología",
       "credentialType": "professional"
     }
   ],
   "courses": [
     {
-      "id": 1,
+      "id": "crs_dM0CnQ5F",
       "name": "Historia de la Psicología",
       "code": "PSI4121",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_WGOZ9JsY",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
     },
     {
-      "id": 2,
+      "id": "crs_EmGSLded",
       "name": "Fundamentos Biológicos del Comportamiento",
       "code": "PSI4112",
       "credits": 6,
-      "areaId": 1,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 2
-        }
-      ]
+      "areaId": "are_WGOZ9JsY",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
     },
     {
-      "id": 3,
+      "id": "crs_wsjRkb7E",
       "name": "Psicología General",
       "code": "PSI4113",
       "credits": 6,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
     },
     {
-      "id": 4,
+      "id": "crs_HxSzaZbY",
       "name": "Transformaciones Socioculturales",
       "code": "PSI4114",
       "credits": 4,
-      "areaId": 1,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_WGOZ9JsY",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
     },
     {
-      "id": 5,
+      "id": "crs_CYrYzXoZ",
       "name": "Filosofía y Epistemiología de la Psicología",
       "code": "PSI4117",
       "credits": 4,
-      "areaId": 3,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
     },
     {
-      "id": 6,
+      "id": "crs_orGQJhBB",
       "name": "Inglés I",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 6
-        }
-      ]
+      "areaId": "are_JxQJ41Y6",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 6 }]
     },
     {
-      "id": 7,
+      "id": "crs_U2OpPxBv",
       "name": "Análisis Crítico de la Psicología en Chile",
       "code": "PSI4124",
       "credits": 4,
-      "areaId": 1,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_WGOZ9JsY",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
     },
     {
-      "id": 8,
+      "id": "crs_U8pj1xZu",
       "name": "Neurociencias y Psicología",
       "code": "PSI4122",
       "credits": 4,
-      "areaId": 1,
-      "trackIds": [1],
-      "prerequisiteIds": [2],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 2
-        }
-      ]
+      "areaId": "are_WGOZ9JsY",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_EmGSLded"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
     },
     {
-      "id": 9,
+      "id": "crs_iZtWR9cM",
       "name": "Procesos Psicológicos",
       "code": "PSI4123",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [3],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_wsjRkb7E"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
     },
     {
-      "id": 10,
+      "id": "crs_YxIz2KTl",
       "name": "Psicología Social I",
       "code": "PSI4214",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
     },
     {
-      "id": 11,
+      "id": "crs_rDS6wxg5",
       "name": "Estadística",
       "code": "PSI4125",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 5 }]
     },
     {
-      "id": 12,
+      "id": "crs_Ddk7DDJC",
       "name": "Inglés II",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
-      "prerequisiteIds": [6],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 6
-        }
-      ]
+      "areaId": "are_JxQJ41Y6",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_orGQJhBB"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 6 }]
     },
     {
-      "id": 13,
+      "id": "crs_Hkcmxklg",
       "name": "Psicología de la Infancia",
       "code": "PSI4211",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
     },
     {
-      "id": 14,
+      "id": "crs_gjLJAHuF",
       "name": "Psicología de la Adolescencia y Juventud",
       "code": "PSI4212",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 2
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
     },
     {
-      "id": 15,
+      "id": "crs_ZbtTyIbu",
       "name": "Psicología de la Comunicación",
       "code": "PSI4213",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
     },
     {
-      "id": 16,
+      "id": "crs_6VamAauL",
       "name": "Psicología Social II",
       "code": "PSI4224",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [10],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_YxIz2KTl"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
     },
     {
-      "id": 17,
+      "id": "crs_xTMgiTIE",
       "name": "Investigación I",
       "code": "PSI4215",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 5 }]
     },
     {
-      "id": 18,
+      "id": "crs_SaGidvHy",
       "name": "Inglés III",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
-      "prerequisiteIds": [12],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 6
-        }
-      ]
+      "areaId": "are_JxQJ41Y6",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_Ddk7DDJC"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
     },
     {
-      "id": 19,
+      "id": "crs_qIUIG4GX",
       "name": "Introducción a la Psicopatología",
       "code": "PSI4221",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
     },
     {
-      "id": 20,
+      "id": "crs_nTjEsvZT",
       "name": "Introducción a la Psicología Clínica",
       "code": "PSI4222",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 2
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
     },
     {
-      "id": 21,
+      "id": "crs_3CryEAsa",
       "name": "Psicología de la Personalidad",
       "code": "PSI4223",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
     },
     {
-      "id": 22,
+      "id": "crs_VXUGixqQ",
       "name": "Psicología de la Adultez y la Tercera Edad",
       "code": "PSI4216",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
     },
     {
-      "id": 23,
+      "id": "crs_VhHHtIsj",
       "name": "Investigación II",
       "code": "PSI4225",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [17],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_xTMgiTIE"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 5 }]
     },
     {
-      "id": 24,
+      "id": "crs_ZsMVtbuz",
       "name": "Curso de Formación General",
       "code": "CFGXXXX",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
+      "areaId": "are_JxQJ41Y6",
+      "trackIds": ["trk_HFDsS5WN"],
       "isElective": true,
       "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 6
-        },
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 6
-        },
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 6
-        },
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 6
-        }
+        { "programYear": 2, "term": 3, "position": 6 },
+        { "programYear": 3, "term": 1, "position": 6 },
+        { "programYear": 4, "term": 1, "position": 6 },
+        { "programYear": 4, "term": 3, "position": 6 }
       ]
     },
     {
-      "id": 25,
+      "id": "crs_hwV4ObhV",
       "name": "Psicopatología y Psiquiatría de Niños y Adolescentes",
       "code": "PSI4311",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [19],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_qIUIG4GX"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
     },
     {
-      "id": 26,
+      "id": "crs_Mi4mlnbp",
       "name": "Optativo de Perspectivas en Psicología Clínica I",
       "code": "PSIOPXX",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [20],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 2
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_nTjEsvZT"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
     },
     {
-      "id": 27,
+      "id": "crs_cnxvGaWL",
       "name": "Introducción al Psicodiagnóstico",
       "code": "PSI4313",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [21],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_W6WHqBwK",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_3CryEAsa"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
     },
     {
-      "id": 28,
+      "id": "crs_rRnlrk8X",
       "name": "Psicología y Salud",
       "code": "PSI4411",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
     },
     {
-      "id": 29,
+      "id": "crs_73OL3dsM",
       "name": "Investigación III",
       "code": "PSI4315",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [23],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_VhHHtIsj"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 5 }]
     },
     {
-      "id": 30,
+      "id": "crs_gfqaQSyn",
       "name": "Psicopatología y Psiquiatría de Adulto",
       "code": "PSI4321",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [19],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_qIUIG4GX"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
     },
     {
-      "id": 31,
+      "id": "crs_0Rcsfswm",
       "name": "Optativo de Perspectivas en Psicología Clínica II",
       "code": "PSIOPXX",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [20],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 2
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_nTjEsvZT"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
     },
     {
-      "id": 32,
+      "id": "crs_3y9ZV3dt",
       "name": "Psicodiagnóstico de Niños y Adolescentes",
       "code": "PSI4323",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [27],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_cnxvGaWL"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
     },
     {
-      "id": 33,
+      "id": "crs_uYaeR8bj",
       "name": "Psicología y Educación",
       "code": "PSI4324",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
     },
     {
-      "id": 34,
+      "id": "crs_RNI8QvLB",
       "name": "Investigación IV",
       "code": "PSI4325",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [29],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "areaId": "are_ehoQBA7e",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_73OL3dsM"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 5 }]
     },
     {
-      "id": 35,
+      "id": "crs_EEaKQ6dc",
       "name": "Psicología y Justicia",
       "code": "PSI4412",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
     },
     {
-      "id": 36,
+      "id": "crs_yDJIsp1S",
       "name": "Psicología del Trabajo y las Organizaciones",
       "code": "PSI4314",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 2
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
     },
     {
-      "id": 37,
+      "id": "crs_MztMlZqK",
       "name": "Psicodiagnóstico de Adultos",
       "code": "PSI4413",
       "credits": 6,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [27],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_cnxvGaWL"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
     },
     {
-      "id": 38,
+      "id": "crs_pWJQ720m",
       "name": "Psicología y Sujetos Sociales",
       "code": "PSI4414",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
     },
     {
-      "id": 39,
+      "id": "crs_T0aTiSxW",
       "name": "Gestión de Recursos Humanos",
       "code": "PSI4425",
       "credits": 5,
-      "areaId": 6,
-      "trackIds": [1],
-      "prerequisiteIds": [36],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_yDJIsp1S"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
     },
     {
-      "id": 40,
+      "id": "crs_V6t29oYq",
       "name": "Optativo de Intervención Psicosocial",
       "code": "PSIOPXX",
       "credits": 8,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 2
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
     },
     {
-      "id": 41,
+      "id": "crs_AFy4kKo0",
       "name": "Optativo de Intervención Clínica",
       "code": "PSIOPXX",
       "credits": 8,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [31],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_0Rcsfswm"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
     },
     {
-      "id": 42,
+      "id": "crs_13Dy7tWO",
       "name": "Diseño y Evaluación de Proyectos de Intervención",
       "code": "PSI4423",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
     },
     {
-      "id": 43,
+      "id": "crs_DeFaBvhm",
       "name": "Taller de Intervención Psicosocial",
       "code": "PSITATINTPS",
       "credits": 10,
-      "areaId": 5,
-      "trackIds": [1],
-      "prerequisiteIds": [40],
-      "slots": [
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_FGgaCEeJ",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_V6t29oYq"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 1 }]
     },
     {
-      "id": 44,
+      "id": "crs_CmkwDcEt",
       "name": "Taller de Intervención Clínica",
       "code": "PSITATINTCL",
       "credits": 10,
-      "areaId": 6,
-      "trackIds": [1],
-      "prerequisiteIds": [41],
-      "slots": [
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "prerequisiteIds": ["crs_AFy4kKo0"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 3 }]
     },
     {
-      "id": 45,
+      "id": "crs_M1mpVPxx",
       "name": "Curso de Profundización",
       "code": "PSIOPTPR",
       "credits": 4,
-      "trackIds": [1],
+      "trackIds": ["trk_HFDsS5WN"],
       "isElective": true,
       "slots": [
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 5
-        },
-        {
-          "programYear": 5,
-          "term": 3,
-          "position": 6
-        }
+        { "programYear": 5, "term": 1, "position": 5 },
+        { "programYear": 5, "term": 3, "position": 6 }
       ]
     },
     {
-      "id": 46,
+      "id": "crs_ZHhk0dCT",
       "name": "Estrategias de Trabajo Grupal",
       "code": "PSI4424",
       "credits": 6,
-      "areaId": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 6
-        }
-      ]
+      "areaId": "are_T2pIEeS2",
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 6 }]
     },
     {
-      "id": 47,
+      "id": "crs_b38ZTqWP",
       "name": "Práctica Profesional",
       "code": "PSI4521",
       "credits": 22,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 5,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 1 }]
     },
     {
-      "id": 48,
+      "id": "crs_zd1Sfe6L",
       "name": "Supervisión de Práctica",
       "code": "PSI4522",
       "credits": 6,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 5,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "trackIds": ["trk_HFDsS5WN"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
     }
   ]
 }

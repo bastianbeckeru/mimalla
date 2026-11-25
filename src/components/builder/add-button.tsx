@@ -18,7 +18,7 @@ export default function AddButton({
       type="button"
       aria-label={label}
       className={cn(
-        "group flex items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground transition-[background-color,border-color,color] duration-150 ease-out hover:border-border hover:bg-muted/40 hover:text-foreground focus-visible:border-border focus-visible:bg-muted/40 focus-visible:text-foreground focus-visible:outline-none active:bg-muted/60",
+        "group text-muted-foreground hover:border-border hover:bg-muted/40 hover:text-foreground focus-visible:border-border focus-visible:bg-muted/40 focus-visible:text-foreground active:bg-muted/60 flex items-center justify-center rounded-lg border-2 border-dashed transition-[background-color,border-color,color] duration-150 ease-out focus-visible:outline-none",
         revealOnHover ? "border-transparent" : "border-border",
       )}
       style={style}

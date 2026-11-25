@@ -12,6 +12,7 @@ import type { TermSystem } from "@/types/curriculum";
 
 const TERM_SYSTEMS: { value: TermSystem; label: string }[] = [
   { value: "semester", label: "Semestral" },
+  { value: "trimester", label: "Trimestral" },
   { value: "annual", label: "Anual" },
 ];
 

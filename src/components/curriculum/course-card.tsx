@@ -172,11 +172,11 @@ export default function CourseCard({
           ref={surfaceRef}
           aria-hidden
           className={cn(
-            "absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 ring-foreground/10 transition-colors duration-150 ease-out",
+            "ring-foreground/10 absolute top-0 left-0 -z-10 size-full rounded-lg ring-1 transition-colors duration-150 ease-out",
             !hasOwnRing && getEdgeClassName(color, isMuted),
-            role === "misplaced" && "ring-2 ring-warning",
+            role === "misplaced" && "ring-warning ring-2",
             surfaceClassName,
-            isSelected && "ring-2 ring-ring",
+            isSelected && "ring-ring ring-2",
           )}
           style={{
             backgroundColor: isMuted
@@ -187,7 +187,7 @@ export default function CourseCard({
         <span className="flex size-full items-center justify-center overflow-hidden">
           <span
             ref={nameRef}
-            className="line-clamp-3 text-balance font-medium text-xs"
+            className="line-clamp-3 text-xs font-medium text-balance"
           >
             {course.name}
           </span>
@@ -199,7 +199,7 @@ export default function CourseCard({
         <span
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-0 rounded-lg bg-background/60 opacity-0 transition-opacity duration-150 ease-out",
+            "bg-background/60 pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-150 ease-out",
             dimsUnrelated && role === "unrelated" && "opacity-100",
           )}
         />

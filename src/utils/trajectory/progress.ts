@@ -1,4 +1,9 @@
-import type { Course, ExtendedCourse, PeriodKey } from "@/types/curriculum";
+import type {
+  Course,
+  CourseId,
+  ExtendedCourse,
+  PeriodKey,
+} from "@/types/curriculum";
 import type {
   Enrollment,
   EnrollmentStatus,
@@ -47,7 +52,7 @@ export function approveThroughPeriod(
 export function setEnrollmentStatuses(
   enrollments: Enrollment[],
   statuses: Map<string, EnrollmentStatus>,
-  courses: Map<number, ExtendedCourse>,
+  courses: Map<CourseId, ExtendedCourse>,
 ) {
   return [...statuses].reduce(
     (result, [enrollmentId, status]) => {
@@ -75,7 +80,7 @@ export function extractCourseIds(
 
 export function getProgress(
   enrollments: Enrollment[],
-  courses: Map<number, Course>,
+  courses: Map<CourseId, Course>,
 ): TrajectoryProgress {
   return {
     approvedCourseIds: new Set(extractCourseIds(enrollments, "APPROVED")),
@@ -85,7 +90,7 @@ export function getProgress(
 
 export function getTrajectoryStats(
   enrollments: Enrollment[],
-  courses: Map<number, Course>,
+  courses: Map<CourseId, Course>,
 ) {
   let approvedCredits = 0;
   let approvedCourses = 0;
@@ -121,7 +126,7 @@ export function isAvailable(course: Course, progress: TrajectoryProgress) {
 }
 
 export function getAddableCourses(
-  courses: Map<number, Course>,
+  courses: Map<CourseId, Course>,
   enrollments: Enrollment[],
 ) {
   const takenCourseIds = new Set(
@@ -137,14 +142,14 @@ export function setEnrollmentStatus(
   enrollments: Enrollment[],
   enrollmentId: string,
   status: EnrollmentStatus,
-  courses: Map<number, ExtendedCourse>,
+  courses: Map<CourseId, ExtendedCourse>,
 ) {
   const target = enrollments.find((e) => e.id === enrollmentId);
   if (!target) return { enrollments, revertedCount: 0 };
 
   const revertedCourseIds =
     status === "APPROVED"
-      ? new Set<number>()
+      ? new Set<CourseId>()
       : getApprovedSuccessorIds(enrollments, target.courseId, courses);
 
   let revertedCount = 0;
@@ -161,11 +166,11 @@ export function setEnrollmentStatus(
 
 function getApprovedSuccessorIds(
   enrollments: Enrollment[],
-  courseId: number,
-  courses: Map<number, ExtendedCourse>,
+  courseId: CourseId,
+  courses: Map<CourseId, ExtendedCourse>,
 ) {
   const approvedCourseIds = new Set(extractCourseIds(enrollments, "APPROVED"));
-  const successorIds = new Set<number>();
+  const successorIds = new Set<CourseId>();
   const pendingIds = [courseId];
 
   for (let id = pendingIds.pop(); id !== undefined; id = pendingIds.pop()) {

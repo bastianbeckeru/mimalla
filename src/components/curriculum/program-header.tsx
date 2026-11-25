@@ -5,7 +5,12 @@ import ImportCurriculumButton from "@/components/curriculum/import-button";
 import VersionSelect from "@/components/curriculum/version-select";
 import { Separator } from "@/components/ui/separator";
 import { REGULAR_TERMS } from "@/curriculum/periods";
-import type { CredentialType, Curriculum, Program } from "@/types/curriculum";
+import type {
+  CredentialType,
+  Curriculum,
+  Program,
+  TermSystem,
+} from "@/types/curriculum";
 
 const CREDENTIAL_ORDER: CredentialType[] = [
   "professional",
@@ -19,9 +24,12 @@ function getDuration({ termSystem, periods }: Curriculum) {
   const regularPeriods = periods.filter(({ term }) =>
     REGULAR_TERMS[termSystem].includes(term),
   ).length;
-  return termSystem === "semester"
-    ? `${regularPeriods} semestres`
-    : `${regularPeriods} años`;
+  const unit: Record<TermSystem, string> = {
+    semester: "semestres",
+    trimester: "trimestres",
+    annual: "años",
+  };
+  return `${regularPeriods} ${unit[termSystem]}`;
 }
 
 function MetaItem({
@@ -67,10 +75,10 @@ export default function ProgramHeader({
         <p className="text-muted-foreground text-sm">
           {program.institution.name}
         </p>
-        <h1 className="font-heading font-semibold text-2xl tracking-tight">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">
           {curriculum.programName}
         </h1>
-        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
+        <ul className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
           {credentials.map((track) => (
             <MetaItem
               key={track.id}
@@ -89,7 +97,7 @@ export default function ProgramHeader({
           {credentials.length > 0 && (
             <Separator
               orientation="vertical"
-              className="self-center! h-3.5 max-md:hidden"
+              className="h-3.5 self-center! max-md:hidden"
             />
           )}
           <MetaItem icon={<Sun />}>

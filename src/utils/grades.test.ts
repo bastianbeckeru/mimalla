@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { crs } from "@/test/ids";
 import type { Assessment, Enrollment } from "@/types/trajectory";
 import {
   DEFAULT_GRADING_SCALE,
@@ -49,7 +50,7 @@ function group(
 function enrollment(fields: Partial<Enrollment>): Enrollment {
   return {
     id: "e1",
-    courseId: 1,
+    courseId: crs(1),
     year: 2026,
     term: 1,
     position: 1,
@@ -236,15 +237,30 @@ describe("getSchemeDepth", () => {
 
 describe("getCumulativeAverage", () => {
   const courses = new Map([
-    [1, { credits: 10 }],
-    [2, { credits: 5 }],
+    [crs(1), { credits: 10 }],
+    [crs(2), { credits: 5 }],
   ]);
 
   test("weighs course grades by credits, counting every finished attempt", () => {
     const enrollments = [
-      enrollment({ id: "e1", courseId: 1, status: "FAILED", courseGrade: 3 }),
-      enrollment({ id: "e2", courseId: 1, status: "APPROVED", courseGrade: 5 }),
-      enrollment({ id: "e3", courseId: 2, status: "APPROVED", courseGrade: 6 }),
+      enrollment({
+        id: "e1",
+        courseId: crs(1),
+        status: "FAILED",
+        courseGrade: 3,
+      }),
+      enrollment({
+        id: "e2",
+        courseId: crs(1),
+        status: "APPROVED",
+        courseGrade: 5,
+      }),
+      enrollment({
+        id: "e3",
+        courseId: crs(2),
+        status: "APPROVED",
+        courseGrade: 6,
+      }),
     ];
 
     expect(getCumulativeAverage(enrollments, courses, scale)).toBe(
@@ -254,9 +270,19 @@ describe("getCumulativeAverage", () => {
 
   test("leaves out pending enrollments and those without a course grade", () => {
     const enrollments = [
-      enrollment({ id: "e1", courseId: 1, status: "PENDING", courseGrade: 7 }),
-      enrollment({ id: "e2", courseId: 1, status: "APPROVED" }),
-      enrollment({ id: "e3", courseId: 2, status: "APPROVED", courseGrade: 6 }),
+      enrollment({
+        id: "e1",
+        courseId: crs(1),
+        status: "PENDING",
+        courseGrade: 7,
+      }),
+      enrollment({ id: "e2", courseId: crs(1), status: "APPROVED" }),
+      enrollment({
+        id: "e3",
+        courseId: crs(2),
+        status: "APPROVED",
+        courseGrade: 6,
+      }),
     ];
 
     expect(getCumulativeAverage(enrollments, courses, scale)).toBe(6);
@@ -308,7 +334,7 @@ describe("hasRecordedGrades", () => {
     term: 1,
     position: 0,
     status: "PENDING",
-    courseId: 1,
+    courseId: crs(1),
   } satisfies Enrollment;
 
   test("is false without a scheme or a course grade", () => {
@@ -339,7 +365,7 @@ describe("getSuggestedStatus", () => {
   const scale = { min: 1, max: 7, passing: 4 };
   const enrollment = {
     id: "1",
-    courseId: 1,
+    courseId: crs(1),
     year: 2024,
     term: 1,
     position: 1,

@@ -1,1 +1,709 @@
-{"schemaVersion":1,"program":{"name":"Química y Farmacia","institution":"Universidad de Chile"},"effectiveYear":2022,"versionName":"v4.0","termSystem":"semester","periods":[{"programYear":1,"term":1},{"programYear":1,"term":3},{"programYear":2,"term":1},{"programYear":2,"term":3},{"programYear":3,"term":1},{"programYear":3,"term":3},{"programYear":4,"term":1},{"programYear":4,"term":3},{"programYear":5,"term":1},{"programYear":5,"term":3},{"programYear":6,"term":1}],"areas":[{"id":1,"name":"Plan de Formación Intermedio","color":"#fdf5b5"},{"id":2,"name":"Ámbito Clínico","color":"#fea8ec"},{"id":3,"name":"Ámbito Industria","color":"#ffbea2"},{"id":4,"name":"Ámbito Investigación","color":"#aef0c7"},{"id":5,"name":"Ámbito Asuntos Regulatorios","color":"#c2ddfd"}],"tracks":[{"id":1,"name":"Química y Farmacia","credentialType":"professional"},{"id":2,"name":"Licenciatura en Ciencias Farmacéuticas","credentialType":"academic"},{"id":3,"name":"Bachiller General con mención en Ciencias","credentialType":"academic"}],"courses":[{"id":1,"name":"Química General I","code":"CBQI1101","credits":5,"areaId":1,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":1}]},{"id":2,"name":"Técnicas de Laboratorio Químico","code":"CBQI1104","credits":4,"areaId":1,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":2}]},{"id":3,"name":"Mecánica","code":"CBEP1103","credits":4,"areaId":1,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":3}]},{"id":4,"name":"Introducción al Cálculo","code":"CBEP1102","credits":5,"areaId":1,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":4}]},{"id":5,"name":"El Químico Farmacéutico y su Acción","code":"CITF1109","credits":5,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":5}]},{"id":6,"name":"Formación General","credits":4,"trackIds":[1,2,3],"isElective":true,"slots":[{"programYear":1,"term":1,"position":6}]},{"id":7,"name":"Inglés I","code":"CIEP1105","credits":3,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":1,"position":7}]},{"id":8,"name":"Química General II","code":"CBQI1201","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[1],"slots":[{"programYear":1,"term":3,"position":1}]},{"id":9,"name":"Laboratorio de Química General","code":"CBQI1204","credits":4,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[1,2],"slots":[{"programYear":1,"term":3,"position":2}]},{"id":10,"name":"Electromagnetismo","code":"CBEP1203","credits":4,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[3,4],"slots":[{"programYear":1,"term":3,"position":3}]},{"id":11,"name":"Cálculo Diferencial e Integral","code":"CBEP1202","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[4],"slots":[{"programYear":1,"term":3,"position":4}]},{"id":12,"name":"Biología General","code":"CIBQ1207","credits":5,"areaId":2,"trackIds":[1,2,3],"slots":[{"programYear":1,"term":3,"position":5}]},{"id":13,"name":"El Medicamento y su Evolución","code":"CITF1209","credits":4,"areaId":2,"trackIds":[1,2,3],"prerequisiteIds":[5],"slots":[{"programYear":1,"term":3,"position":6}]},{"id":14,"name":"Inglés II","code":"CIEP1205","credits":3,"trackIds":[1,2,3],"prerequisiteIds":[7],"slots":[{"programYear":1,"term":3,"position":7}]},{"id":15,"name":"Química Orgánica I","code":"CBQO2101","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[8],"slots":[{"programYear":2,"term":1,"position":1}]},{"id":16,"name":"Química Analítica I","code":"CBQI2102","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[8,9],"slots":[{"programYear":2,"term":1,"position":2}]},{"id":17,"name":"Laboratorio I de Química Orgánica","code":"CBQO2104","credits":4,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[8,9],"slots":[{"programYear":2,"term":1,"position":3}]},{"id":18,"name":"Estadística y Análisis de Datos","code":"CBEP2103","credits":3,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[11],"slots":[{"programYear":2,"term":1,"position":4}]},{"id":19,"name":"Fisiología Celular","code":"CIBQ2109","credits":4,"areaId":2,"trackIds":[1,2,3],"prerequisiteIds":[1,10,12],"slots":[{"programYear":2,"term":1,"position":5}]},{"id":20,"name":"Investigación para las Ciencias Farmacéuticas","code":"CITF2110","credits":4,"areaId":3,"trackIds":[1,2,3],"prerequisiteIds":[13,14],"slots":[{"programYear":2,"term":1,"position":6}]},{"id":21,"name":"Inglés III","code":"CIEP2105","credits":3,"trackIds":[1,2,3],"prerequisiteIds":[14],"slots":[{"programYear":2,"term":1,"position":7}]},{"id":22,"name":"Formación General","credits":2,"trackIds":[1,2,3],"isElective":true,"slots":[{"programYear":2,"term":1,"position":8}]},{"id":23,"name":"Química Orgánica II","code":"CBQO2201","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[15],"slots":[{"programYear":2,"term":3,"position":1}]},{"id":24,"name":"Laboratorio de Análisis Químico","code":"CBQI2204","credits":4,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[9,16,18],"slots":[{"programYear":2,"term":3,"position":2}]},{"id":25,"name":"Química Analítica II","code":"CBQI2202","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[16],"slots":[{"programYear":2,"term":3,"position":3}]},{"id":26,"name":"Fisicoquímica I","code":"CBQO2203","credits":5,"areaId":1,"trackIds":[1,2,3],"prerequisiteIds":[3,11,15],"slots":[{"programYear":2,"term":3,"position":4}]},{"id":27,"name":"Fisiología de Sistemas","code":"CIBQ2208","credits":4,"areaId":2,"trackIds":[1,2,3],"prerequisiteIds":[19],"slots":[{"programYear":2,"term":3,"position":5}]},{"id":28,"name":"Práctica Intermedia","code":"CIEP3117","credits":4,"areaId":2,"trackIds":[1,2,3],"prerequisiteIds":[20],"slots":[{"programYear":2,"term":3,"position":6}]},{"id":29,"name":"Inglés IV","code":"CIEP2205","credits":3,"trackIds":[1,2,3],"prerequisiteIds":[21],"slots":[{"programYear":2,"term":3,"position":7}]},{"id":30,"name":"Laboratorio de Análisis Instrumental","code":"CBQI3101","credits":4,"areaId":1,"trackIds":[1,2],"prerequisiteIds":[24,25],"slots":[{"programYear":3,"term":1,"position":1}]},{"id":31,"name":"Botánica y Farmacognosia","credits":7,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[23,25],"slots":[{"programYear":3,"term":1,"position":2}]},{"id":32,"name":"Química de Heterocíclicos y Análisis Espectroscópico","code":"CIQO3113","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[23],"slots":[{"programYear":3,"term":1,"position":3}]},{"id":33,"name":"Bioquímica","code":"CIBQ3114","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[23,26],"slots":[{"programYear":3,"term":1,"position":4}]},{"id":34,"name":"Farmacología General","code":"CQFT3102","credits":6,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[24,27],"slots":[{"programYear":3,"term":1,"position":5}]},{"id":35,"name":"Gestión de Calidad","code":"CITF3116","credits":3,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[20],"slots":[{"programYear":3,"term":1,"position":6}]},{"id":36,"name":"Microbiología","code":"CIBQ3213","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[33],"slots":[{"programYear":3,"term":3,"position":1}]},{"id":37,"name":"Farmacoquímica I","code":"CIQF3214","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[32,34],"slots":[{"programYear":3,"term":3,"position":2}]},{"id":38,"name":"Farmacología de Sistemas I","code":"CIQF3215","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[34],"slots":[{"programYear":3,"term":3,"position":3}]},{"id":39,"name":"Fisiopatología Molecular","code":"CIBQ3216","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[27,33],"slots":[{"programYear":3,"term":3,"position":4}]},{"id":40,"name":"Legislación Farmacéutica","code":"CITF3217","credits":4,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[28,35],"slots":[{"programYear":3,"term":3,"position":5}]},{"id":41,"name":"Fisicoquímica Farmacéutica","code":"CIQO3218","credits":6,"areaId":3,"trackIds":[1,2],"prerequisiteIds":[26],"slots":[{"programYear":3,"term":3,"position":6}]},{"id":42,"name":"Fisiopatología y Semiología","code":"CIBQ4112","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[39],"slots":[{"programYear":4,"term":1,"position":1}]},{"id":43,"name":"Farmacoquímica II","code":"CIQF4113","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[37],"slots":[{"programYear":4,"term":1,"position":2}]},{"id":44,"name":"Farmacología de Sistemas II","code":"CIQF4114","credits":6,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[36,38],"slots":[{"programYear":4,"term":1,"position":3}]},{"id":45,"name":"Salud Pública","code":"CITF4115","credits":3,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[40],"slots":[{"programYear":4,"term":1,"position":4}]},{"id":46,"name":"Tecnología Farmacéutica I","code":"CITF4116","credits":6,"areaId":3,"trackIds":[1,2],"prerequisiteIds":[40,41],"slots":[{"programYear":4,"term":1,"position":5}]},{"id":47,"name":"Operaciones Unitarias para Q & F","code":"CICA4117","credits":5,"areaId":3,"trackIds":[1,2],"prerequisiteIds":[41],"slots":[{"programYear":4,"term":1,"position":6}]},{"id":48,"name":"Análisis de Medicamentos, Doping y Drogas de Abuso","code":"CIQF4211","credits":5,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[30,43],"slots":[{"programYear":4,"term":3,"position":1}]},{"id":49,"name":"Nutrición Clínica","code":"CICA4212","credits":3,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[42],"slots":[{"programYear":4,"term":3,"position":2}]},{"id":50,"name":"Bioquímica Clínica","code":"CIBQ4213","credits":4,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[42],"slots":[{"programYear":4,"term":3,"position":3}]},{"id":51,"name":"Biofarmacia y Farmacocinética","code":"CITF4214","credits":6,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[34,46],"slots":[{"programYear":4,"term":3,"position":4}]},{"id":52,"name":"Tecnología Farmacéutica II","code":"CITF4215","credits":6,"areaId":3,"trackIds":[1,2],"prerequisiteIds":[46,47],"slots":[{"programYear":4,"term":3,"position":5}]},{"id":53,"name":"Administración y Gestión Farmacéutica","code":"CITF4216","credits":3,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[46],"slots":[{"programYear":4,"term":3,"position":6}]},{"id":54,"name":"Estadística Farmacéutica","code":"CITF4217","credits":3,"areaId":2,"trackIds":[1,2],"prerequisiteIds":[18,45],"slots":[{"programYear":4,"term":3,"position":7}]},{"id":55,"name":"Farmacología Clínica","code":"CPQF5110","credits":6,"areaId":2,"trackIds":[1],"prerequisiteIds":[44,50,51],"slots":[{"programYear":5,"term":1,"position":1}]},{"id":56,"name":"Bromatología","code":"CPCA5111","credits":4,"areaId":2,"trackIds":[1],"prerequisiteIds":[30,49],"slots":[{"programYear":5,"term":1,"position":2}]},{"id":57,"name":"Toxicología","code":"CPQF5112","credits":5,"areaId":2,"trackIds":[1],"prerequisiteIds":[44,50],"slots":[{"programYear":5,"term":1,"position":3}]},{"id":58,"name":"Farmacia Asistencial","code":"CPTF5113","credits":4,"areaId":2,"trackIds":[1],"prerequisiteIds":[45,53],"slots":[{"programYear":5,"term":1,"position":4}]},{"id":59,"name":"Tecnología Cosmética","code":"CPTF5114","credits":4,"areaId":3,"trackIds":[1],"prerequisiteIds":[52],"slots":[{"programYear":5,"term":1,"position":5}]},{"id":60,"name":"Electivos Especializados","credits":7,"trackIds":[1],"isElective":true,"slots":[{"programYear":5,"term":1,"position":6}]},{"id":61,"name":"Farmacia Clínica","code":"CPTF5206","credits":5,"areaId":2,"trackIds":[1],"prerequisiteIds":[55],"slots":[{"programYear":5,"term":3,"position":1}]},{"id":62,"name":"Práctica Profesional en Farmacia Comunitaria","code":"CPTF5207","credits":7,"areaId":2,"trackIds":[1],"prerequisiteIds":[53,55,57],"slots":[{"programYear":5,"term":3,"position":2}]},{"id":63,"name":"Biotecnología Farmacéutica","code":"CPTF5208","credits":4,"areaId":2,"trackIds":[1],"prerequisiteIds":[39,52],"slots":[{"programYear":5,"term":3,"position":3}]},{"id":64,"name":"Economía en Salud y Marketing Farmacéutico","code":"CPTF5209","credits":3,"areaId":2,"trackIds":[1],"prerequisiteIds":[45,53,55],"slots":[{"programYear":5,"term":3,"position":4}]},{"id":65,"name":"Innovación y Proyectos","code":"CPTF5210","credits":3,"areaId":4,"trackIds":[1],"prerequisiteIds":[54],"slots":[{"programYear":5,"term":3,"position":5}]},{"id":66,"name":"Electivos Especializados","credits":8,"trackIds":[1],"isElective":true,"slots":[{"programYear":5,"term":3,"position":6}]},{"id":67,"name":"Actividad Final de Titulación","code":"CPEP6106","credits":30,"trackIds":[1],"prerequisiteCredits":300,"slots":[{"programYear":6,"term":1,"position":1}]}]}
+{
+  "schemaVersion": 2,
+  "program": {
+    "name": "Química y Farmacia",
+    "institution": "Universidad de Chile"
+  },
+  "effectiveYear": 2022,
+  "versionName": "v4.0",
+  "termSystem": "semester",
+  "periods": [
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 },
+    { "programYear": 6, "term": 1 }
+  ],
+  "areas": [
+    {
+      "id": "are_2164XaRm",
+      "name": "Plan de Formación Intermedio",
+      "color": "#fdf5b5"
+    },
+    { "id": "are_A8K0L7jW", "name": "Ámbito Clínico", "color": "#fea8ec" },
+    { "id": "are_qBXsnd7U", "name": "Ámbito Industria", "color": "#ffbea2" },
+    {
+      "id": "are_ESrHvg9p",
+      "name": "Ámbito Investigación",
+      "color": "#aef0c7"
+    },
+    {
+      "id": "are_mAERG2b3",
+      "name": "Ámbito Asuntos Regulatorios",
+      "color": "#c2ddfd"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "trk_zrj0PWb0",
+      "name": "Química y Farmacia",
+      "credentialType": "professional"
+    },
+    {
+      "id": "trk_83DjaMgk",
+      "name": "Licenciatura en Ciencias Farmacéuticas",
+      "credentialType": "academic"
+    },
+    {
+      "id": "trk_2zkdFXcc",
+      "name": "Bachiller General con mención en Ciencias",
+      "credentialType": "academic"
+    }
+  ],
+  "courses": [
+    {
+      "id": "crs_HAsjzXPS",
+      "name": "Química General I",
+      "code": "CBQI1101",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
+    },
+    {
+      "id": "crs_eoxWzflS",
+      "name": "Técnicas de Laboratorio Químico",
+      "code": "CBQI1104",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 2 }]
+    },
+    {
+      "id": "crs_2aT6ki1j",
+      "name": "Mecánica",
+      "code": "CBEP1103",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
+    },
+    {
+      "id": "crs_mcaddaOj",
+      "name": "Introducción al Cálculo",
+      "code": "CBEP1102",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
+    },
+    {
+      "id": "crs_kAG7APGW",
+      "name": "El Químico Farmacéutico y su Acción",
+      "code": "CITF1109",
+      "credits": 5,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 5 }]
+    },
+    {
+      "id": "crs_ONm83kaL",
+      "name": "Formación General",
+      "credits": 4,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "isElective": true,
+      "slots": [{ "programYear": 1, "term": 1, "position": 6 }]
+    },
+    {
+      "id": "crs_bsduVJ3I",
+      "name": "Inglés I",
+      "code": "CIEP1105",
+      "credits": 3,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 7 }]
+    },
+    {
+      "id": "crs_9qNBb7TP",
+      "name": "Química General II",
+      "code": "CBQI1201",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_HAsjzXPS"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
+    },
+    {
+      "id": "crs_Ufg3TOKR",
+      "name": "Laboratorio de Química General",
+      "code": "CBQI1204",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_HAsjzXPS", "crs_eoxWzflS"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 2 }]
+    },
+    {
+      "id": "crs_aaQIS2pk",
+      "name": "Electromagnetismo",
+      "code": "CBEP1203",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_2aT6ki1j", "crs_mcaddaOj"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
+    },
+    {
+      "id": "crs_IyvHTEZX",
+      "name": "Cálculo Diferencial e Integral",
+      "code": "CBEP1202",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_mcaddaOj"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
+    },
+    {
+      "id": "crs_ugIyburl",
+      "name": "Biología General",
+      "code": "CIBQ1207",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 5 }]
+    },
+    {
+      "id": "crs_THAZOh9s",
+      "name": "El Medicamento y su Evolución",
+      "code": "CITF1209",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_kAG7APGW"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 6 }]
+    },
+    {
+      "id": "crs_3n6kuFTc",
+      "name": "Inglés II",
+      "code": "CIEP1205",
+      "credits": 3,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_bsduVJ3I"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 7 }]
+    },
+    {
+      "id": "crs_Si7MsJHd",
+      "name": "Química Orgánica I",
+      "code": "CBQO2101",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_9qNBb7TP"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
+    },
+    {
+      "id": "crs_ZYM98jRX",
+      "name": "Química Analítica I",
+      "code": "CBQI2102",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_9qNBb7TP", "crs_Ufg3TOKR"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 2 }]
+    },
+    {
+      "id": "crs_vpHtDXol",
+      "name": "Laboratorio I de Química Orgánica",
+      "code": "CBQO2104",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_9qNBb7TP", "crs_Ufg3TOKR"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
+    },
+    {
+      "id": "crs_TyOZ6gkZ",
+      "name": "Estadística y Análisis de Datos",
+      "code": "CBEP2103",
+      "credits": 3,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_IyvHTEZX"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
+    },
+    {
+      "id": "crs_vmSiCVIm",
+      "name": "Fisiología Celular",
+      "code": "CIBQ2109",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_HAsjzXPS", "crs_aaQIS2pk", "crs_ugIyburl"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 5 }]
+    },
+    {
+      "id": "crs_Y4CnM7Ka",
+      "name": "Investigación para las Ciencias Farmacéuticas",
+      "code": "CITF2110",
+      "credits": 4,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_THAZOh9s", "crs_3n6kuFTc"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
+    },
+    {
+      "id": "crs_OUoPCbQ1",
+      "name": "Inglés III",
+      "code": "CIEP2105",
+      "credits": 3,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_3n6kuFTc"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 7 }]
+    },
+    {
+      "id": "crs_MprMweOM",
+      "name": "Formación General",
+      "credits": 2,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "isElective": true,
+      "slots": [{ "programYear": 2, "term": 1, "position": 8 }]
+    },
+    {
+      "id": "crs_Fe7Iovnb",
+      "name": "Química Orgánica II",
+      "code": "CBQO2201",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_Si7MsJHd"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
+    },
+    {
+      "id": "crs_TdrXHlmX",
+      "name": "Laboratorio de Análisis Químico",
+      "code": "CBQI2204",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_Ufg3TOKR", "crs_ZYM98jRX", "crs_TyOZ6gkZ"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 2 }]
+    },
+    {
+      "id": "crs_2cRQUjLK",
+      "name": "Química Analítica II",
+      "code": "CBQI2202",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_ZYM98jRX"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
+    },
+    {
+      "id": "crs_JlrCU2zX",
+      "name": "Fisicoquímica I",
+      "code": "CBQO2203",
+      "credits": 5,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_2aT6ki1j", "crs_IyvHTEZX", "crs_Si7MsJHd"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
+    },
+    {
+      "id": "crs_akQk2ZzN",
+      "name": "Fisiología de Sistemas",
+      "code": "CIBQ2208",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_vmSiCVIm"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 5 }]
+    },
+    {
+      "id": "crs_0m8ik686",
+      "name": "Práctica Intermedia",
+      "code": "CIEP3117",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_Y4CnM7Ka"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
+    },
+    {
+      "id": "crs_MqCuYVN3",
+      "name": "Inglés IV",
+      "code": "CIEP2205",
+      "credits": 3,
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk", "trk_2zkdFXcc"],
+      "prerequisiteIds": ["crs_OUoPCbQ1"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 7 }]
+    },
+    {
+      "id": "crs_gDdzm4cf",
+      "name": "Laboratorio de Análisis Instrumental",
+      "code": "CBQI3101",
+      "credits": 4,
+      "areaId": "are_2164XaRm",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_TdrXHlmX", "crs_2cRQUjLK"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
+    },
+    {
+      "id": "crs_h2zfw4iO",
+      "name": "Botánica y Farmacognosia",
+      "credits": 7,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_Fe7Iovnb", "crs_2cRQUjLK"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 2 }]
+    },
+    {
+      "id": "crs_GG695QH4",
+      "name": "Química de Heterocíclicos y Análisis Espectroscópico",
+      "code": "CIQO3113",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_Fe7Iovnb"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 3 }]
+    },
+    {
+      "id": "crs_w4w1hWOa",
+      "name": "Bioquímica",
+      "code": "CIBQ3114",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_Fe7Iovnb", "crs_JlrCU2zX"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
+    },
+    {
+      "id": "crs_qaAg2BcX",
+      "name": "Farmacología General",
+      "code": "CQFT3102",
+      "credits": 6,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_TdrXHlmX", "crs_akQk2ZzN"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 5 }]
+    },
+    {
+      "id": "crs_glhZPLPL",
+      "name": "Gestión de Calidad",
+      "code": "CITF3116",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_Y4CnM7Ka"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 6 }]
+    },
+    {
+      "id": "crs_YJidsLmN",
+      "name": "Microbiología",
+      "code": "CIBQ3213",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_w4w1hWOa"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
+    },
+    {
+      "id": "crs_lDrdsbsi",
+      "name": "Farmacoquímica I",
+      "code": "CIQF3214",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_GG695QH4", "crs_qaAg2BcX"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 2 }]
+    },
+    {
+      "id": "crs_ILWA0LRu",
+      "name": "Farmacología de Sistemas I",
+      "code": "CIQF3215",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_qaAg2BcX"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
+    },
+    {
+      "id": "crs_2hBfqgP2",
+      "name": "Fisiopatología Molecular",
+      "code": "CIBQ3216",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_akQk2ZzN", "crs_w4w1hWOa"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
+    },
+    {
+      "id": "crs_f4fQ2Ffq",
+      "name": "Legislación Farmacéutica",
+      "code": "CITF3217",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_0m8ik686", "crs_glhZPLPL"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 5 }]
+    },
+    {
+      "id": "crs_Rcrb60u9",
+      "name": "Fisicoquímica Farmacéutica",
+      "code": "CIQO3218",
+      "credits": 6,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_JlrCU2zX"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 6 }]
+    },
+    {
+      "id": "crs_NTWYodss",
+      "name": "Fisiopatología y Semiología",
+      "code": "CIBQ4112",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_2hBfqgP2"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
+    },
+    {
+      "id": "crs_8IPhtnZ5",
+      "name": "Farmacoquímica II",
+      "code": "CIQF4113",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_lDrdsbsi"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
+    },
+    {
+      "id": "crs_eBhXn3F5",
+      "name": "Farmacología de Sistemas II",
+      "code": "CIQF4114",
+      "credits": 6,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_YJidsLmN", "crs_ILWA0LRu"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
+    },
+    {
+      "id": "crs_BlLtc8sO",
+      "name": "Salud Pública",
+      "code": "CITF4115",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_f4fQ2Ffq"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 4 }]
+    },
+    {
+      "id": "crs_y6TImjLC",
+      "name": "Tecnología Farmacéutica I",
+      "code": "CITF4116",
+      "credits": 6,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_f4fQ2Ffq", "crs_Rcrb60u9"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 5 }]
+    },
+    {
+      "id": "crs_2Z4G502M",
+      "name": "Operaciones Unitarias para Q & F",
+      "code": "CICA4117",
+      "credits": 5,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_Rcrb60u9"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 6 }]
+    },
+    {
+      "id": "crs_C70xISyn",
+      "name": "Análisis de Medicamentos, Doping y Drogas de Abuso",
+      "code": "CIQF4211",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_gDdzm4cf", "crs_8IPhtnZ5"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
+    },
+    {
+      "id": "crs_5YYQRyXK",
+      "name": "Nutrición Clínica",
+      "code": "CICA4212",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_NTWYodss"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 2 }]
+    },
+    {
+      "id": "crs_iA0XVUkX",
+      "name": "Bioquímica Clínica",
+      "code": "CIBQ4213",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_NTWYodss"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 3 }]
+    },
+    {
+      "id": "crs_iVsrM1UU",
+      "name": "Biofarmacia y Farmacocinética",
+      "code": "CITF4214",
+      "credits": 6,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_qaAg2BcX", "crs_y6TImjLC"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
+    },
+    {
+      "id": "crs_oSBjyLRf",
+      "name": "Tecnología Farmacéutica II",
+      "code": "CITF4215",
+      "credits": 6,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_y6TImjLC", "crs_2Z4G502M"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
+    },
+    {
+      "id": "crs_G4ymUgPO",
+      "name": "Administración y Gestión Farmacéutica",
+      "code": "CITF4216",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_y6TImjLC"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 6 }]
+    },
+    {
+      "id": "crs_CHtO0EAL",
+      "name": "Estadística Farmacéutica",
+      "code": "CITF4217",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0", "trk_83DjaMgk"],
+      "prerequisiteIds": ["crs_TyOZ6gkZ", "crs_BlLtc8sO"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 7 }]
+    },
+    {
+      "id": "crs_g8wEemDg",
+      "name": "Farmacología Clínica",
+      "code": "CPQF5110",
+      "credits": 6,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_eBhXn3F5", "crs_iA0XVUkX", "crs_iVsrM1UU"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 1 }]
+    },
+    {
+      "id": "crs_X1c4sw02",
+      "name": "Bromatología",
+      "code": "CPCA5111",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_gDdzm4cf", "crs_5YYQRyXK"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 2 }]
+    },
+    {
+      "id": "crs_ooLT8pKh",
+      "name": "Toxicología",
+      "code": "CPQF5112",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_eBhXn3F5", "crs_iA0XVUkX"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 3 }]
+    },
+    {
+      "id": "crs_EKjAwNZp",
+      "name": "Farmacia Asistencial",
+      "code": "CPTF5113",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_BlLtc8sO", "crs_G4ymUgPO"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 4 }]
+    },
+    {
+      "id": "crs_hZ6JwsDC",
+      "name": "Tecnología Cosmética",
+      "code": "CPTF5114",
+      "credits": 4,
+      "areaId": "are_qBXsnd7U",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_oSBjyLRf"],
+      "slots": [{ "programYear": 5, "term": 1, "position": 5 }]
+    },
+    {
+      "id": "crs_H9BFaN7G",
+      "name": "Electivos Especializados",
+      "credits": 7,
+      "trackIds": ["trk_zrj0PWb0"],
+      "isElective": true,
+      "slots": [{ "programYear": 5, "term": 1, "position": 6 }]
+    },
+    {
+      "id": "crs_QPCHTHpc",
+      "name": "Farmacia Clínica",
+      "code": "CPTF5206",
+      "credits": 5,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_g8wEemDg"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 1 }]
+    },
+    {
+      "id": "crs_AEKRqauI",
+      "name": "Práctica Profesional en Farmacia Comunitaria",
+      "code": "CPTF5207",
+      "credits": 7,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_G4ymUgPO", "crs_g8wEemDg", "crs_ooLT8pKh"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 2 }]
+    },
+    {
+      "id": "crs_FKm25ie9",
+      "name": "Biotecnología Farmacéutica",
+      "code": "CPTF5208",
+      "credits": 4,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_2hBfqgP2", "crs_oSBjyLRf"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 3 }]
+    },
+    {
+      "id": "crs_UtW0JwLd",
+      "name": "Economía en Salud y Marketing Farmacéutico",
+      "code": "CPTF5209",
+      "credits": 3,
+      "areaId": "are_A8K0L7jW",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_BlLtc8sO", "crs_G4ymUgPO", "crs_g8wEemDg"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 4 }]
+    },
+    {
+      "id": "crs_QLvgA2xo",
+      "name": "Innovación y Proyectos",
+      "code": "CPTF5210",
+      "credits": 3,
+      "areaId": "are_ESrHvg9p",
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteIds": ["crs_CHtO0EAL"],
+      "slots": [{ "programYear": 5, "term": 3, "position": 5 }]
+    },
+    {
+      "id": "crs_nDkNsMto",
+      "name": "Electivos Especializados",
+      "credits": 8,
+      "trackIds": ["trk_zrj0PWb0"],
+      "isElective": true,
+      "slots": [{ "programYear": 5, "term": 3, "position": 6 }]
+    },
+    {
+      "id": "crs_yrXMSR75",
+      "name": "Actividad Final de Titulación",
+      "code": "CPEP6106",
+      "credits": 30,
+      "trackIds": ["trk_zrj0PWb0"],
+      "prerequisiteCredits": 300,
+      "slots": [{ "programYear": 6, "term": 1, "position": 1 }]
+    }
+  ]
+}

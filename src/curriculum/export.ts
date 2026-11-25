@@ -3,7 +3,7 @@ import { exportableCurriculumSchema } from "@/curriculum/schemas";
 import type { Draft } from "@/types/builder";
 import { slugify } from "@/utils/strings";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export function exportFile({ curriculum }: Draft) {
   const courses = curriculum.courses
@@ -16,17 +16,19 @@ export function exportFile({ curriculum }: Draft) {
       return slotA && slotB ? compareSlots(slotA, slotB) : 0;
     });
 
-  const areaIds = [
+  // Areas in the order courses first use them, then unused ones.
+  const areaOrder = [
     ...new Set([
       ...courses.flatMap((course) => course.areaId ?? []),
       ...curriculum.areas.map((area) => area.id),
     ]),
   ];
-  const exportedAreaId = (areaId: number) => areaIds.indexOf(areaId) + 1;
-  const exportedTrackId = (trackId: number) =>
-    curriculum.tracks.findIndex((track) => track.id === trackId) + 1;
-  const exportedCourseId = (courseId: number) =>
-    courses.findIndex((course) => course.id === courseId) + 1;
+  const byIndexIn =
+    <T>(ids: T[]) =>
+    (a: T, b: T) =>
+      ids.indexOf(a) - ids.indexOf(b);
+  const trackOrder = curriculum.tracks.map((track) => track.id);
+  const courseOrder = courses.map((course) => course.id);
 
   return JSON.stringify({
     schemaVersion: SCHEMA_VERSION,
@@ -45,35 +47,29 @@ export function exportFile({ curriculum }: Draft) {
       .toSorted(comparePeriods)
       .map(({ programYear, term }) => ({ programYear, term })),
     areas: curriculum.areas
-      .map((area) => ({
-        id: exportedAreaId(area.id),
-        name: area.name,
-        color: area.color,
-      }))
-      .toSorted((a, b) => a.id - b.id),
-    tracks: curriculum.tracks.map((track, index) => ({
-      id: index + 1,
+      .toSorted((a, b) => byIndexIn(areaOrder)(a.id, b.id))
+      .map((area) => ({ id: area.id, name: area.name, color: area.color })),
+    tracks: curriculum.tracks.map((track) => ({
+      id: track.id,
       name: track.name,
       ...(track.credentialType !== null && {
         credentialType: track.credentialType,
       }),
     })),
-    courses: courses.map((course, index) => ({
-      id: index + 1,
+    courses: courses.map((course) => ({
+      id: course.id,
       name: course.name,
       ...(course.code !== "" && { code: course.code }),
       credits: course.credits,
       ...(course.duration !== 1 && { duration: course.duration }),
-      ...(course.areaId !== null && { areaId: exportedAreaId(course.areaId) }),
+      ...(course.areaId !== null && { areaId: course.areaId }),
       ...(course.trackIds.length > 0 && {
-        trackIds: course.trackIds
-          .map(exportedTrackId)
-          .toSorted((a, b) => a - b),
+        trackIds: course.trackIds.toSorted(byIndexIn(trackOrder)),
       }),
       ...(course.prerequisiteIds.length > 0 && {
-        prerequisiteIds: course.prerequisiteIds
-          .map(exportedCourseId)
-          .toSorted((a, b) => a - b),
+        prerequisiteIds: course.prerequisiteIds.toSorted(
+          byIndexIn(courseOrder),
+        ),
       }),
       ...(course.prerequisiteCredits > 0 && {
         prerequisiteCredits: course.prerequisiteCredits,

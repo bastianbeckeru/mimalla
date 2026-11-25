@@ -73,7 +73,7 @@ export default function PrerequisitesField({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-heading font-semibold text-sm">Prerrequisitos</h3>
+        <h3 className="font-heading text-sm font-semibold">Prerrequisitos</h3>
         {prerequisites.length > 0 && (
           <span className="text-muted-foreground text-xs tabular-nums">
             {prerequisites.length}
@@ -87,18 +87,18 @@ export default function PrerequisitesField({
             return (
               <li
                 key={prerequisite.id}
-                className="flex items-stretch gap-3 rounded-lg bg-muted/50 py-2 pr-1.5 pl-3"
+                className="bg-muted/50 flex items-stretch gap-3 rounded-lg py-2 pr-1.5 pl-3"
               >
                 <span
-                  className="w-0.5 shrink-0 rounded-full bg-muted-foreground/40"
+                  className="bg-muted-foreground/40 w-0.5 shrink-0 rounded-full"
                   style={{ backgroundColor: getAreaColor(prerequisite) }}
                 />
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-medium text-sm">
+                  <span className="truncate text-sm font-medium">
                     {prerequisite.name}
                   </span>
                   {misplacedIds.includes(prerequisite.id) ? (
-                    <span className="flex items-center gap-1 text-warning text-xs">
+                    <span className="text-warning flex items-center gap-1 text-xs">
                       <TriangleAlert className="size-3 shrink-0" />
                       Está en la misma columna o en una posterior.
                     </span>
@@ -114,7 +114,7 @@ export default function PrerequisitesField({
                   variant="ghost"
                   size="icon-xs"
                   aria-label={`Quitar prerrequisito ${prerequisite.name}`}
-                  className="self-center text-muted-foreground"
+                  className="text-muted-foreground self-center"
                   onClick={() =>
                     dispatch({
                       type: "removePrerequisite",
@@ -135,7 +135,7 @@ export default function PrerequisitesField({
           render={
             <Button
               variant="outline"
-              className="justify-start font-normal text-muted-foreground"
+              className="text-muted-foreground justify-start font-normal"
             />
           }
         >
@@ -222,7 +222,7 @@ export default function PrerequisitesField({
         <Button
           variant="ghost"
           size="sm"
-          className="-ml-2.5 self-start text-muted-foreground"
+          className="text-muted-foreground -ml-2.5 self-start"
           onClick={() => setIsCreditsRequested(true)}
         >
           <Plus />

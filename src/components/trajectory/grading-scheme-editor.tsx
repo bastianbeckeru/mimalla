@@ -101,7 +101,7 @@ export default function GradingSchemeEditor({
 
   if (rows.length === 0 && isReadOnly)
     return (
-      <p className="p-6 text-muted-foreground text-sm">
+      <p className="text-muted-foreground p-6 text-sm">
         Aún no hay evaluaciones.
       </p>
     );
@@ -146,8 +146,8 @@ export default function GradingSchemeEditor({
   return (
     // Holding a drag handle must not select the text around it. Inputs opt back
     // in because Safari would otherwise not let them be edited.
-    <div className="select-none py-3 pr-3 pl-1 [-webkit-touch-callout:none] [&_input]:select-text">
-      <div className="flex h-6 items-center pr-1 text-muted-foreground text-xs">
+    <div className="py-3 pr-3 pl-1 select-none [-webkit-touch-callout:none] [&_input]:select-text">
+      <div className="text-muted-foreground flex h-6 items-center pr-1 text-xs">
         <span className="min-w-0 flex-1 pl-5">Evaluaciones</span>
         <span className="w-15 shrink-0 pr-2 text-right">Peso</span>
         <span className="w-13 shrink-0 pr-2 text-right">Nota</span>
@@ -155,7 +155,7 @@ export default function GradingSchemeEditor({
       </div>
       {rootIssue !== null && <WeightIssue sum={rootIssue} />}
       {hasInvalidGrade && (
-        <p className="flex items-center gap-1.5 py-1 pl-5 text-destructive text-sm">
+        <p className="text-destructive flex items-center gap-1.5 py-1 pl-5 text-sm">
           <TriangleAlert className="size-3.5 shrink-0" />
           Las notas fuera de {formatGrade(scale.min)} a {formatGrade(scale.max)}{" "}
           no se cuentan.
@@ -188,7 +188,7 @@ export default function GradingSchemeEditor({
                 >
                   <Button
                     variant="ghost"
-                    className="h-7 w-full justify-start px-1 text-muted-foreground"
+                    className="text-muted-foreground h-7 w-full justify-start px-1"
                     onClick={() =>
                       add(createSingle(), slot.group.assessment.id)
                     }
@@ -257,7 +257,7 @@ export default function GradingSchemeEditor({
           {drop && (
             <div
               aria-hidden
-              className="pointer-events-none absolute right-0 h-0.5 rounded-full bg-primary"
+              className="bg-primary pointer-events-none absolute right-0 h-0.5 rounded-full"
               style={{
                 top: drop.indicator.top - 1,
                 left: drop.indicator.depth * INDENT_PX + INDICATOR_LEFT_PX,
@@ -267,7 +267,7 @@ export default function GradingSchemeEditor({
         </div>
       </DragDropProvider>
       {hasEmptyGroup && (
-        <p className="py-1 pl-5 text-muted-foreground text-xs">
+        <p className="text-muted-foreground py-1 pl-5 text-xs">
           Los grupos sin evaluaciones no cuentan para la nota.
         </p>
       )}

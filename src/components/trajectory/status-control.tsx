@@ -40,7 +40,7 @@ export default function StatusControl({
           value={option}
           disabled={option === "APPROVED" && !isAvailable}
           className={cn(
-            "h-9 min-w-0 flex-1 text-muted-foreground capitalize",
+            "text-muted-foreground h-9 min-w-0 flex-1 capitalize",
             SELECTED_TEXT[option],
           )}
         >

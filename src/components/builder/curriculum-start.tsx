@@ -28,12 +28,12 @@ function StartOption({
 }) {
   return (
     <>
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground [&_svg]:size-4">
+      <span className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md [&_svg]:size-4">
         {icon}
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="truncate font-medium text-sm">{title}</span>
-        <span className="truncate text-muted-foreground text-xs">
+        <span className="truncate text-sm font-medium">{title}</span>
+        <span className="text-muted-foreground truncate text-xs">
           {description}
         </span>
       </span>
@@ -73,7 +73,7 @@ export default function CurriculumStart({
   return (
     <div className="m-auto flex w-full max-w-110 flex-col gap-8 p-6">
       <div className="flex flex-col gap-2">
-        <h2 className="font-heading font-semibold text-2xl">
+        <h2 className="font-heading text-2xl font-semibold">
           ¿Qué programa vas a armar?
         </h2>
         <p className="text-muted-foreground">

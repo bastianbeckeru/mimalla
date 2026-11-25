@@ -41,7 +41,7 @@ export default function PeriodHeader({
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label={`Opciones de ${label}`}
-          className="group/header flex w-full items-center gap-1 rounded-md px-2 py-1 text-left font-semibold text-muted-foreground text-xs outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-muted data-popup-open:text-foreground"
+          className="group/header text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 data-popup-open:bg-muted data-popup-open:text-foreground flex w-full items-center gap-1 rounded-md px-2 py-1 text-left text-xs font-semibold transition-colors outline-none focus-visible:ring-3"
         >
           <span className="flex-1 truncate">{label}</span>
           <Ellipsis className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover/header:opacity-100 group-focus-visible/header:opacity-100 group-data-popup-open/header:opacity-100" />
@@ -71,7 +71,7 @@ export default function PeriodHeader({
             <Trash2 /> Eliminar columna
           </DropdownMenuItem>
           {!isRemovable && (
-            <p className="max-w-56 px-1.5 py-1 text-muted-foreground text-xs">
+            <p className="text-muted-foreground max-w-56 px-1.5 py-1 text-xs">
               Solo se pueden eliminar columnas sin cursos.
             </p>
           )}

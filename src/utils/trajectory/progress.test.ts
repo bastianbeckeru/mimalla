@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { crs } from "@/test/ids";
 import type { Enrollment } from "@/types/trajectory";
 import { extendCourses } from "@/utils/curriculum";
 import {
@@ -16,8 +17,8 @@ import {
 describe("setEnrollmentStatus", () => {
   const courses = extendCourses([
     course(1),
-    course(2, { prerequisiteIds: [1] }),
-    course(3, { prerequisiteIds: [2] }),
+    course(2, { prerequisiteIds: [crs(1)] }),
+    course(3, { prerequisiteIds: [crs(2)] }),
     course(4),
   ]);
 
@@ -91,9 +92,9 @@ describe("approveThroughPeriod", () => {
     entry,
     curriculum: curriculumOf([
       course(1),
-      course(2, { prerequisiteIds: [1] }),
-      course(3, { prerequisiteIds: [2] }),
-      course(4, { prerequisiteIds: [5] }),
+      course(2, { prerequisiteIds: [crs(1)] }),
+      course(3, { prerequisiteIds: [crs(2)] }),
+      course(4, { prerequisiteIds: [crs(5)] }),
       course(5),
     ]),
   };
@@ -134,7 +135,7 @@ describe("approveThroughPeriod", () => {
 describe("setEnrollmentStatuses", () => {
   const courses = extendCourses([
     course(1),
-    course(2, { prerequisiteIds: [1] }),
+    course(2, { prerequisiteIds: [crs(1)] }),
     course(3),
   ]);
 

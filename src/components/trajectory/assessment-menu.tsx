@@ -51,7 +51,7 @@ export default function AssessmentMenu({
             size="icon-sm"
             aria-label={`Opciones de ${assessment.name}`}
             className={cn(
-              "shrink-0 text-muted-foreground transition-opacity",
+              "text-muted-foreground shrink-0 transition-opacity",
               triggerClassName,
             )}
           />

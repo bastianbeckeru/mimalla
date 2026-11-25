@@ -30,7 +30,7 @@ Opening a pull request does not oblige the maintainers to review or merge it. We
    bun run dev
    ```
 
-No environment variables are needed.
+No environment variables are needed to run the app. The `db:*` scripts need `DATABASE_URL` (see `.env.example`), a Neon connection string; database tests run without it.
 
 ## Pull requests
 

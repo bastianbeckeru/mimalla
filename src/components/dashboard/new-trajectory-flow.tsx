@@ -6,6 +6,7 @@ import { ChevronLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import VersionHint from "@/components/curriculum/version-hint";
+import ImportTrajectoryDialog from "@/components/dashboard/import-trajectory-dialog";
 import { AdaptiveSelect } from "@/components/ui/adaptive-select";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -24,11 +25,13 @@ import {
 } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useImportTrajectory } from "@/hooks/use-import-trajectory";
+import { useTrajectoryStore } from "@/stores/trajectory";
 import type {
   CatalogInstitution,
   CatalogProgram,
   Curriculum,
 } from "@/types/curriculum";
+import { getProgramPath } from "@/utils/curriculum";
 import { ENTRY_TERMS } from "@/utils/period-key";
 
 export const PROGRAM_PARAM = "programa";
@@ -53,10 +56,12 @@ export default function NewTrajectoryFlow({
   catalog,
   requested,
   onImport,
+  onLoadFile,
 }: {
   catalog: CatalogInstitution[];
   requested: RequestedProgram | null;
   onImport: (curriculumPath: string, curriculum: Curriculum) => void;
+  onLoadFile: (curriculumPath: string, curriculum: Curriculum) => void;
 }) {
   const [institution, setInstitution] = useState(
     requested?.institution ?? (catalog.length === 1 ? catalog[0] : undefined),
@@ -91,6 +96,7 @@ export default function NewTrajectoryFlow({
             catalog={catalog}
             institution={institution}
             onInstitutionChange={setInstitution}
+            onLoadFile={onLoadFile}
           />
         )}
       </div>
@@ -116,8 +122,8 @@ function StepDots({ currentStep }: { currentStep: number }) {
           className={cn(
             "h-1.5 rounded-full transition-[width,background-color] duration-200 ease-out motion-reduce:transition-none",
             step === currentStep
-              ? "w-5 bg-foreground"
-              : "w-1.5 bg-foreground/25",
+              ? "bg-foreground w-5"
+              : "bg-foreground/25 w-1.5",
           )}
         />
       ))}
@@ -139,12 +145,12 @@ function Step({
   return (
     <div
       className={cn(
-        "fade-in slide-in-from-bottom-2 mx-auto flex min-h-0 w-full max-w-md flex-1 animate-in flex-col gap-6 px-4 pt-2 pb-6 duration-200 ease-out motion-reduce:animate-none md:flex-none md:pt-0",
+        "fade-in slide-in-from-bottom-2 animate-in mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-6 px-4 pt-2 pb-6 duration-200 ease-out motion-reduce:animate-none md:flex-none md:pt-0",
         className,
       )}
     >
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-balance font-heading font-semibold text-2xl tracking-tight">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-balance">
           {title}
         </h1>
         <p className="text-muted-foreground">{description}</p>
@@ -158,11 +164,18 @@ function ProgramStep({
   catalog,
   institution,
   onInstitutionChange,
+  onLoadFile,
 }: {
   catalog: CatalogInstitution[];
   institution: CatalogInstitution | undefined;
   onInstitutionChange: (institution: CatalogInstitution | undefined) => void;
+  onLoadFile: (curriculumPath: string, curriculum: Curriculum) => void;
 }) {
+  const addImportedTrajectory = useTrajectoryStore(
+    (state) => state.addImportedTrajectory,
+  );
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+
   function chooseProgram(program: CatalogProgram) {
     track("trajectory_program_chosen", { program: program.path });
     window.history.pushState(
@@ -216,7 +229,7 @@ function ProgramStep({
                   <CommandItem
                     key={program.path}
                     value={program.name}
-                    className="min-h-11 pointer-coarse:active:bg-muted pointer-coarse:data-selected:bg-transparent md:min-h-8"
+                    className="pointer-coarse:active:bg-muted min-h-11 md:min-h-8 pointer-coarse:data-selected:bg-transparent"
                     onSelect={() => chooseProgram(program)}
                   >
                     {program.name}
@@ -228,17 +241,42 @@ function ProgramStep({
         </Command>
       )}
 
-      <p className="mt-auto shrink-0 text-muted-foreground text-xs">
-        ¿No encuentras tu carrera?{" "}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={PROGRAM_REQUEST_URL}
-          className="underline underline-offset-4 hover:text-foreground"
-        >
-          Solicítala aquí
-        </a>
-      </p>
+      <div className="text-muted-foreground mt-auto shrink-0 space-y-1 text-xs">
+        <p>
+          ¿Tienes un archivo?{" "}
+          <button
+            type="button"
+            className="hover:text-foreground underline underline-offset-4"
+            onClick={() => setIsLoadingFile(true)}
+          >
+            Cárgalo
+          </button>
+        </p>
+        <p>
+          ¿No encuentras tu carrera?{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={PROGRAM_REQUEST_URL}
+            className="hover:text-foreground underline underline-offset-4"
+          >
+            Solicítala aquí
+          </a>
+        </p>
+      </div>
+      <ImportTrajectoryDialog
+        open={isLoadingFile}
+        onOpenChange={setIsLoadingFile}
+        target={null}
+        current={null}
+        onImport={({ curriculum, ...imported }) => {
+          addImportedTrajectory(imported);
+          track("trajectory_created_from_file", {
+            program: getProgramPath(imported.curriculumPath),
+          });
+          onLoadFile(imported.curriculumPath, curriculum);
+        }}
+      />
     </Step>
   );
 }

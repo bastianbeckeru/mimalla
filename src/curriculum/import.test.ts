@@ -3,6 +3,7 @@ import { apply } from "@/builder/apply";
 import { createDraft } from "@/builder/draft";
 import { exportFile, isExportable } from "@/curriculum/export";
 import { importFile } from "@/curriculum/import";
+import { are, crs, trk } from "@/test/ids";
 import type { Action } from "@/types/builder";
 
 type FileRecord = Record<string, unknown>;
@@ -17,7 +18,7 @@ type FileFixture = FileRecord & {
 
 function exampleFile(): FileFixture {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     program: { name: "Derecho", institution: "UDP" },
     effectiveYear: 2023,
     versionName: "v6.0",
@@ -28,32 +29,36 @@ function exampleFile(): FileFixture {
       { programYear: 1, term: 4 },
       { programYear: 2, term: 1 },
     ],
-    areas: [{ id: 1, name: "Derecho Privado", color: "#4f46e5" }],
+    areas: [{ id: are(1), name: "Derecho Privado", color: "#4f46e5" }],
     tracks: [
-      { id: 1, name: "Licenciatura en Derecho", credentialType: "academic" },
+      {
+        id: trk(1),
+        name: "Licenciatura en Derecho",
+        credentialType: "academic",
+      },
     ],
     courses: [
       {
-        id: 1,
+        id: crs(1),
         name: "Introducción al Derecho",
         code: "DER101",
         credits: 6,
-        areaId: 1,
-        trackIds: [1],
+        areaId: are(1),
+        trackIds: [trk(1)],
         slots: [{ programYear: 1, term: 1, position: 1 }],
       },
       {
-        id: 2,
+        id: crs(2),
         name: "Derecho Civil",
         credits: 10,
         duration: 2,
-        trackIds: [1],
-        prerequisiteIds: [1],
+        trackIds: [trk(1)],
+        prerequisiteIds: [crs(1)],
         prerequisiteCredits: 30,
         slots: [{ programYear: 1, term: 3, position: 1 }],
       },
       {
-        id: 3,
+        id: crs(3),
         name: "Curso de Formación General",
         credits: 5,
         isElective: true,
@@ -94,17 +99,21 @@ describe("rejecting an invalid file", () => {
       importChanged((file) => {
         delete file.schemaVersion;
       }),
-    ).toEqual(rejection("La versión del formato (schemaVersion) debe ser 1."));
+    ).toEqual(
+      rejection(
+        "La versión del formato (schemaVersion) debe ser un número entre 1 y 2.",
+      ),
+    );
   });
 
   test("rejects a higher schema version", () => {
     expect(
       importChanged((file) => {
-        file.schemaVersion = 2;
+        file.schemaVersion = 3;
       }),
     ).toEqual(
       rejection(
-        "El archivo usa la versión 2 del formato, más nueva que la que reconoce este constructor.",
+        "El archivo usa la versión 3 del formato, más nueva que la que reconoce este constructor.",
       ),
     );
   });
@@ -190,9 +199,11 @@ describe("rejecting an invalid file", () => {
   test("rejects an unknown term system", () => {
     expect(
       importChanged((file) => {
-        file.termSystem = "trimester";
+        file.termSystem = "quarter";
       }),
-    ).toEqual(rejection('El régimen debe ser "semester" o "annual".'));
+    ).toEqual(
+      rejection('El régimen debe ser "semester", "trimester" o "annual".'),
+    );
   });
 
   test("rejects a curriculum without periods", () => {
@@ -248,15 +259,15 @@ describe("rejecting an invalid file", () => {
     );
   });
 
-  test("rejects area ids with gaps", () => {
+  test("rejects an area id without its prefix", () => {
     expect(
       importChanged((file) => {
-        file.areas[0].id = 2;
-        file.courses[0].areaId = 2;
+        file.areas[0].id = crs(1);
+        file.courses[0].areaId = crs(1);
       }),
     ).toEqual(
       rejection(
-        "Los ids de las áreas deben ir de 1 a 1, sin saltos ni repetirse.",
+        "Los ids de las áreas deben ser distintos y tener la forma are_ seguida de 8 letras o números.",
       ),
     );
   });
@@ -264,11 +275,11 @@ describe("rejecting an invalid file", () => {
   test("rejects repeated course ids", () => {
     expect(
       importChanged((file) => {
-        file.courses[2].id = 2;
+        file.courses[2].id = crs(2);
       }),
     ).toEqual(
       rejection(
-        "Los ids de los cursos deben ir de 1 a 3, sin saltos ni repetirse.",
+        "Los ids de los cursos deben ser distintos y tener la forma crs_ seguida de 8 letras o números.",
       ),
     );
   });
@@ -278,7 +289,7 @@ describe("rejecting an invalid file", () => {
       importChanged((file) => {
         delete file.areas[0].name;
       }),
-    ).toEqual(rejection("El área 1 debe tener un nombre."));
+    ).toEqual(rejection("El área are_00000001 debe tener un nombre."));
   });
 
   test("rejects an area color that is not lowercase #rrggbb", () => {
@@ -301,14 +312,14 @@ describe("rejecting an invalid file", () => {
     ).toEqual(rejection("La malla debe tener una lista de planes."));
   });
 
-  test("rejects track ids with gaps", () => {
+  test("rejects a track id that is a number", () => {
     expect(
       importChanged((file) => {
-        file.tracks[0].id = 2;
+        file.tracks[0].id = 1;
       }),
     ).toEqual(
       rejection(
-        "Los ids de los planes deben ir de 1 a 1, sin saltos ni repetirse.",
+        "Los ids de los planes deben ser distintos y tener la forma trk_ seguida de 8 letras o números.",
       ),
     );
   });
@@ -318,7 +329,7 @@ describe("rejecting an invalid file", () => {
       importChanged((file) => {
         file.tracks[0].name = " ";
       }),
-    ).toEqual(rejection("El plan 1 debe tener un nombre."));
+    ).toEqual(rejection("El plan trk_00000001 debe tener un nombre."));
   });
 
   test("rejects an unknown credential type", () => {
@@ -348,7 +359,7 @@ describe("rejecting an invalid file", () => {
   test("rejects a track without courses", () => {
     expect(
       importChanged((file) => {
-        file.tracks.push({ id: 2, name: "Título de Abogado" });
+        file.tracks.push({ id: trk(2), name: "Título de Abogado" });
       }),
     ).toEqual(rejection('El plan "Título de Abogado" no tiene cursos.'));
   });
@@ -358,7 +369,7 @@ describe("rejecting an invalid file", () => {
       importChanged((file) => {
         file.courses[1].name = null;
       }),
-    ).toEqual(rejection("El curso 2 debe tener un nombre."));
+    ).toEqual(rejection("El curso crs_00000002 debe tener un nombre."));
   });
 
   test("rejects a course with a blank name", () => {
@@ -366,7 +377,7 @@ describe("rejecting an invalid file", () => {
       importChanged((file) => {
         file.courses[1].name = "  ";
       }),
-    ).toEqual(rejection("El curso 2 debe tener un nombre."));
+    ).toEqual(rejection("El curso crs_00000002 debe tener un nombre."));
   });
 
   test("rejects a course code that is not text", () => {
@@ -456,7 +467,7 @@ describe("rejecting an invalid file", () => {
   test("rejects an area that does not exist", () => {
     expect(
       importChanged((file) => {
-        file.courses[0].areaId = 2;
+        file.courses[0].areaId = are(2);
       }),
     ).toEqual(
       rejection('El área del curso "Introducción al Derecho" no existe.'),
@@ -474,7 +485,7 @@ describe("rejecting an invalid file", () => {
   test("rejects a track that does not exist", () => {
     expect(
       importChanged((file) => {
-        file.courses[0].trackIds = [1, 2];
+        file.courses[0].trackIds = [trk(1), trk(2)];
       }),
     ).toEqual(
       rejection(
@@ -484,7 +495,7 @@ describe("rejecting an invalid file", () => {
   });
 
   test("rejects an empty or repeated track list", () => {
-    for (const trackIds of [[], [1, 1]])
+    for (const trackIds of [[], [trk(1), trk(1)]])
       expect(
         importChanged((file) => {
           file.courses[0].trackIds = trackIds;
@@ -511,7 +522,7 @@ describe("rejecting an invalid file", () => {
   test("rejects a repeated prerequisite", () => {
     expect(
       importChanged((file) => {
-        file.courses[1].prerequisiteIds = [1, 1];
+        file.courses[1].prerequisiteIds = [crs(1), crs(1)];
       }),
     ).toEqual(
       rejection(
@@ -523,7 +534,7 @@ describe("rejecting an invalid file", () => {
   test("rejects a prerequisite that does not exist", () => {
     expect(
       importChanged((file) => {
-        file.courses[1].prerequisiteIds = [4];
+        file.courses[1].prerequisiteIds = [crs(4)];
       }),
     ).toEqual(
       rejection(
@@ -535,7 +546,7 @@ describe("rejecting an invalid file", () => {
   test("rejects a course that is its own prerequisite", () => {
     expect(
       importChanged((file) => {
-        file.courses[1].prerequisiteIds = [2];
+        file.courses[1].prerequisiteIds = [crs(2)];
       }),
     ).toEqual(
       rejection(
@@ -547,8 +558,8 @@ describe("rejecting an invalid file", () => {
   test("rejects a cycle of prerequisites", () => {
     expect(
       importChanged((file) => {
-        file.courses[0].prerequisiteIds = [3];
-        file.courses[2].prerequisiteIds = [2];
+        file.courses[0].prerequisiteIds = [crs(3)];
+        file.courses[2].prerequisiteIds = [crs(2)];
       }),
     ).toEqual(
       rejection(
@@ -671,22 +682,22 @@ describe("importing a file", () => {
             { programYear: 1, term: 4 },
             { programYear: 2, term: 1 },
           ],
-          areas: [{ id: 1, name: "Derecho Privado", color: "#4f46e5" }],
+          areas: [{ id: are(1), name: "Derecho Privado", color: "#4f46e5" }],
           tracks: [
             {
-              id: 1,
+              id: trk(1),
               name: "Licenciatura en Derecho",
               credentialType: "academic",
             },
           ],
           courses: [
             {
-              id: 1,
+              id: crs(1),
               name: "Introducción al Derecho",
               code: "DER101",
               credits: 6,
-              areaId: 1,
-              trackIds: [1],
+              areaId: are(1),
+              trackIds: [trk(1)],
               duration: 1,
               prerequisiteIds: [],
               prerequisiteCredits: 0,
@@ -694,20 +705,20 @@ describe("importing a file", () => {
               slots: [{ programYear: 1, term: 1, position: 1 }],
             },
             {
-              id: 2,
+              id: crs(2),
               name: "Derecho Civil",
               code: "",
               credits: 10,
               areaId: null,
-              trackIds: [1],
+              trackIds: [trk(1)],
               duration: 2,
-              prerequisiteIds: [1],
+              prerequisiteIds: [crs(1)],
               prerequisiteCredits: 30,
               isElective: false,
               slots: [{ programYear: 1, term: 3, position: 1 }],
             },
             {
-              id: 3,
+              id: crs(3),
               name: "Curso de Formación General",
               code: "",
               credits: 5,
@@ -725,9 +736,96 @@ describe("importing a file", () => {
           ],
         },
         baseColor: "#4f46e5",
-        handColoredAreaIds: [1],
+        handColoredAreaIds: [are(1)],
       },
     });
+  });
+});
+
+/** The example file as version 1 wrote it, with ids numbered from 1. */
+function exampleFileV1() {
+  const file = exampleFile();
+  const numbers = new Map<unknown, number>([
+    [crs(1), 1],
+    [crs(2), 2],
+    [crs(3), 3],
+    [are(1), 1],
+    [trk(1), 1],
+  ]);
+  const number = (id: unknown) => numbers.get(id);
+  return {
+    ...file,
+    schemaVersion: 1,
+    areas: file.areas.map((area) => ({ ...area, id: number(area.id) })),
+    tracks: file.tracks.map((track) => ({ ...track, id: number(track.id) })),
+    courses: file.courses.map((course) => ({
+      ...course,
+      id: number(course.id),
+      ...(course.areaId !== undefined && { areaId: number(course.areaId) }),
+      ...(Array.isArray(course.trackIds) && {
+        trackIds: course.trackIds.map(number),
+      }),
+      ...(Array.isArray(course.prerequisiteIds) && {
+        prerequisiteIds: course.prerequisiteIds.map(number),
+      }),
+    })),
+  };
+}
+
+describe("importing a version 1 file", () => {
+  test("gives new ids to courses, areas and tracks and keeps their references", () => {
+    const result = importFile(JSON.stringify(exampleFileV1()));
+    if (!result.ok) throw new Error(result.reason);
+    const { areas, tracks, courses } = result.draft.curriculum;
+    const [intro, civil] = courses;
+
+    expect(areas[0]?.id).toMatch(/^are_[A-Za-z0-9]{8}$/);
+    expect(tracks[0]?.id).toMatch(/^trk_[A-Za-z0-9]{8}$/);
+    expect(courses.map((course) => course.id)).toEqual([
+      expect.stringMatching(/^crs_[A-Za-z0-9]{8}$/),
+      expect.stringMatching(/^crs_[A-Za-z0-9]{8}$/),
+      expect.stringMatching(/^crs_[A-Za-z0-9]{8}$/),
+    ]);
+    expect(intro?.areaId).toBe(areas[0]?.id ?? null);
+    expect(intro?.trackIds).toEqual(tracks.map((track) => track.id));
+    expect(civil?.prerequisiteIds).toEqual(intro ? [intro.id] : []);
+  });
+
+  test("rejects ids with gaps", () => {
+    const file = exampleFileV1();
+    file.areas[0] = { ...file.areas[0], id: 2 };
+
+    expect(importFile(JSON.stringify(file))).toEqual(
+      rejection(
+        "Los ids de las áreas deben ir de 1 a 1, sin saltos ni repetirse.",
+      ),
+    );
+  });
+
+  test("rejects the trimester term system", () => {
+    expect(
+      importFile(
+        JSON.stringify({ ...exampleFileV1(), termSystem: "trimester" }),
+      ),
+    ).toEqual(rejection('El régimen debe ser "semester" o "annual".'));
+  });
+});
+
+describe("importing a trimester file", () => {
+  test("loads three regular terms and an intensive one per year", () => {
+    const result = importChanged((file) => {
+      file.termSystem = "trimester";
+      file.periods = [
+        { programYear: 1, term: 1 },
+        { programYear: 1, term: 2 },
+        { programYear: 1, term: 3 },
+        { programYear: 1, term: 4 },
+        { programYear: 2, term: 1 },
+      ];
+    });
+
+    expect(result.ok && result.draft.curriculum.termSystem).toBe("trimester");
+    expect(result.ok && result.draft.curriculum.periods).toHaveLength(5);
   });
 });
 
@@ -752,42 +850,57 @@ const curriculumActions: Action[] = [
     },
   },
   { type: "addIntensiveTerm", programYear: 1, term: 4 },
-  { type: "addArea", name: "Privado" },
-  { type: "addArea", name: "Público" },
+  { type: "addArea", id: are(1), name: "Privado" },
+  { type: "addArea", id: are(2), name: "Público" },
   {
     type: "addCourse",
+    id: crs(1),
     name: "Nuevo curso",
     period: { programYear: 1, term: 1 },
   },
   {
     type: "addCourse",
+    id: crs(2),
     name: "Nuevo curso",
     period: { programYear: 1, term: 1 },
   },
   {
     type: "addCourse",
+    id: crs(3),
     name: "Nuevo curso",
     period: { programYear: 1, term: 3 },
   },
-  { type: "editCourse", courseId: 1, changes: { name: "Civil", code: "D1" } },
-  { type: "editCourse", courseId: 2, changes: { isElective: true } },
-  { type: "addSlot", courseId: 2 },
+  {
+    type: "editCourse",
+    courseId: crs(1),
+    changes: { name: "Civil", code: "D1" },
+  },
+  { type: "editCourse", courseId: crs(2), changes: { isElective: true } },
+  { type: "addSlot", courseId: crs(2) },
   {
     type: "moveSlot",
-    courseId: 2,
+    courseId: crs(2),
     slotIndex: 1,
     to: { programYear: 2, term: 1, position: 2 },
   },
-  { type: "editCourse", courseId: 3, changes: { credits: 10, duration: 2 } },
-  { type: "assignArea", courseId: 1, areaId: 2 },
-  { type: "assignArea", courseId: 3, areaId: 1 },
-  { type: "addPrerequisite", courseId: 3, prerequisiteId: 1 },
-  { type: "setPrerequisiteCredits", courseId: 3, credits: 30 },
-  { type: "addTrack", name: "Plan Común" },
-  { type: "addTrack", name: "Licenciatura" },
-  { type: "editTrack", trackId: 2, changes: { credentialType: "academic" } },
-  { type: "assignTracks", courseId: 1, trackIds: [1, 2] },
-  { type: "assignTracks", courseId: 3, trackIds: [2] },
+  {
+    type: "editCourse",
+    courseId: crs(3),
+    changes: { credits: 10, duration: 2 },
+  },
+  { type: "assignArea", courseId: crs(1), areaId: are(2) },
+  { type: "assignArea", courseId: crs(3), areaId: are(1) },
+  { type: "addPrerequisite", courseId: crs(3), prerequisiteId: crs(1) },
+  { type: "setPrerequisiteCredits", courseId: crs(3), credits: 30 },
+  { type: "addTrack", id: trk(1), name: "Plan Común" },
+  { type: "addTrack", id: trk(2), name: "Licenciatura" },
+  {
+    type: "editTrack",
+    trackId: trk(2),
+    changes: { credentialType: "academic" },
+  },
+  { type: "assignTracks", courseId: crs(1), trackIds: [trk(1), trk(2)] },
+  { type: "assignTracks", courseId: crs(3), trackIds: [trk(2)] },
 ];
 
 describe("loading back a downloaded file", () => {
@@ -800,8 +913,8 @@ describe("loading back a downloaded file", () => {
   test("restores the same draft when it was built in file order", () => {
     const draft = draftAfter(
       ...curriculumActions,
-      { type: "assignArea", courseId: 1, areaId: 1 },
-      { type: "assignArea", courseId: 3, areaId: 2 },
+      { type: "assignArea", courseId: crs(1), areaId: are(1) },
+      { type: "assignArea", courseId: crs(3), areaId: are(2) },
     );
 
     expect(importDraft(exportFile(draft))).toEqual(draft);
@@ -810,14 +923,14 @@ describe("loading back a downloaded file", () => {
   test("restores the base color from the area shades and keeps other colors as hand-colored", () => {
     const draft = draftAfter(
       ...curriculumActions,
-      { type: "addArea", name: "Sin cursos" },
+      { type: "addArea", id: are(3), name: "Sin cursos" },
       { type: "setBaseColor", color: "#16a34a" },
-      { type: "setAreaColor", areaId: 3, color: "#123456" },
+      { type: "setAreaColor", areaId: are(3), color: "#123456" },
     );
 
     const imported = importDraft(exportFile(draft));
 
     expect(imported.baseColor).toBe("#16a34a");
-    expect(imported.handColoredAreaIds).toEqual([3]);
+    expect(imported.handColoredAreaIds).toEqual([are(3)]);
   });
 });

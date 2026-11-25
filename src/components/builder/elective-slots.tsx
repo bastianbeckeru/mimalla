@@ -79,7 +79,7 @@ export default function ElectiveSlots({
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-2.5 self-start text-muted-foreground"
+            className="text-muted-foreground -ml-2.5 self-start"
             onClick={() => dispatch({ type: "addSlot", courseId: course.id })}
           >
             <Plus />

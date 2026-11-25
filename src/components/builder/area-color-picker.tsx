@@ -93,7 +93,7 @@ function ColorGroup({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="font-medium text-muted-foreground text-xs">{label}</span>
+      <span className="text-muted-foreground text-xs font-medium">{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {colors.map((color) => (
           <ColorSwatch

@@ -46,7 +46,7 @@ export default function MoveEnrollmentDialog({
                   type="button"
                   disabled={isCurrent || conflict !== null}
                   className={cn(
-                    "flex min-h-11 w-full flex-col justify-center rounded-lg px-2 py-1.5 text-left text-sm hover:bg-muted disabled:pointer-events-none",
+                    "hover:bg-muted flex min-h-11 w-full flex-col justify-center rounded-lg px-2 py-1.5 text-left text-sm disabled:pointer-events-none",
                     (isCurrent || conflict !== null) && "text-muted-foreground",
                   )}
                   onClick={() => onMove(period)}

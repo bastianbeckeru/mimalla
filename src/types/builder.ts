@@ -1,19 +1,22 @@
 import type { HexColor } from "@/types/colors";
 import type {
   Area,
+  AreaId,
   Course,
+  CourseId,
   Curriculum,
   CurriculumDetails,
   Period,
   Slot,
   TermSystem,
   Track,
+  TrackId,
 } from "@/types/curriculum";
 
 export type Draft = {
   curriculum: Curriculum;
   baseColor: HexColor;
-  handColoredAreaIds: number[];
+  handColoredAreaIds: AreaId[];
 };
 
 export type Handlers<A extends { type: string }> = {
@@ -26,37 +29,43 @@ export type CurriculumAction = {
 };
 
 export type CourseAction =
-  | { type: "addCourse"; name: string; period: Period; position?: number }
+  | {
+      type: "addCourse";
+      id: CourseId;
+      name: string;
+      period: Period;
+      position?: number;
+    }
   | {
       type: "editCourse";
-      courseId: number;
+      courseId: CourseId;
       changes: Partial<
         Pick<Course, "name" | "code" | "credits" | "duration" | "isElective">
       >;
     }
-  | { type: "deleteCourse"; courseId: number };
+  | { type: "deleteCourse"; courseId: CourseId };
 
 export type AreaAction =
-  | { type: "addArea"; name: string }
+  | { type: "addArea"; id: AreaId; name: string }
   | {
       type: "editArea";
-      areaId: number;
+      areaId: AreaId;
       changes: Partial<Pick<Area, "name">>;
     }
-  | { type: "deleteArea"; areaId: number }
-  | { type: "setAreaColor"; areaId: number; color: string }
+  | { type: "deleteArea"; areaId: AreaId }
+  | { type: "setAreaColor"; areaId: AreaId; color: string }
   | { type: "setBaseColor"; color: string }
-  | { type: "assignArea"; courseId: number; areaId: number | null };
+  | { type: "assignArea"; courseId: CourseId; areaId: AreaId | null };
 
 export type TrackAction =
-  | { type: "addTrack"; name: string }
+  | { type: "addTrack"; id: TrackId; name: string }
   | {
       type: "editTrack";
-      trackId: number;
+      trackId: TrackId;
       changes: Partial<Pick<Track, "name" | "credentialType">>;
     }
-  | { type: "deleteTrack"; trackId: number }
-  | { type: "assignTracks"; courseId: number; trackIds: number[] };
+  | { type: "deleteTrack"; trackId: TrackId }
+  | { type: "assignTracks"; courseId: CourseId; trackIds: TrackId[] };
 
 export type PeriodAction =
   | {
@@ -71,27 +80,27 @@ export type PeriodAction =
 
 export type SlotAction = {
   type: "moveSlot";
-  courseId: number;
+  courseId: CourseId;
   slotIndex: number;
   to: Slot;
 };
 
 export type ResizeAction = {
   type: "resizeCourse";
-  courseId: number;
+  courseId: CourseId;
   slotIndex: number;
   rows: number;
   duration: number;
 };
 
 export type ElectiveAction =
-  | { type: "addSlot"; courseId: number }
-  | { type: "removeSlot"; courseId: number; slotIndex: number };
+  | { type: "addSlot"; courseId: CourseId }
+  | { type: "removeSlot"; courseId: CourseId; slotIndex: number };
 
 export type PrerequisiteAction =
-  | { type: "addPrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "removePrerequisite"; courseId: number; prerequisiteId: number }
-  | { type: "setPrerequisiteCredits"; courseId: number; credits: number };
+  | { type: "addPrerequisite"; courseId: CourseId; prerequisiteId: CourseId }
+  | { type: "removePrerequisite"; courseId: CourseId; prerequisiteId: CourseId }
+  | { type: "setPrerequisiteCredits"; courseId: CourseId; credits: number };
 
 export type Action =
   | CurriculumAction

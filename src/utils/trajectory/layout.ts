@@ -5,7 +5,7 @@ import {
   pushDownCollisions,
 } from "@/curriculum/grid";
 import { compareSlots } from "@/curriculum/periods";
-import type { Curriculum, PeriodKey } from "@/types/curriculum";
+import type { CourseId, Curriculum, PeriodKey } from "@/types/curriculum";
 import type { Enrollment, Entry, TrajectoryContext } from "@/types/trajectory";
 import { arabicToRoman } from "@/utils/numbers";
 import {
@@ -158,7 +158,7 @@ export function settleEnrollments(
   anchorIds: string[] = [],
 ): Enrollment[] {
   const layout = layOutTrajectory(enrollments, context);
-  const cardsOf = (courseId: number) =>
+  const cardsOf = (courseId: CourseId) =>
     layout.cards.filter((card) => card.courseId === courseId);
   const anchors = anchorIds.flatMap((id) => {
     const card = layout.cards.find((candidate) => candidate.id === id);

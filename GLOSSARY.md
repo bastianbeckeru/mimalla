@@ -17,10 +17,10 @@ A degree course of study that an institution offers for admission, such as Derec
 _Avoid_: Career, carrera, degree
 
 **Catalog**:
-Every program available in Mi Malla, grouped by institution and department.
+Every published curriculum in Mi Malla, grouped by institution, department and program.
 
 **Curriculum viewer**:
-The public page of a program, where anyone explores one of its official curriculums.
+The public page of a program, where anyone explores one of its curriculums.
 
 ## Curriculums
 
@@ -29,22 +29,22 @@ A course layout of a program, with its slots, areas, courses and tracks. Shown i
 _Avoid_: Malla (alone), structure, program data
 
 **Official curriculum**:
-A curriculum the institution publishes and Mi Malla lists in its catalog. It applies to the students who enter the program from its year on, until a newer one replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
+The curriculum an institution sets for a program, as its own documents publish it. Each curriculum in the catalog transcribes one. It applies to the students who enter the program from its year on, until a newer one replaces it; students do not move from one curriculum to another. Shown in the UI as "malla oficial".
 
 **Effective year**:
 The first year of entry a curriculum applies to. Students who enter the program that year or later follow it, until a curriculum with a later effective year replaces it.
 _Avoid_: Year (alone), start year
 
 **Builder**:
-Where anyone lays out a curriculum from scratch and downloads it as a curriculum file. A curriculum made in the builder is not official until it enters the catalog. Shown in the UI as "constructor de mallas".
+Where anyone lays out a curriculum from scratch and downloads it as a curriculum file. A curriculum made in the builder enters the catalog when it is published or proposed as a change. Shown in the UI as "constructor de mallas".
 _Avoid_: Editor, creator
 
 **Curriculum file**:
-A curriculum saved as a `.malla` file. It is the only way a curriculum travels: the builder downloads and loads it, and the catalog imports it. It holds the curriculum alone, not catalog data such as the department or the program codes.
+A curriculum saved as a `.malla` file. It is the only way a curriculum travels: the builder downloads and loads it, and each revision in the catalog is one. It holds the curriculum alone, not catalog data such as the department or the program codes.
 _Avoid_: JSON, builder file, malla file
 
 **Course**:
-A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
+A subject an institution teaches, with its own code and credits. The code identifies the course within its institution, though a curriculum may leave it out until someone adds it, and the same course can belong to the curriculums of several programs. Its prerequisites depend on each curriculum. Shown in the UI as "curso".
 _Avoid_: Ramo, subject, asignatura
 
 **Curriculum course**:
@@ -92,6 +92,54 @@ _Avoid_: Plan (in code: it clashes with "plan de estudios" and with planning a t
 What completing a track grants, if anything: a professional title, an academic degree, a technical title, a certificate or a mention. A student can earn several mentions.
 _Avoid_: Diploma
 
+## Collaboration
+
+**Revision**:
+A version of a curriculum in the catalog, recorded with its author and a message. A revision never changes; a change makes a new one. The list of revisions is shown in the UI as "historial".
+_Avoid_: Version (it clashes with the version name of a curriculum), commit, snapshot
+
+**Current revision**:
+The revision of a curriculum that the curriculum viewer shows and new trajectories start from.
+_Avoid_: Main, head, latest
+
+**Publish**:
+To add to the catalog a curriculum for a program and effective year that has none. A program has at most one curriculum per effective year.
+
+**Proposal**:
+A change to a curriculum, made in the builder, that becomes its current revision once approved. Shown in the UI as "propuesta de cambios".
+_Avoid_: Pull request, suggestion, request
+
+**Conflict**:
+A field of a course that both a proposal and the current revision changed since the proposal started, so the proposal cannot be approved until its author updates it.
+
+**Community approval**:
+The approval of a proposal that no maintainer answered in time, when other users approve it and nobody objects.
+
+**Maintainer**:
+A user who approves or closes the proposals of a curriculum and changes it directly. Whoever publishes a curriculum is its first maintainer. Shown in the UI as "mantenedor".
+_Avoid_: Owner, author, moderator
+
+**Admin**:
+A Mi Malla operator who can approve proposals in any curriculum, assign maintainers, verify and archive curriculums, and add institutions and programs.
+_Avoid_: Moderator, superadmin
+
+**Community curriculum**:
+A curriculum in the catalog that no admin has verified. Shown in the UI as "de la comunidad".
+
+**Verified curriculum**:
+A curriculum one of whose revisions an admin checked against its official curriculum. Revisions approved after that one are shown as changes since verification. Shown in the UI as "verificada".
+_Avoid_: Official (an official curriculum is the institution's own)
+
+**Draft curriculum**:
+A curriculum for a program not yet in the catalog, visible only to its author until an admin adds the program.
+
+**Archived curriculum**:
+A curriculum an admin removed from the catalog, such as spam or a duplicate. Trajectories that use it keep working.
+_Avoid_: Deleted
+
+**Completeness**:
+How much of the data a curriculum should have it already has, such as the code of every course.
+
 ## Trajectories
 
 **Dashboard**:
@@ -102,7 +150,7 @@ A student's own path through a curriculum: it starts as a copy of a base curricu
 _Avoid_: Student curriculum, study plan, roadmap, malla
 
 **Base curriculum**:
-The curriculum a trajectory was created from, and the one it returns to when reset.
+The curriculum a trajectory was created from, at one of its revisions, and the one it returns to when reset. The trajectory can move to a newer revision without losing its enrollments.
 
 **Entry**:
 The period in which the student started the program; it anchors the trajectory to calendar years.
@@ -120,11 +168,11 @@ The part of a year a period or slot covers: a regular term of the term system, o
 _Avoid_: Season
 
 **Term system**:
-How a curriculum splits each program year into regular terms: two semesters, or one annual term.
+How a curriculum splits each program year into regular terms: two semesters, three trimesters, or one annual term.
 _Avoid_: Régimen, calendar
 
 **Semester**:
-A first or second semester term. Winter and summer terms are not semesters and do not count toward the semester number.
+A first or second semester term. Winter and summer terms are not semesters and do not count toward the semester number. Institutions that call these terms cuatrimestres use the same term system with that name.
 
 **Enrollment**:
 A course placed in a period of a trajectory, with its status and its grading scheme. The same elective can have several enrollments, and a failed course retaken later gets a new enrollment.
@@ -188,3 +236,6 @@ _Avoid_: Target grade, needed grade
 The average of the course grades of every approved and failed enrollment of a trajectory, weighted by credits. Each attempt at a course counts.
 _Avoid_: GPA, PPA, global average
 
+**Trajectory file**:
+A trajectory saved as an `.xlsx` workbook, holding its entry, grading scale, enrollments and grading schemes. It is a backup and a way in for grades kept in a spreadsheet: loading it replaces a trajectory, never merges into one. Shown in the UI as "progreso" ("Descargar progreso", "Cargar progreso").
+_Avoid_: Backup file, export, CSV

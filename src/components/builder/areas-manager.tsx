@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { BASE_COLORS } from "@/curriculum/colors";
+import { createAreaId } from "@/curriculum/ids";
 import type { Action, Draft } from "@/types/builder";
 
 const NEW_AREA_NAME = "Nueva área";
@@ -41,7 +42,7 @@ export default function AreasManager({
         className="w-80 gap-4"
       >
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium text-muted-foreground text-xs">
+          <span className="text-muted-foreground text-xs font-medium">
             Color base
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -57,7 +58,7 @@ export default function AreasManager({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="font-medium text-muted-foreground text-xs">
+          <span className="text-muted-foreground text-xs font-medium">
             Áreas
           </span>
           {areas.length === 0 && (
@@ -98,7 +99,13 @@ export default function AreasManager({
           <Button
             variant="ghost"
             className="self-start"
-            onClick={() => dispatch({ type: "addArea", name: NEW_AREA_NAME })}
+            onClick={() =>
+              dispatch({
+                type: "addArea",
+                id: createAreaId(),
+                name: NEW_AREA_NAME,
+              })
+            }
           >
             <Plus />
             Agregar área

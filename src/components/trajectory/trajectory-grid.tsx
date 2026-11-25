@@ -77,7 +77,7 @@ const PeriodHeader = memo(function PeriodHeader({
         <DropdownMenuTrigger
           aria-label={actionsLabel}
           className={cn(
-            "flex min-h-7 w-full items-center gap-1.5 rounded-md px-2 py-1 text-left font-semibold text-muted-foreground text-xs outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring data-popup-open:bg-muted",
+            "text-muted-foreground hover:bg-muted focus-visible:ring-ring data-popup-open:bg-muted flex min-h-7 w-full items-center gap-1.5 rounded-md px-2 py-1 text-left text-xs font-semibold outline-none focus-visible:ring-2",
             isCurrent && "text-foreground",
           )}
         >
@@ -374,7 +374,7 @@ export default function TrajectoryGrid({
             <div
               key={period}
               aria-hidden
-              className="fade-in pointer-events-none z-10 -mx-1 animate-in bg-background/70 duration-150 motion-reduce:animate-none"
+              className="fade-in animate-in bg-background/70 pointer-events-none z-10 -mx-1 duration-150 motion-reduce:animate-none"
               style={{
                 gridColumn: index + 1,
                 gridRow: `1 / span ${rows + HEADER_ROWS}`,

@@ -71,7 +71,7 @@ export default function ResizeHandle({
         onRelease({ height: 0, duration: 0 });
       }}
     >
-      <span className="block size-full rounded-br-sm border-current border-r-2 border-b-2 opacity-70" />
+      <span className="block size-full rounded-br-sm border-r-2 border-b-2 border-current opacity-70" />
     </div>
   );
 }

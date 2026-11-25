@@ -5,11 +5,11 @@ Read the curriculum ("malla curricular") of one study program from a PDF and wri
 ## Steps
 
 1. **Read the details.** From the PDF, take the program name, the institution, the effective year (the first entry year the curriculum applies to, often "vigente desde" or "plan 2019") and the version name if one is printed ("v6.0", "Plan 2019-B"). Ask the user for the program name, the institution or the effective year when the PDF lacks them; a guessed value turns into a wrong curriculum that loads without error.
-2. **Pick the term system.** `semester` when columns are semesters, `annual` when courses last a whole academic year. For trimesters or any other system, stop and tell the user: the format cannot express them.
+2. **Pick the term system.** `semester` when columns are semesters, `trimester` when they are trimesters (three per academic year), `annual` when courses last a whole academic year. For any other system (quarters, four-month terms), stop and tell the user: the format cannot express them.
 3. **List the periods.** One period per column of the PDF, mapped with [Terms](#terms). Include winter and summer columns only where the PDF places courses in them.
 4. **List the areas.** One area per entry of the PDF's color legend (or per group heading), with the legend's color as lowercase `#rrggbb`. No legend means `"areas": []`.
 5. **List the tracks.** One track per milestone the PDF names, following [Tracks](#tracks). None means `"tracks": []`.
-6. **List the courses.** Every course box in the PDF becomes a course with its slot, following [Courses](#courses). Then assign ids and positions as described in [Layout](#layout).
+6. **List the courses.** Every course box in the PDF becomes a course with its slot, following [Courses](#courses). Then assign ids as described in [Ids](#ids) and positions as described in [Layout](#layout).
 7. **Check.** Walk every rule of [File format](#file-format) and [Layout](#layout) against the file. The step is done when each rule holds, every course box of the PDF is accounted for (either a course or one slot of an elective), and every track has at least one course.
 8. **Write and report.** Save the file as the program name in lowercase kebab case without accents, an underscore, the effective year and the `.malla` extension (`derecho_2023.malla`, `ingenieria-civil-industrial_2020.malla`); the builder only offers `.malla` files to load. Then report to the user every judgement call: credits rounded, requirements dropped, electives merged, colors approximated, values you could not read.
 
@@ -20,9 +20,10 @@ Read the curriculum ("malla curricular") of one study program from a PDF and wri
 | `termSystem` | 1 | 2 | 3 | 4 |
 | --- | --- | --- | --- | --- |
 | `semester` | first semester | winter | second semester | summer |
+| `trimester` | first trimester | second trimester | third trimester | summer |
 | `annual` | academic year | | | summer |
 
-A PDF that numbers semesters consecutively (I to X) maps semester `n` to `programYear: ceil(n / 2)`, `term: 1` when `n` is odd and `term: 3` when it is even.
+A PDF that numbers semesters consecutively (I to X) maps semester `n` to `programYear: ceil(n / 2)`, `term: 1` when `n` is odd and `term: 3` when it is even. Trimesters numbered I to XV map trimester `n` to `programYear: ceil(n / 3)` and `term: n - 3 * (programYear - 1)`.
 
 ## Courses
 
@@ -53,7 +54,11 @@ The grid has one column per period and rows of a fixed size. A slot starts at ro
 
 Place the courses column by column, top to bottom in the PDF's order: each slot goes at the first row where all the cells it covers are free. Gaps are allowed, so a slot may start lower to mirror a gap in the PDF.
 
-Number the courses 1 to n in the order of their first slot (by period, then position), the areas 1 to n in the order their first course appears, and the tracks 1 to n in the order you list them.
+List the courses in the order of their first slot (by period, then position), the areas in the order their first course appears, and the tracks in the order you list them.
+
+## Ids
+
+Every course, area and track gets an id made of a prefix and 8 random letters and digits (`A`–`Z`, `a`–`z`, `0`–`9`): `crs_` for courses, `are_` for areas and `trk_` for tracks, such as `crs_k3T9xQ2a`. Ids never repeat within a file. They are permanent: student trajectories point at course ids, so when you fix an existing file, keep the ids of the courses, areas and tracks it already has and make new ids only for new ones.
 
 ## File format
 
@@ -61,7 +66,7 @@ Example (one course per line for reading):
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": { "name": "Derecho", "institution": "UDP" },
   "effectiveYear": 2023,
   "versionName": "v6.0",
@@ -72,12 +77,12 @@ Example (one course per line for reading):
     { "programYear": 1, "term": 4 },
     { "programYear": 2, "term": 1 }
   ],
-  "areas": [{ "id": 1, "name": "Derecho Privado", "color": "#4f46e5" }],
-  "tracks": [{ "id": 1, "name": "Licenciatura en Ciencias Jurídicas", "credentialType": "academic" }],
+  "areas": [{ "id": "are_Q7mPz2Lk", "name": "Derecho Privado", "color": "#4f46e5" }],
+  "tracks": [{ "id": "trk_8vRt3NcW", "name": "Licenciatura en Ciencias Jurídicas", "credentialType": "academic" }],
   "courses": [
-    { "id": 1, "name": "Introducción al Derecho", "code": "DER101", "credits": 6, "areaId": 1, "trackIds": [1], "slots": [{ "programYear": 1, "term": 1, "position": 1 }] },
-    { "id": 2, "name": "Curso de Formación General", "credits": 5, "trackIds": [1], "isElective": true, "slots": [{ "programYear": 1, "term": 1, "position": 2 }, { "programYear": 2, "term": 1, "position": 1 }] },
-    { "id": 3, "name": "Derecho Civil", "credits": 10, "duration": 2, "trackIds": [1], "prerequisiteIds": [1], "prerequisiteCredits": 30, "slots": [{ "programYear": 1, "term": 3, "position": 1 }] }
+    { "id": "crs_k3T9xQ2a", "name": "Introducción al Derecho", "code": "DER101", "credits": 6, "areaId": "are_Q7mPz2Lk", "trackIds": ["trk_8vRt3NcW"], "slots": [{ "programYear": 1, "term": 1, "position": 1 }] },
+    { "id": "crs_Hb4sYe9D", "name": "Curso de Formación General", "credits": 5, "trackIds": ["trk_8vRt3NcW"], "isElective": true, "slots": [{ "programYear": 1, "term": 1, "position": 2 }, { "programYear": 2, "term": 1, "position": 1 }] },
+    { "id": "crs_2fWqLn7X", "name": "Derecho Civil", "credits": 10, "duration": 2, "trackIds": ["trk_8vRt3NcW"], "prerequisiteIds": ["crs_k3T9xQ2a"], "prerequisiteCredits": 30, "slots": [{ "programYear": 1, "term": 3, "position": 1 }] }
   ]
 }
 ```
@@ -86,15 +91,15 @@ Optional fields are **omitted** when they hold their default; an empty string, `
 
 | Field | Type | Rule |
 | --- | --- | --- |
-| `schemaVersion` | integer | always `1` |
+| `schemaVersion` | integer | always `2` |
 | `program.name` | string | required, not empty |
 | `program.institution` | string | required, not empty |
 | `effectiveYear` | integer | required, 1900–2100 |
 | `versionName` | string | optional, not empty |
-| `termSystem` | `"semester"` \| `"annual"` | required |
+| `termSystem` | `"semester"` \| `"trimester"` \| `"annual"` | required |
 | `periods[]` | `{ programYear, term }` | integers, at least one, `term` valid for the term system, no repeats, sorted by program year then term |
 | `areas[]` | `{ id, name, color }` | required array, may be empty |
-| `areas[].id`, `tracks[].id`, `courses[].id` | integer | 1 to n without gaps or repeats, counted separately for areas, tracks and courses |
+| `areas[].id`, `tracks[].id`, `courses[].id` | string | `are_`, `trk_` or `crs_` and 8 letters or digits, no repeats (see [Ids](#ids)) |
 | `areas[].color` | string | lowercase `#rrggbb` |
 | `tracks[]` | `{ id, name, credentialType }` | required array, may be empty; every track needs at least one course |
 | `tracks[].name` | string | required, not empty |
@@ -103,9 +108,9 @@ Optional fields are **omitted** when they hold their default; an empty string, `
 | `courses[].code` | string | optional, not empty |
 | `courses[].credits` | integer | required, ≥ 0 |
 | `courses[].duration` | integer | optional, ≥ 2, must not span past the last period |
-| `courses[].areaId` | integer | optional, an existing area id |
-| `courses[].trackIds` | integer[] | optional, not empty, existing track ids, no repeats |
-| `courses[].prerequisiteIds` | integer[] | optional, not empty, existing course ids, no repeats, never the course itself, no cycles |
+| `courses[].areaId` | string | optional, an existing area id |
+| `courses[].trackIds` | string[] | optional, not empty, existing track ids, no repeats |
+| `courses[].prerequisiteIds` | string[] | optional, not empty, existing course ids, no repeats, never the course itself, no cycles |
 | `courses[].prerequisiteCredits` | integer | optional, ≥ 1 |
 | `courses[].isElective` | `true` | optional; only electives may have more than one slot |
 | `courses[].slots[]` | `{ programYear, term, position }` | at least one, the period must be in `periods`, `position` integer ≥ 1, no overlaps (see [Layout](#layout)) |

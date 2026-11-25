@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "program": {
     "name": "Obstetricia y Neonatología",
     "institution": "Universidad Diego Portales"
@@ -8,635 +8,367 @@
   "versionName": "v4",
   "termSystem": "semester",
   "periods": [
-    {
-      "programYear": 1,
-      "term": 1
-    },
-    {
-      "programYear": 1,
-      "term": 3
-    },
-    {
-      "programYear": 2,
-      "term": 1
-    },
-    {
-      "programYear": 2,
-      "term": 3
-    },
-    {
-      "programYear": 3,
-      "term": 1
-    },
-    {
-      "programYear": 3,
-      "term": 3
-    },
-    {
-      "programYear": 4,
-      "term": 1
-    },
-    {
-      "programYear": 4,
-      "term": 3
-    },
-    {
-      "programYear": 5,
-      "term": 1
-    },
-    {
-      "programYear": 5,
-      "term": 3
-    }
+    { "programYear": 1, "term": 1 },
+    { "programYear": 1, "term": 3 },
+    { "programYear": 2, "term": 1 },
+    { "programYear": 2, "term": 3 },
+    { "programYear": 3, "term": 1 },
+    { "programYear": 3, "term": 3 },
+    { "programYear": 4, "term": 1 },
+    { "programYear": 4, "term": 3 },
+    { "programYear": 5, "term": 1 },
+    { "programYear": 5, "term": 3 }
   ],
   "areas": [
+    { "id": "are_bPHO7hMW", "name": "Ciencias Básicas", "color": "#00a7d6" },
+    { "id": "are_IZ55JaBJ", "name": "Área Disciplinar", "color": "#aeddf1" },
     {
-      "id": 1,
-      "name": "Ciencias Básicas",
-      "color": "#00a7d6"
-    },
-    {
-      "id": 2,
-      "name": "Área Disciplinar",
-      "color": "#aeddf1"
-    },
-    {
-      "id": 3,
+      "id": "are_qtOcceQa",
       "name": "Área Investigación, Gestión y Desarrollo Disciplinar",
       "color": "#6f6f6e"
     },
     {
-      "id": 4,
+      "id": "are_Gckj3svG",
       "name": "Formación General e Inglés",
       "color": "#ffffff"
     },
-    {
-      "id": 5,
-      "name": "Formación General",
-      "color": "#ffffff"
-    }
+    { "id": "are_tYdOmwXI", "name": "Formación General", "color": "#ffffff" }
   ],
   "tracks": [
     {
-      "id": 1,
+      "id": "trk_ezKYuQY8",
       "name": "Obstetricia y Neonatología",
       "credentialType": "professional"
     }
   ],
   "courses": [
     {
-      "id": 1,
+      "id": "crs_21R3CpVX",
       "name": "Bases Científicas del Funcionamiento Humano",
       "code": "OBS03111",
       "credits": 8,
-      "areaId": 1,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_bPHO7hMW",
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 1 }]
     },
     {
-      "id": 2,
+      "id": "crs_2kNoyvZt",
       "name": "Cuidados en Salud Mental",
       "code": "OBS03112",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 3 }]
     },
     {
-      "id": 3,
+      "id": "crs_WGvQWxi3",
       "name": "Fundamentos de la Matronería",
       "code": "OBS03113",
       "credits": 10,
-      "areaId": 3,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 4 }]
     },
     {
-      "id": 4,
+      "id": "crs_5Og4zi8j",
       "name": "Salud con Perspectiva de Género",
       "code": "OBS03114",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 1,
-          "position": 6
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 1, "term": 1, "position": 6 }]
     },
     {
-      "id": 5,
+      "id": "crs_JjdqGEE9",
       "name": "Morfofunción I",
       "code": "OBS03121",
       "credits": 10,
-      "areaId": 1,
-      "trackIds": [1],
-      "prerequisiteIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_bPHO7hMW",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_21R3CpVX"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 1 }]
     },
     {
-      "id": 6,
+      "id": "crs_619B55La",
       "name": "Salud Sexual Integral",
       "code": "OBS03122",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [4],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_5Og4zi8j"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 3 }]
     },
     {
-      "id": 7,
+      "id": "crs_X4C8cEGE",
       "name": "Clínica de PAM",
       "code": "OBS03123",
       "credits": 8,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [3],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_WGvQWxi3"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 4 }]
     },
     {
-      "id": 8,
+      "id": "crs_gYdUHQH8",
       "name": "Inglés I",
       "code": "CIG1012",
       "credits": 5,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 1,
-          "term": 3,
-          "position": 6
-        }
-      ]
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 1, "term": 3, "position": 6 }]
     },
     {
-      "id": 9,
+      "id": "crs_xuduJUex",
       "name": "Morfofunción II",
       "code": "OBS03211",
       "credits": 9,
-      "areaId": 1,
-      "trackIds": [1],
-      "prerequisiteIds": [5],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_bPHO7hMW",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_JjdqGEE9"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 1 }]
     },
     {
-      "id": 10,
+      "id": "crs_tfv99CQb",
       "name": "Cuidado Integral de la/el RN Sano",
       "code": "OBS03212",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [7],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_X4C8cEGE"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 3 }]
     },
     {
-      "id": 11,
+      "id": "crs_1HRTcd1K",
       "name": "Cuidado Integral en el Periodo Grávido Puerperal",
       "code": "OBS03213",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [7],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_X4C8cEGE"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 4 }]
     },
     {
-      "id": 12,
+      "id": "crs_z0mqbRHB",
       "name": "Atención en Salud Reproductiva",
       "code": "OBS03214",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [6],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 5
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_619B55La"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 5 }]
     },
     {
-      "id": 13,
+      "id": "crs_uiW5uBu9",
       "name": "Inglés II",
       "code": "CIG1013",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
-      "prerequisiteIds": [8],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 6
-        }
-      ]
+      "areaId": "are_Gckj3svG",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_gYdUHQH8"],
+      "slots": [{ "programYear": 2, "term": 1, "position": 6 }]
     },
     {
-      "id": 14,
+      "id": "crs_7wDNjD1E",
       "name": "Curso de Formación General",
       "code": "CFGXXXX",
       "credits": 5,
-      "areaId": 5,
-      "trackIds": [1],
+      "areaId": "are_tYdOmwXI",
+      "trackIds": ["trk_ezKYuQY8"],
       "isElective": true,
       "slots": [
-        {
-          "programYear": 2,
-          "term": 1,
-          "position": 7
-        },
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 7
-        },
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 5
-        },
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 6
-        },
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 5
-        },
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 6
-        }
+        { "programYear": 2, "term": 1, "position": 7 },
+        { "programYear": 2, "term": 3, "position": 7 },
+        { "programYear": 3, "term": 1, "position": 5 },
+        { "programYear": 3, "term": 1, "position": 6 },
+        { "programYear": 3, "term": 3, "position": 5 },
+        { "programYear": 3, "term": 3, "position": 6 }
       ]
     },
     {
-      "id": 15,
+      "id": "crs_GPYQ2Ga8",
       "name": "Abordaje Integral de Patologías Frecuentes",
       "code": "OBS03221",
       "credits": 8,
-      "areaId": 1,
-      "trackIds": [1],
-      "prerequisiteIds": [9],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_bPHO7hMW",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_xuduJUex"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 1 }]
     },
     {
-      "id": 16,
+      "id": "crs_pGWPe6Kr",
       "name": "Cuidado Integral de la/el RN con Patologías",
       "code": "OBS03222",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [10],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_tfv99CQb"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 3 }]
     },
     {
-      "id": 17,
+      "id": "crs_AmpauKmw",
       "name": "Cuidado del Alto Riesgo Obstétrico",
       "code": "OBS03223",
       "credits": 4,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [11],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_1HRTcd1K"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 4 }]
     },
     {
-      "id": 18,
+      "id": "crs_iqw7i7OC",
       "name": "Salud Familiar",
       "code": "OBS03224",
       "credits": 4,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [3],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_WGvQWxi3"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 5 }]
     },
     {
-      "id": 19,
+      "id": "crs_OpyWOQ7n",
       "name": "Inglés III",
       "code": "CIG1014",
       "credits": 5,
-      "areaId": 4,
-      "trackIds": [1],
-      "prerequisiteIds": [13],
-      "slots": [
-        {
-          "programYear": 2,
-          "term": 3,
-          "position": 6
-        }
-      ]
+      "areaId": "are_Gckj3svG",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_uiW5uBu9"],
+      "slots": [{ "programYear": 2, "term": 3, "position": 6 }]
     },
     {
-      "id": 20,
+      "id": "crs_zl4CEibr",
       "name": "Clínica Integrada en Matronería Fisiológica",
       "code": "OBS03311",
       "credits": 16,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [15, 16, 17],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_GPYQ2Ga8", "crs_pGWPe6Kr", "crs_AmpauKmw"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 1 }]
     },
     {
-      "id": 21,
+      "id": "crs_txePRtcT",
       "name": "Gestión en Salud",
       "code": "OBS03312",
       "credits": 4,
-      "areaId": 3,
-      "trackIds": [1],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 1,
-          "position": 4
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "slots": [{ "programYear": 3, "term": 1, "position": 4 }]
     },
     {
-      "id": 22,
+      "id": "crs_yJZJdA4o",
       "name": "Cuidados Perinatales de Alto Riesgo",
       "code": "OBS03321",
       "credits": 10,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [16, 17],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_pGWPe6Kr", "crs_AmpauKmw"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 1 }]
     },
     {
-      "id": 23,
+      "id": "crs_6UJjY2Vr",
       "name": "Bioética y Aspectos Legales de la Profesión",
       "code": "OBS03322",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [21],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 3
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_txePRtcT"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 3 }]
     },
     {
-      "id": 24,
+      "id": "crs_Y2utq3eX",
       "name": "Atención Ginecológica y Ginecooncológica",
       "code": "OBS03323",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [20],
-      "slots": [
-        {
-          "programYear": 3,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_zl4CEibr"],
+      "slots": [{ "programYear": 3, "term": 3, "position": 4 }]
     },
     {
-      "id": 25,
+      "id": "crs_LGrrfAq0",
       "name": "Integrado Disciplinar Basado en Simulación",
       "code": "OBS03411",
       "credits": 5,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [22],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 1
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_yJZJdA4o"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 1 }]
     },
     {
-      "id": 26,
+      "id": "crs_5K3FVU9j",
       "name": "Fundamentos de la Investigación",
       "code": "OBS03412",
       "credits": 6,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [23],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 2
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_6UJjY2Vr"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 2 }]
     },
     {
-      "id": 27,
+      "id": "crs_cmozeNWw",
       "name": "Calidad y Seguridad en Salud",
       "code": "OBS03413",
       "credits": 4,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [21],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 3
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_txePRtcT"],
+      "slots": [{ "programYear": 4, "term": 1, "position": 3 }]
     },
     {
-      "id": 28,
+      "id": "crs_4NrTq5Ow",
       "name": "Electivo de Formación Profesional",
       "code": "OBS03EL",
       "credits": 0,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [20],
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_zl4CEibr"],
       "isElective": true,
       "slots": [
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 4
-        },
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 5
-        },
-        {
-          "programYear": 4,
-          "term": 1,
-          "position": 6
-        }
+        { "programYear": 4, "term": 1, "position": 4 },
+        { "programYear": 4, "term": 1, "position": 5 },
+        { "programYear": 4, "term": 1, "position": 6 }
       ]
     },
     {
-      "id": 29,
+      "id": "crs_Beu2k7Nj",
       "name": "Clínica Integrada en Matronería Patológica",
       "code": "OBS03421",
       "credits": 16,
-      "areaId": 2,
-      "trackIds": [1],
-      "prerequisiteIds": [25],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 1
-        }
-      ]
+      "areaId": "are_IZ55JaBJ",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_LGrrfAq0"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 1 }]
     },
     {
-      "id": 30,
+      "id": "crs_x6gLw6gk",
       "name": "Innovación en Salud",
       "code": "OBS03422",
       "credits": 4,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [21],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 4
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_txePRtcT"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 4 }]
     },
     {
-      "id": 31,
+      "id": "crs_00rWKs4S",
       "name": "Investigación Aplicada",
       "code": "OBS03423",
       "credits": 10,
-      "areaId": 3,
-      "trackIds": [1],
-      "prerequisiteIds": [26],
-      "slots": [
-        {
-          "programYear": 4,
-          "term": 3,
-          "position": 5
-        }
-      ]
+      "areaId": "are_qtOcceQa",
+      "trackIds": ["trk_ezKYuQY8"],
+      "prerequisiteIds": ["crs_5K3FVU9j"],
+      "slots": [{ "programYear": 4, "term": 3, "position": 5 }]
     },
     {
-      "id": 32,
+      "id": "crs_EL8gvgBe",
       "name": "Internado",
       "code": "OBS203X",
       "credits": 15,
-      "trackIds": [1],
+      "trackIds": ["trk_ezKYuQY8"],
       "isElective": true,
       "slots": [
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 1
-        },
-        {
-          "programYear": 5,
-          "term": 1,
-          "position": 4
-        },
-        {
-          "programYear": 5,
-          "term": 3,
-          "position": 1
-        },
-        {
-          "programYear": 5,
-          "term": 3,
-          "position": 4
-        }
+        { "programYear": 5, "term": 1, "position": 1 },
+        { "programYear": 5, "term": 1, "position": 4 },
+        { "programYear": 5, "term": 3, "position": 1 },
+        { "programYear": 5, "term": 3, "position": 4 }
       ]
     }
   ]

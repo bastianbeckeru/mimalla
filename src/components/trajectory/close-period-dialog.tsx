@@ -106,7 +106,7 @@ function ClosePeriodForm({
                 {name}
               </span>
               {grade && (
-                <span className="shrink-0 text-muted-foreground text-sm tabular-nums">
+                <span className="text-muted-foreground shrink-0 text-sm tabular-nums">
                   {grade}
                 </span>
               )}
@@ -128,20 +128,20 @@ function ClosePeriodForm({
                   <ToggleGroupItem
                     value="FAILED"
                     aria-label="Reprobado"
-                    className="size-10 min-w-0 px-0 text-muted-foreground aria-pressed:bg-destructive/10 aria-pressed:text-destructive sm:size-8"
+                    className="text-muted-foreground aria-pressed:bg-destructive/10 aria-pressed:text-destructive size-10 min-w-0 px-0 sm:size-8"
                   >
                     <X />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="APPROVED"
                     aria-label="Aprobado"
-                    className="size-10 min-w-0 px-0 text-muted-foreground aria-pressed:bg-success/10 aria-pressed:text-success sm:size-8"
+                    className="text-muted-foreground aria-pressed:bg-success/10 aria-pressed:text-success size-10 min-w-0 px-0 sm:size-8"
                   >
                     <Check />
                   </ToggleGroupItem>
                 </ToggleGroup>
               ) : (
-                <span className="flex shrink-0 items-center gap-1 text-muted-foreground text-xs">
+                <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
                   <Lock className="size-3" />
                   Bloqueado
                 </span>

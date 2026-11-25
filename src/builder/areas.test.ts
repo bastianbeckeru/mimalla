@@ -6,6 +6,7 @@ import {
   getCourseColor,
   getTextColor,
 } from "@/curriculum/colors";
+import { are, crs } from "@/test/ids";
 import type { Action } from "@/types/builder";
 import type { HexColor } from "@/types/colors";
 import type { Area, Course } from "@/types/curriculum";
@@ -20,15 +21,15 @@ function draftAfter(...actions: Action[]) {
 describe("creating an area", () => {
   test("adds it with its name and the next id", () => {
     const draft = draftAfter(
-      { type: "addArea", name: "Derecho Privado" },
-      { type: "addArea", name: "Derecho Público" },
+      { type: "addArea", id: are(1), name: "Derecho Privado" },
+      { type: "addArea", id: are(2), name: "Derecho Público" },
     );
 
     expect(
       draft.curriculum.areas.map(({ id, name }) => ({ id, name })),
     ).toEqual([
-      { id: 1, name: "Derecho Privado" },
-      { id: 2, name: "Derecho Público" },
+      { id: are(1), name: "Derecho Privado" },
+      { id: are(2), name: "Derecho Público" },
     ]);
   });
 
@@ -37,7 +38,11 @@ describe("creating an area", () => {
     const draft = draftAfter(
       ...Array.from(
         { length: shades.length + 1 },
-        (_, index): Action => ({ type: "addArea", name: `Área ${index}` }),
+        (_, index): Action => ({
+          type: "addArea",
+          id: are(index + 1),
+          name: `Área ${index}`,
+        }),
       ),
     );
 
@@ -50,10 +55,10 @@ describe("creating an area", () => {
 
 describe("renaming an area", () => {
   test("changes only its name", () => {
-    const before = draftAfter({ type: "addArea", name: "Privado" });
+    const before = draftAfter({ type: "addArea", id: are(1), name: "Privado" });
     const draft = apply(before, {
       type: "editArea",
-      areaId: 1,
+      areaId: are(1),
       changes: { name: "Derecho Privado" },
     });
 
@@ -65,43 +70,58 @@ describe("renaming an area", () => {
 
 describe("assigning a course to an area", () => {
   const before = draftAfter(
-    { type: "addArea", name: "Privado" },
-    { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
+    { type: "addArea", id: are(1), name: "Privado" },
+    {
+      type: "addCourse",
+      id: crs(1),
+      name: "Nuevo curso",
+      period: FIRST_SEMESTER,
+    },
   );
 
   test("sets the course's area, and can clear it again", () => {
     const assigned = apply(before, {
       type: "assignArea",
-      courseId: 1,
-      areaId: 1,
+      courseId: crs(1),
+      areaId: are(1),
     });
     const cleared = apply(assigned, {
       type: "assignArea",
-      courseId: 1,
+      courseId: crs(1),
       areaId: null,
     });
 
-    expect(assigned.curriculum.courses[0]?.areaId).toBe(1);
+    expect(assigned.curriculum.courses[0]?.areaId).toBe(are(1));
     expect(cleared.curriculum.courses[0]?.areaId).toBeNull();
   });
 
   test("ignores an area that does not exist", () => {
-    expect(apply(before, { type: "assignArea", courseId: 1, areaId: 2 })).toBe(
-      before,
-    );
+    expect(
+      apply(before, { type: "assignArea", courseId: crs(1), areaId: are(2) }),
+    ).toBe(before);
   });
 });
 
 describe("deleting an area", () => {
   test("removes it and leaves its courses without an area", () => {
     const draft = draftAfter(
-      { type: "addArea", name: "Privado" },
-      { type: "addArea", name: "Público" },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "assignArea", courseId: 1, areaId: 1 },
-      { type: "assignArea", courseId: 2, areaId: 2 },
-      { type: "deleteArea", areaId: 1 },
+      { type: "addArea", id: are(1), name: "Privado" },
+      { type: "addArea", id: are(2), name: "Público" },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      { type: "assignArea", courseId: crs(1), areaId: are(1) },
+      { type: "assignArea", courseId: crs(2), areaId: are(2) },
+      { type: "deleteArea", areaId: are(1) },
     );
 
     expect(draft.curriculum.areas.map((area) => area.name)).toEqual([
@@ -109,22 +129,22 @@ describe("deleting an area", () => {
     ]);
     expect(draft.curriculum.courses.map((course) => course.areaId)).toEqual([
       null,
-      2,
+      are(2),
     ]);
   });
 });
 
 describe("coloring areas", () => {
   const threeAreas: Action[] = [
-    { type: "addArea", name: "Privado" },
-    { type: "addArea", name: "Público" },
-    { type: "addArea", name: "Penal" },
+    { type: "addArea", id: are(1), name: "Privado" },
+    { type: "addArea", id: are(2), name: "Público" },
+    { type: "addArea", id: are(3), name: "Penal" },
   ];
 
   test("sets an area's color by hand, lowercased", () => {
     const draft = draftAfter(...threeAreas, {
       type: "setAreaColor",
-      areaId: 2,
+      areaId: are(2),
       color: "#FF8800",
     });
 
@@ -135,23 +155,23 @@ describe("coloring areas", () => {
     "ignores the invalid color %p",
     (color) => {
       const before = draftAfter(...threeAreas);
-      expect(apply(before, { type: "setAreaColor", areaId: 2, color })).toBe(
-        before,
-      );
+      expect(
+        apply(before, { type: "setAreaColor", areaId: are(2), color }),
+      ).toBe(before);
     },
   );
 
   test("ignores coloring an area that does not exist", () => {
     const before = draftAfter(...threeAreas);
     expect(
-      apply(before, { type: "setAreaColor", areaId: 4, color: "#ff8800" }),
+      apply(before, { type: "setAreaColor", areaId: are(4), color: "#ff8800" }),
     ).toBe(before);
   });
 
   test("changing the base color recolors only the areas not colored by hand", () => {
     const draft = draftAfter(
       ...threeAreas,
-      { type: "setAreaColor", areaId: 2, color: "#ff8800" },
+      { type: "setAreaColor", areaId: are(2), color: "#ff8800" },
       { type: "setBaseColor", color: "#16a34a" },
     );
     const shades = getAreaShades("#16a34a");
@@ -167,9 +187,9 @@ describe("coloring areas", () => {
   test("a new area does not inherit the hand coloring of a deleted one", () => {
     const draft = draftAfter(
       ...threeAreas,
-      { type: "setAreaColor", areaId: 3, color: "#ff8800" },
-      { type: "deleteArea", areaId: 3 },
-      { type: "addArea", name: "Procesal" },
+      { type: "setAreaColor", areaId: are(3), color: "#ff8800" },
+      { type: "deleteArea", areaId: are(3) },
+      { type: "addArea", id: are(3), name: "Procesal" },
       { type: "setBaseColor", color: "#16a34a" },
     );
 
@@ -189,11 +209,21 @@ describe("coloring areas", () => {
 describe("course colors", () => {
   test("a course takes its area's color, and the neutral default without one", () => {
     const draft = draftAfter(
-      { type: "addArea", name: "Privado" },
-      { type: "setAreaColor", areaId: 1, color: "#ff8800" },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "addCourse", name: "Nuevo curso", period: FIRST_SEMESTER },
-      { type: "assignArea", courseId: 1, areaId: 1 },
+      { type: "addArea", id: are(1), name: "Privado" },
+      { type: "setAreaColor", areaId: are(1), color: "#ff8800" },
+      {
+        type: "addCourse",
+        id: crs(1),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      {
+        type: "addCourse",
+        id: crs(2),
+        name: "Nuevo curso",
+        period: FIRST_SEMESTER,
+      },
+      { type: "assignArea", courseId: crs(1), areaId: are(1) },
     );
     const [assigned, unassigned] = draft.curriculum.courses as [Course, Course];
 
