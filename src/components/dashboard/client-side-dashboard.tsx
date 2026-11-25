@@ -277,7 +277,7 @@ function TrajectoryDashboard({
       <SidebarInset className="min-w-0 overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarToggle />
-          <h1 className="min-w-0 truncate px-2 font-heading font-semibold text-base">
+          <h1 className="font-heading min-w-0 truncate px-2 text-base font-semibold">
             {curriculum.programName}
           </h1>
           <div className="ml-auto flex items-center gap-1">

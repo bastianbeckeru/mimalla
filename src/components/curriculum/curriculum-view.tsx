@@ -66,7 +66,7 @@ export default function CurriculumView({
           {curriculum.periods.map((period, index) => (
             <h2
               key={`${period.programYear}-${period.term}`}
-              className="truncate px-2 py-1 font-semibold text-muted-foreground text-xs"
+              className="text-muted-foreground truncate px-2 py-1 text-xs font-semibold"
               style={{ gridColumn: index + 1, gridRow: 1 }}
             >
               {getPeriodLabel(curriculum.termSystem, period)}

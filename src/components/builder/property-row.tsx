@@ -20,7 +20,7 @@ export default function PropertyRow({
     <div className="flex min-h-9 items-center gap-3 rounded-md px-2">
       <label
         htmlFor={htmlFor}
-        className="flex w-24 shrink-0 items-center gap-2 text-muted-foreground text-sm"
+        className="text-muted-foreground flex w-24 shrink-0 items-center gap-2 text-sm"
       >
         <Icon className="size-4 shrink-0" />
         {label}

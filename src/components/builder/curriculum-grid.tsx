@@ -381,7 +381,7 @@ function GridContent({
         {landing && (
           <div
             aria-hidden
-            className="pointer-events-none z-10 rounded-lg bg-primary/10"
+            className="bg-primary/10 pointer-events-none z-10 rounded-lg"
             style={{
               gridColumn: `${landing.column} / span ${landing.duration}`,
               gridRow: `${HEADER_ROWS + landing.row} / span ${landing.height}`,

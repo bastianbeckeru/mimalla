@@ -150,7 +150,7 @@ export default function GradeSummary({
           inputMode="decimal"
           placeholder="—"
           value={entered === undefined ? "" : formatGrade(entered)}
-          className="h-11 w-16 shrink-0 bg-background text-center font-heading font-semibold text-xl! tabular-nums dark:bg-background"
+          className="bg-background font-heading dark:bg-background h-11 w-16 shrink-0 text-center text-xl! font-semibold tabular-nums"
           onCommit={(text) => {
             const grade = parseGrade(text);
             if (Number.isNaN(grade)) return;
@@ -161,7 +161,7 @@ export default function GradeSummary({
       ) : (
         <span
           className={cn(
-            "shrink-0 px-2 font-heading font-semibold text-3xl tabular-nums",
+            "font-heading shrink-0 px-2 text-3xl font-semibold tabular-nums",
             courseGrade === null
               ? shownGrade === null && "text-muted-foreground"
               : isPassing
@@ -179,7 +179,7 @@ export default function GradeSummary({
           aria-label="Volver a la nota calculada"
           title="Volver a la nota calculada"
           data-grade-field
-          className="shrink-0 text-muted-foreground"
+          className="text-muted-foreground shrink-0"
           onBlur={closeWhenFocusLeaves}
           onPointerDown={(event) => event.preventDefault()}
           onClick={() => {
@@ -197,7 +197,7 @@ export default function GradeSummary({
           size="icon-sm"
           aria-label="Editar nota oficial"
           title="Nota oficial"
-          className="shrink-0 text-muted-foreground"
+          className="text-muted-foreground shrink-0"
           onClick={() => setIsEditingGrade(true)}
         >
           <Pencil />

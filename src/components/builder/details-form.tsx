@@ -35,7 +35,7 @@ export function OptionalLabel({
   return (
     <FieldLabel htmlFor={htmlFor} className="w-full justify-between">
       {children}
-      <span className="font-normal text-muted-foreground text-xs">
+      <span className="text-muted-foreground text-xs font-normal">
         Opcional
       </span>
     </FieldLabel>
@@ -73,26 +73,26 @@ export default function DetailsForm({
         render={
           <Button
             variant="ghost"
-            className="h-9 min-w-0 gap-2.5 px-2 text-base aria-expanded:bg-muted"
+            className="aria-expanded:bg-muted h-9 min-w-0 gap-2.5 px-2 text-base"
           />
         }
       >
         {curriculum.institution !== "" && (
           <>
-            <span className="truncate font-heading font-medium text-muted-foreground">
+            <span className="font-heading text-muted-foreground truncate font-medium">
               {curriculum.institution}
             </span>
-            <Slash className="size-3 rotate-[-22.5deg] text-muted-foreground/60" />
+            <Slash className="text-muted-foreground/60 size-3 rotate-[-22.5deg]" />
           </>
         )}
-        <span className="truncate font-heading font-medium">
+        <span className="font-heading truncate font-medium">
           {curriculum.programName || "Sin título"}
         </span>
         <ChevronDown className="text-muted-foreground transition-transform duration-200 group-aria-expanded/button:rotate-180" />
       </PopoverTrigger>
       <PopoverContent align="start" sideOffset={8} className="w-100 gap-0 p-0">
         <div className="flex flex-col gap-0.5 px-5 pt-5">
-          <h2 className="font-heading font-semibold text-base">
+          <h2 className="font-heading text-base font-semibold">
             Detalles de la malla
           </h2>
           <p className="text-muted-foreground text-xs">
@@ -180,7 +180,7 @@ export default function DetailsForm({
             <ToggleGroup
               aria-labelledby="builder-term-system"
               spacing={0}
-              className="grid w-full grid-cols-2 gap-0.5 rounded-lg bg-muted/50 p-0.5 ring-1 ring-border"
+              className="bg-muted/50 ring-border grid w-full grid-cols-2 gap-0.5 rounded-lg p-0.5 ring-1"
               value={[curriculum.termSystem]}
               disabled={hasCourses}
               onValueChange={([termSystem]) => {
@@ -196,7 +196,7 @@ export default function DetailsForm({
                   key={termSystem.value}
                   value={termSystem.value}
                   size="sm"
-                  className="rounded-md! font-normal text-muted-foreground aria-pressed:bg-popover aria-pressed:text-foreground aria-pressed:shadow-xs dark:aria-pressed:bg-muted"
+                  className="text-muted-foreground aria-pressed:bg-popover aria-pressed:text-foreground dark:aria-pressed:bg-muted rounded-md! font-normal aria-pressed:shadow-xs"
                 >
                   {termSystem.label}
                 </ToggleGroupItem>
@@ -210,17 +210,17 @@ export default function DetailsForm({
             )}
           </Field>
         </FieldGroup>
-        <div className="flex items-center gap-5 border-t px-5 py-3.5 text-muted-foreground text-sm">
+        <div className="text-muted-foreground flex items-center gap-5 border-t px-5 py-3.5 text-sm">
           <span className="flex items-center gap-2">
             <Layers className="size-4" />
-            <span className="font-medium text-foreground tabular-nums">
+            <span className="text-foreground font-medium tabular-nums">
               {curriculum.courses.length}
             </span>
             cursos
           </span>
           <span className="flex items-center gap-2">
             <Coins className="size-4" />
-            <span className="font-medium text-foreground tabular-nums">
+            <span className="text-foreground font-medium tabular-nums">
               {credits}
             </span>
             créditos

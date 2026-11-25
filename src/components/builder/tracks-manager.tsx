@@ -67,7 +67,7 @@ export default function TracksManager({
         sideOffset={8}
         className="w-96 gap-2"
       >
-        <span className="font-medium text-muted-foreground text-xs">
+        <span className="text-muted-foreground text-xs font-medium">
           Planes
         </span>
         {tracks.length === 0 && (

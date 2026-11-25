@@ -75,10 +75,10 @@ export default function ProgramHeader({
         <p className="text-muted-foreground text-sm">
           {program.institution.name}
         </p>
-        <h1 className="font-heading font-semibold text-2xl tracking-tight">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">
           {curriculum.programName}
         </h1>
-        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
+        <ul className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
           {credentials.map((track) => (
             <MetaItem
               key={track.id}
@@ -97,7 +97,7 @@ export default function ProgramHeader({
           {credentials.length > 0 && (
             <Separator
               orientation="vertical"
-              className="self-center! h-3.5 max-md:hidden"
+              className="h-3.5 self-center! max-md:hidden"
             />
           )}
           <MetaItem icon={<Sun />}>

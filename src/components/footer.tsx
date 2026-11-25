@@ -8,12 +8,12 @@ export default function Footer({
 }: React.HTMLAttributes<HTMLElement>) {
   return (
     <footer className={cn("border-t", className)}>
-      <div className="mx-auto flex max-w-300 flex-col items-center justify-between gap-x-6 gap-y-1.5 px-4 pt-6 pb-8 text-center text-muted-foreground text-sm sm:flex-row sm:flex-wrap sm:gap-y-3 sm:px-6 sm:py-7 sm:text-left">
+      <div className="text-muted-foreground mx-auto flex max-w-300 flex-col items-center justify-between gap-x-6 gap-y-1.5 px-4 pt-6 pb-8 text-center text-sm sm:flex-row sm:flex-wrap sm:gap-y-3 sm:px-6 sm:py-7 sm:text-left">
         <p>
           Desarrollado con{" "}
           <HeartIcon
             aria-label="amor"
-            className="inline size-3.5 fill-current align-[-2px] text-destructive"
+            className="text-destructive inline size-3.5 fill-current align-[-2px]"
           />
           , por estudiantes para estudiantes.
         </p>

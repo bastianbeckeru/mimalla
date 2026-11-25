@@ -31,12 +31,12 @@ function RelationRow({
         {name}
       </span>
       {detail && (
-        <span className="shrink-0 text-muted-foreground text-xs tabular-nums">
+        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
           {detail}
         </span>
       )}
       {onOpen && (
-        <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
+        <ChevronRight className="text-muted-foreground size-3.5 shrink-0" />
       )}
     </>
   );
@@ -78,12 +78,12 @@ export function Prerequisites({
               isMet ? (
                 <Check
                   aria-label="Cumplido"
-                  className="size-3.5 shrink-0 text-success"
+                  className="text-success size-3.5 shrink-0"
                 />
               ) : (
                 <Circle
                   aria-label="Pendiente"
-                  className="size-3.5 shrink-0 text-muted-foreground"
+                  className="text-muted-foreground size-3.5 shrink-0"
                 />
               )
             }
@@ -123,7 +123,7 @@ export default function CourseDetails({
         <p className="flex min-w-0 items-center gap-2">
           <span
             aria-hidden
-            className="size-2.5 shrink-0 rounded-[3px] ring-1 ring-foreground/15"
+            className="ring-foreground/15 size-2.5 shrink-0 rounded-[3px] ring-1"
             style={{ backgroundColor: getCourseColor(curriculum, course) }}
           />
           <span className="truncate">{area?.name ?? "Sin área"}</span>

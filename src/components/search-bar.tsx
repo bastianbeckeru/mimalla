@@ -38,7 +38,7 @@ export function Searchbar({ catalog }: { catalog: CatalogInstitution[] }) {
       <Button
         variant="outline"
         aria-label="Buscar carrera"
-        className="size-11 items-center justify-center gap-2 rounded-xl bg-muted/50 text-foreground sm:h-10 sm:w-56 sm:bg-transparent sm:px-3 sm:text-muted-foreground"
+        className="bg-muted/50 text-foreground sm:text-muted-foreground size-11 items-center justify-center gap-2 rounded-xl sm:h-10 sm:w-56 sm:bg-transparent sm:px-3"
         onClick={() => handleOpen("button")}
       >
         <p className="ml-0.5 hidden flex-1 text-left text-sm sm:block">

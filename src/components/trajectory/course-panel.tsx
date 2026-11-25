@@ -91,7 +91,7 @@ export default function CoursePanel({
   return open && panelContentProps ? (
     <aside
       aria-label="Curso seleccionado"
-      className="fade-in slide-in-from-right-2 flex w-96 shrink-0 animate-in flex-col overflow-hidden border-l bg-popover text-sm duration-200 ease-out motion-reduce:animate-none"
+      className="fade-in slide-in-from-right-2 animate-in bg-popover flex w-96 shrink-0 flex-col overflow-hidden border-l text-sm duration-200 ease-out motion-reduce:animate-none"
     >
       <CoursePanelContent
         key={panelContentProps.enrollment.id}

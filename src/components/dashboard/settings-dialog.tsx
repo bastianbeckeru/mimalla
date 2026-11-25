@@ -53,7 +53,7 @@ export default function SettingsDialog({
                   key={id}
                   variant="ghost"
                   aria-current={id === activeSection ? "page" : undefined}
-                  className="h-9 justify-start text-muted-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground"
+                  className="text-muted-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground h-9 justify-start"
                   onClick={() => setActiveSection(id)}
                 >
                   <Icon />
@@ -63,8 +63,8 @@ export default function SettingsDialog({
             </nav>
             <div className="flex min-w-0 flex-1 flex-col">
               <header className="flex h-13 shrink-0 items-center border-b px-6">
-                <DialogTitle className="flex items-center gap-1.5 font-medium font-sans text-sm">
-                  <span className="font-normal text-muted-foreground">
+                <DialogTitle className="flex items-center gap-1.5 font-sans text-sm font-medium">
+                  <span className="text-muted-foreground font-normal">
                     Configuraciones
                   </span>
                   <span aria-hidden className="text-muted-foreground">

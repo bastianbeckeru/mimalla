@@ -99,7 +99,7 @@ export default function AssessmentRow({
         rowRef(element);
       }}
       className={cn(
-        "group/row flex h-9 items-center rounded-md pr-1 transition-colors hover:bg-muted/50",
+        "group/row hover:bg-muted/50 flex h-9 items-center rounded-md pr-1 transition-colors",
         isLifted && "bg-background opacity-60 shadow-md",
         isNewGroup && "bg-primary/10 hover:bg-primary/10",
       )}
@@ -113,7 +113,7 @@ export default function AssessmentRow({
           data-base-ui-swipe-ignore
           aria-label={`Mover ${assessment.name}`}
           className={cn(
-            "flex h-7 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-opacity active:cursor-grabbing",
+            "text-muted-foreground flex h-7 w-5 shrink-0 cursor-grab touch-none items-center justify-center rounded-md transition-opacity active:cursor-grabbing",
             REVEAL_ON_ROW,
           )}
         >
@@ -129,7 +129,7 @@ export default function AssessmentRow({
             type="button"
             aria-expanded={!isCollapsed}
             aria-label={`${isCollapsed ? "Expandir" : "Colapsar"} ${assessment.name}`}
-            className="flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex size-5 shrink-0 items-center justify-center rounded-sm"
             onClick={onToggleCollapsed}
           >
             <ChevronRight
@@ -150,11 +150,11 @@ export default function AssessmentRow({
           value={assessment.name}
           className={cn(
             FIELD,
-            "truncate px-1 group-hover/row:border-input",
+            "group-hover/row:border-input truncate px-1",
             collapsedCount !== null
-              ? "field-sizing-content w-auto min-w-8 max-w-full"
+              ? "field-sizing-content w-auto max-w-full min-w-8"
               : dropNote
-                ? "sm:field-sizing-content min-w-0 flex-1 sm:w-auto sm:min-w-8 sm:max-w-full sm:flex-none"
+                ? "min-w-0 flex-1 sm:field-sizing-content sm:w-auto sm:max-w-full sm:min-w-8 sm:flex-none"
                 : "min-w-0 flex-1",
             assessment.kind === "GROUP" && "font-medium",
           )}
@@ -171,12 +171,12 @@ export default function AssessmentRow({
           }
         />
         {collapsedCount !== null && (
-          <span className="shrink-0 text-muted-foreground text-xs">
+          <span className="text-muted-foreground shrink-0 text-xs">
             {collapsedCount}
           </span>
         )}
         {dropNote && (
-          <span className="hidden shrink-0 text-muted-foreground text-xs sm:inline">
+          <span className="text-muted-foreground hidden shrink-0 text-xs sm:inline">
             {collapsedCount !== null && "· "}
             {dropNote}
           </span>
@@ -199,7 +199,7 @@ export default function AssessmentRow({
             onUpdate((current) => ({ ...current, weight }));
           }}
         />
-        <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground text-xs">
+        <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-xs">
           %
         </span>
       </div>
@@ -216,7 +216,7 @@ export default function AssessmentRow({
           className={cn(
             FIELD,
             NUMBER_FIELD,
-            "pointer-coarse:ml-1 pointer-coarse:w-12 w-13 shrink-0 px-2 text-right",
+            "w-13 shrink-0 px-2 text-right pointer-coarse:ml-1 pointer-coarse:w-12",
           )}
           onCommit={(text) => {
             const grade = parseGrade(text);
@@ -227,7 +227,7 @@ export default function AssessmentRow({
       ) : (
         <span
           className={cn(
-            "w-13 shrink-0 px-2 text-right font-medium text-sm tabular-nums",
+            "w-13 shrink-0 px-2 text-right text-sm font-medium tabular-nums",
             grade?.isPartial && "text-muted-foreground italic",
             !grade && "text-muted-foreground",
             isReadOnly && "opacity-50",
@@ -264,12 +264,12 @@ export function WeightIssue({
   const text = `Los pesos suman ${formatWeight(sum)}%.`;
   if (isCompact)
     return (
-      <span title={text} className="shrink-0 text-warning">
+      <span title={text} className="text-warning shrink-0">
         <TriangleAlert aria-label={text} className="size-3.5" />
       </span>
     );
   return (
-    <p className="flex items-center gap-1.5 py-1 pl-5 text-sm text-warning">
+    <p className="text-warning flex items-center gap-1.5 py-1 pl-5 text-sm">
       <TriangleAlert className="size-3.5 shrink-0" />
       {text}
     </p>

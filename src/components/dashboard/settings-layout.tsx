@@ -15,7 +15,7 @@ export function SettingsGroup({
   return (
     <section className="space-y-2">
       <div>
-        <h3 className="font-heading font-semibold text-sm">{title}</h3>
+        <h3 className="font-heading text-sm font-semibold">{title}</h3>
         {description && (
           <p className="text-muted-foreground text-xs">{description}</p>
         )}
@@ -36,7 +36,7 @@ export function RowText({
 }) {
   return (
     <div className="min-w-0 space-y-0.5">
-      <p className="font-medium text-sm">{label}</p>
+      <p className="text-sm font-medium">{label}</p>
       {description && (
         <p className="text-muted-foreground text-xs">{description}</p>
       )}

@@ -99,7 +99,7 @@ export default function SidebarResizeHandle({
   return (
     <>
       {drag?.isClosing && (
-        <div className="pointer-events-none absolute inset-0 bg-sidebar/60" />
+        <div className="bg-sidebar/60 pointer-events-none absolute inset-0" />
       )}
       {/* biome-ignore lint/a11y/useSemanticElements: a focusable separator with a value is the ARIA window splitter, which <hr> cannot be */}
       <div
@@ -111,7 +111,7 @@ export default function SidebarResizeHandle({
         aria-valuemax={MAX_SIDEBAR_WIDTH}
         aria-valuenow={width}
         data-dragging={drag ? "" : undefined}
-        className="group/handle absolute inset-y-0 -right-1.5 z-20 flex w-3 cursor-col-resize touch-none select-none justify-center outline-none"
+        className="group/handle absolute inset-y-0 -right-1.5 z-20 flex w-3 cursor-col-resize touch-none justify-center outline-none select-none"
         onPointerDown={startDrag}
         onPointerMove={moveDrag}
         onPointerUp={finishDrag}
@@ -126,10 +126,10 @@ export default function SidebarResizeHandle({
           onWidthChange(clampSidebarWidth(width + direction * KEYBOARD_STEP));
         }}
       >
-        <span className="w-px bg-transparent transition-colors group-hover/handle:bg-foreground/40 group-focus-visible/handle:bg-ring group-data-dragging/handle:bg-foreground/60" />
+        <span className="group-hover/handle:bg-foreground/40 group-focus-visible/handle:bg-ring group-data-dragging/handle:bg-foreground/60 w-px bg-transparent transition-colors" />
       </div>
       {drag && (
-        <div className="pointer-events-none absolute top-1/2 left-full z-20 ml-2 flex -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-md border bg-popover px-2 py-1 font-medium text-popover-foreground text-xs tabular-nums shadow-sm [&_svg]:size-3.5">
+        <div className="bg-popover text-popover-foreground pointer-events-none absolute top-1/2 left-full z-20 ml-2 flex -translate-y-1/2 items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium whitespace-nowrap tabular-nums shadow-sm [&_svg]:size-3.5">
           {drag.isClosing ? (
             <>
               <PanelLeftClose />

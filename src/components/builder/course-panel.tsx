@@ -43,7 +43,7 @@ function CreditsStepper({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex h-7 w-fit items-center rounded-md border border-input">
+      <div className="border-input flex h-7 w-fit items-center rounded-md border">
         <Button
           variant="ghost"
           size="icon-xs"
@@ -56,7 +56,7 @@ function CreditsStepper({
         <input
           id="builder-course-credits"
           inputMode="numeric"
-          className="w-9 bg-transparent text-center text-sm tabular-nums outline-none aria-invalid:text-destructive"
+          className="aria-invalid:text-destructive w-9 bg-transparent text-center text-sm tabular-nums outline-none"
           aria-invalid={!hasValidCredits}
           aria-describedby="builder-course-credits-error"
           value={creditsText}
@@ -116,9 +116,9 @@ export default function CoursePanel({
   return (
     <div className="flex min-h-full flex-col">
       <div className="relative flex flex-col gap-1 px-6 pt-5 pb-4">
-        <p className="flex items-center gap-2 pr-8 text-muted-foreground text-xs">
+        <p className="text-muted-foreground flex items-center gap-2 pr-8 text-xs">
           <span
-            className="size-2 shrink-0 rounded-[3px] bg-muted ring-1 ring-foreground/15"
+            className="bg-muted ring-foreground/15 size-2 shrink-0 rounded-[3px] ring-1"
             style={area && { backgroundColor: area.color }}
           />
           <span className="truncate">{meta.join(" · ")}</span>
@@ -128,7 +128,7 @@ export default function CoursePanel({
           required
           aria-invalid={!courseNameSchema.safeParse(course.name).success}
           placeholder="Nombre del curso"
-          className="-mx-1 rounded-md bg-transparent px-1 font-heading font-semibold text-xl outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50 aria-invalid:ring-2 aria-invalid:ring-destructive/40"
+          className="font-heading placeholder:text-muted-foreground focus-visible:ring-ring/50 aria-invalid:ring-destructive/40 -mx-1 rounded-md bg-transparent px-1 text-xl font-semibold outline-none focus-visible:ring-2 aria-invalid:ring-2"
           value={course.name}
           onChange={(event) =>
             dispatch(
@@ -145,7 +145,7 @@ export default function CoursePanel({
           variant="ghost"
           size="icon-sm"
           aria-label="Cerrar"
-          className="absolute top-4 right-4 text-muted-foreground"
+          className="text-muted-foreground absolute top-4 right-4"
           onClick={onClose}
         >
           <X />
@@ -192,7 +192,7 @@ export default function CoursePanel({
         />
       </div>
       <div className="flex-1 border-t px-6 py-5">{children}</div>
-      <div className="sticky bottom-0 flex items-center justify-between border-t bg-background px-4 py-3">
+      <div className="bg-background sticky bottom-0 flex items-center justify-between border-t px-4 py-3">
         <Button
           variant="destructive"
           onClick={() =>

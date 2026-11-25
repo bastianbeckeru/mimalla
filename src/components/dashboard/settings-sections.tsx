@@ -182,7 +182,7 @@ function GradingScaleGroup({
         <p
           id={errorId}
           role="alert"
-          className="px-3 py-2.5 text-destructive text-xs"
+          className="text-destructive px-3 py-2.5 text-xs"
         >
           La mínima debe ser menor que la máxima y la aprobación debe quedar
           entre ambas.
@@ -296,11 +296,11 @@ function PreferencesSection() {
   return (
     <>
       <section className="space-y-2">
-        <h3 className="font-heading font-semibold text-sm">Tema</h3>
+        <h3 className="font-heading text-sm font-semibold">Tema</h3>
         <ToggleGroup
           aria-label="Tema"
           spacing={1}
-          className="w-full rounded-lg bg-muted/50 p-1 sm:w-fit"
+          className="bg-muted/50 w-full rounded-lg p-1 sm:w-fit"
           value={theme ? [theme] : []}
           onValueChange={([next]) => {
             if (next) setTheme(next);
@@ -310,7 +310,7 @@ function PreferencesSection() {
             <ToggleGroupItem
               key={value}
               value={value}
-              className="flex-1 text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground sm:flex-none"
+              className="text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground flex-1 sm:flex-none"
             >
               <Icon />
               {label}
@@ -351,7 +351,7 @@ function HelpSection() {
       <SettingsGroup title="Soporte">
         <a href={REPORT_URL} className={LINK_ROW_CLASS}>
           <RowText label="Reportar un problema" />
-          <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" />
+          <ArrowUpRight className="text-muted-foreground size-4 shrink-0" />
         </a>
         <a
           href={RELEASES_URL}
@@ -360,7 +360,7 @@ function HelpSection() {
           className={LINK_ROW_CLASS}
         >
           <RowText label="Novedades" description={`Versión ${version}`} />
-          <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" />
+          <ArrowUpRight className="text-muted-foreground size-4 shrink-0" />
         </a>
       </SettingsGroup>
       <SettingsGroup title="Preguntas frecuentes">
@@ -372,12 +372,12 @@ function HelpSection() {
             className="group"
           >
             <summary
-              className={`${LINK_ROW_CLASS} cursor-pointer list-none font-medium text-sm [&::-webkit-details-marker]:hidden`}
+              className={`${LINK_ROW_CLASS} cursor-pointer list-none text-sm font-medium [&::-webkit-details-marker]:hidden`}
             >
               {question}
-              <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+              <ChevronDown className="text-muted-foreground size-4 shrink-0 transition-transform group-open:rotate-180" />
             </summary>
-            <p className="px-3 pb-2.5 text-muted-foreground text-xs">
+            <p className="text-muted-foreground px-3 pb-2.5 text-xs">
               {answer}
             </p>
           </details>

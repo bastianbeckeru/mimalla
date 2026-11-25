@@ -76,13 +76,13 @@ function CurriculumSummary({
 
   return (
     <>
-      <span className="flex w-full min-w-0 items-center gap-2 pr-6 text-sidebar-muted-foreground text-xs">
-        <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-sm bg-sidebar-muted px-0.5 font-semibold text-[0.5rem] tracking-tight">
+      <span className="text-sidebar-muted-foreground flex w-full min-w-0 items-center gap-2 pr-6 text-xs">
+        <span className="bg-sidebar-muted flex h-4 min-w-4 shrink-0 items-center justify-center rounded-sm px-0.5 text-[0.5rem] font-semibold tracking-tight">
           {initials || "–"}
         </span>
         <span className="truncate">{institution || "Sin institución"}</span>
       </span>
-      <span className="w-full truncate font-medium text-foreground">
+      <span className="text-foreground w-full truncate font-medium">
         {programName || "Sin título"}
       </span>
       <span className="text-sidebar-muted-foreground text-xs tabular-nums">
@@ -125,7 +125,7 @@ export default function CurriculaSidebar({
   return (
     <Sidebar>
       <SidebarHeader className="gap-4 p-0">
-        <div className="flex h-14 items-center justify-between border-sidebar-border border-b px-4">
+        <div className="border-sidebar-border flex h-14 items-center justify-between border-b px-4">
           <Logo alwaysShow className="[&_span]:text-base [&_svg]:size-6" />
           <Button
             variant="ghost"

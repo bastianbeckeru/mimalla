@@ -96,9 +96,9 @@ function PassedPeriodsForm({
               key={period}
               value={period}
               className={cn(
-                "h-auto min-h-14 flex-col gap-0 px-1 py-2 text-muted-foreground text-xs aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary aria-pressed:hover:text-primary-foreground",
+                "text-muted-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary aria-pressed:hover:text-primary-foreground h-auto min-h-14 flex-col gap-0 px-1 py-2 text-xs",
                 index < selectedIndex &&
-                  "border-transparent bg-muted text-foreground",
+                  "bg-muted text-foreground border-transparent",
               )}
             >
               {label}

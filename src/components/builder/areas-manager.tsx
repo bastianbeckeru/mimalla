@@ -42,7 +42,7 @@ export default function AreasManager({
         className="w-80 gap-4"
       >
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium text-muted-foreground text-xs">
+          <span className="text-muted-foreground text-xs font-medium">
             Color base
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -58,7 +58,7 @@ export default function AreasManager({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="font-medium text-muted-foreground text-xs">
+          <span className="text-muted-foreground text-xs font-medium">
             Áreas
           </span>
           {areas.length === 0 && (

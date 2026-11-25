@@ -71,7 +71,7 @@ function ScreenHeader({
           variant="ghost"
           size="icon-sm"
           aria-label="Volver"
-          className="-ml-1.5 text-sidebar-muted-foreground"
+          className="text-sidebar-muted-foreground -ml-1.5"
           onClick={onBack}
         >
           <ChevronLeft />
@@ -79,7 +79,7 @@ function ScreenHeader({
         <h2
           ref={titleRef}
           tabIndex={-1}
-          className="font-heading font-semibold text-base outline-none"
+          className="font-heading text-base font-semibold outline-none"
         >
           {title}
         </h2>
@@ -100,17 +100,17 @@ function MobileSettingsList({
           <li key={id}>
             <button
               type="button"
-              className="flex w-full items-center gap-3 px-3 py-2.5 text-left outline-none transition-colors hover:bg-muted/50 focus-visible:bg-muted/50"
+              className="hover:bg-muted/50 focus-visible:bg-muted/50 flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors outline-none"
               onClick={() => onOpenSection(id)}
             >
-              <Icon className="size-4 shrink-0 text-sidebar-muted-foreground" />
+              <Icon className="text-sidebar-muted-foreground size-4 shrink-0" />
               <span className="min-w-0 flex-1 space-y-0.5">
-                <span className="block font-medium text-sm">{label}</span>
-                <span className="block text-sidebar-muted-foreground text-xs">
+                <span className="block text-sm font-medium">{label}</span>
+                <span className="text-sidebar-muted-foreground block text-xs">
                   {summary}
                 </span>
               </span>
-              <ChevronRight className="size-4 shrink-0 text-sidebar-muted-foreground" />
+              <ChevronRight className="text-sidebar-muted-foreground size-4 shrink-0" />
             </button>
           </li>
         ))}
@@ -213,12 +213,12 @@ export default function DashboardSidebar({
 
           <SidebarContent>
             <SidebarGroup className="px-4 py-3">
-              <SidebarGroupLabel className="px-0 text-sidebar-muted-foreground">
+              <SidebarGroupLabel className="text-sidebar-muted-foreground px-0">
                 Progreso
               </SidebarGroupLabel>
               <SidebarGroupContent className="space-y-2 text-sm">
                 <Progress value={progress} />
-                <div className="flex justify-between gap-2 text-sidebar-muted-foreground tabular-nums">
+                <div className="text-sidebar-muted-foreground flex justify-between gap-2 tabular-nums">
                   <p>
                     {approvedCourses}/{totalCourses} cursos
                   </p>
@@ -228,11 +228,11 @@ export default function DashboardSidebar({
             </SidebarGroup>
             {cumulativeAverage !== null && (
               <SidebarGroup className="px-4 py-3">
-                <SidebarGroupLabel className="px-0 text-sidebar-muted-foreground">
+                <SidebarGroupLabel className="text-sidebar-muted-foreground px-0">
                   Promedio acumulado
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
-                  <p className="font-heading font-semibold text-2xl tabular-nums">
+                  <p className="font-heading text-2xl font-semibold tabular-nums">
                     {formatGrade(Math.round(cumulativeAverage * 100) / 100)}
                   </p>
                   <p className="text-sidebar-muted-foreground text-xs">

@@ -122,8 +122,8 @@ function StepDots({ currentStep }: { currentStep: number }) {
           className={cn(
             "h-1.5 rounded-full transition-[width,background-color] duration-200 ease-out motion-reduce:transition-none",
             step === currentStep
-              ? "w-5 bg-foreground"
-              : "w-1.5 bg-foreground/25",
+              ? "bg-foreground w-5"
+              : "bg-foreground/25 w-1.5",
           )}
         />
       ))}
@@ -145,12 +145,12 @@ function Step({
   return (
     <div
       className={cn(
-        "fade-in slide-in-from-bottom-2 mx-auto flex min-h-0 w-full max-w-md flex-1 animate-in flex-col gap-6 px-4 pt-2 pb-6 duration-200 ease-out motion-reduce:animate-none md:flex-none md:pt-0",
+        "fade-in slide-in-from-bottom-2 animate-in mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-6 px-4 pt-2 pb-6 duration-200 ease-out motion-reduce:animate-none md:flex-none md:pt-0",
         className,
       )}
     >
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-balance font-heading font-semibold text-2xl tracking-tight">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-balance">
           {title}
         </h1>
         <p className="text-muted-foreground">{description}</p>
@@ -229,7 +229,7 @@ function ProgramStep({
                   <CommandItem
                     key={program.path}
                     value={program.name}
-                    className="min-h-11 pointer-coarse:active:bg-muted pointer-coarse:data-selected:bg-transparent md:min-h-8"
+                    className="pointer-coarse:active:bg-muted min-h-11 md:min-h-8 pointer-coarse:data-selected:bg-transparent"
                     onSelect={() => chooseProgram(program)}
                   >
                     {program.name}
@@ -241,12 +241,12 @@ function ProgramStep({
         </Command>
       )}
 
-      <div className="mt-auto shrink-0 space-y-1 text-muted-foreground text-xs">
+      <div className="text-muted-foreground mt-auto shrink-0 space-y-1 text-xs">
         <p>
           ¿Tienes un archivo?{" "}
           <button
             type="button"
-            className="underline underline-offset-4 hover:text-foreground"
+            className="hover:text-foreground underline underline-offset-4"
             onClick={() => setIsLoadingFile(true)}
           >
             Cárgalo
@@ -258,7 +258,7 @@ function ProgramStep({
             target="_blank"
             rel="noreferrer"
             href={PROGRAM_REQUEST_URL}
-            className="underline underline-offset-4 hover:text-foreground"
+            className="hover:text-foreground underline underline-offset-4"
           >
             Solicítala aquí
           </a>

@@ -175,8 +175,8 @@ function SummaryList({
 
 function ReplaceNotice() {
   return (
-    <p className="flex gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm">
-      <TriangleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+    <p className="border-destructive/30 bg-destructive/5 flex gap-2 rounded-lg border px-3 py-2 text-sm">
+      <TriangleAlert className="text-destructive mt-0.5 size-4 shrink-0" />
       Tu malla actual se reemplazará por la del archivo. Lo que no esté en el
       archivo se perderá.
     </p>
@@ -284,7 +284,7 @@ export default function ImportTrajectoryDialog({
 
           {step.kind === "FAILED" && (
             <p className="flex gap-2 text-sm">
-              <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+              <CircleAlert className="text-destructive mt-0.5 size-4 shrink-0" />
               {step.message}
             </p>
           )}

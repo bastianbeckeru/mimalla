@@ -19,7 +19,7 @@ const NO_AREA_LABEL = "Sin área";
 function AreaDot({ color }: { color?: string }) {
   return (
     <span
-      className="size-2.5 shrink-0 rounded-[3px] bg-muted ring-1 ring-foreground/15"
+      className="bg-muted ring-foreground/15 size-2.5 shrink-0 rounded-[3px] ring-1"
       style={color ? { backgroundColor: color } : undefined}
     />
   );
