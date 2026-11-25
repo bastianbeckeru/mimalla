@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.9/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -23,6 +23,11 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
+  "markdown": {
+    "formatter": {
+      "enabled": false
+    }
+  },
   "css": {
     "parser": {
       "tailwindDirectives": true
@@ -33,10 +38,9 @@
     "rules": {
       "preset": "recommended",
       "nursery": {
-        "useSortedClasses": {
+        "useTailwindSortedClasses": {
           "level": "warn",
-          "fix": "safe",
-          "options": { "functions": ["cn", "cva"] }
+          "fix": "safe"
         }
       },
       "style": {
@@ -106,5 +110,6 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "tailwind": { "mergeFunctions": ["cn"], "variantFunctions": ["cva"] }
 }
